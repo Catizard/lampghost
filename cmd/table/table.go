@@ -4,6 +4,8 @@ Copyright © 2024 Catizard <1185032459@qq.com>
 package table
 
 import (
+	"github.com/Catizard/lampghost/cmd/table/add"
+	"github.com/Catizard/lampghost/cmd/table/sync"
 	"github.com/spf13/cobra"
 )
 
@@ -16,6 +18,9 @@ var TableCmd = &cobra.Command{
 }
 
 func init() {
+	TableCmd.AddCommand(sync.SyncCmd)
+	TableCmd.AddCommand(add.AddCmd)
+
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command

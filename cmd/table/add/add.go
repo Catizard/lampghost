@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Catizard/lampghost/internel/difftable"
 	"github.com/Catizard/lampghost/internel/remote"
-	"github.com/Catizard/lampghost/internel/vo"
 	"github.com/spf13/cobra"
 )
 
@@ -22,7 +22,7 @@ var AddCmd = &cobra.Command{
 			panic("only .json format url is supported, sorry :(")
 		}
 		// 1. Fetch difficult table header
-		dth := &vo.DiffTableHeader{}
+		dth := &difftable.DiffTableHeader{}
 		remote.FetchJson(url, dth)
 		if aliasName, err := cmd.LocalFlags().GetString("alias"); err == nil {
 			dth.Alias = aliasName

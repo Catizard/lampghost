@@ -1,4 +1,4 @@
-package vo
+package difftable
 
 import (
 	"encoding/json"

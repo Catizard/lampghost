@@ -4,7 +4,12 @@ Copyright © 2024 Catizard <1185032459@qq.com>
 package add
 
 import (
+	"errors"
 	"fmt"
+	"io"
+	"io/fs"
+	"net/http"
+	"os"
 	"strings"
 
 	"github.com/Catizard/lampghost/internel/remote"
@@ -12,7 +17,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// addCmd represents the add command
 var AddCmd = &cobra.Command{
 	Use:   "add",
 	Short: "add bms difficult url, ignore if already exists in table_header.json",
@@ -25,6 +29,27 @@ var AddCmd = &cobra.Command{
 		dth := &vo.DiffTableHeader{}
 		remote.FetchJson(url, dth)
 		fmt.Printf("dataUrl=%s\n", dth.DataUrl)
+		fmt.Printf("name=%s\n", dth.Name)
+		fileName := fmt.Sprintf("%s.json", dth.Name)
+		// If data.json is already here, do nothing
+		if _, err := os.Stat(fileName); err == nil {
+			panic(fmt.Errorf("%s is already exists, if you want to update data.json, use sync command instead", fileName))
+		} else if errors.Is(err, fs.ErrExist) {
+			// unexpected...
+			panic(err)
+		}
+		file, err := os.Create(fileName)
+		if err != nil {
+			panic(err)
+		}
+		// download to file
+		// TODO: if dataUrl is not start with http...
+		resp, err := http.Get(dth.DataUrl)
+		if err != nil {
+			panic(err)
+		}
+		defer resp.Body.Close()
+		io.Copy(file, resp.Body)
 	},
 }
 

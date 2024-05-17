@@ -4,12 +4,7 @@ Copyright © 2024 Catizard <1185032459@qq.com>
 package add
 
 import (
-	"errors"
 	"fmt"
-	"io"
-	"io/fs"
-	"net/http"
-	"os"
 	"strings"
 
 	"github.com/Catizard/lampghost/internel/remote"
@@ -26,30 +21,18 @@ var AddCmd = &cobra.Command{
 		if !strings.HasSuffix(url, ".json") {
 			panic("only .json format url is supported, sorry :(")
 		}
+		// 1. Fetch difficult table header
 		dth := &vo.DiffTableHeader{}
 		remote.FetchJson(url, dth)
-		fmt.Printf("dataUrl=%s\n", dth.DataUrl)
-		fmt.Printf("name=%s\n", dth.Name)
-		fileName := fmt.Sprintf("%s.json", dth.Name)
-		// If data.json is already here, do nothing
-		if _, err := os.Stat(fileName); err == nil {
-			panic(fmt.Errorf("%s is already exists, if you want to update data.json, use sync command instead", fileName))
-		} else if errors.Is(err, fs.ErrExist) {
-			// unexpected...
-			panic(err)
+		if aliasName, err := cmd.LocalFlags().GetString("alias"); err == nil {
+			dth.Alias = aliasName
 		}
-		file, err := os.Create(fileName)
+		// 2. Add difficult table header
+		err := dth.AddDiffTable()
 		if err != nil {
 			panic(err)
 		}
-		// download to file
-		// TODO: if dataUrl is not start with http...
-		resp, err := http.Get(dth.DataUrl)
-		if err != nil {
-			panic(err)
-		}
-		defer resp.Body.Close()
-		io.Copy(file, resp.Body)
+		fmt.Printf("%s loaded", dth.Name)
 	},
 }
 
@@ -62,5 +45,5 @@ func init() {
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// addCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	AddCmd.Flags().StringP("alias", "a", "", "difficult table's alias, could be used as name in other commands")
 }

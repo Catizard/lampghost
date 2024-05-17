@@ -1,1 +1,4 @@
 *.json
+lampghost
+.vscode
+.idea

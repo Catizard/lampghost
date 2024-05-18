@@ -6,6 +6,7 @@ package cmd
 import (
 	"os"
 
+	"github.com/Catizard/lampghost/cmd/rival"
 	"github.com/Catizard/lampghost/cmd/table"
 	"github.com/Catizard/lampghost/cmd/version"
 	"github.com/spf13/cobra"
@@ -32,6 +33,7 @@ func Execute() {
 func init() {
 	rootCmd.AddCommand(version.VersionCmd)
 	rootCmd.AddCommand(table.TableCmd)
+	rootCmd.AddCommand(rival.RivalCmd)
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.

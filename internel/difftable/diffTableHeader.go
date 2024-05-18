@@ -11,6 +11,10 @@ import (
 	"os"
 )
 
+const (
+	headerFileName = "tableHeader.json"
+)
+
 type DiffTableHeader struct {
 	DataUrl     string `json:"data_url"`
 	LastUpdate  string `json:"last_update"`
@@ -21,19 +25,18 @@ type DiffTableHeader struct {
 }
 
 // Add a difficult table header(or say, meta data) and related song data to disk.
-// Before calling this function, data.json should't exist on disk, beaviour is undefined.
-// All difficult table headers would locate in one single file.If the file hasn't exist, it would be created.
+// Before calling this function, data.json should't exist on disk, otherwise beaviour is undefined.
+// All difficult table headers' info would be saved in one single file.
 func (header *DiffTableHeader) AddDiffTable() error {
 	// 1. Sync table header file
 	// create table header file if necessary
 	// TODO: A constant variable file?
-	headerFileName := "tableHeader.json"
 	var file *os.File
 
 	var headers []DiffTableHeader
 	// race?
 	if _, err := os.Stat(headerFileName); errors.Is(err, fs.ErrNotExist) {
-		file, err = os.Create(headerFileName)
+		_, err = os.Create(headerFileName)
 		if err != nil {
 			panic(err)
 		}
@@ -80,18 +83,66 @@ func (header *DiffTableHeader) AddDiffTable() error {
 		// unexpected...
 		panic(err)
 	}
-	// Or, add this difficult table
-	file, err = os.Create(fileName)
+	return saveTableData(header.getDataJsonFileName(), header.DataUrl)
+}
+
+// Query loaded table headers on disk.
+// Use name to identify, match on alias or original name.
+// Matched result count could be more than 1.
+func QueryDifficultTableHeader(name string) ([]DiffTableHeader, error) {
+	// Read all data from disk.
+	f, err := os.Open(headerFileName)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	// 3. Download to file
-	// TODO: if dataUrl is not start with http...
-	resp, err := http.Get(header.DataUrl)
+	body, err := io.ReadAll(f)
 	if err != nil {
-		panic(err)
+		return nil, err
+	}
+	var local []DiffTableHeader
+	err = json.Unmarshal(body, &local)
+	if err != nil {
+		return nil, err
+	}
+
+	res := make([]DiffTableHeader, 0)
+
+	for _, v := range local {
+		if v.Name == name || v.Alias == name {
+			res = append(res, v)
+		}
+	}
+	return res, nil
+}
+
+func (header *DiffTableHeader) SyncDifficultTable() error {
+	// TODO: header's info might changed, sync header part also
+
+	// sync data.json, propagate any error
+	return saveTableData(header.getDataJsonFileName(), header.DataUrl)
+}
+
+// Download specified difficult table's data to disk
+// File would be overwrite if it already exist
+func saveTableData(fileName string, dataUrl string) error {
+	// 1. Create data file
+	file, err := os.Create(fileName)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	// 2. Download to file
+	// TODO: if dataUrl is not start with http...
+	resp, err := http.Get(dataUrl)
+	if err != nil {
+		return err
 	}
 	defer resp.Body.Close()
 	io.Copy(file, resp.Body)
 	return nil
+}
+
+// Return difficult table header's data json file name
+func (header *DiffTableHeader) getDataJsonFileName() string {
+	return header.Name + ".json"
 }

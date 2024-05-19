@@ -74,3 +74,32 @@ func AddRivalInfo(info *RivalInfo) error {
 	os.WriteFile(rivalConfigFileName, newBody, fs.FileMode(os.O_WRONLY))
 	return nil
 }
+
+func QueryRivalInfo(name string) ([]RivalInfo, error) {
+	if _, err := os.Stat(rivalConfigFileName); err != nil {
+		return nil, err
+	}
+
+	arr := make([]RivalInfo, 0)
+	file, err := os.Open(rivalConfigFileName)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	body, err := io.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(body, &arr)
+	if err != nil {
+		return nil, err
+	}
+
+	ret := make([]RivalInfo, 0)
+	for _, v := range arr {
+		if v.Name == name {
+			ret = append(ret, v)
+		}
+	}
+	return ret, nil
+}

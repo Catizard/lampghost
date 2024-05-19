@@ -31,8 +31,6 @@ func (header *DiffTableHeader) AddDiffTable() error {
 	// 1. Sync table header file
 	// create table header file if necessary
 	// TODO: A constant variable file?
-	var file *os.File
-
 	var headers []DiffTableHeader
 	// race?
 	if _, err := os.Stat(headerFileName); errors.Is(err, fs.ErrNotExist) {
@@ -41,10 +39,11 @@ func (header *DiffTableHeader) AddDiffTable() error {
 			panic(err)
 		}
 	} else {
-		file, err = os.Open(headerFileName)
+		file, err := os.Open(headerFileName)
 		if err != nil {
 			panic(err)
 		}
+		defer file.Close()
 		body, err := io.ReadAll(file)
 		log.Printf("body=%s", body)
 		if err != nil {

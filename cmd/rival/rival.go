@@ -1,31 +1,24 @@
 /*
 Copyright © 2024 Catizard <1185032459@qq.com>
-
 */
-package rival 
+package rival
 
 import (
-	"fmt"
-
+	"github.com/Catizard/lampghost/cmd/rival/add"
 	"github.com/spf13/cobra"
 )
 
 // rivalCmd represents the rival command
 var RivalCmd = &cobra.Command{
 	Use:   "rival",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Add or edit rival settings",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("rival called")
+		cmd.Help()
 	},
 }
 
 func init() {
+	RivalCmd.AddCommand(add.AddCmd)	
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command

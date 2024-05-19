@@ -6,6 +6,7 @@ package ghost
 import (
 	"fmt"
 
+	"github.com/Catizard/lampghost/internel/ghost"
 	"github.com/Catizard/lampghost/internel/rival"
 	"github.com/spf13/cobra"
 )
@@ -31,6 +32,11 @@ var GhostCmd = &cobra.Command{
 		rivalInfo := rivalArr[0]
 		scoreLogPath := rivalInfo.ScoreLogPath
 		fmt.Printf("scoreLogPath=%s\n", scoreLogPath)
+		scoreLogArray, err := ghost.ReadScoreLogFromSqlite(scoreLogPath)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("ghost: %d loaded", len(scoreLogArray))
 	},
 }
 

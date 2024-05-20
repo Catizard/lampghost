@@ -6,6 +6,7 @@ package ghost
 import (
 	"fmt"
 
+	"github.com/Catizard/lampghost/internel/difftable"
 	"github.com/Catizard/lampghost/internel/ghost"
 	"github.com/Catizard/lampghost/internel/rival"
 	"github.com/spf13/cobra"
@@ -48,6 +49,33 @@ var GhostCmd = &cobra.Command{
 			panic(err)
 		}
 		fmt.Printf("ghost: %d songs loaded", len(songDataArray))
+
+		// Difficult table
+		dthArr, err := difftable.QueryDifficultTableHeader("insane")
+		if err != nil {
+			panic(err)
+		}
+		if len(dthArr) != 1 {
+			panic("what")
+		}
+		dth := dthArr[0]
+
+		diffTableMap, err := difftable.ReadDiffTableLevelMap(dth.Name + ".json")			
+		if err != nil {
+			panic(err)
+		}
+
+		// Merge sha256 info from SongData.db to difficult table
+		songDataMd5Map := make(map[string]ghost.SongData)
+		for _, songData := range songDataArray {
+			songDataMd5Map[songData.Md5] = songData
+		}
+
+		for _, arr := range diffTableMap {
+			for _, v := range arr {
+				v.Sha256 = songDataMd5Map[v.Md5].Sha256
+			}
+		}
 	},
 }
 

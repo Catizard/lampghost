@@ -15,8 +15,9 @@ const (
 )
 
 type RivalInfo struct {
-	Name string
+	Name         string
 	ScoreLogPath string
+	SongDataPath string
 }
 
 // Add one rival info(or say, meta data) to disk.
@@ -58,10 +59,11 @@ func AddRivalInfo(info *RivalInfo) error {
 			// But this kind of sucks
 			prevArray[i].Name = info.Name
 			prevArray[i].ScoreLogPath = info.ScoreLogPath
+			prevArray[i].SongDataPath = info.SongDataPath
 			find = true
 		}
 	}
-	
+
 	// If it doesn't exist, append it
 	if !find {
 		prevArray = append(prevArray, *info)
@@ -75,6 +77,8 @@ func AddRivalInfo(info *RivalInfo) error {
 	return nil
 }
 
+// Query rival's info by name.
+// Multiple results could be matched.
 func QueryRivalInfo(name string) ([]RivalInfo, error) {
 	if _, err := os.Stat(rivalConfigFileName); err != nil {
 		return nil, err

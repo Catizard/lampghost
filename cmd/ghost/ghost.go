@@ -30,13 +30,24 @@ var GhostCmd = &cobra.Command{
 			panic("multiple rivals matched")
 		}
 		rivalInfo := rivalArr[0]
+
+		// Score log
 		scoreLogPath := rivalInfo.ScoreLogPath
 		fmt.Printf("scoreLogPath=%s\n", scoreLogPath)
 		scoreLogArray, err := ghost.ReadScoreLogFromSqlite(scoreLogPath)
 		if err != nil {
 			panic(err)
 		}
-		fmt.Printf("ghost: %d loaded", len(scoreLogArray))
+		fmt.Printf("ghost: %d logs loaded", len(scoreLogArray))
+		
+		// Song data
+		songDataPath := rivalInfo.SongDataPath
+		fmt.Printf("songDataPath=%s\n", songDataPath)
+		songDataArray, err := ghost.ReadSongDataFromSqlite(songDataPath)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("ghost: %d songs loaded", len(songDataArray))
 	},
 }
 

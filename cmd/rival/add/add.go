@@ -10,17 +10,20 @@ import (
 
 // addCmd represents the add command
 var AddCmd = &cobra.Command{
-	Use:   "add [rival name] [scorelog.db path]",
-	Args:  cobra.ExactArgs(2),
-	Short: "Register a rival's info and log",
+	Use:   "add [rival name] [scorelog.db path] [songData.db path]",
+	Args:  cobra.ExactArgs(3),
+	Short: "Register a rival's info",
 	Run: func(cmd *cobra.Command, args []string) {
 		rivalName := args[0]
-		dbFilePath := args[1]
+		scoreLogPath := args[1]
+		songDataPath := args[2]
 
 		rivalInfo := &rival.RivalInfo{
 			Name:         rivalName,
-			ScoreLogPath: dbFilePath,
+			ScoreLogPath: scoreLogPath,
+			SongDataPath: songDataPath,
 		}
+
 		err := rival.AddRivalInfo(rivalInfo)
 		if err != nil {
 			panic(err)

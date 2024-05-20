@@ -2,7 +2,6 @@ package ghost
 
 import (
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/jmoiron/sqlx"
@@ -46,6 +45,5 @@ func ReadScoreLogFromSqlite(filePath string) ([]ScoreLog, error) {
 		}
 		scoreLogArray = append(scoreLogArray, log)
 	}
-	log.Printf("read %d logs from db", len(scoreLogArray))
 	return scoreLogArray, nil
 }

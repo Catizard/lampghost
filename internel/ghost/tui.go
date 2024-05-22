@@ -13,7 +13,7 @@ import (
 )
 
 type item struct {
-	title, desc string
+	title, desc, level string
 }
 
 func (i item) Title() string       { return i.title }
@@ -43,11 +43,12 @@ var (
 type mainModel struct {
 	levelList   list.Model
 	songList    list.Model
+	levelData   []string // not used
 	state       sessionState
-	choice      item
 	w           int
 	h           int
-	songListMap map[string]list.Model
+	songDataMap map[string][]difftable.DiffTable
+	index       string
 }
 
 func buildLevelList(dth *difftable.DiffTableHeader, diffTable []difftable.DiffTable) ([]list.Item, string) {
@@ -73,25 +74,53 @@ func buildLevelList(dth *difftable.DiffTableHeader, diffTable []difftable.DiffTa
 		}
 		return ll < rr
 	})
+
 	items := make([]list.Item, 0)
 	for _, v := range sortedLevels {
 		title := dth.Symbol + " " + v
 		n := item{
 			title: title,
 			desc:  "発狂BMS難易度表" + title,
+			level: v,
 		}
 		items = append(items, n)
 	}
 	return items, sortedLevels[0]
 }
 
-func buildSongList(diffTable []difftable.DiffTable, defaultLevel string) []list.Item {
+func buildSongList(m *mainModel, diffTable []difftable.DiffTable) {
+	// Level maps to song info array
+	m.songDataMap = make(map[string][]difftable.DiffTable)
+	for _, v := range diffTable {
+		if _, ok := m.songDataMap[v.Level]; !ok {
+			m.songDataMap[v.Level] = make([]difftable.DiffTable, 0)
+		}
+		m.songDataMap[v.Level] = append(m.songDataMap[v.Level], v)
+	}
+}
 
+func (m *mainModel) transferLevel(level string) {
+	rawArray := m.songDataMap[level]
+	itemList := make([]list.Item, 0)
+	for _, v := range rawArray {
+		n := item{
+			title: v.Title,
+		}
+		itemList = append(itemList, n)
+	}
+	songList := list.New(itemList, list.NewDefaultDelegate(), 0, 0)
+	songList.DisableQuitKeybindings()
+	// At the very begining, w & h was not set
+	if m.w != 0 && m.h != 0 {
+		h, v := listStyle.GetFrameSize()
+		songList.SetSize(m.w - h, m.h - v)
+	}
+	m.songList = songList
 }
 
 func newModel(dth *difftable.DiffTableHeader, diffTable []difftable.DiffTable) mainModel {
 	m := mainModel{state: levelView}
-	// build level list
+	// Build level list
 	levelItems, defaultLevel := buildLevelList(dth, diffTable)
 	m.levelList = list.New(levelItems, list.NewDefaultDelegate(), 0, 0)
 	m.levelList.Title = "Levels"
@@ -99,15 +128,15 @@ func newModel(dth *difftable.DiffTableHeader, diffTable []difftable.DiffTable) m
 	m.levelList.SetShowStatusBar(false)
 	m.levelList.KeyMap.NextPage.Unbind()
 	m.levelList.KeyMap.PrevPage.Unbind()
-	// TODO: build song list
-	songItems := buildSongList(diffTable, defaultLevel)
-	m.songList = list.New(songItems, list.NewDefaultDelegate(), 0, 0)
-
+	m.levelList.DisableQuitKeybindings()
+	// Build song list
+	buildSongList(&m, diffTable)
+	m.transferLevel(defaultLevel)
 	return m
 }
 
 func (m mainModel) Init() tea.Cmd {
-	return tea.EnterAltScreen
+	return tea.Batch(tea.EnterAltScreen, tea.DisableMouse)
 }
 
 func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -116,19 +145,17 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "ctrl+c", "q":
-			return m, tea.Quit
-		case "tab":
-			if m.state == levelView {
-				m.state = songView
-			} else {
+		case "esc":
+			if m.state == songView {
 				m.state = levelView
 			}
+		case "ctrl+c", "q":
+			return m, tea.Quit
 		case "enter":
 			if m.state == levelView {
 				i, ok := m.levelList.SelectedItem().(item)
 				if ok {
-					m.choice = i
+					m.transferLevel(i.level)
 				}
 				m.state = songView
 			}
@@ -147,7 +174,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.w = msg.Width
 		m.h = msg.Height
 		m.levelList.SetSize(msg.Width-h, msg.Height-v)
-		m.songList.SetSize(msg.Width-h, msg.Height-v)
+		m.songList.SetSize(msg.Width-h,msg.Height-v)
 	}
 
 	return m, tea.Batch(cmds...)

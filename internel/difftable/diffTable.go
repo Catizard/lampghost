@@ -17,7 +17,10 @@ type DiffTable struct {
 	Title    string
 	Url      string `json:"url"`
 	UrlDiff  string `json:"url_diff"`
-	Sha256   string // Actually doesn't exist, must be merged from elsewhere
+
+	// Actually doesn't exist, must be merged from elsewhere
+	Sha256   string 	
+	Lamp     int32  
 }
 
 // Read Difficult Table content from disk.

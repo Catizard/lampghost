@@ -4,20 +4,18 @@ Copyright © 2024 Catizard <1185032459@qq.com>
 package ghost
 
 import (
-	"fmt"
-
 	"github.com/Catizard/lampghost/internel/difftable"
 	"github.com/Catizard/lampghost/internel/ghost"
 	"github.com/Catizard/lampghost/internel/rival"
 	"github.com/spf13/cobra"
 )
 
-// TODO: below implementation is for testing core functions, the real ghost command should open a tui application
+// TODO: every steps should give choices
 // ghostCmd represents the ghost command
 var GhostCmd = &cobra.Command{
 	Use:   "ghost [rival]",
 	Short: "ghost",
-	Args: cobra.ExactArgs(1),
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		rivalName := args[0]
 		rivalArr, err := rival.QueryRivalInfo(rivalName)
@@ -33,49 +31,26 @@ var GhostCmd = &cobra.Command{
 		rivalInfo := rivalArr[0]
 
 		// Score log
-		scoreLogPath := rivalInfo.ScoreLogPath
-		fmt.Printf("scoreLogPath=%s\n", scoreLogPath)
-		scoreLogArray, err := ghost.ReadScoreLogFromSqlite(scoreLogPath)
+		scoreLogArray, err := ghost.ReadScoreLogFromSqlite(rivalInfo.ScoreLogPath)
 		if err != nil {
 			panic(err)
 		}
-		fmt.Printf("ghost: %d logs loaded", len(scoreLogArray))
-		
+
 		// Song data
-		songDataPath := rivalInfo.SongDataPath
-		fmt.Printf("songDataPath=%s\n", songDataPath)
-		songDataArray, err := ghost.ReadSongDataFromSqlite(songDataPath)
-		if err != nil {
-			panic(err)
-		}
-		fmt.Printf("ghost: %d songs loaded", len(songDataArray))
-
-		// Difficult table
-		dthArr, err := difftable.QueryDifficultTableHeader("insane")
-		if err != nil {
-			panic(err)
-		}
-		if len(dthArr) != 1 {
-			panic("what")
-		}
-		dth := dthArr[0]
-
-		diffTableMap, err := difftable.ReadDiffTableLevelMap(dth.Name + ".json")			
+		songDataArray, err := ghost.ReadSongDataFromSqlite(rivalInfo.SongDataPath)
 		if err != nil {
 			panic(err)
 		}
 
-		// Merge sha256 info from SongData.db to difficult table
-		songDataMd5Map := make(map[string]ghost.SongData)
-		for _, songData := range songDataArray {
-			songDataMd5Map[songData.Md5] = songData
-		}
+		// Difficult table header
+		dth := difftable.QueryDifficultTableHeaderExactlyOne("insane")
 
-		for _, arr := range diffTableMap {
-			for _, v := range arr {
-				v.Sha256 = songDataMd5Map[v.Md5].Sha256
-			}
+		// Difficult table data
+		diffTable, err := difftable.ReadDiffTable(dth.Name + ".json")
+		if err != nil {
+			panic(err)
 		}
+		ghost.OpenGhostTui(&dth, diffTable, songDataArray, scoreLogArray)
 	},
 }
 

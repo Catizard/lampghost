@@ -114,6 +114,23 @@ func QueryDifficultTableHeader(name string) ([]DiffTableHeader, error) {
 	return res, nil
 }
 
+// Query but panic when multiple result matched
+// None matched is also take as an error
+// Simple wrap of QueryDifficultTableHeader
+func QueryDifficultTableHeaderExactlyOne(name string) DiffTableHeader {
+	rawArr, err := QueryDifficultTableHeader(name)
+	if err != nil {
+		panic(err)
+	}
+	if len(rawArr) == 0 {
+		panic("no difficult table header found")
+	}
+	if len(rawArr) > 1 {
+		panic("multiple difficult table matched")
+	}
+	return rawArr[0]
+}
+
 func (header *DiffTableHeader) SyncDifficultTable() error {
 	// TODO: header's info might changed, sync header part also
 

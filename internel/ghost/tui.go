@@ -48,7 +48,6 @@ type mainModel struct {
 	w           int
 	h           int
 	songDataMap map[string][]difftable.DiffTable
-	index       string
 }
 
 func buildLevelList(dth *difftable.DiffTableHeader, diffTable []difftable.DiffTable) ([]list.Item, string) {
@@ -113,12 +112,13 @@ func (m *mainModel) transferLevel(level string) {
 	// At the very begining, w & h was not set
 	if m.w != 0 && m.h != 0 {
 		h, v := listStyle.GetFrameSize()
-		songList.SetSize(m.w - h, m.h - v)
+		songList.SetSize(m.w-h, m.h-v)
 	}
 	m.songList = songList
 }
 
 func newModel(dth *difftable.DiffTableHeader, diffTable []difftable.DiffTable) mainModel {
+	// TODO: merge songData -> scoreLog, scoreLog -> diffTable
 	m := mainModel{state: levelView}
 	// Build level list
 	levelItems, defaultLevel := buildLevelList(dth, diffTable)
@@ -174,7 +174,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.w = msg.Width
 		m.h = msg.Height
 		m.levelList.SetSize(msg.Width-h, msg.Height-v)
-		m.songList.SetSize(msg.Width-h,msg.Height-v)
+		m.songList.SetSize(msg.Width-h, msg.Height-v)
 	}
 
 	return m, tea.Batch(cmds...)

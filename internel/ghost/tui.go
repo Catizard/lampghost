@@ -38,6 +38,10 @@ var (
 				BorderStyle(lipgloss.NormalBorder()).
 				BorderForeground(lipgloss.Color("69"))
 	listStyle = lipgloss.NewStyle().Margin(1, 2)
+	flBlock   = lipgloss.NewStyle().SetString(" ").Width(20).Background(lipgloss.Color("#FF0000"))
+	ezBlock   = lipgloss.NewStyle().SetString(" ").Width(20).Background(lipgloss.Color("#00FF00"))
+	nrBlock   = lipgloss.NewStyle().SetString(" ").Width(20).Background(lipgloss.Color("#0000FF"))
+	hcBlock   = lipgloss.NewStyle().SetString(" ").Width(20).Background(lipgloss.Color("#FFFFFF"))
 )
 
 type mainModel struct {
@@ -104,6 +108,18 @@ func (m *mainModel) transferLevel(level string) {
 	for _, v := range rawArray {
 		n := item{
 			title: v.Title,
+			desc:  "",
+		}
+		if v.Lamp == 0 {
+			// do nothing
+		} else if v.Lamp < 4 {
+			n.desc = flBlock.String()
+		} else if v.Lamp < 5 {
+			n.desc = ezBlock.String()
+		} else if v.Lamp < 6 {
+			n.desc = nrBlock.String()
+		} else {
+			n.desc = hcBlock.String()
 		}
 		itemList = append(itemList, n)
 	}
@@ -118,7 +134,6 @@ func (m *mainModel) transferLevel(level string) {
 }
 
 func newModel(dth *difftable.DiffTableHeader, diffTable []difftable.DiffTable) mainModel {
-	// TODO: merge songData -> scoreLog, scoreLog -> diffTable
 	m := mainModel{state: levelView}
 	// Build level list
 	levelItems, defaultLevel := buildLevelList(dth, diffTable)
@@ -197,7 +212,37 @@ func (m mainModel) View() string {
 // left is the specified difficult table's levels
 // right is the related song list and lamp status
 func OpenGhostTui(dth *difftable.DiffTableHeader, dt []difftable.DiffTable, songData []SongData, scoreLog []ScoreLog) {
+	// NOTE: merge songData -> diffTable, scoreLog -> diffTable before any operation
+	mergeSha256FromSongData(dt, songData)
+	mergeLampFromScoreLog(dt, scoreLog)
+	// After two merge functions, dt now contains lamp info
 	if _, err := tea.NewProgram(newModel(dth, dt)).Run(); err != nil {
 		log.Fatal(err)
+	}
+}
+
+// Merge Sha256 field from song data
+// In place function, do not return a new array
+func mergeSha256FromSongData(dtArray []difftable.DiffTable, songData []SongData) {
+	songDataMd5Map := make(map[string]SongData)
+	for _, v := range songData {
+		songDataMd5Map[v.Md5] = v
+	}
+	for i := range dtArray {
+		dtArray[i].Sha256 = songDataMd5Map[dtArray[i].Md5].Sha256
+	}
+}
+
+// Merge maximum lamp from scorelog
+// In place function, do not return a new array
+func mergeLampFromScoreLog(dtArray []difftable.DiffTable, scoreLog []ScoreLog) {
+	dtSha256Map := make(map[string]*difftable.DiffTable)
+	for i, v := range dtArray {
+		dtSha256Map[v.Sha256] = &dtArray[i]
+	}
+	for _, v := range scoreLog {
+		if t, ok := dtSha256Map[v.Sha256]; ok {
+			t.Lamp = max(t.Lamp, v.Clear)
+		}
 	}
 }

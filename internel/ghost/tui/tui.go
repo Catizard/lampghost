@@ -97,24 +97,30 @@ func buildSongList(m *mainModel, diffTable []difftable.DiffTable) {
 	}
 }
 
+func drawLamp(lamp int32) string {
+	if lamp == 0 {
+		return ""
+		// do nothing
+	} else if lamp < 4 {
+		return flBlock.String()
+	} else if lamp < 5 {
+		return ezBlock.String()
+	} else if lamp < 6 {
+		return nrBlock.String()
+	}
+	return hcBlock.String()
+}
+
 func (m *mainModel) transferLevel(level string) {
 	rawArray := m.songDataMap[level]
 	itemList := make([]list.Item, 0)
 	for _, v := range rawArray {
+		selfLamp := lipgloss.NewStyle().MarginRight(20).Render(drawLamp(v.Lamp))
+		ghostLamp := drawLamp(v.GhostLamp)
+		desc := lipgloss.JoinHorizontal(0, selfLamp, ghostLamp)
 		n := item{
 			title: v.Title,
-			desc:  "",
-		}
-		if v.Lamp == 0 {
-			// do nothing
-		} else if v.Lamp < 4 {
-			n.desc = flBlock.String()
-		} else if v.Lamp < 5 {
-			n.desc = ezBlock.String()
-		} else if v.Lamp < 6 {
-			n.desc = nrBlock.String()
-		} else {
-			n.desc = hcBlock.String()
+			desc:  desc,
 		}
 		itemList = append(itemList, n)
 	}
@@ -204,10 +210,14 @@ func (m mainModel) View() string {
 // The terminal would be split into 2 pieces:
 // left is the specified difficult table's levels
 // right is the related song list and lamp status
-func OpenGhostTui(dth *difftable.DiffTableHeader, dt []difftable.DiffTable, rivalInfo *rival.RivalInfo) {
+func OpenGhostTui(dth *difftable.DiffTableHeader, dt []difftable.DiffTable, selfInfo *rival.RivalInfo, ghostInfo *rival.RivalInfo) {
 	// NOTE: merge songData -> diffTable, scoreLog -> diffTable before any operation
-	mergeSha256FromSongData(dt, rivalInfo.SongData)
-	mergeLampFromScoreLog(dt, rivalInfo.ScoreLog)
+	// Merge self
+	mergeSha256FromSongData(dt, selfInfo.SongData)
+	mergeLampFromScoreLog(dt, selfInfo.ScoreLog)
+	// Merge ghost
+	mergeSha256FromSongData(dt, ghostInfo.SongData)
+	mergeGhostLampFromScoreLog(dt, ghostInfo.ScoreLog)
 	// After two merge functions, dt now contains lamp info
 	if _, err := tea.NewProgram(newModel(dth, dt)).Run(); err != nil {
 		log.Fatal(err)
@@ -221,8 +231,10 @@ func mergeSha256FromSongData(dtArray []difftable.DiffTable, songData []score.Son
 	for _, v := range songData {
 		songDataMd5Map[v.Md5] = v
 	}
-	for i := range dtArray {
-		dtArray[i].Sha256 = songDataMd5Map[dtArray[i].Md5].Sha256
+	for i, dt := range dtArray {
+		if songData, ok := songDataMd5Map[dt.Md5]; ok {
+			dtArray[i].Sha256 = songData.Sha256
+		}
 	}
 }
 
@@ -236,6 +248,19 @@ func mergeLampFromScoreLog(dtArray []difftable.DiffTable, scoreLog []score.Score
 	for _, v := range scoreLog {
 		if t, ok := dtSha256Map[v.Sha256]; ok {
 			t.Lamp = max(t.Lamp, v.Clear)
+		}
+	}
+}
+
+// Same with above function, the only difference is target
+func mergeGhostLampFromScoreLog(dtArray []difftable.DiffTable, scoreLog []score.ScoreLog) {
+	dtSha256Map := make(map[string]*difftable.DiffTable)
+	for i, v := range dtArray {
+		dtSha256Map[v.Sha256] = &dtArray[i]
+	}
+	for _, v := range scoreLog {
+		if t, ok := dtSha256Map[v.Sha256]; ok {
+			t.GhostLamp = max(t.GhostLamp, v.Clear)
 		}
 	}
 }

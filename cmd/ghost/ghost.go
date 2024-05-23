@@ -13,30 +13,12 @@ import (
 // TODO: every steps should give choices
 // ghostCmd represents the ghost command
 var GhostCmd = &cobra.Command{
-	Use:   "ghost [rival]",
+	Use:   "ghost [self] [ghost]",
 	Short: "ghost",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		rivalName := args[0]
-		rivalArr, err := rival.QueryRivalInfo(rivalName)
-		if err != nil {
-			panic(err)
-		}
-		if len(rivalArr) == 0 {
-			panic("no such a rival")
-		}
-		if len(rivalArr) > 1 {
-			panic("multiple rivals matched")
-		}
-		rivalInfo := rivalArr[0]
-
-		if err := rivalInfo.LoadRivalScoreLog(); err != nil {
-			panic(err)
-		}
-
-		if err := rivalInfo.LoadRivalSongData(); err != nil {
-			panic(err)
-		}
+		selfInfo := queryAndLoadRival(args[0])
+		ghostInfo := queryAndLoadRival(args[1])
 
 		// Difficult table header
 		dth := difftable.QueryDifficultTableHeaderExactlyOne("insane")
@@ -46,7 +28,7 @@ var GhostCmd = &cobra.Command{
 		if err != nil {
 			panic(err)
 		}
-		ghostTui.OpenGhostTui(&dth, diffTable, &rivalInfo)
+		ghostTui.OpenGhostTui(&dth, diffTable, &selfInfo, &ghostInfo)
 	},
 }
 
@@ -60,4 +42,23 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// ghostCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+// TODO: Give choice
+func queryAndLoadRival(rivalName string) rival.RivalInfo {
+	rivalArr, err := rival.QueryRivalInfo(rivalName)
+	if err != nil {
+		panic(err)
+	}
+	if len(rivalArr) != 1 {
+		panic("len(rivalArr) != 1")
+	}
+	rivalInfo := rivalArr[0]
+	if err := rivalInfo.LoadRivalScoreLog(); err != nil {
+		panic(err)
+	}
+	if err := rivalInfo.LoadRivalSongData(); err != nil {
+		panic(err)
+	}
+	return rivalInfo
 }

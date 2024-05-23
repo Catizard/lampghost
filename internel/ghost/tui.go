@@ -199,7 +199,7 @@ func (m mainModel) View() string {
 	var s string
 	// model := m.currentFocusedModel()
 	if m.state == levelView {
-		s += lipgloss.JoinHorizontal(lipgloss.Top, m.levelList.View(), m.songList.View())
+		s += lipgloss.JoinHorizontal(lipgloss.Top, m.levelList.View())
 	} else {
 		s += lipgloss.JoinHorizontal(lipgloss.Top, m.levelList.View(), m.songList.View())
 	}

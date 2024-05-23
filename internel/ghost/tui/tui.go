@@ -33,10 +33,10 @@ const (
 
 var (
 	listStyle = lipgloss.NewStyle().Margin(1, 2)
-	flBlock   = lipgloss.NewStyle().SetString(" ").Width(20).Background(lipgloss.Color("#FF0000"))
-	ezBlock   = lipgloss.NewStyle().SetString(" ").Width(20).Background(lipgloss.Color("#00FF00"))
-	nrBlock   = lipgloss.NewStyle().SetString(" ").Width(20).Background(lipgloss.Color("#0000FF"))
-	hcBlock   = lipgloss.NewStyle().SetString(" ").Width(20).Background(lipgloss.Color("#FFFFFF"))
+	flBlock   = lipgloss.NewStyle().SetString(" ").Width(10).Background(lipgloss.Color("#FF0000"))
+	ezBlock   = lipgloss.NewStyle().SetString(" ").Width(10).Background(lipgloss.Color("#00FF00"))
+	nrBlock   = lipgloss.NewStyle().SetString(" ").Width(10).Background(lipgloss.Color("#0000FF"))
+	hcBlock   = lipgloss.NewStyle().SetString(" ").Width(10).Background(lipgloss.Color("#FFFFFF"))
 )
 
 type mainModel struct {
@@ -100,15 +100,17 @@ func buildSongList(m *mainModel, diffTable []difftable.DiffTable) {
 func drawLamp(lamp int32) string {
 	if lamp == 0 {
 		return ""
-		// do nothing
-	} else if lamp < 4 {
+	}
+	if 1 <= lamp && lamp < 4 {
 		return flBlock.String()
 	} else if lamp < 5 {
 		return ezBlock.String()
 	} else if lamp < 6 {
 		return nrBlock.String()
+	} else if lamp < 11 {
+		return hcBlock.String()
 	}
-	return hcBlock.String()
+	return ""
 }
 
 func (m *mainModel) transferLevel(level string) {

@@ -1,4 +1,4 @@
-package ghost
+package score
 
 import (
 	"fmt"

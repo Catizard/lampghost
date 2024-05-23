@@ -8,6 +8,8 @@ import (
 	"io/fs"
 	"os"
 	"path"
+
+	"github.com/Catizard/lampghost/internel/score"
 )
 
 const (
@@ -18,6 +20,8 @@ type RivalInfo struct {
 	Name         string
 	ScoreLogPath string
 	SongDataPath string
+	ScoreLog     []score.ScoreLog `json:"-"`
+	SongData     []score.SongData `json:"-"`
 }
 
 // Add one rival info(or say, meta data) to disk.
@@ -106,4 +110,22 @@ func QueryRivalInfo(name string) ([]RivalInfo, error) {
 		}
 	}
 	return ret, nil
+}
+
+func (r *RivalInfo) LoadRivalScoreLog() error {
+	scoreLog, err := score.ReadScoreLogFromSqlite(r.ScoreLogPath)
+	if err != nil {
+		return err
+	}
+	r.ScoreLog = scoreLog
+	return nil
+}
+
+func (r *RivalInfo) LoadRivalSongData() error {
+	songData, err := score.ReadSongDataFromSqlite(r.SongDataPath)
+	if err != nil {
+		return err
+	}
+	r.SongData = songData
+	return nil
 }

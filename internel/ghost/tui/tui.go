@@ -1,4 +1,4 @@
-package ghost
+package tui
 
 import (
 	"log"
@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/Catizard/lampghost/internel/difftable"
+	"github.com/Catizard/lampghost/internel/rival"
+	"github.com/Catizard/lampghost/internel/score"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -30,13 +32,6 @@ const (
 )
 
 var (
-	modelStyle = lipgloss.NewStyle().
-			Align(lipgloss.Left, lipgloss.Center).
-			BorderStyle(lipgloss.HiddenBorder())
-	focusedModelStyle = lipgloss.NewStyle().
-				Align(lipgloss.Left, lipgloss.Center).
-				BorderStyle(lipgloss.NormalBorder()).
-				BorderForeground(lipgloss.Color("69"))
 	listStyle = lipgloss.NewStyle().Margin(1, 2)
 	flBlock   = lipgloss.NewStyle().SetString(" ").Width(20).Background(lipgloss.Color("#FF0000"))
 	ezBlock   = lipgloss.NewStyle().SetString(" ").Width(20).Background(lipgloss.Color("#00FF00"))
@@ -197,13 +192,11 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m mainModel) View() string {
 	var s string
-	// model := m.currentFocusedModel()
 	if m.state == levelView {
 		s += lipgloss.JoinHorizontal(lipgloss.Top, m.levelList.View())
 	} else {
 		s += lipgloss.JoinHorizontal(lipgloss.Top, m.levelList.View(), m.songList.View())
 	}
-	// s += helpStyle.Render(fmt.Sprintf("\ntab: focus next • n: new %s • q: exit\n", model))
 	return s
 }
 
@@ -211,10 +204,10 @@ func (m mainModel) View() string {
 // The terminal would be split into 2 pieces:
 // left is the specified difficult table's levels
 // right is the related song list and lamp status
-func OpenGhostTui(dth *difftable.DiffTableHeader, dt []difftable.DiffTable, songData []SongData, scoreLog []ScoreLog) {
+func OpenGhostTui(dth *difftable.DiffTableHeader, dt []difftable.DiffTable, rivalInfo *rival.RivalInfo) {
 	// NOTE: merge songData -> diffTable, scoreLog -> diffTable before any operation
-	mergeSha256FromSongData(dt, songData)
-	mergeLampFromScoreLog(dt, scoreLog)
+	mergeSha256FromSongData(dt, rivalInfo.SongData)
+	mergeLampFromScoreLog(dt, rivalInfo.ScoreLog)
 	// After two merge functions, dt now contains lamp info
 	if _, err := tea.NewProgram(newModel(dth, dt)).Run(); err != nil {
 		log.Fatal(err)
@@ -223,8 +216,8 @@ func OpenGhostTui(dth *difftable.DiffTableHeader, dt []difftable.DiffTable, song
 
 // Merge Sha256 field from song data
 // In place function, do not return a new array
-func mergeSha256FromSongData(dtArray []difftable.DiffTable, songData []SongData) {
-	songDataMd5Map := make(map[string]SongData)
+func mergeSha256FromSongData(dtArray []difftable.DiffTable, songData []score.SongData) {
+	songDataMd5Map := make(map[string]score.SongData)
 	for _, v := range songData {
 		songDataMd5Map[v.Md5] = v
 	}
@@ -235,7 +228,7 @@ func mergeSha256FromSongData(dtArray []difftable.DiffTable, songData []SongData)
 
 // Merge maximum lamp from scorelog
 // In place function, do not return a new array
-func mergeLampFromScoreLog(dtArray []difftable.DiffTable, scoreLog []ScoreLog) {
+func mergeLampFromScoreLog(dtArray []difftable.DiffTable, scoreLog []score.ScoreLog) {
 	dtSha256Map := make(map[string]*difftable.DiffTable)
 	for i, v := range dtArray {
 		dtSha256Map[v.Sha256] = &dtArray[i]

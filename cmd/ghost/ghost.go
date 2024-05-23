@@ -5,7 +5,7 @@ package ghost
 
 import (
 	"github.com/Catizard/lampghost/internel/difftable"
-	"github.com/Catizard/lampghost/internel/ghost"
+	ghostTui "github.com/Catizard/lampghost/internel/ghost/tui"
 	"github.com/Catizard/lampghost/internel/rival"
 	"github.com/spf13/cobra"
 )
@@ -30,15 +30,11 @@ var GhostCmd = &cobra.Command{
 		}
 		rivalInfo := rivalArr[0]
 
-		// Score log
-		scoreLogArray, err := ghost.ReadScoreLogFromSqlite(rivalInfo.ScoreLogPath)
-		if err != nil {
+		if err := rivalInfo.LoadRivalScoreLog(); err != nil {
 			panic(err)
 		}
 
-		// Song data
-		songDataArray, err := ghost.ReadSongDataFromSqlite(rivalInfo.SongDataPath)
-		if err != nil {
+		if err := rivalInfo.LoadRivalSongData(); err != nil {
 			panic(err)
 		}
 
@@ -50,7 +46,7 @@ var GhostCmd = &cobra.Command{
 		if err != nil {
 			panic(err)
 		}
-		ghost.OpenGhostTui(&dth, diffTable, songDataArray, scoreLogArray)
+		ghostTui.OpenGhostTui(&dth, diffTable, &rivalInfo)
 	},
 }
 

@@ -14,7 +14,7 @@ import (
 // ghostCmd represents the ghost command
 var GhostCmd = &cobra.Command{
 	Use:   "ghost [self] [ghost]",
-	Short: "ghost",
+	Short: "Open ghost tui application",
 	Args:  cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		selfInfo := queryAndLoadRival(args[0])

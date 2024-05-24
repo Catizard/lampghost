@@ -8,12 +8,14 @@ import (
 	"io/fs"
 	"os"
 	"path"
+	"slices"
 
 	"github.com/Catizard/lampghost/internel/score"
 )
 
 const (
 	rivalConfigFileName = "rivalConfig.json"
+	filePerm            = 0666
 )
 
 type RivalInfo struct {
@@ -22,94 +24,6 @@ type RivalInfo struct {
 	SongDataPath string
 	ScoreLog     []score.ScoreLog `json:"-"`
 	SongData     []score.SongData `json:"-"`
-}
-
-// Add one rival info(or say, meta data) to disk.
-func AddRivalInfo(info *RivalInfo) error {
-	// Before we do anything, check if scorelog filepath exist
-	if path.IsAbs(info.ScoreLogPath) {
-		panic("Sorry, absolute path is not supported.")
-	}
-	if _, err := os.Stat(info.ScoreLogPath); errors.Is(err, fs.ErrNotExist) {
-		panic(fmt.Errorf("cannot find %s on your file system", info.ScoreLogPath))
-	}
-	var prevArray []RivalInfo
-
-	if _, err := os.Stat(rivalConfigFileName); errors.Is(err, fs.ErrNotExist) {
-		_, err := os.Create(rivalConfigFileName)
-		if err != nil {
-			return err
-		}
-	} else {
-		file, err := os.Open(rivalConfigFileName)
-		if err != nil {
-			panic(err)
-		}
-		defer file.Close()
-		body, err := io.ReadAll(file)
-		if err != nil {
-			return err
-		}
-		err = json.Unmarshal(body, &prevArray)
-		if err != nil {
-			return err
-		}
-	}
-
-	find := false
-	for i, v := range prevArray {
-		if v.Name == info.Name {
-			// We don't have to remove it, we can override it
-			// But this kind of sucks
-			prevArray[i].Name = info.Name
-			prevArray[i].ScoreLogPath = info.ScoreLogPath
-			prevArray[i].SongDataPath = info.SongDataPath
-			find = true
-		}
-	}
-
-	// If it doesn't exist, append it
-	if !find {
-		prevArray = append(prevArray, *info)
-	}
-
-	newBody, err := json.Marshal(prevArray)
-	if err != nil {
-		return err
-	}
-	os.WriteFile(rivalConfigFileName, newBody, fs.FileMode(os.O_WRONLY))
-	return nil
-}
-
-// Query rival's info by name.
-// Multiple results could be matched.
-func QueryRivalInfo(name string) ([]RivalInfo, error) {
-	if _, err := os.Stat(rivalConfigFileName); err != nil {
-		return nil, err
-	}
-
-	arr := make([]RivalInfo, 0)
-	file, err := os.Open(rivalConfigFileName)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-	body, err := io.ReadAll(file)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(body, &arr)
-	if err != nil {
-		return nil, err
-	}
-
-	ret := make([]RivalInfo, 0)
-	for _, v := range arr {
-		if v.Name == name {
-			ret = append(ret, v)
-		}
-	}
-	return ret, nil
 }
 
 func (r *RivalInfo) LoadRivalScoreLog() error {
@@ -128,4 +42,83 @@ func (r *RivalInfo) LoadRivalSongData() error {
 	}
 	r.SongData = songData
 	return nil
+}
+
+// Save one rival info(or say, meta data) to disk.
+func (info *RivalInfo) SaveRivalInfo() error {
+	// Sane check before saving rival
+	if path.IsAbs(info.ScoreLogPath) {
+		return fmt.Errorf("sorry, absolute path is not supported")
+	}
+	if _, err := os.Stat(info.ScoreLogPath); errors.Is(err, fs.ErrNotExist) {
+		return fmt.Errorf("cannot stat %s on your file system", info.ScoreLogPath)
+	}
+	if _, err := os.Stat(info.SongDataPath); errors.Is(err, fs.ErrNotExist) {
+		return fmt.Errorf("cannot stat %s on your file system", info.SongDataPath)
+	}
+
+	// Read previous data into mermory
+	arr, err := ReadRivalInfoFromDisk(rivalConfigFileName)
+	if err != nil {
+		return err
+	}
+
+	// If rival is already added, skip
+	if find := slices.ContainsFunc(arr, func(rhs RivalInfo) bool {
+		return rhs.Name == info.Name
+	}); find {
+		return fmt.Errorf("cannot add one rival twice.\nHint: use rival sync to update info instead")
+	}
+
+	// If it doesn't exist, append it, then write back
+	arr = append(arr, *info)
+	// TODO: build tags here
+
+	newBody, err := json.Marshal(arr)
+	if err != nil {
+		return err
+	}
+	os.WriteFile(rivalConfigFileName, newBody, filePerm)
+	return nil
+}
+
+// Query rival's info by name.
+// Multiple results could be matched.
+// Returns nil if file doesn't exist.
+func QueryRivalInfo(name string) ([]RivalInfo, error) {
+	// Read disk data into mermory
+	arr, err := ReadRivalInfoFromDisk(rivalConfigFileName)
+	if err != nil {
+		return nil, err
+	}
+
+	ret := make([]RivalInfo, 0)
+	for _, v := range arr {
+		if v.Name == name {
+			ret = append(ret, v)
+		}
+	}
+	return ret, nil
+}
+
+// Read rivals data from disk
+func ReadRivalInfoFromDisk(path string) ([]RivalInfo, error) {
+	// Create file if it doesn't exist
+	f, err := os.OpenFile(rivalConfigFileName, os.O_RDWR|os.O_CREATE, filePerm)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	// Read previous data into mermory
+	var prevArray []RivalInfo
+	body, err := io.ReadAll(f)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(body, &prevArray)
+	if err != nil {
+		return nil, err
+	}
+	return prevArray, nil
 }

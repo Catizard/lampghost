@@ -24,8 +24,7 @@ var AddCmd = &cobra.Command{
 			SongDataPath: songDataPath,
 		}
 
-		err := rival.AddRivalInfo(rivalInfo)
-		if err != nil {
+		if err := rivalInfo.SaveRivalInfo(); err != nil {
 			panic(err)
 		}
 	},

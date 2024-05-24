@@ -6,8 +6,8 @@ package rival
 import (
 	"github.com/Catizard/lampghost/cmd/rival/add"
 	rinit "github.com/Catizard/lampghost/cmd/rival/rinit"
+	"github.com/Catizard/lampghost/cmd/rival/sync"
 	"github.com/Catizard/lampghost/cmd/rival/tags"
-	"github.com/Catizard/lampghost/cmd/table/sync"
 	"github.com/spf13/cobra"
 )
 

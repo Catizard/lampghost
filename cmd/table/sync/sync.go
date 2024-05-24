@@ -5,7 +5,6 @@ package sync
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/Catizard/lampghost/internel/difftable"
 	"github.com/spf13/cobra"
@@ -21,7 +20,7 @@ var SyncCmd = &cobra.Command{
 		if err != nil {
 			panic(err)
 		}
-		if (len(matchedArray) == 0) {
+		if len(matchedArray) == 0 {
 			panic("no such a difficult table")
 		}
 		// TODO: give options to choose when multi header was matched
@@ -31,9 +30,8 @@ var SyncCmd = &cobra.Command{
 
 		// Assume there is only one matched result
 		matchedHeader := matchedArray[0]
-		log.Printf("matched %s with alias=%s, name=%s\n", name, matchedHeader.Alias, matchedHeader.Name)
 		// Call sync function on specified header
-		if err = matchedHeader.SyncDifficultTable(); err != nil{
+		if err = matchedHeader.SyncDifficultTable(); err != nil {
 			panic(err)
 		}
 	},

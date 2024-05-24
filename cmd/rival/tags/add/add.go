@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// addCmd represents the add command
 var AddCmd = &cobra.Command{
 	Use:   "add [tag name] [time]",
 	Short: "Add a tag to rival",

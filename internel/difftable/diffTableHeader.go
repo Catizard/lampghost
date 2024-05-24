@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"log"
 	"net/http"
 	"os"
 )
@@ -45,7 +44,6 @@ func (header *DiffTableHeader) AddDiffTable() error {
 		}
 		defer file.Close()
 		body, err := io.ReadAll(file)
-		log.Printf("body=%s", body)
 		if err != nil {
 			panic(err)
 		}
@@ -53,7 +51,6 @@ func (header *DiffTableHeader) AddDiffTable() error {
 		if err != nil {
 			panic(err)
 		}
-		log.Printf("len(headers)=%v", len(headers))
 	}
 
 	// if new one already exist

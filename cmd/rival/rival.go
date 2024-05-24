@@ -6,6 +6,8 @@ package rival
 import (
 	"github.com/Catizard/lampghost/cmd/rival/add"
 	rinit "github.com/Catizard/lampghost/cmd/rival/rinit"
+	"github.com/Catizard/lampghost/cmd/rival/tags"
+	"github.com/Catizard/lampghost/cmd/table/sync"
 	"github.com/spf13/cobra"
 )
 
@@ -19,8 +21,10 @@ var RivalCmd = &cobra.Command{
 }
 
 func init() {
-	RivalCmd.AddCommand(add.AddCmd)	
+	RivalCmd.AddCommand(add.AddCmd)
 	RivalCmd.AddCommand(rinit.InitCmd)
+	RivalCmd.AddCommand(tags.TagsCmd)
+	RivalCmd.AddCommand(sync.SyncCmd)
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command

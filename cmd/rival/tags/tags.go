@@ -1,31 +1,31 @@
 /*
 Copyright © 2024 Catizard <1185032459@qq.com>
 */
-package rinit
+package tags
 
 import (
-	"fmt"
-
+	tags "github.com/Catizard/lampghost/cmd/rival/tags/add"
 	"github.com/spf13/cobra"
 )
 
-// initCmd represents the init command
-var InitCmd = &cobra.Command{
-	Use:   "init",
-	Short: "Setup yours scorelog and songdata path",
+// tagsCmd represents the tags command
+var TagsCmd = &cobra.Command{
+	Use:   "tags",
+	Short: "Commands on rival's tags",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("init called")
+		cmd.Help()
 	},
 }
 
 func init() {
+	TagsCmd.AddCommand(tags.AddCmd)
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// initCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// tagsCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// initCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// tagsCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

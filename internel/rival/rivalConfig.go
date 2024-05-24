@@ -18,12 +18,20 @@ const (
 	filePerm            = 0666
 )
 
+type RivalTag struct {
+	TagName   string
+	Generated bool
+	TimeStamp int64
+}
+
 type RivalInfo struct {
 	Name         string
 	ScoreLogPath string
 	SongDataPath string
-	ScoreLog     []score.ScoreLog `json:"-"`
-	SongData     []score.SongData `json:"-"`
+	// TODO: ignore tags field temporarily
+	Tags     []RivalTag       `json:"-"`
+	ScoreLog []score.ScoreLog `json:"-"`
+	SongData []score.SongData `json:"-"`
 }
 
 func (r *RivalInfo) LoadRivalScoreLog() error {
@@ -72,7 +80,7 @@ func (info *RivalInfo) SaveRivalInfo() error {
 
 	// If it doesn't exist, append it, then write back
 	arr = append(arr, *info)
-	// TODO: build tags here
+	// TODO: generate tags here
 
 	newBody, err := json.Marshal(arr)
 	if err != nil {

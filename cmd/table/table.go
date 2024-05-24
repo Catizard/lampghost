@@ -5,14 +5,14 @@ package table
 
 import (
 	"github.com/Catizard/lampghost/cmd/table/add"
-	"github.com/Catizard/lampghost/cmd/table/rename"
+	"github.com/Catizard/lampghost/cmd/table/edit"
 	"github.com/Catizard/lampghost/cmd/table/sync"
 	"github.com/spf13/cobra"
 )
 
 // tableCmd represents the table command
 var TableCmd = &cobra.Command{
-	Use: "table",
+	Use:   "table",
 	Short: "Add or edit difficult table settings",
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
@@ -22,7 +22,7 @@ var TableCmd = &cobra.Command{
 func init() {
 	TableCmd.AddCommand(sync.SyncCmd)
 	TableCmd.AddCommand(add.AddCmd)
-	TableCmd.AddCommand(rename.RenameCmd)
+	TableCmd.AddCommand(edit.EditCmd)
 
 	// Here you will define your flags and configuration settings.
 

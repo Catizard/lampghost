@@ -17,11 +17,11 @@ var SyncCmd = &cobra.Command{
 	Short: "sync one specified difficult table's data.\nHint: alias could be used too",
 	Run: func(cmd *cobra.Command, args []string) {
 		name := args[0]
-		matchedArray, err := difftable.QueryDifficultTableHeader(name)
+		matchedArray, err := difftable.QueryDifficultTableHeaderLoosely(name)
 		if err != nil {
 			panic(err)
 		}
-		if (len(matchedArray) == 0) {
+		if len(matchedArray) == 0 {
 			panic("no such a difficult table")
 		}
 		// TODO: give options to choose when multi header was matched
@@ -33,7 +33,7 @@ var SyncCmd = &cobra.Command{
 		matchedHeader := matchedArray[0]
 		log.Printf("matched %s with alias=%s, name=%s\n", name, matchedHeader.Alias, matchedHeader.Name)
 		// Call sync function on specified header
-		if err = matchedHeader.SyncDifficultTable(); err != nil{
+		if err = matchedHeader.SyncDifficultTable(); err != nil {
 			panic(err)
 		}
 	},

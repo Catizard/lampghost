@@ -13,10 +13,10 @@ import (
 // syncCmd represents the sync command
 var SyncCmd = &cobra.Command{
 	Use:   "sync [difficult table's name]",
-	Short: "sync one specified difficult table's data.\nHint: alias could be used too",
+	Short: "sync one specified difficult table's data.",
 	Run: func(cmd *cobra.Command, args []string) {
 		name := args[0]
-		matchedArray, err := difftable.QueryDifficultTableHeader(name)
+		matchedArray, err := difftable.QueryDifficultTableHeaderLoosely(name)
 		if err != nil {
 			panic(err)
 		}

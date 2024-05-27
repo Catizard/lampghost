@@ -7,7 +7,6 @@ import (
 	"io"
 	"os"
 	"path"
-	"slices"
 
 	"github.com/Catizard/lampghost/internel/common"
 	"github.com/Catizard/lampghost/internel/score"
@@ -71,28 +70,12 @@ func (info *RivalInfo) SaveRivalInfo() error {
 		return fmt.Errorf("cannot stat %s on your file system", info.SongDataPath)
 	}
 
-	// Read previous data into mermory
-	arr, err := ReadRivalInfoFromDisk(rivalConfigFileName)
+	db := common.OpenDB()
+	defer db.Close()
+	_, err := db.NamedExec(`INSERT INTO rival_info (name, score_log_path, song_data_path) values (:name, :score_log_path, :song_data_path)`, info)
 	if err != nil {
 		return err
 	}
-
-	// If rival is already added, skip
-	if find := slices.ContainsFunc(arr, func(rhs RivalInfo) bool {
-		return rhs.Name == info.Name
-	}); find {
-		return fmt.Errorf("cannot add one rival twice.\nHint: use rival sync to update info instead")
-	}
-
-	// If it doesn't exist, append it, then write back
-	arr = append(arr, *info)
-	// TODO: generate tags here
-
-	newBody, err := json.Marshal(arr)
-	if err != nil {
-		return err
-	}
-	os.WriteFile(rivalConfigFileName, newBody, filePerm)
 	return nil
 }
 

@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/fs"
 	"os"
 	"path"
 	"slices"
@@ -65,10 +64,10 @@ func (info *RivalInfo) SaveRivalInfo() error {
 	if path.IsAbs(info.ScoreLogPath) {
 		return fmt.Errorf("sorry, absolute path is not supported")
 	}
-	if _, err := os.Stat(info.ScoreLogPath); errors.Is(err, fs.ErrNotExist) {
+	if _, err := os.Stat(info.ScoreLogPath); errors.Is(err, os.ErrNotExist) {
 		return fmt.Errorf("cannot stat %s on your file system", info.ScoreLogPath)
 	}
-	if _, err := os.Stat(info.SongDataPath); errors.Is(err, fs.ErrNotExist) {
+	if _, err := os.Stat(info.SongDataPath); errors.Is(err, os.ErrNotExist) {
 		return fmt.Errorf("cannot stat %s on your file system", info.SongDataPath)
 	}
 

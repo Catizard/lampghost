@@ -12,6 +12,9 @@ import (
 var InitCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Init lampghost application's database",
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		// Do nothing, only purpose is to override root's hook
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		config.InitLampGhost()
 	},

@@ -52,7 +52,7 @@ func (header *DiffTableHeader) AddDiffTable() error {
 	// If data.json is already here, do nothing
 	if _, err := os.Stat(fileName); err == nil {
 		panic(fmt.Errorf("%s has been already exists, if you want to update data.json, use sync command instead", fileName))
-	} else if errors.Is(err, fs.ErrExist) {
+	} else if errors.Is(err, os.ErrExist) {
 		// unexpected...
 		panic(err)
 	}

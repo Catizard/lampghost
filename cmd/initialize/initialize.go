@@ -1,0 +1,21 @@
+/*
+Copyright © 2024 Catizard <1185032459@qq.com>
+*/
+package initialize
+
+import (
+	"github.com/Catizard/lampghost/internel/config"
+	"github.com/spf13/cobra"
+)
+
+// Initialize database that lampghost would use
+var InitCmd = &cobra.Command{
+	Use:   "init",
+	Short: "Init lampghost application's database",
+	Run: func(cmd *cobra.Command, args []string) {
+		config.InitLampGhost()
+	},
+}
+
+func init() {
+}

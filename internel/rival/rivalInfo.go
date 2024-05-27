@@ -10,7 +10,10 @@ import (
 	"path"
 	"slices"
 
+	"github.com/Catizard/lampghost/internel/common"
 	"github.com/Catizard/lampghost/internel/score"
+	"github.com/jmoiron/sqlx"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 const (
@@ -18,20 +21,24 @@ const (
 	filePerm            = 0666
 )
 
-type RivalTag struct {
-	TagName   string
-	Generated bool
-	TimeStamp int64
+type RivalInfo struct {
+	Id           int    `db:"id"`
+	Name         string `db:"name"`
+	ScoreLogPath string `db:"score_log_path"`
+	SongDataPath string `db:"song_data_path"`
+	Tags         []RivalTag
+	ScoreLog     []score.ScoreLog
+	SongData     []score.SongData
 }
 
-type RivalInfo struct {
-	Name         string
-	ScoreLogPath string
-	SongDataPath string
-	// TODO: ignore tags field temporarily
-	Tags     []RivalTag       `json:"-"`
-	ScoreLog []score.ScoreLog `json:"-"`
-	SongData []score.SongData `json:"-"`
+func InitRivalInfoTable() error {
+	db, err := sqlx.Open("sqlite3", common.DBFileName)
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+	_, err = db.Exec("DROP TABLE IF EXISTS 'rival_info';CREATE TABLE rival_info (name TEXT(255) NOT NULL, id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, score_log_path TEXT(255) NOT NULL, song_data_path TEXT(255) NOT NULL);")
+	return err
 }
 
 func (r *RivalInfo) LoadRivalScoreLog() error {

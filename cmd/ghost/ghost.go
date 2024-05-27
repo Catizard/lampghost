@@ -10,7 +10,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// TODO: every steps should give choices
 // ghostCmd represents the ghost command
 var GhostCmd = &cobra.Command{
 	Use:   "ghost [self] [ghost]",
@@ -33,27 +32,13 @@ var GhostCmd = &cobra.Command{
 }
 
 func init() {
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// ghostCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// ghostCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-// TODO: Give choice
 func queryAndLoadRival(rivalName string) rival.RivalInfo {
-	rivalArr, err := rival.QueryRivalInfo(rivalName)
+	rivalInfo, err := rival.QueryRivalInfo(rivalName)
 	if err != nil {
 		panic(err)
 	}
-	if len(rivalArr) != 1 {
-		panic("len(rivalArr) != 1")
-	}
-	rivalInfo := rivalArr[0]
 	if err := rivalInfo.LoadRivalScoreLog(); err != nil {
 		panic(err)
 	}

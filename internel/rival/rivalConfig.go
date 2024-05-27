@@ -90,23 +90,22 @@ func (info *RivalInfo) SaveRivalInfo() error {
 	return nil
 }
 
-// Query rival's info by name.
-// Multiple results could be matched.
-// Returns nil if file doesn't exist.
-func QueryRivalInfo(name string) ([]RivalInfo, error) {
+// Query rival's info by name. Only zero or one result could be match
+// Promise that if error is not nil, one rival must be matched
+// Warning: If error is not nil, the first result's value has no meaning
+func QueryRivalInfo(name string) (RivalInfo, error) {
 	// Read disk data into mermory
 	arr, err := ReadRivalInfoFromDisk(rivalConfigFileName)
 	if err != nil {
-		return nil, err
+		return RivalInfo{}, err
 	}
 
-	ret := make([]RivalInfo, 0)
 	for _, v := range arr {
 		if v.Name == name {
-			ret = append(ret, v)
+			return v, nil
 		}
 	}
-	return ret, nil
+	return RivalInfo{}, fmt.Errorf("no such a rival named %s", name)
 }
 
 // Read rivals data from disk

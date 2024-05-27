@@ -5,8 +5,8 @@ package ghost
 
 import (
 	"github.com/Catizard/lampghost/internel/difftable"
-	ghostTui "github.com/Catizard/lampghost/internel/ghost/tui"
 	"github.com/Catizard/lampghost/internel/rival"
+	ghostTui "github.com/Catizard/lampghost/internel/tui/ghost"
 	"github.com/spf13/cobra"
 )
 

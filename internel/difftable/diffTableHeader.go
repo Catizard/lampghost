@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/Catizard/lampghost/internel/remote"
+	"github.com/Catizard/lampghost/internel/common"
 )
 
 const (
@@ -80,7 +80,7 @@ func QueryDifficultTableHeaderStrictly(name string) ([]DiffTableHeader, error) {
 func QueryDifficultTableHeader(equalf func(DiffTableHeader) bool) ([]DiffTableHeader, error) {
 	// Read all data from disk.
 	var local []DiffTableHeader
-	remote.FetchJsonFromFile(headerFileName, &local)
+	common.FetchJsonFromFile(headerFileName, &local)
 
 	res := make([]DiffTableHeader, 0)
 	for _, v := range local {

@@ -27,6 +27,7 @@ func (r *RivalInfo) String() string {
 	return fmt.Sprintf("%s (log=[%s],data=[%s])", r.Name, r.ScoreLogPath, r.SongDataPath)
 }
 
+// Initialize rival_info table
 func InitRivalInfoTable() error {
 	db, err := sqlx.Open("sqlite3", common.DBFileName)
 	if err != nil {

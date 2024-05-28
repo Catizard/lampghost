@@ -10,6 +10,7 @@ import (
 	"os"
 
 	"github.com/Catizard/lampghost/internel/common"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 const (
@@ -17,12 +18,21 @@ const (
 )
 
 type DiffTableHeader struct {
-	DataUrl     string `json:"data_url"`
-	LastUpdate  string `json:"last_update"`
-	Name        string
-	OriginalUrl string `json:"original_url"`
-	Symbol      string `json:"Symbol"`
-	Alias       string
+	Id          int    `db:"id"`
+	DataUrl     string `json:"data_url" db:"data_url"`
+	LastUpdate  string `json:"last_update" db:"last_update"`
+	Name        string `json:"name" db:"name"`
+	OriginalUrl string `json:"original_url" db:"original_url"`
+	Symbol      string `json:"symbol" db:"symbol"`
+	Alias       string `json:"alias" db:"alias"`
+}
+
+// Initialize difftable_header table
+func InitDifftableHeaderTable() error {
+	db := common.OpenDB()
+	defer db.Close()
+	_, err := db.Exec("DROP TABLE IF EXISTS 'difftable_header';CREATE TABLE difftable_header ( id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, alias TEXT, last_update TEXT, symbol TEXT NOT NULL);")
+	return err
 }
 
 // Add a difficult table header(or say, meta data) and related song data to disk.

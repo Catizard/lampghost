@@ -46,10 +46,10 @@ type mainModel struct {
 	state       sessionState
 	w           int
 	h           int
-	songDataMap map[string][]difftable.DiffTable
+	songDataMap map[string][]difftable.DiffTableData
 }
 
-func buildLevelList(dth *difftable.DiffTableHeader, diffTable []difftable.DiffTable) ([]list.Item, string) {
+func buildLevelList(dth *difftable.DiffTableHeader, diffTable []difftable.DiffTableData) ([]list.Item, string) {
 	// convert diffTable to list items
 	levels := make(map[string]interface{})
 	for _, v := range diffTable {
@@ -86,12 +86,12 @@ func buildLevelList(dth *difftable.DiffTableHeader, diffTable []difftable.DiffTa
 	return items, sortedLevels[0]
 }
 
-func buildSongList(m *mainModel, diffTable []difftable.DiffTable) {
+func buildSongList(m *mainModel, diffTable []difftable.DiffTableData) {
 	// Level maps to song info array
-	m.songDataMap = make(map[string][]difftable.DiffTable)
+	m.songDataMap = make(map[string][]difftable.DiffTableData)
 	for _, v := range diffTable {
 		if _, ok := m.songDataMap[v.Level]; !ok {
-			m.songDataMap[v.Level] = make([]difftable.DiffTable, 0)
+			m.songDataMap[v.Level] = make([]difftable.DiffTableData, 0)
 		}
 		m.songDataMap[v.Level] = append(m.songDataMap[v.Level], v)
 	}
@@ -136,7 +136,7 @@ func (m *mainModel) transferLevel(level string) {
 	m.songList = songList
 }
 
-func newModel(dth *difftable.DiffTableHeader, diffTable []difftable.DiffTable) mainModel {
+func newModel(dth *difftable.DiffTableHeader, diffTable []difftable.DiffTableData) mainModel {
 	m := mainModel{state: levelView}
 	// Build level list
 	levelItems, defaultLevel := buildLevelList(dth, diffTable)
@@ -212,7 +212,7 @@ func (m mainModel) View() string {
 // The terminal would be split into 2 pieces:
 // left is the specified difficult table's levels
 // right is the related song list and lamp status
-func OpenGhostTui(dth *difftable.DiffTableHeader, dt []difftable.DiffTable, selfInfo *rival.RivalInfo, ghostInfo *rival.RivalInfo) {
+func OpenGhostTui(dth *difftable.DiffTableHeader, dt []difftable.DiffTableData, selfInfo *rival.RivalInfo, ghostInfo *rival.RivalInfo) {
 	// NOTE: merge songData -> diffTable, scoreLog -> diffTable before any operation
 	// Merge self
 	mergeSha256FromSongData(dt, selfInfo.SongData)
@@ -228,7 +228,7 @@ func OpenGhostTui(dth *difftable.DiffTableHeader, dt []difftable.DiffTable, self
 
 // Merge Sha256 field from song data
 // In place function, do not return a new array
-func mergeSha256FromSongData(dtArray []difftable.DiffTable, songData []score.SongData) {
+func mergeSha256FromSongData(dtArray []difftable.DiffTableData, songData []score.SongData) {
 	songDataMd5Map := make(map[string]score.SongData)
 	for _, v := range songData {
 		songDataMd5Map[v.Md5] = v
@@ -242,8 +242,8 @@ func mergeSha256FromSongData(dtArray []difftable.DiffTable, songData []score.Son
 
 // Merge maximum lamp from scorelog
 // In place function, do not return a new array
-func mergeLampFromScoreLog(dtArray []difftable.DiffTable, scoreLog []score.ScoreLog) {
-	dtSha256Map := make(map[string]*difftable.DiffTable)
+func mergeLampFromScoreLog(dtArray []difftable.DiffTableData, scoreLog []score.ScoreLog) {
+	dtSha256Map := make(map[string]*difftable.DiffTableData)
 	for i, v := range dtArray {
 		dtSha256Map[v.Sha256] = &dtArray[i]
 	}
@@ -255,8 +255,8 @@ func mergeLampFromScoreLog(dtArray []difftable.DiffTable, scoreLog []score.Score
 }
 
 // Same with above function, the only difference is target
-func mergeGhostLampFromScoreLog(dtArray []difftable.DiffTable, scoreLog []score.ScoreLog) {
-	dtSha256Map := make(map[string]*difftable.DiffTable)
+func mergeGhostLampFromScoreLog(dtArray []difftable.DiffTableData, scoreLog []score.ScoreLog) {
+	dtSha256Map := make(map[string]*difftable.DiffTableData)
 	for i, v := range dtArray {
 		dtSha256Map[v.Sha256] = &dtArray[i]
 	}

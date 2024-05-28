@@ -14,7 +14,7 @@ var SyncCmd = &cobra.Command{
 	Short: "sync one specified difficult table's data.",
 	Run: func(cmd *cobra.Command, args []string) {
 		name := args[0]
-		dth, err := difftable.QueryDifficultTableHeaderByNameWithChoices(name)
+		dth, err := difftable.QueryDiffTableHeaderByNameWithChoices(name)
 		if err != nil {
 			panic(err)
 		}

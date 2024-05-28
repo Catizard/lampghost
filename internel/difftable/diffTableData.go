@@ -6,9 +6,9 @@ import (
 	"os"
 )
 
-// struct DiffTable represents a content of difficult table
+// struct DiffTableData represents one content of a difficult table
 // TODO: Sha256 is ignored now, since table may not contain it
-type DiffTable struct {
+type DiffTableData struct {
 	Artist    string
 	Comment   string
 	Level     string
@@ -24,7 +24,7 @@ type DiffTable struct {
 }
 
 // Read Difficult Table content from disk.
-func ReadDiffTable(filePath string) ([]DiffTable, error) {
+func ReadDiffTable(filePath string) ([]DiffTableData, error) {
 	f, err := os.Open(filePath)
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func ReadDiffTable(filePath string) ([]DiffTable, error) {
 	if err != nil {
 		return nil, err
 	}
-	var local []DiffTable
+	var local []DiffTableData
 	err = json.Unmarshal(body, &local)
 	if err != nil {
 		return nil, err
@@ -42,16 +42,16 @@ func ReadDiffTable(filePath string) ([]DiffTable, error) {
 }
 
 // Read difficult table content, and return a group split by level
-func ReadDiffTableLevelMap(filePath string) (map[string][]DiffTable, error) {
+func ReadDiffTableLevelMap(filePath string) (map[string][]DiffTableData, error) {
 	rawArr, err := ReadDiffTable(filePath)
 	if err != nil {
 		return nil, err
 	}
 
-	ret := make(map[string][]DiffTable)
+	ret := make(map[string][]DiffTableData)
 	for _, v := range rawArr {
 		if _, ok := ret[v.Level]; !ok {
-			ret[v.Level] = make([]DiffTable, 0)
+			ret[v.Level] = make([]DiffTableData, 0)
 		}
 		ret[v.Level] = append(ret[v.Level], v)
 	}

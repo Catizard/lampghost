@@ -9,10 +9,10 @@ import (
 // Don't return error, the caller cannot handle any error from InitLampGhost
 func InitLampGhost() {
 	// difftable_header
-	if err := difftable.InitDifftableHeaderTable(); err != nil {
+	if err := difftable.InitDiffTableHeaderTable(); err != nil {
 		panic(err)
 	}
-	// TODO: difftable's content
+	// TODO: Should we clear any .json file too?
 	// rival_info
 	if err := rival.InitRivalInfoTable(); err != nil {
 		panic(err)

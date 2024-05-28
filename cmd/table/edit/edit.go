@@ -15,7 +15,7 @@ var EditCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		tableName := args[0]
-		dt, err := difftable.QueryDifficultTableHeaderByNameWithChoices(tableName)
+		dt, err := difftable.QueryDiffTableHeaderByNameWithChoices(tableName)
 		if err != nil {
 			panic(err)
 		}

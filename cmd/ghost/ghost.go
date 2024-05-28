@@ -24,7 +24,7 @@ var GhostCmd = &cobra.Command{
 
 		// Difficult table header
 		// TODO: give difftable argument
-		dth, err := difftable.QueryDifficultTableHeaderByNameWithChoices("insane")
+		dth, err := difftable.QueryDiffTableHeaderByNameWithChoices("insane")
 		if err != nil {
 			panic(err)
 		}

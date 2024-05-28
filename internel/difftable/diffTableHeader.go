@@ -31,7 +31,7 @@ func (header *DiffTableHeader) String() string {
 }
 
 // Initialize difftable_header table
-func InitDifftableHeaderTable() error {
+func InitDiffTableHeaderTable() error {
 	db := common.OpenDB()
 	defer db.Close()
 	_, err := db.Exec("DROP TABLE IF EXISTS 'difftable_header';CREATE TABLE difftable_header ( id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, alias TEXT, last_update TEXT, symbol TEXT NOT NULL, data_location TEXT NOT NULL, data_url TEXT NOT NULL);")
@@ -41,7 +41,7 @@ func InitDifftableHeaderTable() error {
 // Add a difficult table header(or say, meta data) and related song data to disk.
 func (header *DiffTableHeader) SaveDiffTableHeader() error {
 	// 1. Validation
-	if arr, err := QueryDifficultTableHeaderByName(header.Name); err != nil || len(arr) > 0 {
+	if arr, err := QueryDiffTableHeaderByName(header.Name); err != nil || len(arr) > 0 {
 		if err != nil {
 			return err
 		}
@@ -64,8 +64,25 @@ func (header *DiffTableHeader) SaveDiffTableHeader() error {
 	return nil
 }
 
+// Delete a difficult table header and its data file
+func (header *DiffTableHeader) DeleteDiffTableHeader() error {
+	db := common.OpenDB()
+	defer db.Close()
+
+	// 1) Try remove the data file, ignore any error
+	os.Remove(header.DataLocation)
+	// 2) Remove header from database
+	_, err := db.Exec("DELETE FROM difftable_header WHERE id=?", header.Id)
+	return err
+}
+
+// Return difficult table header's data json file name
+func (header *DiffTableHeader) getDataJsonFileName() string {
+	return header.Name + ".json"
+}
+
 // Query by name or alias
-func QueryDifficultTableHeaderByName(name string) ([]DiffTableHeader, error) {
+func QueryDiffTableHeaderByName(name string) ([]DiffTableHeader, error) {
 	db := common.OpenDB()
 	defer db.Close()
 	var ret []DiffTableHeader
@@ -74,8 +91,8 @@ func QueryDifficultTableHeaderByName(name string) ([]DiffTableHeader, error) {
 }
 
 // Simple choose wrapper of QueryDifficultTableHeaderByName
-func QueryDifficultTableHeaderByNameWithChoices(name string) (DiffTableHeader, error) {
-	dthArr, err := QueryDifficultTableHeaderByName(name)
+func QueryDiffTableHeaderByNameWithChoices(name string) (DiffTableHeader, error) {
+	dthArr, err := QueryDiffTableHeaderByName(name)
 	if err != nil {
 		return DiffTableHeader{}, err
 	}
@@ -88,9 +105,8 @@ func QueryDifficultTableHeaderByNameWithChoices(name string) (DiffTableHeader, e
 }
 
 func (header *DiffTableHeader) SyncDifficultTable() error {
-	// TODO: header's info might changed, sync header part also
-
-	// sync data.json, propagate any error
+	// Sync data.json, propagate any error
+	// This might lead to a corrupted file, but its ok since we can call sync command again to overwrite it
 	return saveTableData(header.getDataJsonFileName(), header.DataUrl)
 }
 
@@ -112,9 +128,4 @@ func saveTableData(fileName string, dataUrl string) error {
 	defer resp.Body.Close()
 	io.Copy(file, resp.Body)
 	return nil
-}
-
-// Return difficult table header's data json file name
-func (header *DiffTableHeader) getDataJsonFileName() string {
-	return header.Name + ".json"
 }

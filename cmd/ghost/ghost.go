@@ -4,8 +4,11 @@ Copyright © 2024 Catizard <1185032459@qq.com>
 package ghost
 
 import (
+	"fmt"
+
 	"github.com/Catizard/lampghost/internel/difftable"
 	"github.com/Catizard/lampghost/internel/rival"
+	"github.com/Catizard/lampghost/internel/tui/choose"
 	ghostTui "github.com/Catizard/lampghost/internel/tui/ghost"
 	"github.com/spf13/cobra"
 )
@@ -35,13 +38,20 @@ func init() {
 }
 
 func queryAndLoadRival(rivalName string) rival.RivalInfo {
-	rivalInfo, err := rival.QueryRivalInfo(rivalName)
+	rivalInfoArr, err := rival.QueryRivalInfo(rivalName)
 	if err != nil {
 		panic(err)
 	}
+	rivalNameArr := make([]string, 0)
+	for _, r := range rivalInfoArr {
+		rivalNameArr = append(rivalNameArr, fmt.Sprintf("%s (log=[%s],data=[%s])", r.Name, r.ScoreLogPath, r.SongDataPath))
+	}
+	index := choose.OpenChooseTui(rivalNameArr, fmt.Sprintf("Multiple rivals named %s, please choose one:", rivalName))
+	rivalInfo := rivalInfoArr[index]
 	if err := rivalInfo.LoadRivalScoreLog(); err != nil {
 		panic(err)
 	}
+	// TODO: support "shrink mode"
 	if err := rivalInfo.LoadRivalSongData(); err != nil {
 		panic(err)
 	}

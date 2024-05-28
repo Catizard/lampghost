@@ -1,10 +1,8 @@
 package rival
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"path"
 
@@ -12,11 +10,6 @@ import (
 	"github.com/Catizard/lampghost/internel/score"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
-)
-
-const (
-	rivalConfigFileName = "rivalConfig.json"
-	filePerm            = 0666
 )
 
 type RivalInfo struct {
@@ -72,49 +65,22 @@ func (info *RivalInfo) SaveRivalInfo() error {
 
 	db := common.OpenDB()
 	defer db.Close()
-	_, err := db.NamedExec(`INSERT INTO rival_info (name, score_log_path, song_data_path) values (:name, :score_log_path, :song_data_path)`, info)
+	_, err := db.NamedExec(`INSERT INTO rival_info (name, score_log_path, song_data_path) VALUES (:name,:score_log_path,:song_data_path)`, info)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-// Query rival's info by name. Only zero or one result could be match
-// Promise that if error is not nil, one rival must be matched
-// Warning: If error is not nil, the first result's value has no meaning
-func QueryRivalInfo(name string) (RivalInfo, error) {
-	// Read disk data into mermory
-	arr, err := ReadRivalInfoFromDisk(rivalConfigFileName)
-	if err != nil {
-		return RivalInfo{}, err
+// Query rival's info by name.
+// Returns error when no result.
+func QueryRivalInfo(name string) ([]RivalInfo, error) {
+	db := common.OpenDB()
+	defer db.Close()
+	var ret []RivalInfo
+	err := db.Select(&ret, "SELECT * FROM rival_info where name=?", name)
+	if err == nil && len(ret) == 0 {
+		err = fmt.Errorf("query doesn't return any result")
 	}
-
-	for _, v := range arr {
-		if v.Name == name {
-			return v, nil
-		}
-	}
-	return RivalInfo{}, fmt.Errorf("no such a rival named %s", name)
-}
-
-// Read rivals data from disk
-func ReadRivalInfoFromDisk(path string) ([]RivalInfo, error) {
-	// Create file if it doesn't exist
-	f, err := os.OpenFile(rivalConfigFileName, os.O_RDWR|os.O_CREATE, filePerm)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-
-	// Read previous data into mermory
-	var prevArray []RivalInfo
-	body, err := io.ReadAll(f)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(body, &prevArray)
-	if err != nil {
-		return nil, err
-	}
-	return prevArray, nil
+	return ret, err
 }

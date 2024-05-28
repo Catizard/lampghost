@@ -7,6 +7,8 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+var ynChoices []string = []string{"no", "yes"}
+
 type model struct {
 	choices  []string
 	cursor   int
@@ -17,7 +19,7 @@ type model struct {
 func newModel(choices []string, msg string) model {
 	return model{
 		choices:  choices,
-		selected: 0,
+		selected: -1,
 		msg:      msg,
 	}
 }
@@ -37,7 +39,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.cursor--
 			}
 		case "down", "j":
-			if m.cursor > 0 {
+			if m.cursor+1 < len(m.choices) {
 				m.cursor++
 			}
 		case "enter", " ":
@@ -69,10 +71,34 @@ func (m model) View() string {
 // Returns index of user's choice
 // Fast return if there is no need to choose
 func OpenChooseTui(choices []string, msg string) int {
+	if len(choices) == 0 {
+		panic("OpenChooseTui: len(choices) == 0")
+	}
+	if len(choices) == 1 {
+		return 0 // fast fail
+	}
 	m := newModel(choices, msg)
 	p := tea.NewProgram(m)
-	if _, err := p.Run(); err != nil {
+
+	// Result of p.Run() is tea.Model other than model
+	// So here we have to declare a new variable and perform cast on it
+	rm, err := p.Run()
+	if err != nil {
 		log.Fatalf("OpenChooseTui returns a error: %v\n", err)
 	}
-	return m.selected
+	if rm, ok := rm.(model); ok && rm.selected == -1 {
+		log.Fatalf("You didn't make any choices") // -----+
+	} else { //                                           |
+		return rm.selected //                             |
+	} //                                                  |
+	// Cannot be reached   // <---------------------------+
+	return -1
+}
+
+// Simple wrapper of OpenChooseTui
+// With two choices: yes and no
+// Returns false if choose no, true if choose yes
+func OpenYesOrNoChooseTui(msg string) bool {
+	i := OpenChooseTui(ynChoices, msg)
+	return i != 0
 }

@@ -34,12 +34,12 @@ func (header *DiffTableHeader) String() string {
 func InitDifftableHeaderTable() error {
 	db := common.OpenDB()
 	defer db.Close()
-	_, err := db.Exec("DROP TABLE IF EXISTS 'difftable_header';CREATE TABLE difftable_header ( id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, alias TEXT, last_update TEXT, symbol TEXT NOT NULL, data_location TEXT NOT NULL);")
+	_, err := db.Exec("DROP TABLE IF EXISTS 'difftable_header';CREATE TABLE difftable_header ( id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, alias TEXT, last_update TEXT, symbol TEXT NOT NULL, data_location TEXT NOT NULL, data_url TEXT NOT NULL);")
 	return err
 }
 
 // Add a difficult table header(or say, meta data) and related song data to disk.
-func (header *DiffTableHeader) AddDiffTable() error {
+func (header *DiffTableHeader) SaveDiffTableHeader() error {
 	// 1. Validation
 	if arr, err := QueryDifficultTableHeaderByName(header.Name); err != nil || len(arr) > 0 {
 		if err != nil {

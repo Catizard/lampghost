@@ -7,18 +7,17 @@ import (
 )
 
 // struct DiffTable represents a content of difficult table
+// TODO: Sha256 is ignored now, since table may not contain it
 type DiffTable struct {
-	Artist   string
-	Comment  string
-	Level    string
-	Lr2BmsId string `json:"lr2_bmdid"`
-	Md5      string
-	NameDiff string
-	Title    string
-	Url      string `json:"url"`
-	UrlDiff  string `json:"url_diff"`
-
-	// Actually doesn't exist, must be merged from elsewhere
+	Artist    string
+	Comment   string
+	Level     string
+	Lr2BmsId  string `json:"lr2_bmdid"`
+	Md5       string
+	NameDiff  string
+	Title     string
+	Url       string `json:"url"`
+	UrlDiff   string `json:"url_diff"`
 	Sha256    string `json:"-"`
 	Lamp      int32  `json:"-"`
 	GhostLamp int32  `json:"-"`

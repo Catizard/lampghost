@@ -13,7 +13,7 @@ import (
 )
 
 var AddCmd = &cobra.Command{
-	Use:   "add",
+	Use:   "add [table_name] [--alias alias_name]",
 	Short: "add bms difficult url, ignore if already exists in table_header.json",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
@@ -28,7 +28,7 @@ var AddCmd = &cobra.Command{
 			dth.Alias = aliasName
 		}
 		// 2. Add difficult table header
-		err := dth.AddDiffTable()
+		err := dth.SaveDiffTableHeader()
 		if err != nil {
 			panic(err)
 		}

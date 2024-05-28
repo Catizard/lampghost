@@ -71,8 +71,7 @@ func (info *RivalInfo) SaveRivalInfo() error {
 
 	db := common.OpenDB()
 	defer db.Close()
-	_, err := db.NamedExec(`INSERT INTO rival_info (name, score_log_path, song_data_path) VALUES (:name,:score_log_path,:song_data_path)`, info)
-	if err != nil {
+	if _, err := db.NamedExec(`INSERT INTO rival_info (name, score_log_path, song_data_path) VALUES (:name,:score_log_path,:song_data_path)`, info); err != nil {
 		return err
 	}
 	return nil
@@ -94,7 +93,7 @@ func QueryRivalInfo(name string) ([]RivalInfo, error) {
 // Simple wrapper of QueryRivalInfo.
 // Returns error if no result matched.
 // Open tui application when multiple results matched.
-func QueryExactlyRivalInfo(name string) (RivalInfo, error) {
+func QueryRivalInfoWithChoices(name string) (RivalInfo, error) {
 	rivalArr, err := QueryRivalInfo(name)
 	if err != nil {
 		return RivalInfo{}, err

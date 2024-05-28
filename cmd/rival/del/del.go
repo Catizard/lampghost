@@ -15,7 +15,7 @@ var DelCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		name := args[0]
-		rivalInfo, err := rival.QueryExactlyRivalInfo(name)
+		rivalInfo, err := rival.QueryRivalInfoWithChoices(name)
 		if err != nil {
 			panic(err)
 		}

@@ -8,6 +8,7 @@ import (
 
 	"github.com/Catizard/lampghost/internel/common"
 	"github.com/Catizard/lampghost/internel/score"
+	"github.com/Catizard/lampghost/internel/tui/choose"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -20,6 +21,10 @@ type RivalInfo struct {
 	Tags         []RivalTag
 	ScoreLog     []score.ScoreLog
 	SongData     []score.SongData
+}
+
+func (r *RivalInfo) String() string {
+	return fmt.Sprintf("%s (log=[%s],data=[%s])", r.Name, r.ScoreLogPath, r.SongDataPath)
 }
 
 func InitRivalInfoTable() error {
@@ -83,4 +88,30 @@ func QueryRivalInfo(name string) ([]RivalInfo, error) {
 		err = fmt.Errorf("query doesn't return any result")
 	}
 	return ret, err
+}
+
+// Simple wrapper of QueryRivalInfo.
+// Returns error if no result matched.
+// Open tui application when multiple results matched.
+func QueryExactlyRivalInfo(name string) (RivalInfo, error) {
+	rivalArr, err := QueryRivalInfo(name)
+	if err != nil {
+		return RivalInfo{}, err
+	}
+	choices := make([]string, 0)
+	for _, r := range rivalArr {
+		choices = append(choices, r.String())
+	}
+	index := choose.OpenChooseTui(choices, fmt.Sprintf("Multiple rivals named %s, please choose one:", name))
+	return rivalArr[index], nil
+}
+
+func DeleteRivalInfo(id int) error {
+	db := common.OpenDB()
+	defer db.Close()
+	_, err := db.Exec(`DELETE FROM rival_info where id=?`, id)
+	if err != nil {
+		return err
+	}
+	return nil
 }

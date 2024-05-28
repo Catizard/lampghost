@@ -44,7 +44,7 @@ func queryAndLoadRival(rivalName string) rival.RivalInfo {
 	}
 	rivalNameArr := make([]string, 0)
 	for _, r := range rivalInfoArr {
-		rivalNameArr = append(rivalNameArr, fmt.Sprintf("%s (log=[%s],data=[%s])", r.Name, r.ScoreLogPath, r.SongDataPath))
+		rivalNameArr = append(rivalNameArr, r.String())
 	}
 	index := choose.OpenChooseTui(rivalNameArr, fmt.Sprintf("Multiple rivals named %s, please choose one:", rivalName))
 	rivalInfo := rivalInfoArr[index]

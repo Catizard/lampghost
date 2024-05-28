@@ -1,121 +1,90 @@
 package difftable
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
-	"io/fs"
+	"log"
 	"net/http"
 	"os"
 
 	"github.com/Catizard/lampghost/internel/common"
+	"github.com/Catizard/lampghost/internel/tui/choose"
 	_ "github.com/mattn/go-sqlite3"
 )
 
-const (
-	headerFileName = "tableHeader.json"
-)
-
 type DiffTableHeader struct {
-	Id          int    `db:"id"`
-	DataUrl     string `json:"data_url" db:"data_url"`
-	LastUpdate  string `json:"last_update" db:"last_update"`
-	Name        string `json:"name" db:"name"`
-	OriginalUrl string `json:"original_url" db:"original_url"`
-	Symbol      string `json:"symbol" db:"symbol"`
-	Alias       string `json:"alias" db:"alias"`
+	Id           int    `db:"id"`
+	DataUrl      string `json:"data_url" db:"data_url"`
+	DataLocation string `db:"data_location"`
+	LastUpdate   string `json:"last_update" db:"last_update"`
+	Name         string `json:"name" db:"name"`
+	OriginalUrl  string `json:"original_url" db:"original_url"`
+	Symbol       string `json:"symbol" db:"symbol"`
+	Alias        string `json:"alias" db:"alias"`
+}
+
+func (header *DiffTableHeader) String() string {
+	if len(header.Alias) > 0 {
+		return fmt.Sprintf("%s(%s) [symbol=%s, url=%s]", header.Name, header.Alias, header.Symbol, header.Alias)
+	}
+	return fmt.Sprintf("%s [symbol=%s, url=%s]", header.Name, header.Symbol, header.Alias)
 }
 
 // Initialize difftable_header table
 func InitDifftableHeaderTable() error {
 	db := common.OpenDB()
 	defer db.Close()
-	_, err := db.Exec("DROP TABLE IF EXISTS 'difftable_header';CREATE TABLE difftable_header ( id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, alias TEXT, last_update TEXT, symbol TEXT NOT NULL);")
+	_, err := db.Exec("DROP TABLE IF EXISTS 'difftable_header';CREATE TABLE difftable_header ( id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, alias TEXT, last_update TEXT, symbol TEXT NOT NULL, data_location TEXT NOT NULL);")
 	return err
 }
 
 // Add a difficult table header(or say, meta data) and related song data to disk.
-// Before calling this function, data.json should't exist on disk, otherwise beaviour is undefined.
-// All difficult table headers' info would be saved in one single file.
 func (header *DiffTableHeader) AddDiffTable() error {
-	// 1. Sync table header file
-	headers, err := QueryDifficultTableHeaderStrictly(header.Name)
-	if err != nil {
+	// 1. Validation
+	if arr, err := QueryDifficultTableHeaderByName(header.Name); err != nil || len(arr) > 0 {
+		if err != nil {
+			return err
+		}
+		log.Fatalf(`There is already a table named (or its alias matches) %s
+		Use table sync command to sync table.
+		Use table del command to delete table`, header.Name)
+	}
+	// 2. Create data file
+	if err := saveTableData(header.getDataJsonFileName(), header.DataUrl); err != nil {
 		return err
 	}
-	if len(headers) > 0 {
-		return fmt.Errorf("%s difficult table has already been added.\nHint: use table sync %s to sync table's data\nIf you believe this is an error, type 'table del %s' to remove", header.Name, header.Name, header.Name)
+	// 3. Insert into database
+	dataLocation := header.getDataJsonFileName()
+	header.DataLocation = dataLocation
+	db := common.OpenDB()
+	defer db.Close()
+	if _, err := db.NamedExec(`INSERT INTO difftable_header(id, data_url, data_location, last_update, name, symbol, alias) VALUES (:id, :data_url, :data_location, :last_update, :name, :symbol, :alias)`, header); err != nil {
+		return err
 	}
+	return nil
+}
 
-	// Append new one, then write everything back
-	headers = append(headers, *header)
+// Query by name or alias
+func QueryDifficultTableHeaderByName(name string) ([]DiffTableHeader, error) {
+	db := common.OpenDB()
+	defer db.Close()
+	var ret []DiffTableHeader
+	err := db.Select(&ret, "SELECT * FROM difftable_header WHERE name=? OR alias=?", name, name)
+	return ret, err
+}
 
-	newBody, err := json.Marshal(headers)
+// Simple choose wrapper of QueryDifficultTableHeaderByName
+func QueryDifficultTableHeaderByNameWithChoices(name string) (DiffTableHeader, error) {
+	dthArr, err := QueryDifficultTableHeaderByName(name)
 	if err != nil {
-		panic(err)
+		return DiffTableHeader{}, err
 	}
-	os.WriteFile(headerFileName, newBody, fs.FileMode(os.O_WRONLY))
-
-	// 2. Create data file
-	fileName := header.getDataJsonFileName()
-	// If data.json is already here, do nothing
-	if _, err := os.Stat(fileName); err == nil {
-		panic(fmt.Errorf("%s has been already exists, if you want to update data.json, use sync command instead", fileName))
-	} else if errors.Is(err, os.ErrExist) {
-		// unexpected...
-		panic(err)
+	choices := make([]string, 0)
+	for _, v := range dthArr {
+		choices = append(choices, v.String())
 	}
-	return saveTableData(header.getDataJsonFileName(), header.DataUrl)
-}
-
-// Query table headers on disk.
-// Returned when name or alias name is matched
-func QueryDifficultTableHeaderLoosely(name string) ([]DiffTableHeader, error) {
-	return QueryDifficultTableHeader(func(dth DiffTableHeader) bool {
-		return dth.Name == name || dth.Alias == name
-	})
-}
-
-// Query table headers on disk.
-// Returned only when name is matched
-func QueryDifficultTableHeaderStrictly(name string) ([]DiffTableHeader, error) {
-	return QueryDifficultTableHeader(func(dth DiffTableHeader) bool {
-		return dth.Name == name
-	})
-}
-
-// Prototype of difficult table header's query function.
-// Query headers from disk, return array of headers when succeed
-func QueryDifficultTableHeader(equalf func(DiffTableHeader) bool) ([]DiffTableHeader, error) {
-	// Read all data from disk.
-	var local []DiffTableHeader
-	common.FetchJsonFromFile(headerFileName, &local)
-
-	res := make([]DiffTableHeader, 0)
-	for _, v := range local {
-		if equalf(v) {
-			res = append(res, v)
-		}
-	}
-	return res, nil
-}
-
-// Query but panic when multiple result matched
-// None matched is also take as an error
-// Simple wrap of QueryDifficultTableHeader
-func QueryDifficultTableHeaderExactlyOne(name string) DiffTableHeader {
-	rawArr, err := QueryDifficultTableHeaderLoosely(name)
-	if err != nil {
-		panic(err)
-	}
-	if len(rawArr) == 0 {
-		panic("no difficult table header found")
-	}
-	if len(rawArr) > 1 {
-		panic("multiple difficult table matched")
-	}
-	return rawArr[0]
+	i := choose.OpenChooseTui(choices, "Multiple table matched with %s, please choose one:")
+	return dthArr[i], nil
 }
 
 func (header *DiffTableHeader) SyncDifficultTable() error {

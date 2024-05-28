@@ -15,8 +15,10 @@ var EditCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		tableName := args[0]
-		// TODO: give choices when need
-		dt := difftable.QueryDifficultTableHeaderExactlyOne(tableName)
+		dt, err := difftable.QueryDifficultTableHeaderByNameWithChoices(tableName)
+		if err != nil {
+			panic(err)
+		}
 		aliasName := cmd.Flag("alias").Value.String()
 
 		anyChange := false

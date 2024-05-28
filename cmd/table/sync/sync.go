@@ -4,8 +4,6 @@ Copyright © 2024 Catizard <1185032459@qq.com>
 package sync
 
 import (
-	"fmt"
-
 	"github.com/Catizard/lampghost/internel/difftable"
 	"github.com/spf13/cobra"
 )
@@ -16,22 +14,12 @@ var SyncCmd = &cobra.Command{
 	Short: "sync one specified difficult table's data.",
 	Run: func(cmd *cobra.Command, args []string) {
 		name := args[0]
-		matchedArray, err := difftable.QueryDifficultTableHeaderLoosely(name)
+		dth, err := difftable.QueryDifficultTableHeaderByNameWithChoices(name)
 		if err != nil {
 			panic(err)
 		}
-		if len(matchedArray) == 0 {
-			panic("no such a difficult table")
-		}
-		// TODO: give options to choose when multi header was matched
-		if len(matchedArray) > 1 {
-			panic(fmt.Errorf("more than 1 difftable matched on %s", name))
-		}
-
-		// Assume there is only one matched result
-		matchedHeader := matchedArray[0]
 		// Call sync function on specified header
-		if err = matchedHeader.SyncDifficultTable(); err != nil {
+		if err = dth.SyncDifficultTable(); err != nil {
 			panic(err)
 		}
 	},

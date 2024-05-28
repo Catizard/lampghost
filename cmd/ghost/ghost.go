@@ -23,7 +23,11 @@ var GhostCmd = &cobra.Command{
 		ghostInfo := queryAndLoadRival(args[1])
 
 		// Difficult table header
-		dth := difftable.QueryDifficultTableHeaderExactlyOne("insane")
+		// TODO: give difftable argument
+		dth, err := difftable.QueryDifficultTableHeaderByNameWithChoices("insane")
+		if err != nil {
+			panic(err)
+		}
 
 		// Difficult table data
 		diffTable, err := difftable.ReadDiffTable(dth.Name + ".json")

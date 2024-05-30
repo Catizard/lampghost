@@ -72,7 +72,7 @@ func (header *DiffTableHeader) SaveDiffTableHeader() error {
 	db := common.OpenDB()
 	defer db.Close()
 	db.Begin()
-	if _, err := db.NamedExec(`INSERT INTO difftable_header(id, data_url, data_location, last_update, name, symbol, alias) VALUES (:id, :data_url, :data_location, :last_update, :name, :symbol, :alias)`, header); err != nil {
+	if _, err := db.NamedExec(`INSERT INTO difftable_header(data_url, data_location, last_update, name, symbol, alias) VALUES (:data_url, :data_location, :last_update, :name, :symbol, :alias)`, header); err != nil {
 		db.MustBegin().Rollback()
 		return err
 	}

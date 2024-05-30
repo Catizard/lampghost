@@ -14,14 +14,15 @@ import (
 )
 
 type DiffTableHeader struct {
-	Id           int    `db:"id"`
-	DataUrl      string `json:"data_url" db:"data_url"`
-	DataLocation string `db:"data_location"`
-	LastUpdate   string `json:"last_update" db:"last_update"`
-	Name         string `json:"name" db:"name"`
-	OriginalUrl  string `json:"original_url" db:"original_url"`
-	Symbol       string `json:"symbol" db:"symbol"`
-	Alias        string `json:"alias" db:"alias"`
+	Id           int            `db:"id"`
+	DataUrl      string         `json:"data_url" db:"data_url"`
+	DataLocation string         `db:"data_location"`
+	LastUpdate   string         `json:"last_update" db:"last_update"`
+	Name         string         `json:"name" db:"name"`
+	OriginalUrl  string         `json:"original_url" db:"original_url"`
+	Symbol       string         `json:"symbol" db:"symbol"`
+	Alias        string         `json:"alias" db:"alias"`
+	Course       [][]CourseInfo `json:"course"`
 }
 
 func (header *DiffTableHeader) String() string {
@@ -70,9 +71,17 @@ func (header *DiffTableHeader) SaveDiffTableHeader() error {
 	header.DataLocation = dataLocation
 	db := common.OpenDB()
 	defer db.Close()
+	db.Begin()
 	if _, err := db.NamedExec(`INSERT INTO difftable_header(id, data_url, data_location, last_update, name, symbol, alias) VALUES (:id, :data_url, :data_location, :last_update, :name, :symbol, :alias)`, header); err != nil {
+		db.MustBegin().Rollback()
 		return err
 	}
+	// 4. Try save course info into database
+	if err := saveCourseInfoFromTableHeader(db, *header); err != nil {
+		db.MustBegin().Rollback()
+		return err
+	}
+	db.MustBegin().Commit()
 	return nil
 }
 

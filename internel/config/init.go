@@ -13,6 +13,10 @@ func InitLampGhost() {
 		panic(err)
 	}
 	// TODO: Should we clear any .json file too?
+	// course_info
+	if err := difftable.InitCourseInfoTable(); err != nil {
+		panic(err)
+	}
 	// rival_info
 	if err := rival.InitRivalInfoTable(); err != nil {
 		panic(err)

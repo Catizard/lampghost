@@ -7,9 +7,11 @@ import (
 )
 
 type RivalTag struct {
-	TagName   string
-	Generated bool
-	TimeStamp int64
+	Id        int    `db:"id"`
+	RivalId   int    `db:"rival_id"`
+	TagName   string `db:"tag_name"`
+	Generated bool   `db:"generated"`
+	TimeStamp int64  `db:"timestamp"`
 }
 
 func InitRivalTagTable() error {

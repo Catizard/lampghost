@@ -52,11 +52,7 @@ func queryAndLoadRival(rivalName string) rival.RivalInfo {
 	}
 	index := choose.OpenChooseTui(rivalNameArr, fmt.Sprintf("Multiple rivals named %s, please choose one:", rivalName))
 	rivalInfo := rivalInfoArr[index]
-	if err := rivalInfo.LoadRivalScoreLog(); err != nil {
-		panic(err)
-	}
-	// TODO: support "shrink mode"
-	if err := rivalInfo.LoadRivalSongData(); err != nil {
+	if err := rivalInfo.LoadDataIfNil(); err != nil {
 		panic(err)
 	}
 	return rivalInfo

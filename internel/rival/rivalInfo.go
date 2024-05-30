@@ -38,21 +38,32 @@ func InitRivalInfoTable() error {
 	return err
 }
 
-func (r *RivalInfo) LoadRivalScoreLog() error {
-	scoreLog, err := score.ReadScoreLogFromSqlite(r.ScoreLogPath)
-	if err != nil {
-		return err
+// Simple wrapper of LoadRivalScoreLog and LoadRivalSongData
+// Only loads if field is nil
+// If any error occurs, data on r cannot be insured
+func (r *RivalInfo) LoadDataIfNil() error {
+	if r.ScoreLog == nil {
+		if err := r.loadRivalScoreLog(); err != nil {
+			return err
+		}
 	}
-	r.ScoreLog = scoreLog
+	// TODO: support "shrink" mode
+	if r.SongData == nil {
+		if err := r.loadRivalSongData(); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
-func (r *RivalInfo) LoadRivalSongData() error {
-	songData, err := score.ReadSongDataFromSqlite(r.SongDataPath)
-	if err != nil {
+// Like LoadDataIfNil, without nil check
+func (r *RivalInfo) LoadDataForcely() error {
+	if err := r.loadRivalScoreLog(); err != nil {
 		return err
 	}
-	r.SongData = songData
+	if err := r.loadRivalSongData(); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -113,5 +124,23 @@ func DeleteRivalInfo(id int) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (r *RivalInfo) loadRivalScoreLog() error {
+	scoreLog, err := score.ReadScoreLogFromSqlite(r.ScoreLogPath)
+	if err != nil {
+		return err
+	}
+	r.ScoreLog = scoreLog
+	return nil
+}
+
+func (r *RivalInfo) loadRivalSongData() error {
+	songData, err := score.ReadSongDataFromSqlite(r.SongDataPath)
+	if err != nil {
+		return err
+	}
+	r.SongData = songData
 	return nil
 }

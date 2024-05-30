@@ -5,6 +5,7 @@ package tags
 
 import (
 	tags "github.com/Catizard/lampghost/cmd/rival/tags/add"
+	"github.com/Catizard/lampghost/cmd/rival/tags/build"
 	"github.com/spf13/cobra"
 )
 
@@ -19,13 +20,5 @@ var TagsCmd = &cobra.Command{
 
 func init() {
 	TagsCmd.AddCommand(tags.AddCmd)
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// tagsCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// tagsCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	TagsCmd.AddCommand(build.BuildCmd)
 }

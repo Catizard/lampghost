@@ -77,11 +77,20 @@ func (c *CourseInfo) prepareBeforeSave(dth DiffTableHeader) {
 	c.Source = dth.Name
 }
 
+// Preqrequiste after read function on CourseInfo
+func (c *CourseInfo) prepareAfterRead() {
+	// Split md5s field back
+	c.Md5 = strings.Split(c.Md5s, ",")
+}
+
 // Fetch all data
 func QueryAllCourseInfo() ([]CourseInfo, error) {
 	db := common.OpenDB()
 	defer db.Close()
 	var ret []CourseInfo
 	err := db.Select(&ret, "SELECT * FROM course_info")
+	for i := range ret {
+		ret[i].prepareAfterRead()
+	}
 	return ret, err
 }

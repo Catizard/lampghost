@@ -13,6 +13,20 @@ const (
 	DBFileName = "lampghost.db"
 )
 
+const (
+	NO_PLAY = iota
+	Failed
+	AssistEasy
+	LightAssistEasy
+	Easy
+	Normal
+	Hard
+	ExHard
+	FullCombo
+	Perfect
+	Max
+)
+
 // Panic if lampghost.db is not exist
 func CheckInitialize() {
 	if _, err := os.Stat(DBFileName); errors.Is(err, os.ErrNotExist) {

@@ -1,7 +1,7 @@
 /*
 Copyright © 2024 Catizard <1185032459@qq.com>
 */
-package del 
+package del
 
 import (
 	"github.com/Catizard/lampghost/internel/difftable"
@@ -9,15 +9,27 @@ import (
 )
 
 var DelCmd = &cobra.Command{
-	Use:   "del [table_name]",
+	Use:   "del",
 	Short: "Delete a difficult table",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.ExactArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
-		name := args[0]
-		dth, err := difftable.QueryDiffTableHeaderByNameWithChoices(name)
+		name, err := cmd.LocalFlags().GetString("name")
 		if err != nil {
 			panic(err)
 		}
+		var dth difftable.DiffTableHeader
+		var qErr error
+		if len(name) == 0 {
+			// Special case: doesn't specify a name
+			// In this case, all tables would be printed
+			dth, qErr = difftable.AllDiffTableHeaderWithChoices()
+		} else {
+			dth, qErr = difftable.QueryDiffTableHeaderByNameWithChoices(name)
+		}
+		if qErr != nil {
+			panic(qErr)
+		}
+
 		if err := dth.DeleteDiffTableHeader(); err != nil {
 			panic(err)
 		}
@@ -25,4 +37,5 @@ var DelCmd = &cobra.Command{
 }
 
 func init() {
+	DelCmd.Flags().StringP("name", "n", "", "Specify the deleting table's name")
 }

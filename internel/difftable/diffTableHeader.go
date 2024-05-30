@@ -81,6 +81,15 @@ func (header *DiffTableHeader) getDataJsonFileName() string {
 	return header.Name + ".json"
 }
 
+// Fetch all data from sqlite
+func QueryAllDiffTableHeader() ([]DiffTableHeader, error) {
+	db := common.OpenDB()
+	defer db.Close()
+	var ret []DiffTableHeader
+	err := db.Select(&ret, "SELECT * FROM difftable_header")
+	return ret, err
+}
+
 // Query by name or alias
 func QueryDiffTableHeaderByName(name string) ([]DiffTableHeader, error) {
 	db := common.OpenDB()
@@ -95,6 +104,23 @@ func QueryDiffTableHeaderByNameWithChoices(name string) (DiffTableHeader, error)
 	dthArr, err := QueryDiffTableHeaderByName(name)
 	if err != nil {
 		return DiffTableHeader{}, err
+	}
+	return openDiffTableChooseTui(dthArr)
+}
+
+// Like QueryDiffTableHeaderByNameWithChoices, but without query
+func AllDiffTableHeaderWithChoices() (DiffTableHeader, error) {
+	dthArr, err := QueryAllDiffTableHeader()
+	if err != nil {
+		return DiffTableHeader{}, err
+	}
+	return openDiffTableChooseTui(dthArr)
+}
+
+// Simple choose wrapper for difftable_header
+func openDiffTableChooseTui(dthArr []DiffTableHeader) (DiffTableHeader, error) {
+	if len(dthArr) == 0 {
+		return DiffTableHeader{}, fmt.Errorf("no table data")
 	}
 	choices := make([]string, 0)
 	for _, v := range dthArr {

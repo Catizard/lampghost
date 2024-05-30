@@ -13,8 +13,8 @@ import (
 )
 
 var AddCmd = &cobra.Command{
-	Use:   "add [table_name] [--alias alias_name]",
-	Short: "add bms difficult url, ignore if already exists in table_header.json",
+	Use:   "add [the name of table to be added] ",
+	Short: "Add one bms difficult table",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		url := args[0]

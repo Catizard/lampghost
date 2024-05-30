@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/Catizard/lampghost/internel/common"
 	"github.com/Catizard/lampghost/internel/tui/choose"
@@ -36,6 +37,17 @@ func InitDiffTableHeaderTable() error {
 	defer db.Close()
 	_, err := db.Exec("DROP TABLE IF EXISTS 'difftable_header';CREATE TABLE difftable_header ( id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, alias TEXT, last_update TEXT, symbol TEXT NOT NULL, data_location TEXT NOT NULL, data_url TEXT NOT NULL);")
 	return err
+}
+
+// Fetch difficult table header from url
+// For now, it only supports .json file
+func FetchDiffTableHeader(url string) (DiffTableHeader, error) {
+	if !strings.HasSuffix(url, ".json") {
+		return DiffTableHeader{}, fmt.Errorf("only .json format url is supported, sorry :(")
+	}
+	dth := DiffTableHeader{}
+	common.FetchJson(url, &dth)
+	return dth, nil
 }
 
 // Add a difficult table header(or say, meta data) and related song data to disk.

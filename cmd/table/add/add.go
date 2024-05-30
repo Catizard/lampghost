@@ -4,10 +4,6 @@ Copyright © 2024 Catizard <1185032459@qq.com>
 package add
 
 import (
-	"fmt"
-	"strings"
-
-	"github.com/Catizard/lampghost/internel/common"
 	"github.com/Catizard/lampghost/internel/difftable"
 	"github.com/spf13/cobra"
 )
@@ -18,21 +14,19 @@ var AddCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		url := args[0]
-		if !strings.HasSuffix(url, ".json") {
-			panic("only .json format url is supported, sorry :(")
-		}
 		// 1. Fetch difficult table header
-		dth := &difftable.DiffTableHeader{}
-		common.FetchJson(url, dth)
+		dth, err := difftable.FetchDiffTableHeader(url)
+		if err != nil {
+			panic(err)
+		}
 		if aliasName, err := cmd.LocalFlags().GetString("alias"); err == nil {
 			dth.Alias = aliasName
 		}
 		// 2. Add difficult table header
-		err := dth.SaveDiffTableHeader()
+		err = dth.SaveDiffTableHeader()
 		if err != nil {
 			panic(err)
 		}
-		fmt.Printf("%s loaded", dth.Name)
 	},
 }
 

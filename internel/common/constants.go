@@ -2,9 +2,9 @@ package common
 
 import (
 	"errors"
-	"log"
 	"os"
 
+	"github.com/charmbracelet/log"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 )

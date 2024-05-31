@@ -3,13 +3,13 @@ package difftable
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strings"
 
 	"github.com/Catizard/lampghost/internel/common"
 	"github.com/Catizard/lampghost/internel/tui/choose"
+	"github.com/charmbracelet/log"
 	_ "github.com/mattn/go-sqlite3"
 )
 

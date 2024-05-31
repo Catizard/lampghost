@@ -1,7 +1,6 @@
 package ghost
 
 import (
-	"log"
 	"sort"
 	"strconv"
 	"time"
@@ -12,6 +11,7 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/log"
 )
 
 type item struct {

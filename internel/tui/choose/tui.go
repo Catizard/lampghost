@@ -2,9 +2,9 @@ package choose
 
 import (
 	"fmt"
-	"log"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/log"
 )
 
 var ynChoices []string = []string{"no", "yes"}

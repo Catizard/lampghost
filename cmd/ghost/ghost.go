@@ -10,6 +10,7 @@ import (
 	"github.com/Catizard/lampghost/internel/rival"
 	"github.com/Catizard/lampghost/internel/tui/choose"
 	ghostTui "github.com/Catizard/lampghost/internel/tui/ghost"
+	"github.com/charmbracelet/log"
 	"github.com/spf13/cobra"
 )
 
@@ -34,11 +35,26 @@ var GhostCmd = &cobra.Command{
 		if err != nil {
 			panic(err)
 		}
+
+		// If tag flagged
+		if b, err := cmd.Flags().GetBool("tag"); err != nil {
+			panic(err)
+		} else {
+			if b {
+				// You have to choose a tag first
+				tag, err := ghostInfo.ChooseFromAllTags()
+				if err != nil {
+					panic(err)
+				}
+				log.Infof("Choosed %s, time=%d\n", tag.TagName, tag.TimeStamp)
+			}
+		}
 		ghostTui.OpenGhostTui(&dth, diffTable, &selfInfo, &ghostInfo)
 	},
 }
 
 func init() {
+	GhostCmd.Flags().Bool("tag", false, "When flagged, only logs before the chosen tag would be used")
 }
 
 func queryAndLoadRival(rivalName string) rival.RivalInfo {

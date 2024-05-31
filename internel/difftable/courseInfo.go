@@ -48,6 +48,7 @@ func saveCourseInfoFromTableHeader(db *sqlx.DB, dth DiffTableHeader) error {
 		return err
 	}
 
+	// TODO: hack on rawData to delete no good/no speed mutated courses
 	rawData := dth.Course
 	for _, arr := range rawData {
 		for _, v := range arr {

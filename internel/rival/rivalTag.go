@@ -1,12 +1,15 @@
 package rival
 
 import (
+	"fmt"
 	"sort"
+	"time"
 
 	"github.com/Catizard/lampghost/internel/common"
 	"github.com/Catizard/lampghost/internel/common/clearType"
 	"github.com/Catizard/lampghost/internel/difftable"
 	"github.com/Catizard/lampghost/internel/score"
+	"github.com/Catizard/lampghost/internel/tui/choose"
 	"github.com/charmbracelet/log"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
@@ -18,6 +21,11 @@ type RivalTag struct {
 	TagName   string `db:"tag_name"`
 	Generated bool   `db:"generated"`
 	TimeStamp int64  `db:"timestamp"`
+}
+
+func (r *RivalTag) String() string {
+	t := time.Unix(r.TimeStamp, 0)
+	return fmt.Sprintf("%s[%s]", r.TagName, t.Format("2006-01-02 15:04:05"))
 }
 
 func InitRivalTagTable() error {
@@ -40,13 +48,16 @@ func (r *RivalInfo) BuildTags(courseArr []difftable.CourseInfo) error {
 		panic(err)
 	}
 
-	// TODO: only calculate sha256 once
+	// TODO: Structure of this procdure should be changed
 	// Maps songdata by md5
 	md5MapsToSongData := make(map[string]score.SongData)
 	for _, v := range r.SongData {
 		md5MapsToSongData[v.Md5] = v
 	}
 
+	// TODO: genocide 2018 course contains some mutations like no speed/no good. They contain the exactly same md5 so sha256 would be the same
+	// This causes tag generation actually works incorectly, I think delete them directly from course would be the easist way to handle this problem
+	// At current development stage, the specific implementation is difftable/saveCourseInfoFromTableHeader (Actaully hasn't implemented now)
 	interestSha256 := make(map[string]struct{}, 0)
 	for i, course := range courseArr {
 		var sha256 string
@@ -166,4 +177,25 @@ func (r *RivalInfo) syncGeneratedTags(tags []RivalTag) error {
 	}
 	tx.Commit()
 	return nil
+}
+
+func (r *RivalInfo) QueryAllTags() ([]RivalTag, error) {
+	db := common.OpenDB()
+	defer db.Close()
+	var ret []RivalTag
+	err := db.Select(&ret, "SELECT * FROM rival_tag WHERE rival_id=?", r.Id)
+	return ret, err
+}
+
+func (r *RivalInfo) ChooseFromAllTags() (RivalTag, error) {
+	if tags, err := r.QueryAllTags(); err != nil {
+		return RivalTag{}, nil
+	} else {
+		choices := make([]string, 0)
+		for _, v := range tags {
+			choices = append(choices, v.String())
+		}
+		i := choose.OpenChooseTui(choices, "Choose a tag to ghost with")
+		return tags[i], nil
+	}
 }

@@ -16,7 +16,8 @@ type CourseInfo struct {
 	Source string   `db:"source"`
 	// This field's only purpose is to store value in database
 	// Since you cannot directly store array in database
-	Md5s string `db:"md5s"`
+	Md5s    string `db:"md5s"`
+	Sha256s string // Can be seen as a mapping from md5s
 }
 
 // Initialze course_info header

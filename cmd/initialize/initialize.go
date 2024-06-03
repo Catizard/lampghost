@@ -4,7 +4,7 @@ Copyright © 2024 Catizard <1185032459@qq.com>
 package initialize
 
 import (
-	"github.com/Catizard/lampghost/internel/config"
+	"github.com/Catizard/lampghost/internal/config"
 	"github.com/spf13/cobra"
 )
 

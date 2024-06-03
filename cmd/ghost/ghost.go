@@ -6,10 +6,10 @@ package ghost
 import (
 	"fmt"
 
-	"github.com/Catizard/lampghost/internel/difftable"
-	"github.com/Catizard/lampghost/internel/rival"
-	"github.com/Catizard/lampghost/internel/tui/choose"
-	ghostTui "github.com/Catizard/lampghost/internel/tui/ghost"
+	"github.com/Catizard/lampghost/internal/difftable"
+	"github.com/Catizard/lampghost/internal/rival"
+	"github.com/Catizard/lampghost/internal/tui/choose"
+	ghostTui "github.com/Catizard/lampghost/internal/tui/ghost"
 	"github.com/charmbracelet/log"
 	"github.com/spf13/cobra"
 )

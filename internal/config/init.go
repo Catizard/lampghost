@@ -1,8 +1,8 @@
 package config
 
 import (
-	"github.com/Catizard/lampghost/internel/difftable"
-	"github.com/Catizard/lampghost/internel/rival"
+	"github.com/Catizard/lampghost/internal/difftable"
+	"github.com/Catizard/lampghost/internal/rival"
 )
 
 // Initialize lampghost application's database

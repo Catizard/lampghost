@@ -7,8 +7,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Catizard/lampghost/internel/common"
-	"github.com/Catizard/lampghost/internel/tui/choose"
+	"github.com/Catizard/lampghost/internal/common"
+	"github.com/Catizard/lampghost/internal/tui/choose"
 	"github.com/charmbracelet/log"
 	_ "github.com/mattn/go-sqlite3"
 )

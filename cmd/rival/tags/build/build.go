@@ -4,8 +4,8 @@ Copyright © 2024 Catizard <1185032459@qq.com>
 package build
 
 import (
-	"github.com/Catizard/lampghost/internel/difftable"
-	"github.com/Catizard/lampghost/internel/rival"
+	"github.com/Catizard/lampghost/internal/difftable"
+	"github.com/Catizard/lampghost/internal/rival"
 	"github.com/charmbracelet/log"
 	"github.com/spf13/cobra"
 )

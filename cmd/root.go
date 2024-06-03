@@ -11,7 +11,7 @@ import (
 	"github.com/Catizard/lampghost/cmd/rival"
 	"github.com/Catizard/lampghost/cmd/table"
 	"github.com/Catizard/lampghost/cmd/version"
-	"github.com/Catizard/lampghost/internel/common"
+	"github.com/Catizard/lampghost/internal/common"
 	"github.com/spf13/cobra"
 )
 

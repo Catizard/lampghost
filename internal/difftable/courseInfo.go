@@ -3,7 +3,7 @@ package difftable
 import (
 	"strings"
 
-	"github.com/Catizard/lampghost/internel/common"
+	"github.com/Catizard/lampghost/internal/common"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 )

@@ -113,7 +113,7 @@ func QueryRivalInfoWithChoices(name string) (RivalInfo, error) {
 	for _, r := range rivalArr {
 		choices = append(choices, r.String())
 	}
-	index := choose.OpenChooseTui(choices, fmt.Sprintf("Multiple rivals named %s, please choose one:", name))
+	index := choose.OpenChooseTuiSkippable(choices, fmt.Sprintf("Multiple rivals named %s, please choose one:", name))
 	return rivalArr[index], nil
 }
 

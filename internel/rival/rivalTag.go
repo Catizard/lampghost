@@ -195,7 +195,7 @@ func (r *RivalInfo) ChooseFromAllTags() (RivalTag, error) {
 		for _, v := range tags {
 			choices = append(choices, v.String())
 		}
-		i := choose.OpenChooseTui(choices, "Choose a tag to ghost with")
+		i := choose.OpenChooseTuiSkippable(choices, "Choose a tag to ghost with")
 		return tags[i], nil
 	}
 }

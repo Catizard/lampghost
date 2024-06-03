@@ -66,7 +66,7 @@ func queryAndLoadRival(rivalName string) rival.RivalInfo {
 	for _, r := range rivalInfoArr {
 		rivalNameArr = append(rivalNameArr, r.String())
 	}
-	index := choose.OpenChooseTui(rivalNameArr, fmt.Sprintf("Multiple rivals named %s, please choose one:", rivalName))
+	index := choose.OpenChooseTuiSkippable(rivalNameArr, fmt.Sprintf("Multiple rivals named %s, please choose one:", rivalName))
 	rivalInfo := rivalInfoArr[index]
 	if err := rivalInfo.LoadDataIfNil(); err != nil {
 		panic(err)

@@ -147,7 +147,7 @@ func openDiffTableChooseTui(dthArr []DiffTableHeader) (DiffTableHeader, error) {
 	for _, v := range dthArr {
 		choices = append(choices, v.String())
 	}
-	i := choose.OpenChooseTui(choices, "Multiple table matched with %s, please choose one:")
+	i := choose.OpenChooseTuiSkippable(choices, "Multiple table matched with %s, please choose one:")
 	return dthArr[i], nil
 }
 

@@ -4,7 +4,10 @@ Copyright © 2024 Catizard <1185032459@qq.com>
 package del
 
 import (
+	"fmt"
+
 	"github.com/Catizard/lampghost/internal/difftable"
+	"github.com/Catizard/lampghost/internal/tui/choose"
 	"github.com/spf13/cobra"
 )
 
@@ -29,9 +32,10 @@ var DelCmd = &cobra.Command{
 		if qErr != nil {
 			panic(qErr)
 		}
-
-		if err := dth.DeleteDiffTableHeader(); err != nil {
-			panic(err)
+		if b := choose.OpenYesOrNoChooseTui(fmt.Sprintf("Delete %s?", dth.String())); b {
+			if err := dth.DeleteDiffTableHeader(); err != nil {
+				panic(err)
+			}
 		}
 	},
 }

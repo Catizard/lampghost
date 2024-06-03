@@ -38,12 +38,20 @@ func OpenChooseTui(choices []string, msg string, skip bool) int {
 	return ret
 }
 
-// Simple wrapper of OpenChooseTui
-// With two choices: yes and no
-// Returns false if choose no, true if choose yes
+// Simple wrapper for huh confirm
 func OpenYesOrNoChooseTui(msg string) bool {
-	return huh.NewConfirm().
-		Title(msg).
-		Affirmative("Yes").
-		Negative("No").GetValue().(bool)
+	var r bool
+	form := huh.NewForm(
+		huh.NewGroup(
+			huh.NewConfirm().
+				Title(msg).
+				Affirmative("Yes").
+				Negative("No").
+				Value(&r),
+		),
+	)
+	if err := form.Run(); err != nil {
+		log.Fatal(err)
+	}
+	return r
 }

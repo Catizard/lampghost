@@ -31,10 +31,8 @@ var (
 )
 
 // Initialze course_info header
-func InitCourseInfoTable() error {
-	db := common.OpenDB()
-	defer db.Close()
-	_, err := db.Exec(`
+func InitCourseInfoTable(tx *sqlx.Tx) error {
+	_, err := tx.Exec(`
 	DROP TABLE IF EXISTS 'course_info';
 	CREATE TABLE course_info (
 		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,

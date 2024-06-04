@@ -18,6 +18,7 @@ This project so called "lampghost" is because it's like the "ghost record" in ca
 
 ## Further
 
+- Use context package when command begins
 - Better frustation (need advice & help)
 - Add configuration file support
 - Support "shrink" mode: only one songdata.db file is used across everywhere, only scorelog.db need be loaded. One songdata.db file would be around 60MB~150MB which is too large for collecting

@@ -28,13 +28,8 @@ func (r *RivalInfo) String() string {
 }
 
 // Initialize rival_info table
-func InitRivalInfoTable() error {
-	db, err := sqlx.Open("sqlite3", common.DBFileName)
-	if err != nil {
-		return err
-	}
-	defer db.Close()
-	_, err = db.Exec("DROP TABLE IF EXISTS 'rival_info';CREATE TABLE rival_info (name TEXT(255) NOT NULL, id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, score_log_path TEXT(255) NOT NULL, song_data_path TEXT(255) NOT NULL);")
+func InitRivalInfoTable(tx *sqlx.Tx) error {
+	_, err := tx.Exec("DROP TABLE IF EXISTS 'rival_info';CREATE TABLE rival_info (name TEXT(255) NOT NULL, id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, score_log_path TEXT(255) NOT NULL, song_data_path TEXT(255) NOT NULL);")
 	return err
 }
 

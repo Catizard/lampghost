@@ -10,6 +10,7 @@ import (
 	"github.com/Catizard/lampghost/internal/common"
 	"github.com/Catizard/lampghost/internal/tui/choose"
 	"github.com/charmbracelet/log"
+	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -33,10 +34,8 @@ func (header *DiffTableHeader) String() string {
 }
 
 // Initialize difftable_header table
-func InitDiffTableHeaderTable() error {
-	db := common.OpenDB()
-	defer db.Close()
-	_, err := db.Exec("DROP TABLE IF EXISTS 'difftable_header';CREATE TABLE difftable_header ( id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, alias TEXT, last_update TEXT, symbol TEXT NOT NULL, data_location TEXT NOT NULL, data_url TEXT NOT NULL);")
+func InitDiffTableHeaderTable(tx *sqlx.Tx) error {
+	_, err := tx.Exec("DROP TABLE IF EXISTS 'difftable_header';CREATE TABLE difftable_header ( id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, alias TEXT, last_update TEXT, symbol TEXT NOT NULL, data_location TEXT NOT NULL, data_url TEXT NOT NULL);")
 	return err
 }
 

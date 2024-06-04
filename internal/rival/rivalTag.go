@@ -28,13 +28,8 @@ func (r *RivalTag) String() string {
 	return fmt.Sprintf("%s[%s]", r.TagName, t.Format("2006-01-02 15:04:05"))
 }
 
-func InitRivalTagTable() error {
-	db, err := sqlx.Open("sqlite3", common.DBFileName)
-	if err != nil {
-		return err
-	}
-	defer db.Close()
-	_, err = db.Exec("DROP TABLE IF EXISTS 'rival_tag';CREATE TABLE rival_tag (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, rival_id INTEGER NOT NULL, tag_name TEXT(255) NOT NULL, 'generated' INTEGER DEFAULT (0) NOT NULL, 'timestamp' TEXT NOT NULL)")
+func InitRivalTagTable(tx *sqlx.Tx) error {
+	_, err := tx.Exec("DROP TABLE IF EXISTS 'rival_tag';CREATE TABLE rival_tag (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, rival_id INTEGER NOT NULL, tag_name TEXT(255) NOT NULL, 'generated' INTEGER DEFAULT (0) NOT NULL, 'timestamp' TEXT NOT NULL)")
 	return err
 }
 

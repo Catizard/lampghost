@@ -37,7 +37,7 @@ func InitCourseInfoTable() error {
 
 // Save course info from difficult table's fetch result
 // If there is already a content has the same name, md5s, source, skip it
-func saveCourseInfoFromTableHeader(db *sqlx.DB, dth DiffTableHeader) error {
+func saveCourseInfoFromTableHeader(tx *sqlx.Tx, dth DiffTableHeader) error {
 	// If there is no course...
 	if dth.Course == nil || len(dth.Course) == 0 || len(dth.Course[0]) == 0 {
 		return nil
@@ -65,7 +65,7 @@ func saveCourseInfoFromTableHeader(db *sqlx.DB, dth DiffTableHeader) error {
 				continue
 			}
 			// OK, it's unique
-			if _, err := db.NamedExec("INSERT INTO course_info(name, md5s, source) VALUES(:name, :md5s, :source)", &v); err != nil {
+			if err := v.InsertCourseInfo(tx); err != nil {
 				return err
 			}
 		}
@@ -95,4 +95,10 @@ func QueryAllCourseInfo() ([]CourseInfo, error) {
 		ret[i].prepareAfterRead()
 	}
 	return ret, err
+}
+
+// Insert one row to database
+func (c *CourseInfo) InsertCourseInfo(tx *sqlx.Tx) error {
+	_, err := tx.NamedExec("INSERT INTO course_info(name, md5s, source) VALUES(:name, :md5s, :source)", c)
+	return err
 }

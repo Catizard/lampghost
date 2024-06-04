@@ -71,17 +71,17 @@ func (header *DiffTableHeader) SaveDiffTableHeader() error {
 	header.DataLocation = dataLocation
 	db := common.OpenDB()
 	defer db.Close()
-	db.Begin()
-	if _, err := db.NamedExec(`INSERT INTO difftable_header(data_url, data_location, last_update, name, symbol, alias) VALUES (:data_url, :data_location, :last_update, :name, :symbol, :alias)`, header); err != nil {
-		db.MustBegin().Rollback()
+	tx := db.MustBegin()
+	if _, err := tx.NamedExec(`INSERT INTO difftable_header(data_url, data_location, last_update, name, symbol, alias) VALUES (:data_url, :data_location, :last_update, :name, :symbol, :alias)`, header); err != nil {
+		tx.Rollback()
 		return err
 	}
 	// 4. Try save course info into database
-	if err := saveCourseInfoFromTableHeader(db, *header); err != nil {
-		db.MustBegin().Rollback()
+	if err := saveCourseInfoFromTableHeader(tx, *header); err != nil {
+		tx.Rollback()
 		return err
 	}
-	db.MustBegin().Commit()
+	tx.Commit()
 	return nil
 }
 

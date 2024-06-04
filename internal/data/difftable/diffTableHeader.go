@@ -33,6 +33,17 @@ func (header *DiffTableHeader) String() string {
 	return fmt.Sprintf("%s [symbol=%s, url=%s]", header.Name, header.Symbol, header.Alias)
 }
 
+type DiffTableHeaderService interface {
+	InitDiffTableHeaderTable() error
+	FindList(filter DiffTableHeaderFilter) ([]*DiffTableHeader, error)
+}
+
+type DiffTableHeaderFilter struct {
+	// Filtering fields
+	Id *string 
+	Name *string
+}
+
 // Initialize difftable_header table
 func InitDiffTableHeaderTable(tx *sqlx.Tx) error {
 	_, err := tx.Exec("DROP TABLE IF EXISTS 'difftable_header';CREATE TABLE difftable_header ( id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, alias TEXT, last_update TEXT, symbol TEXT NOT NULL, data_location TEXT NOT NULL, data_url TEXT NOT NULL);")

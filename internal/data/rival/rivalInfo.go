@@ -7,7 +7,7 @@ import (
 	"path"
 
 	"github.com/Catizard/lampghost/internal/common"
-	"github.com/Catizard/lampghost/internal/score"
+	"github.com/Catizard/lampghost/internal/data/score"
 	"github.com/Catizard/lampghost/internal/tui/choose"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"

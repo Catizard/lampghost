@@ -5,9 +5,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/Catizard/lampghost/internal/difftable"
-	"github.com/Catizard/lampghost/internal/rival"
-	"github.com/Catizard/lampghost/internal/score"
+	"github.com/Catizard/lampghost/internal/data/difftable"
+	"github.com/Catizard/lampghost/internal/data/rival"
+	"github.com/Catizard/lampghost/internal/data/score"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"

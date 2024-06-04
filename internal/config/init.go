@@ -4,8 +4,8 @@ import (
 	"log"
 
 	"github.com/Catizard/lampghost/internal/common"
-	"github.com/Catizard/lampghost/internal/difftable"
-	"github.com/Catizard/lampghost/internal/rival"
+	"github.com/Catizard/lampghost/internal/data/difftable"
+	"github.com/Catizard/lampghost/internal/data/rival"
 )
 
 // Initialize lampghost application's database

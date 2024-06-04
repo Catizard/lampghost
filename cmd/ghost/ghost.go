@@ -6,8 +6,8 @@ package ghost
 import (
 	"fmt"
 
-	"github.com/Catizard/lampghost/internal/difftable"
-	"github.com/Catizard/lampghost/internal/rival"
+	"github.com/Catizard/lampghost/internal/data/difftable"
+	"github.com/Catizard/lampghost/internal/data/rival"
 	"github.com/Catizard/lampghost/internal/tui/choose"
 	ghostTui "github.com/Catizard/lampghost/internal/tui/ghost"
 	"github.com/charmbracelet/log"

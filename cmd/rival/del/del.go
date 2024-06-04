@@ -4,7 +4,7 @@ Copyright © 2024 Catizard <1185032459@qq.com>
 package del
 
 import (
-	"github.com/Catizard/lampghost/internal/rival"
+	"github.com/Catizard/lampghost/internal/data/rival"
 	"github.com/Catizard/lampghost/internal/tui/choose"
 	"github.com/spf13/cobra"
 )

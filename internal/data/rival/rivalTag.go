@@ -7,8 +7,8 @@ import (
 
 	"github.com/Catizard/lampghost/internal/common"
 	"github.com/Catizard/lampghost/internal/common/clearType"
-	"github.com/Catizard/lampghost/internal/difftable"
-	"github.com/Catizard/lampghost/internal/score"
+	"github.com/Catizard/lampghost/internal/data/difftable"
+	"github.com/Catizard/lampghost/internal/data/score"
 	"github.com/Catizard/lampghost/internal/tui/choose"
 	"github.com/charmbracelet/log"
 	"github.com/jmoiron/sqlx"

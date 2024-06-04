@@ -4,7 +4,7 @@ Copyright © 2024 Catizard <1185032459@qq.com>
 package add
 
 import (
-	"github.com/Catizard/lampghost/internal/rival"
+	"github.com/Catizard/lampghost/internal/data/rival"
 	"github.com/spf13/cobra"
 )
 

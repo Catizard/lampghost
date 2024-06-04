@@ -6,7 +6,7 @@ package del
 import (
 	"fmt"
 
-	"github.com/Catizard/lampghost/internal/difftable"
+	"github.com/Catizard/lampghost/internal/data/difftable"
 	"github.com/Catizard/lampghost/internal/tui/choose"
 	"github.com/spf13/cobra"
 )

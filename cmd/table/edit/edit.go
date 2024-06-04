@@ -4,7 +4,7 @@ Copyright © 2024 Catizard <1185032459@qq.com>
 package edit
 
 import (
-	"github.com/Catizard/lampghost/internal/difftable"
+	"github.com/Catizard/lampghost/internal/data/difftable"
 	"github.com/spf13/cobra"
 )
 

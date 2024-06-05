@@ -4,8 +4,6 @@ import (
 	"os"
 
 	"github.com/Catizard/lampghost/internal/common"
-	"github.com/Catizard/lampghost/internal/data/difftable"
-	"github.com/Catizard/lampghost/internal/data/rival"
 	"github.com/charmbracelet/log"
 )
 
@@ -18,37 +16,6 @@ func init() {
 	}
 	// TODO: Make it configurable
 	WorkingDirectory = homeDir + "/.lampghost/"
-}
-
-// Initialize lampghost application's database
-// Don't return error, the caller cannot handle any error from InitLampGhost
-func InitLampGhost() {
-	db := common.OpenDB()
-	tx := db.MustBegin()
-	// difftable_header
-	if err := difftable.InitDiffTableHeaderTable(tx); err != nil {
-		tx.Rollback()
-		log.Fatal(err)
-	}
-	// TODO: Should we clear any .json file too?
-	// course_info
-	if err := difftable.InitCourseInfoTable(tx); err != nil {
-		tx.Rollback()
-		log.Fatal(err)
-	}
-	// rival_info
-	if err := rival.InitRivalInfoTable(tx); err != nil {
-		tx.Rollback()
-		log.Fatal(err)
-	}
-	// rival_tag
-	if err := rival.InitRivalTagTable(tx); err != nil {
-		tx.Rollback()
-		log.Fatal(err)
-	}
-	if err := tx.Commit(); err != nil {
-		log.Fatal(err)
-	}
 }
 
 // Get LampGhost application's datasource name

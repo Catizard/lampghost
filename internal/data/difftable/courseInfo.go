@@ -30,19 +30,6 @@ var (
 	}
 )
 
-// Initialze course_info header
-func InitCourseInfoTable(tx *sqlx.Tx) error {
-	_, err := tx.Exec(`
-	DROP TABLE IF EXISTS 'course_info';
-	CREATE TABLE course_info (
-		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-		name TEXT NOT NULL,
-		source TEXT NOT NULL,
-		md5s TEXT NOT NULL
-	);`)
-	return err
-}
-
 // Save course info from difficult table's fetch result
 // If there is already a content has the same name, md5s, source, skip it
 func saveCourseInfoFromTableHeader(tx *sqlx.Tx, dth DiffTableHeader) error {

@@ -11,7 +11,6 @@ import (
 	"github.com/Catizard/lampghost/internal/data/score"
 	"github.com/Catizard/lampghost/internal/tui/choose"
 	"github.com/charmbracelet/log"
-	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -26,11 +25,6 @@ type RivalTag struct {
 func (r *RivalTag) String() string {
 	t := time.Unix(r.TimeStamp, 0)
 	return fmt.Sprintf("%s[%s]", r.TagName, t.Format("2006-01-02 15:04:05"))
-}
-
-func InitRivalTagTable(tx *sqlx.Tx) error {
-	_, err := tx.Exec("DROP TABLE IF EXISTS 'rival_tag';CREATE TABLE rival_tag (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, rival_id INTEGER NOT NULL, tag_name TEXT(255) NOT NULL, 'generated' INTEGER DEFAULT (0) NOT NULL, 'timestamp' TEXT NOT NULL)")
-	return err
 }
 
 // Build tags for one rival based on passed course data

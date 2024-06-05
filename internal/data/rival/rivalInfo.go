@@ -9,7 +9,6 @@ import (
 	"github.com/Catizard/lampghost/internal/common"
 	"github.com/Catizard/lampghost/internal/data/score"
 	"github.com/Catizard/lampghost/internal/tui/choose"
-	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -25,12 +24,6 @@ type RivalInfo struct {
 
 func (r *RivalInfo) String() string {
 	return fmt.Sprintf("%s (log=[%s],data=[%s])", r.Name, r.ScoreLogPath, r.SongDataPath)
-}
-
-// Initialize rival_info table
-func InitRivalInfoTable(tx *sqlx.Tx) error {
-	_, err := tx.Exec("DROP TABLE IF EXISTS 'rival_info';CREATE TABLE rival_info (name TEXT(255) NOT NULL, id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, score_log_path TEXT(255) NOT NULL, song_data_path TEXT(255) NOT NULL);")
-	return err
 }
 
 // Simple wrapper of LoadRivalScoreLog and LoadRivalSongData

@@ -33,14 +33,22 @@ func (header *DiffTableHeader) String() string {
 }
 
 type DiffTableHeaderService interface {
-	InitDiffTableHeaderTable() error
 	FindList(filter DiffTableHeaderFilter) ([]*DiffTableHeader, error)
+	FindById(id int) (*DiffTableHeader, error)
+	InsertDiffTableHeader(dth *DiffTableHeader) error
+	UpdateDiffTableHeader(id int, upd DiffTableHeaderUpdate) (*DiffTableHeader, error)
+	DeleteDifftableheader(id int) error
 }
 
 type DiffTableHeaderFilter struct {
 	// Filtering fields
 	Id   *string
 	Name *string
+}
+
+type DiffTableHeaderUpdate struct {
+	Name *string
+	Symbol *string
 }
 
 // Fetch difficult table header from url

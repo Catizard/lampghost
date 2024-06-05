@@ -14,12 +14,27 @@ func NewDiffTableHeaderService(db *DB) *DiffTableHeaderService {
 	return &DiffTableHeaderService{db: db}
 }
 
-func (s *DiffTableHeaderService) InitDiffTableHeaderTable() error {
+func (s *DiffTableHeaderService) FindList(filter difftable.DiffTableHeaderFilter) ([]*difftable.DiffTableHeader, error) {
+	// TODO: implement me!
+	return nil, nil
+}
+
+func (s *DiffTableHeaderService) FindById(id int) (*difftable.DiffTableHeader, error) {
+	// TODO: implement me!
+	return nil, nil
+}
+
+func (s *DiffTableHeaderService) InsertDiffTableHeader(dth *difftable.DiffTableHeader) error {
 	// TODO: implement me!
 	return nil
 }
 
-func (s *DiffTableHeaderService) FindList(filter difftable.DiffTableHeaderFilter) ([]*difftable.DiffTableHeader, error) {
+func (s *DiffTableHeaderService) UpdateDiffTableHeader(id int, upd difftable.DiffTableHeaderUpdate) (*difftable.DiffTableHeader, error) {
 	// TODO: implement me!
 	return nil, nil
+}
+
+func (s *DiffTableHeaderService) DeleteDifftableheader(id int) error {
+	// TODO: implement me!
+	return nil
 }

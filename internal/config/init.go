@@ -1,12 +1,24 @@
 package config
 
 import (
-	"log"
+	"os"
 
 	"github.com/Catizard/lampghost/internal/common"
 	"github.com/Catizard/lampghost/internal/data/difftable"
 	"github.com/Catizard/lampghost/internal/data/rival"
+	"github.com/charmbracelet/log"
 )
+
+var WorkingDirectory string
+
+func init() {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatal(err)
+	}
+	// TODO: Make it configurable
+	WorkingDirectory = homeDir + "/.lampghost/"
+}
 
 // Initialize lampghost application's database
 // Don't return error, the caller cannot handle any error from InitLampGhost
@@ -37,4 +49,10 @@ func InitLampGhost() {
 	if err := tx.Commit(); err != nil {
 		log.Fatal(err)
 	}
+}
+
+// Get LampGhost application's datasource name
+// LampGhost will keep using one single datasource, so this is fine
+func GetDSN() string {
+	return WorkingDirectory + common.DBFileName
 }

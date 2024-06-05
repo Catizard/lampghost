@@ -15,6 +15,8 @@ func init() {
 		log.Fatal(err)
 	}
 	// TODO: Make it configurable
+	// Note: Almost every data should be put in working directory
+	// The only exception is rival's log files, which follows with executable file
 	WorkingDirectory = homeDir + "/.lampghost/"
 }
 

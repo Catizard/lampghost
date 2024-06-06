@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Catizard/lampghost/internal/common"
 	"github.com/Catizard/lampghost/internal/data/difftable"
 )
 
@@ -77,6 +78,15 @@ func (s *DiffTableHeaderService) DeleteDifftableheader(id string) error {
 		return err
 	}
 	return nil
+}
+
+func (s *DiffTableHeaderService) FetchDiffTableHeader(url string) (*difftable.DiffTableHeader, error) {
+	if !strings.HasSuffix(url, ".json") {
+		return nil, fmt.Errorf("only .json format url is supported, sorry :(")
+	}
+	dth := &difftable.DiffTableHeader{}
+	common.FetchJson(url, &dth)
+	return dth, nil
 }
 
 func insertDiffTableHeader(tx *Tx, dth *difftable.DiffTableHeader) error {

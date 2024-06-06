@@ -25,3 +25,7 @@ func init() {
 func GetDSN() string {
 	return WorkingDirectory + common.DBFileName
 }
+
+func JoinWorkingDirectory(relativePath string) string {
+	return WorkingDirectory + relativePath
+}

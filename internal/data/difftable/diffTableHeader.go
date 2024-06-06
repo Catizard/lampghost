@@ -5,7 +5,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"strings"
 
 	"github.com/Catizard/lampghost/internal/common"
 	"github.com/Catizard/lampghost/internal/tui/choose"
@@ -33,11 +32,18 @@ func (header *DiffTableHeader) String() string {
 }
 
 type DiffTableHeaderService interface {
+	// ---------- basic methods ----------
 	FindDiffTableHeaderList(filter DiffTableHeaderFilter) ([]*DiffTableHeader, int, error)
 	FindDiffTableHeaderById(id string) (*DiffTableHeader, error)
 	InsertDiffTableHeader(dth *DiffTableHeader) error
 	UpdateDiffTableHeader(id string, upd DiffTableHeaderUpdate) (*DiffTableHeader, error)
 	DeleteDifftableheader(id string) error
+
+	// Fetch difficult table header info from remote url
+	//
+	// Support forms:
+	// 1) .json file
+	FetchDiffTableHeader(url string) (*DiffTableHeader, error)
 }
 
 type DiffTableHeaderFilter struct {
@@ -54,17 +60,6 @@ type DiffTableHeaderUpdate struct {
 func (d *DiffTableHeader) MergeUpdate(upd DiffTableHeaderUpdate) {
 	d.Name = *upd.Name
 	d.Symbol = *upd.Symbol
-}
-
-// Fetch difficult table header from url
-// For now, it only supports .json file
-func FetchDiffTableHeader(url string) (DiffTableHeader, error) {
-	if !strings.HasSuffix(url, ".json") {
-		return DiffTableHeader{}, fmt.Errorf("only .json format url is supported, sorry :(")
-	}
-	dth := DiffTableHeader{}
-	common.FetchJson(url, &dth)
-	return dth, nil
 }
 
 // Add a difficult table header(or say, meta data) and related song data to disk.

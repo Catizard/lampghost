@@ -4,7 +4,9 @@ Copyright © 2024 Catizard <1185032459@qq.com>
 package add
 
 import (
-	"github.com/Catizard/lampghost/internal/data/difftable"
+	"log"
+
+	"github.com/Catizard/lampghost/internal/sqlite/service"
 	"github.com/spf13/cobra"
 )
 
@@ -15,17 +17,16 @@ var AddCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		url := args[0]
 		// 1. Fetch difficult table header
-		dth, err := difftable.FetchDiffTableHeader(url)
+		dth, err := service.DiffTableHeaderService.FetchDiffTableHeader(url)
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 		if aliasName, err := cmd.LocalFlags().GetString("alias"); err == nil {
 			dth.Alias = aliasName
 		}
 		// 2. Add difficult table header
-		err = dth.SaveDiffTableHeader()
-		if err != nil {
-			panic(err)
+		if err := service.DiffTableHeaderService.InsertDiffTableHeader(dth); err != nil {
+			log.Fatal(err)
 		}
 	},
 }

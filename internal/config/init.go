@@ -1,10 +1,15 @@
 package config
 
 import (
+	"errors"
 	"os"
 
 	"github.com/Catizard/lampghost/internal/common"
 	"github.com/charmbracelet/log"
+)
+
+const (
+	DBFileName = "lampghost.db"
 )
 
 var WorkingDirectory string
@@ -18,6 +23,12 @@ func init() {
 	// Note: Almost every data should be put in working directory
 	// The only exception is rival's log files, which follows with executable file
 	WorkingDirectory = homeDir + "/.lampghost/"
+}
+
+func CheckInitialize() {
+	if _, err := os.Stat(GetDSN()); errors.Is(err, os.ErrNotExist) {
+		log.Fatalf("Call init command before you do anything")
+	}
 }
 
 // Get LampGhost application's datasource name

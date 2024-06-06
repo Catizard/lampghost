@@ -1,10 +1,6 @@
 package common
 
 import (
-	"errors"
-	"os"
-
-	"github.com/charmbracelet/log"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -12,13 +8,6 @@ import (
 const (
 	DBFileName = "lampghost.db"
 )
-
-// Panic if lampghost.db is not exist
-func CheckInitialize() {
-	if _, err := os.Stat(DBFileName); errors.Is(err, os.ErrNotExist) {
-		log.Fatalf("Call init command before you do anything")
-	}
-}
 
 // Open lampghost database
 // Panic if any error occurred

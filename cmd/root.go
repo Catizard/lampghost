@@ -11,7 +11,7 @@ import (
 	"github.com/Catizard/lampghost/cmd/rival"
 	"github.com/Catizard/lampghost/cmd/table"
 	"github.com/Catizard/lampghost/cmd/version"
-	"github.com/Catizard/lampghost/internal/common"
+	"github.com/Catizard/lampghost/internal/config"
 	"github.com/spf13/cobra"
 )
 
@@ -22,7 +22,7 @@ var rootCmd = &cobra.Command{
 		// Every command should check if lampghost.db file exist before executing
 		// Expect init command, which creates lampghost.db
 		// Note: If any command need to define its PersistentPreRun function, common.CheckInitialize should be called
-		common.CheckInitialize()
+		config.CheckInitialize()
 	},
 	// Uncomment the following line if your bare application
 	// has an action associated with it:

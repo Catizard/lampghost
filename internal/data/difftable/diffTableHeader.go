@@ -33,11 +33,11 @@ func (header *DiffTableHeader) String() string {
 }
 
 type DiffTableHeaderService interface {
-	FindList(filter DiffTableHeaderFilter) ([]*DiffTableHeader, error)
-	FindById(id int) (*DiffTableHeader, error)
+	FindDiffTableHeaderList(filter DiffTableHeaderFilter) ([]*DiffTableHeader, int, error)
+	FindDiffTableHeaderById(id string) (*DiffTableHeader, error)
 	InsertDiffTableHeader(dth *DiffTableHeader) error
-	UpdateDiffTableHeader(id int, upd DiffTableHeaderUpdate) (*DiffTableHeader, error)
-	DeleteDifftableheader(id int) error
+	UpdateDiffTableHeader(id string, upd DiffTableHeaderUpdate) (*DiffTableHeader, error)
+	DeleteDifftableheader(id string) error
 }
 
 type DiffTableHeaderFilter struct {
@@ -47,8 +47,13 @@ type DiffTableHeaderFilter struct {
 }
 
 type DiffTableHeaderUpdate struct {
-	Name *string
+	Name   *string
 	Symbol *string
+}
+
+func (d *DiffTableHeader) MergeUpdate(upd DiffTableHeaderUpdate) {
+	d.Name = *upd.Name
+	d.Symbol = *upd.Symbol
 }
 
 // Fetch difficult table header from url

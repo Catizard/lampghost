@@ -16,16 +16,12 @@ var AddCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		url := args[0]
-		// 1. Fetch difficult table header
-		dth, err := service.DiffTableHeaderService.FetchDiffTableHeader(url)
+		aliasName, err := cmd.LocalFlags().GetString("alias")
 		if err != nil {
 			log.Fatal(err)
 		}
-		if aliasName, err := cmd.LocalFlags().GetString("alias"); err == nil {
-			dth.Alias = aliasName
-		}
-		// 2. Add difficult table header
-		if err := service.DiffTableHeaderService.InsertDiffTableHeader(dth); err != nil {
+		_, err = service.DiffTableHeaderService.FetchAndSaveDiffTableHeader(url, aliasName)
+		if err != nil {
 			log.Fatal(err)
 		}
 	},

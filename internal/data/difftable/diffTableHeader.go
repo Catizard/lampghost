@@ -8,7 +8,6 @@ import (
 
 	"github.com/Catizard/lampghost/internal/common"
 	"github.com/Catizard/lampghost/internal/tui/choose"
-	"github.com/charmbracelet/log"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -39,11 +38,11 @@ type DiffTableHeaderService interface {
 	UpdateDiffTableHeader(id string, upd DiffTableHeaderUpdate) (*DiffTableHeader, error)
 	DeleteDifftableheader(id string) error
 
-	// Fetch difficult table header info from remote url
+	// Fetch and save difficult table header info from remote url
 	//
-	// Support forms:
+	// Support url forms:
 	// 1) .json file
-	FetchDiffTableHeader(url string) (*DiffTableHeader, error)
+	FetchAndSaveDiffTableHeader(url string, alias string) (*DiffTableHeader, error)
 }
 
 type DiffTableHeaderFilter struct {
@@ -60,40 +59,6 @@ type DiffTableHeaderUpdate struct {
 func (d *DiffTableHeader) MergeUpdate(upd DiffTableHeaderUpdate) {
 	d.Name = *upd.Name
 	d.Symbol = *upd.Symbol
-}
-
-// Add a difficult table header(or say, meta data) and related song data to disk.
-func (header *DiffTableHeader) SaveDiffTableHeader() error {
-	// 1. Validation
-	if arr, err := QueryDiffTableHeaderByName(header.Name); err != nil || len(arr) > 0 {
-		if err != nil {
-			return err
-		}
-		log.Fatalf(`There is already a table named (or its alias matches) %s
-		Use table sync command to sync table.
-		Use table del command to delete table`, header.Name)
-	}
-	// 2. Create data file
-	if err := saveTableData(header.getDataJsonFileName(), header.DataUrl); err != nil {
-		return err
-	}
-	// 3. Insert into database
-	dataLocation := header.getDataJsonFileName()
-	header.DataLocation = dataLocation
-	db := common.OpenDB()
-	defer db.Close()
-	tx := db.MustBegin()
-	if _, err := tx.NamedExec(`INSERT INTO difftable_header(data_url, data_location, last_update, name, symbol, alias) VALUES (:data_url, :data_location, :last_update, :name, :symbol, :alias)`, header); err != nil {
-		tx.Rollback()
-		return err
-	}
-	// 4. Try save course info into database
-	if err := saveCourseInfoFromTableHeader(tx, *header); err != nil {
-		tx.Rollback()
-		return err
-	}
-	tx.Commit()
-	return nil
 }
 
 // Delete a difficult table header and its data file

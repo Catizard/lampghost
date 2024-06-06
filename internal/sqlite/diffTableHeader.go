@@ -2,10 +2,15 @@ package sqlite
 
 import (
 	"fmt"
+	"io"
+	"net/http"
+	"os"
 	"strings"
 
 	"github.com/Catizard/lampghost/internal/common"
+	"github.com/Catizard/lampghost/internal/config"
 	"github.com/Catizard/lampghost/internal/data/difftable"
+	"github.com/charmbracelet/log"
 )
 
 // Ensure service implements interface
@@ -80,12 +85,36 @@ func (s *DiffTableHeaderService) DeleteDifftableheader(id string) error {
 	return nil
 }
 
-func (s *DiffTableHeaderService) FetchDiffTableHeader(url string) (*difftable.DiffTableHeader, error) {
-	if !strings.HasSuffix(url, ".json") {
-		return nil, fmt.Errorf("only .json format url is supported, sorry :(")
+func (s *DiffTableHeaderService) FetchAndSaveDiffTableHeader(url string, alias string) (*difftable.DiffTableHeader, error) {
+	tx, err := s.db.BeginTx()
+	if err != nil {
+		return nil, err
 	}
-	dth := &difftable.DiffTableHeader{}
-	common.FetchJson(url, &dth)
+	defer tx.Rollback()
+	// 1) Prepare header
+	dth, err := fetchDiffTableFromURL(url)
+	if err != nil {
+		return nil, err
+	}
+	dth.Alias = alias
+	// 2) Validate
+	if ex, err := existsByName(tx, dth.Name); err != nil {
+		return nil, err
+	} else if ex {
+		log.Fatalf(`There is already a table named (or its alias matches) %s
+		Use table sync command to sync table.
+		Use table del command to delete table`, dth.Name)
+	}
+	// 3) Download data file
+	// Setup data file location
+	dth.DataLocation = config.JoinWorkingDirectory(dth.Name + ".json")
+	downloadTableData(dth)
+	// 4) Insert into database
+	insertDiffTableHeader(tx, dth)
+	// 5) TODO: Save course info
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
 	return dth, nil
 }
 
@@ -181,4 +210,48 @@ func deleteDifftableHeader(tx *Tx, id string) error {
 
 	_, err := tx.Exec("DELETE FROM difftable_header WHERE id=?", id)
 	return err
+}
+
+func fetchDiffTableFromURL(url string) (*difftable.DiffTableHeader, error) {
+	if !strings.HasSuffix(url, ".json") {
+		return nil, fmt.Errorf("only .json format url is supported, sorry :(")
+	}
+	dth := &difftable.DiffTableHeader{}
+	common.FetchJson(url, &dth)
+	return dth, nil
+}
+
+func existsByName(tx *Tx, name string) (bool, error) {
+	filter := difftable.DiffTableHeaderFilter{
+		Name: &name,
+	}
+	if _, n, err := findList(tx, filter); err != nil {
+		return false, err
+	} else if n > 0 {
+		return true, nil
+	}
+	return false, nil
+}
+
+// Download difficult table's data.json file
+// TODO: Use database's transaction to protect download phase?
+func downloadTableData(dth *difftable.DiffTableHeader) error {
+	if len(dth.DataUrl) == 0 {
+		return fmt.Errorf("downloadTableData: no data url")
+	}
+	// 1) Create data file
+	file, err := os.Create(dth.DataLocation)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	// 2) Download and save
+	// TODO: if dataUrl is not start with http?
+	resp, err := http.Get(dth.DataUrl)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	io.Copy(file, resp.Body)
+	return nil
 }

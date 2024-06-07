@@ -8,6 +8,7 @@ import (
 
 	"github.com/Catizard/lampghost/internal/data/difftable"
 	"github.com/Catizard/lampghost/internal/data/rival"
+	"github.com/Catizard/lampghost/internal/sqlite/service"
 	"github.com/Catizard/lampghost/internal/tui/choose"
 	ghostTui "github.com/Catizard/lampghost/internal/tui/ghost"
 	"github.com/charmbracelet/log"
@@ -25,7 +26,12 @@ var GhostCmd = &cobra.Command{
 
 		// Difficult table header
 		// TODO: give difftable argument
-		dth, err := difftable.QueryDiffTableHeaderByNameWithChoices("insane")
+		dthName := "insane"
+		filter := difftable.DiffTableHeaderFilter{
+			Name: &dthName,
+		}
+		msg := fmt.Sprintf("Multiple tables matched with %s, choose one:", dthName)
+		dth, err := service.DiffTableHeaderService.FindDiffTableHeaderListWithChoices(msg, filter)
 		if err != nil {
 			panic(err)
 		}
@@ -49,7 +55,7 @@ var GhostCmd = &cobra.Command{
 				log.Infof("Choosed %s, time=%d\n", tag.TagName, tag.TimeStamp)
 			}
 		}
-		ghostTui.OpenGhostTui(&dth, diffTable, &selfInfo, &ghostInfo)
+		ghostTui.OpenGhostTui(dth, diffTable, &selfInfo, &ghostInfo)
 	},
 }
 

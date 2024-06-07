@@ -10,6 +10,7 @@ import (
 	"github.com/Catizard/lampghost/internal/common"
 	"github.com/Catizard/lampghost/internal/config"
 	"github.com/Catizard/lampghost/internal/data/difftable"
+	"github.com/Catizard/lampghost/internal/tui/choose"
 	"github.com/charmbracelet/log"
 )
 
@@ -34,7 +35,7 @@ func (s *DiffTableHeaderService) FindDiffTableHeaderList(filter difftable.DiffTa
 	return findList(tx, filter)
 }
 
-func (s *DiffTableHeaderService) FindDiffTableHeaderById(id string) (*difftable.DiffTableHeader, error) {
+func (s *DiffTableHeaderService) FindDiffTableHeaderById(id int) (*difftable.DiffTableHeader, error) {
 	tx, err := s.db.BeginTx()
 	if err != nil {
 		return nil, err
@@ -56,7 +57,7 @@ func (s *DiffTableHeaderService) InsertDiffTableHeader(dth *difftable.DiffTableH
 	return tx.Commit()
 }
 
-func (s *DiffTableHeaderService) UpdateDiffTableHeader(id string, upd difftable.DiffTableHeaderUpdate) (*difftable.DiffTableHeader, error) {
+func (s *DiffTableHeaderService) UpdateDiffTableHeader(id int, upd difftable.DiffTableHeaderUpdate) (*difftable.DiffTableHeader, error) {
 	tx, err := s.db.BeginTx()
 	if err != nil {
 		return nil, err
@@ -72,7 +73,7 @@ func (s *DiffTableHeaderService) UpdateDiffTableHeader(id string, upd difftable.
 	return ret, nil
 }
 
-func (s *DiffTableHeaderService) DeleteDifftableheader(id string) error {
+func (s *DiffTableHeaderService) DeleteDifftableHeader(id int) error {
 	tx, err := s.db.BeginTx()
 	if err != nil {
 		return err
@@ -116,6 +117,26 @@ func (s *DiffTableHeaderService) FetchAndSaveDiffTableHeader(url string, alias s
 		return nil, err
 	}
 	return dth, nil
+}
+
+func (s *DiffTableHeaderService) FindDiffTableHeaderListWithChoices(msg string, filter difftable.DiffTableHeaderFilter) (*difftable.DiffTableHeader, error) {
+	tx, err := s.db.BeginTx()
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+	if arr, n, err := findList(tx, filter); err != nil {
+		return nil, err
+	} else if n == 0 {
+		return nil, fmt.Errorf("no table data")
+	} else {
+		choices := make([]string, 0)
+		for _, v := range arr {
+			choices = append(choices, v.String())
+		}
+		i := choose.OpenChooseTuiSkippable(choices, msg)
+		return arr[i], nil
+	}
 }
 
 func insertDiffTableHeader(tx *Tx, dth *difftable.DiffTableHeader) error {
@@ -175,7 +196,7 @@ func findList(tx *Tx, filter difftable.DiffTableHeaderFilter) (_ []*difftable.Di
 	return ret, n, nil
 }
 
-func findById(tx *Tx, id string) (*difftable.DiffTableHeader, error) {
+func findById(tx *Tx, id int) (*difftable.DiffTableHeader, error) {
 	arr, _, err := findList(tx, difftable.DiffTableHeaderFilter{Id: &id})
 	if err != nil {
 		return nil, err
@@ -185,7 +206,7 @@ func findById(tx *Tx, id string) (*difftable.DiffTableHeader, error) {
 	return arr[0], nil
 }
 
-func updateDiffTableHeader(tx *Tx, id string, upd difftable.DiffTableHeaderUpdate) (*difftable.DiffTableHeader, error) {
+func updateDiffTableHeader(tx *Tx, id int, upd difftable.DiffTableHeaderUpdate) (*difftable.DiffTableHeader, error) {
 	dth, err := findById(tx, id)
 	if err != nil {
 		return dth, err
@@ -203,7 +224,7 @@ func updateDiffTableHeader(tx *Tx, id string, upd difftable.DiffTableHeaderUpdat
 	return dth, nil
 }
 
-func deleteDifftableHeader(tx *Tx, id string) error {
+func deleteDifftableHeader(tx *Tx, id int) error {
 	if _, err := findById(tx, id); err != nil {
 		return err
 	}

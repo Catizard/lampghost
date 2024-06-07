@@ -33,21 +33,25 @@ func (header *DiffTableHeader) String() string {
 type DiffTableHeaderService interface {
 	// ---------- basic methods ----------
 	FindDiffTableHeaderList(filter DiffTableHeaderFilter) ([]*DiffTableHeader, int, error)
-	FindDiffTableHeaderById(id string) (*DiffTableHeader, error)
+	FindDiffTableHeaderById(id int) (*DiffTableHeader, error)
 	InsertDiffTableHeader(dth *DiffTableHeader) error
-	UpdateDiffTableHeader(id string, upd DiffTableHeaderUpdate) (*DiffTableHeader, error)
-	DeleteDifftableheader(id string) error
+	UpdateDiffTableHeader(id int, upd DiffTableHeaderUpdate) (*DiffTableHeader, error)
+	DeleteDifftableHeader(id int) error
 
 	// Fetch and save difficult table header info from remote url
 	//
 	// Support url forms:
 	// 1) .json file
 	FetchAndSaveDiffTableHeader(url string, alias string) (*DiffTableHeader, error)
+
+	// Simple wrapper of FindDiffTableHeaderList
+	// After query, open tui app and wait user select one
+	FindDiffTableHeaderListWithChoices(msg string, filter DiffTableHeaderFilter) (*DiffTableHeader, error)
 }
 
 type DiffTableHeaderFilter struct {
 	// Filtering fields
-	Id   *string
+	Id   *int
 	Name *string
 }
 
@@ -61,30 +65,9 @@ func (d *DiffTableHeader) MergeUpdate(upd DiffTableHeaderUpdate) {
 	d.Symbol = *upd.Symbol
 }
 
-// Delete a difficult table header and its data file
-func (header *DiffTableHeader) DeleteDiffTableHeader() error {
-	db := common.OpenDB()
-	defer db.Close()
-
-	// 1) Try remove the data file, ignore any error
-	os.Remove(header.DataLocation)
-	// 2) Remove header from database
-	_, err := db.Exec("DELETE FROM difftable_header WHERE id=?", header.Id)
-	return err
-}
-
 // Return difficult table header's data json file name
 func (header *DiffTableHeader) getDataJsonFileName() string {
 	return header.Name + ".json"
-}
-
-// Fetch all data from sqlite
-func QueryAllDiffTableHeader() ([]DiffTableHeader, error) {
-	db := common.OpenDB()
-	defer db.Close()
-	var ret []DiffTableHeader
-	err := db.Select(&ret, "SELECT * FROM difftable_header")
-	return ret, err
 }
 
 // Query by name or alias
@@ -99,15 +82,6 @@ func QueryDiffTableHeaderByName(name string) ([]DiffTableHeader, error) {
 // Simple choose wrapper of QueryDifficultTableHeaderByName
 func QueryDiffTableHeaderByNameWithChoices(name string) (DiffTableHeader, error) {
 	dthArr, err := QueryDiffTableHeaderByName(name)
-	if err != nil {
-		return DiffTableHeader{}, err
-	}
-	return openDiffTableChooseTui(dthArr)
-}
-
-// Like QueryDiffTableHeaderByNameWithChoices, but without query
-func AllDiffTableHeaderWithChoices() (DiffTableHeader, error) {
-	dthArr, err := QueryAllDiffTableHeader()
 	if err != nil {
 		return DiffTableHeader{}, err
 	}

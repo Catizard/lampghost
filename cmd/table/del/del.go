@@ -5,8 +5,10 @@ package del
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/Catizard/lampghost/internal/data/difftable"
+	"github.com/Catizard/lampghost/internal/sqlite/service"
 	"github.com/Catizard/lampghost/internal/tui/choose"
 	"github.com/spf13/cobra"
 )
@@ -20,20 +22,16 @@ var DelCmd = &cobra.Command{
 		if err != nil {
 			panic(err)
 		}
-		var dth difftable.DiffTableHeader
-		var qErr error
-		if len(name) == 0 {
-			// Special case: doesn't specify a name
-			// In this case, all tables would be printed
-			dth, qErr = difftable.AllDiffTableHeaderWithChoices()
-		} else {
-			dth, qErr = difftable.QueryDiffTableHeaderByNameWithChoices(name)
+		filter := difftable.DiffTableHeaderFilter{
+			Name: &name,
 		}
-		if qErr != nil {
-			panic(qErr)
+		msg := fmt.Sprintf("Multiple tables matched with %s, choose one to delete:", name)
+		dth, err := service.DiffTableHeaderService.FindDiffTableHeaderListWithChoices(msg, filter)
+		if err != nil {
+			log.Fatal(err)
 		}
 		if b := choose.OpenYesOrNoChooseTui(fmt.Sprintf("Delete %s?", dth.String())); b {
-			if err := dth.DeleteDiffTableHeader(); err != nil {
+			if err := service.DiffTableHeaderService.DeleteDifftableHeader(dth.Id); err != nil {
 				panic(err)
 			}
 		}

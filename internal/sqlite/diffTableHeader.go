@@ -32,7 +32,7 @@ func (s *DiffTableHeaderService) FindDiffTableHeaderList(filter difftable.DiffTa
 		return nil, 0, err
 	}
 	defer tx.Rollback()
-	return findList(tx, filter)
+	return findDiffTableHeaderList(tx, filter)
 }
 
 func (s *DiffTableHeaderService) FindDiffTableHeaderById(id int) (*difftable.DiffTableHeader, error) {
@@ -41,7 +41,7 @@ func (s *DiffTableHeaderService) FindDiffTableHeaderById(id int) (*difftable.Dif
 		return nil, err
 	}
 	defer tx.Rollback()
-	return findById(tx, id)
+	return findDiffTableHeaderById(tx, id)
 }
 
 func (s *DiffTableHeaderService) InsertDiffTableHeader(dth *difftable.DiffTableHeader) error {
@@ -73,7 +73,7 @@ func (s *DiffTableHeaderService) UpdateDiffTableHeader(id int, upd difftable.Dif
 	return ret, nil
 }
 
-func (s *DiffTableHeaderService) DeleteDifftableHeader(id int) error {
+func (s *DiffTableHeaderService) DeleteDiffTableHeader(id int) error {
 	tx, err := s.db.BeginTx()
 	if err != nil {
 		return err
@@ -125,7 +125,7 @@ func (s *DiffTableHeaderService) FindDiffTableHeaderListWithChoices(msg string, 
 		return nil, err
 	}
 	defer tx.Rollback()
-	if arr, n, err := findList(tx, filter); err != nil {
+	if arr, n, err := findDiffTableHeaderList(tx, filter); err != nil {
 		return nil, err
 	} else if n == 0 {
 		return nil, fmt.Errorf("no table data")
@@ -153,7 +153,7 @@ func insertDiffTableHeader(tx *Tx, dth *difftable.DiffTableHeader) error {
 	return err
 }
 
-func findList(tx *Tx, filter difftable.DiffTableHeaderFilter) (_ []*difftable.DiffTableHeader, n int, err error) {
+func findDiffTableHeaderList(tx *Tx, filter difftable.DiffTableHeaderFilter) (_ []*difftable.DiffTableHeader, n int, err error) {
 	where := []string{"1 = 1"}
 	if v := filter.Id; v != nil {
 		where = append(where, "id = :id")
@@ -196,8 +196,8 @@ func findList(tx *Tx, filter difftable.DiffTableHeaderFilter) (_ []*difftable.Di
 	return ret, n, nil
 }
 
-func findById(tx *Tx, id int) (*difftable.DiffTableHeader, error) {
-	arr, _, err := findList(tx, difftable.DiffTableHeaderFilter{Id: &id})
+func findDiffTableHeaderById(tx *Tx, id int) (*difftable.DiffTableHeader, error) {
+	arr, _, err := findDiffTableHeaderList(tx, difftable.DiffTableHeaderFilter{Id: &id})
 	if err != nil {
 		return nil, err
 	} else if len(arr) == 0 {
@@ -207,7 +207,7 @@ func findById(tx *Tx, id int) (*difftable.DiffTableHeader, error) {
 }
 
 func updateDiffTableHeader(tx *Tx, id int, upd difftable.DiffTableHeaderUpdate) (*difftable.DiffTableHeader, error) {
-	dth, err := findById(tx, id)
+	dth, err := findDiffTableHeaderById(tx, id)
 	if err != nil {
 		return dth, err
 	}
@@ -225,7 +225,7 @@ func updateDiffTableHeader(tx *Tx, id int, upd difftable.DiffTableHeaderUpdate) 
 }
 
 func deleteDifftableHeader(tx *Tx, id int) error {
-	if _, err := findById(tx, id); err != nil {
+	if _, err := findDiffTableHeaderById(tx, id); err != nil {
 		return err
 	}
 
@@ -246,7 +246,7 @@ func existsByName(tx *Tx, name string) (bool, error) {
 	filter := difftable.DiffTableHeaderFilter{
 		Name: &name,
 	}
-	if _, n, err := findList(tx, filter); err != nil {
+	if _, n, err := findDiffTableHeaderList(tx, filter); err != nil {
 		return false, err
 	} else if n > 0 {
 		return true, nil

@@ -8,6 +8,15 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+var (
+	// TODO: Make shouldIgnore as a configurable option
+	shouldIgnoreSpecialConstaints = true
+	ignoreConstraints             = map[string]struct{}{
+		"no_good":  {},
+		"no_speed": {},
+	}
+)
+
 // Represents one course
 type CourseInfo struct {
 	Id         int      `db:"id"`
@@ -21,17 +30,20 @@ type CourseInfo struct {
 	Sha256s string // Can be seen as a mapping from md5s
 }
 
-var (
-	// TODO: Make shouldIgnore as a configurable option
-	shouldIgnoreSpecialConstaints = true
-	ignoreConstraints             = map[string]struct{}{
-		"no_good":  {},
-		"no_speed": {},
-	}
-)
+type CourseInfoService interface {
+	// ---------- basic methods ----------
+	FindCourseInfoList(filter CourseInfoFilter) ([]*CourseInfo, int, error)
+	FindCourseInfoById(id int) (*CourseInfo, error)
+	InsertCourseInfo(courseInfo *CourseInfo) error
+	DeleteCourseInfo(id int) error
+}
+
+type CourseInfoFilter struct {
+	Id   *int
+	Name *string
+}
 
 // Save course info from difficult table's fetch result
-// If there is already a content has the same name, md5s, source, skip it
 func saveCourseInfoFromTableHeader(tx *sqlx.Tx, dth DiffTableHeader) error {
 	// If there is no course...
 	if dth.Course == nil || len(dth.Course) == 0 || len(dth.Course[0]) == 0 {

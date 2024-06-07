@@ -31,7 +31,7 @@ type DiffTableHeaderService interface {
 	FindDiffTableHeaderById(id int) (*DiffTableHeader, error)
 	InsertDiffTableHeader(dth *DiffTableHeader) error
 	UpdateDiffTableHeader(id int, upd DiffTableHeaderUpdate) (*DiffTableHeader, error)
-	DeleteDifftableHeader(id int) error
+	DeleteDiffTableHeader(id int) error
 
 	// Fetch and save difficult table header info from remote url
 	//

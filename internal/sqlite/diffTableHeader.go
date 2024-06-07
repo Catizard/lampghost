@@ -112,7 +112,10 @@ func (s *DiffTableHeaderService) FetchAndSaveDiffTableHeader(url string, alias s
 	downloadTableData(dth)
 	// 4) Insert into database
 	insertDiffTableHeader(tx, dth)
-	// 5) TODO: Save course info
+	// 5) Save course info
+	if err := saveCourseInfoFromTableHeader(tx, dth); err != nil {
+		return nil, err
+	}
 	if err := tx.Commit(); err != nil {
 		return nil, err
 	}

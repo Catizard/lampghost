@@ -6,6 +6,7 @@ package build
 import (
 	"github.com/Catizard/lampghost/internal/data/difftable"
 	"github.com/Catizard/lampghost/internal/data/rival"
+	"github.com/Catizard/lampghost/internal/sqlite/service"
 	"github.com/charmbracelet/log"
 	"github.com/spf13/cobra"
 )
@@ -24,7 +25,7 @@ var BuildCmd = &cobra.Command{
 			if err != nil {
 				panic(err)
 			}
-			courseInfoArr, err := difftable.QueryAllCourseInfo()
+			courseInfoArr, _, err := service.CourseInfoService.FindCourseInfoList(difftable.CourseInfoFilter{})
 			if err != nil {
 				panic(err)
 			}

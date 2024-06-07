@@ -29,7 +29,7 @@ func (r *RivalTag) String() string {
 
 // Build tags for one rival based on passed course data
 // Note: this function can be seen as re-build all generated tags
-func (r *RivalInfo) BuildTags(courseArr []difftable.CourseInfo) error {
+func (r *RivalInfo) BuildTags(courseArr []*difftable.CourseInfo) error {
 	if len(courseArr) == 0 {
 		return nil
 	}

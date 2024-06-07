@@ -31,7 +31,7 @@ var DelCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 		if b := choose.OpenYesOrNoChooseTui(fmt.Sprintf("Delete %s?", dth.String())); b {
-			if err := service.DiffTableHeaderService.DeleteDifftableHeader(dth.Id); err != nil {
+			if err := service.DiffTableHeaderService.DeleteDiffTableHeader(dth.Id); err != nil {
 				panic(err)
 			}
 		}

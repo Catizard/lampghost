@@ -7,6 +7,15 @@ import (
 	"github.com/Catizard/lampghost/internal/data/difftable"
 )
 
+var (
+	// TODO: Make shouldIgnore as a configurable option
+	shouldIgnoreSpecialConstaints = true
+	ignoreConstraints             = map[string]struct{}{
+		"no_good":  {},
+		"no_speed": {},
+	}
+)
+
 var _ difftable.CourseInfoService = (*CourseInfoService)(nil)
 
 // Represents a service component for managing course info
@@ -83,12 +92,13 @@ func findCourseInfoList(tx *Tx, filter difftable.CourseInfoFilter) (_ []*difftab
 
 	ret := make([]*difftable.CourseInfo, 0)
 	for rows.Next() {
-		dth := &difftable.CourseInfo{}
-		if err := rows.StructScan(dth); err != nil {
+		c := &difftable.CourseInfo{}
+		if err := rows.StructScan(c); err != nil {
 			return nil, 0, err
 		}
 
-		ret = append(ret, dth)
+		prepareAfterRead(c)
+		ret = append(ret, c)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, 0, err
@@ -104,6 +114,7 @@ func findCourseInfoById(tx *Tx, id int) (*difftable.CourseInfo, error) {
 	} else if len(arr) == 0 {
 		return nil, fmt.Errorf("panic: no data")
 	}
+	prepareAfterRead(arr[0])
 	return arr[0], nil
 }
 
@@ -119,4 +130,61 @@ func deleteCourseInfo(tx *Tx, id int) error {
 
 	_, err := tx.Exec("DELETE FROM course_info WHERE id=?", id)
 	return err
+}
+
+// Save course info from difficult table's fetch result
+func saveCourseInfoFromTableHeader(tx *Tx, dth *difftable.DiffTableHeader) error {
+	// If there is no course...
+	if dth.Course == nil || len(dth.Course) == 0 || len(dth.Course[0]) == 0 {
+		return nil
+	}
+	// There is no need to care about race
+	courseArr, _, err := findCourseInfoList(tx, difftable.CourseInfoFilter{})
+	if err != nil {
+		return err
+	}
+
+	rawData := dth.Course
+	for _, arr := range rawData {
+		for _, v := range arr {
+			prepareBeforeSave(&v, dth)
+
+			skipFlag := false
+			// Skip 1: There is a same course exists
+			for _, p := range courseArr {
+				if v.Name == p.Name && v.Md5s == p.Md5s && v.Source == p.Source {
+					skipFlag = true
+					break
+				}
+			}
+			// Skip 2: Open ignore special constraints flag and it matches at least one
+			if shouldIgnoreSpecialConstaints {
+				for _, constraint := range v.Constraint {
+					if _, ok := ignoreConstraints[constraint]; ok {
+						skipFlag = true
+					}
+				}
+			}
+			if skipFlag {
+				continue
+			}
+			// OK, it's unique
+			if err := insertCourseInfo(tx, &v); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+// Prerequisite before save function on CourseInfo
+func prepareBeforeSave(c *difftable.CourseInfo, dth *difftable.DiffTableHeader) {
+	c.Md5s = strings.Join(c.Md5, ",")
+	c.Source = dth.Name
+}
+
+// Preqrequiste after read function on CourseInfo
+func prepareAfterRead(c *difftable.CourseInfo) {
+	// Split md5s field back
+	c.Md5 = strings.Split(c.Md5s, ",")
 }

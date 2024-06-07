@@ -7,7 +7,9 @@ import (
 
 // Exposes service directly
 var DiffTableHeaderService difftable.DiffTableHeaderService
+var CourseInfoService difftable.CourseInfoService
 
 func InitService(db *sqlite.DB) {
 	DiffTableHeaderService = sqlite.NewDiffTableHeaderService(db)
+	CourseInfoService = sqlite.NewCourseInfoService(db)
 }

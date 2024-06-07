@@ -6,7 +6,7 @@ CREATE TABLE difftable_header (
     symbol TEXT NOT NULL,
     data_location TEXT NOT NULL,
     data_url TEXT NOT NULL,
-    original_url TEXT NOT NULL
+    original_url TEXT 
 );
 
 CREATE TABLE course_info (

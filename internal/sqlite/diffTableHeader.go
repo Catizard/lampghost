@@ -111,7 +111,9 @@ func (s *DiffTableHeaderService) FetchAndSaveDiffTableHeader(url string, alias s
 	dth.DataLocation = config.JoinWorkingDirectory(dth.Name + ".json")
 	downloadTableData(dth)
 	// 4) Insert into database
-	insertDiffTableHeader(tx, dth)
+	if err := insertDiffTableHeader(tx, dth); err != nil {
+		return nil, err
+	}
 	// 5) Save course info
 	if err := saveCourseInfoFromTableHeader(tx, dth); err != nil {
 		return nil, err

@@ -22,6 +22,28 @@ type RivalInfo struct {
 	SongData     []score.SongData
 }
 
+type RivalInfoService interface {
+	// ---------- basic methods ----------
+	FindRivalInfoList(filter RivalInfoFilter) ([]*RivalInfo, int, error)
+	FindRivalInfoById(id int) (*RivalInfo, error)
+	InsertRivalInfo(dth *RivalInfo) error
+	DeleteRivalInfo(id int) error
+
+	// Simple wrapper of FindRivalInfoList
+	// After query, open tui app and wait user select one
+	ChooseOneRival(msg string, filter RivalInfoFilter) (*RivalInfo, error)
+}
+
+type RivalInfoFilter struct {
+	// Filtering fields
+	Id   *int
+	Name *string
+}
+
+type RivalInfoUpdate struct {
+	Name *string
+}
+
 func (r *RivalInfo) String() string {
 	return fmt.Sprintf("%s (log=[%s],data=[%s])", r.Name, r.ScoreLogPath, r.SongDataPath)
 }

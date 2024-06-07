@@ -80,7 +80,7 @@ func (s *DiffTableHeaderService) DeleteDiffTableHeader(id int) error {
 	}
 	defer tx.Rollback()
 
-	if err := deleteDifftableHeader(tx, id); err != nil {
+	if err := deleteDiffTableHeader(tx, id); err != nil {
 		return err
 	}
 	return nil
@@ -229,7 +229,7 @@ func updateDiffTableHeader(tx *Tx, id int, upd difftable.DiffTableHeaderUpdate) 
 	return dth, nil
 }
 
-func deleteDifftableHeader(tx *Tx, id int) error {
+func deleteDiffTableHeader(tx *Tx, id int) error {
 	if _, err := findDiffTableHeaderById(tx, id); err != nil {
 		return err
 	}

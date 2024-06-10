@@ -71,7 +71,7 @@ func (s *CourseInfoService) DeleteCourseInfo(id int) error {
 	return nil
 }
 
-func findCourseInfoList(tx *Tx, filter difftable.CourseInfoFilter) (_ []*difftable.CourseInfo, n int, err error) {
+func findCourseInfoList(tx *Tx, filter difftable.CourseInfoFilter) (_ []*difftable.CourseInfo, _ int, err error) {
 	where := []string{"1 = 1"}
 	if v := filter.Id; v != nil {
 		where = append(where, "id = :id")
@@ -86,7 +86,7 @@ func findCourseInfoList(tx *Tx, filter difftable.CourseInfoFilter) (_ []*difftab
 		WHERE `+strings.Join(where, " AND "),
 		filter)
 	if err != nil {
-		return nil, n, err
+		return nil, 0, err
 	}
 	defer rows.Close()
 
@@ -104,7 +104,7 @@ func findCourseInfoList(tx *Tx, filter difftable.CourseInfoFilter) (_ []*difftab
 		return nil, 0, err
 	}
 
-	return ret, n, nil
+	return ret, len(ret), nil
 }
 
 func findCourseInfoById(tx *Tx, id int) (*difftable.CourseInfo, error) {

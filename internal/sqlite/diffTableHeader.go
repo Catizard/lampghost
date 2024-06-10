@@ -158,7 +158,7 @@ func insertDiffTableHeader(tx *Tx, dth *difftable.DiffTableHeader) error {
 	return err
 }
 
-func findDiffTableHeaderList(tx *Tx, filter difftable.DiffTableHeaderFilter) (_ []*difftable.DiffTableHeader, n int, err error) {
+func findDiffTableHeaderList(tx *Tx, filter difftable.DiffTableHeaderFilter) (_ []*difftable.DiffTableHeader, _ int, err error) {
 	where := []string{"1 = 1"}
 	if v := filter.Id; v != nil {
 		where = append(where, "id = :id")
@@ -168,20 +168,12 @@ func findDiffTableHeaderList(tx *Tx, filter difftable.DiffTableHeaderFilter) (_ 
 	}
 
 	rows, err := tx.NamedQuery(`
-		SELECT
-			id,
-			data_url,
-			data_location,
-			last_update,
-			name,
-			original_url,
-			symbol,
-			alias
+		SELECT *
 		FROM difftable_header
 		WHERE `+strings.Join(where, " AND "),
 		filter)
 	if err != nil {
-		return nil, n, err
+		return nil, 0, err
 	}
 	defer rows.Close()
 
@@ -198,7 +190,7 @@ func findDiffTableHeaderList(tx *Tx, filter difftable.DiffTableHeaderFilter) (_ 
 		return nil, 0, err
 	}
 
-	return ret, n, nil
+	return ret, len(ret), nil
 }
 
 func findDiffTableHeaderById(tx *Tx, id int) (*difftable.DiffTableHeader, error) {

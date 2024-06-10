@@ -87,6 +87,7 @@ func findRivalInfoList(tx *Tx, filter rival.RivalInfoFilter) (_ []*rival.RivalIn
 	where := []string{"1 = 1"}
 	if v := filter.Id; v != nil {
 		where = append(where, "id = :id")
+func findRivalInfoList(tx *Tx, filter rival.RivalInfoFilter) (_ []*rival.RivalInfo, _ int, err error) {
 	}
 	if v := filter.Name; v != nil {
 		where = append(where, "name = :name")
@@ -98,7 +99,7 @@ func findRivalInfoList(tx *Tx, filter rival.RivalInfoFilter) (_ []*rival.RivalIn
 		WHERE `+strings.Join(where, " AND "),
 		filter)
 	if err != nil {
-		return nil, n, err
+		return nil, 0, err
 	}
 	defer rows.Close()
 
@@ -115,7 +116,7 @@ func findRivalInfoList(tx *Tx, filter rival.RivalInfoFilter) (_ []*rival.RivalIn
 		return nil, 0, err
 	}
 
-	return ret, n, nil
+	return ret, len(ret), nil
 }
 
 func findRivalInfoById(tx *Tx, id int) (*rival.RivalInfo, error) {

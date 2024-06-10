@@ -10,6 +10,7 @@ import (
 	"github.com/Catizard/lampghost/internal/data/difftable"
 	"github.com/Catizard/lampghost/internal/sqlite/service"
 	"github.com/Catizard/lampghost/internal/tui/choose"
+	"github.com/guregu/null/v5"
 	"github.com/spf13/cobra"
 )
 
@@ -23,7 +24,7 @@ var DelCmd = &cobra.Command{
 			panic(err)
 		}
 		filter := difftable.DiffTableHeaderFilter{
-			Name: &name,
+			Name: null.StringFrom(name),
 		}
 		msg := fmt.Sprintf("Multiple tables matched with %s, choose one to delete:", name)
 		dth, err := service.DiffTableHeaderService.FindDiffTableHeaderListWithChoices(msg, filter)
@@ -32,7 +33,7 @@ var DelCmd = &cobra.Command{
 		}
 		if b := choose.OpenYesOrNoChooseTui(fmt.Sprintf("Delete %s?", dth.String())); b {
 			if err := service.DiffTableHeaderService.DeleteDiffTableHeader(dth.Id); err != nil {
-				panic(err)
+				log.Fatal(err)
 			}
 		}
 	},

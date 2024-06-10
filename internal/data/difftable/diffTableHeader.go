@@ -3,6 +3,7 @@ package difftable
 import (
 	"fmt"
 
+	"github.com/guregu/null/v5"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -46,8 +47,8 @@ type DiffTableHeaderService interface {
 
 type DiffTableHeaderFilter struct {
 	// Filtering fields
-	Id   *int
-	Name *string
+	Id   null.Int `db:"id"`
+	Name null.String `db:"name"`
 }
 
 type DiffTableHeaderUpdate struct {

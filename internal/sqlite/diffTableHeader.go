@@ -12,6 +12,7 @@ import (
 	"github.com/Catizard/lampghost/internal/data/difftable"
 	"github.com/Catizard/lampghost/internal/tui/choose"
 	"github.com/charmbracelet/log"
+	"github.com/guregu/null/v5"
 )
 
 // Ensure service implements interface
@@ -160,10 +161,10 @@ func insertDiffTableHeader(tx *Tx, dth *difftable.DiffTableHeader) error {
 
 func findDiffTableHeaderList(tx *Tx, filter difftable.DiffTableHeaderFilter) (_ []*difftable.DiffTableHeader, _ int, err error) {
 	where := []string{"1 = 1"}
-	if v := filter.Id; v != nil {
+	if v := filter.Id; v.Valid {
 		where = append(where, "id = :id")
 	}
-	if v := filter.Name; v != nil {
+	if v := filter.Name; v.Valid {
 		where = append(where, "name = :name")
 	}
 
@@ -194,7 +195,7 @@ func findDiffTableHeaderList(tx *Tx, filter difftable.DiffTableHeaderFilter) (_ 
 }
 
 func findDiffTableHeaderById(tx *Tx, id int) (*difftable.DiffTableHeader, error) {
-	arr, _, err := findDiffTableHeaderList(tx, difftable.DiffTableHeaderFilter{Id: &id})
+	arr, _, err := findDiffTableHeaderList(tx, difftable.DiffTableHeaderFilter{Id: null.IntFrom(int64(id))})
 	if err != nil {
 		return nil, err
 	} else if len(arr) == 0 {
@@ -241,7 +242,7 @@ func fetchDiffTableFromURL(url string) (*difftable.DiffTableHeader, error) {
 
 func existsByName(tx *Tx, name string) (bool, error) {
 	filter := difftable.DiffTableHeaderFilter{
-		Name: &name,
+		Name: null.StringFrom(name),
 	}
 	if _, n, err := findDiffTableHeaderList(tx, filter); err != nil {
 		return false, err

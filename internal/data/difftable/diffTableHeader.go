@@ -13,7 +13,7 @@ type DiffTableHeader struct {
 	DataLocation string         `db:"data_location"`
 	LastUpdate   string         `json:"last_update" db:"last_update"`
 	Name         string         `json:"name" db:"name"`
-	OriginalUrl  string         `json:"original_url" db:"original_url"`
+	OriginalUrl  null.String    `json:"original_url" db:"original_url"`
 	Symbol       string         `json:"symbol" db:"symbol"`
 	Alias        string         `json:"alias" db:"alias"`
 	Course       [][]CourseInfo `json:"course"`
@@ -47,8 +47,9 @@ type DiffTableHeaderService interface {
 
 type DiffTableHeaderFilter struct {
 	// Filtering fields
-	Id   null.Int `db:"id"`
-	Name null.String `db:"name"`
+	Id       null.Int    `db:"id"`
+	Name     null.String `db:"name"`
+	NameLike null.String `db:"nameLike"`
 }
 
 type DiffTableHeaderUpdate struct {

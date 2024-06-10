@@ -167,6 +167,9 @@ func findDiffTableHeaderList(tx *Tx, filter difftable.DiffTableHeaderFilter) (_ 
 	if v := filter.Name; v.Valid {
 		where = append(where, "name = :name")
 	}
+	if v := filter.NameLike; v.Valid {
+		where = append(where, "name like concat('%', :nameLike, '%') or alias like concat('%', :nameLike, '%')")
+	}
 
 	rows, err := tx.NamedQuery(`
 		SELECT *

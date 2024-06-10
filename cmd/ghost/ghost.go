@@ -32,11 +32,11 @@ var GhostCmd = &cobra.Command{
 
 		// Difficult table header
 		// TODO: give difftable argument
-		dthName := "insane"
+		dthNameLike := "insane"
 		filter := difftable.DiffTableHeaderFilter{
-			Name: null.StringFrom(dthName),
+			NameLike: null.StringFrom(dthNameLike),
 		}
-		msg := fmt.Sprintf("Multiple tables matched with %s, choose one:", dthName)
+		msg := fmt.Sprintf("Multiple tables matched with %s, choose one:", dthNameLike)
 		dth, err := service.DiffTableHeaderService.FindDiffTableHeaderListWithChoices(msg, filter)
 		if err != nil {
 			panic(err)

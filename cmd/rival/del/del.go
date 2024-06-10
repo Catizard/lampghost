@@ -5,7 +5,10 @@ package del
 
 import (
 	"github.com/Catizard/lampghost/internal/data/rival"
+	"github.com/Catizard/lampghost/internal/sqlite/service"
 	"github.com/Catizard/lampghost/internal/tui/choose"
+	"github.com/charmbracelet/log"
+	"github.com/guregu/null/v5"
 	"github.com/spf13/cobra"
 )
 
@@ -15,13 +18,15 @@ var DelCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		name := args[0]
-		rivalInfo, err := rival.QueryRivalInfoWithChoices(name)
+		msg := "Multiple rivals matched, please choose one"
+		filter := rival.RivalInfoFilter{Name: null.StringFrom(name)}
+		rivalInfo, err := service.RivalInfoService.ChooseOneRival(msg, filter)
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 		secq := choose.OpenYesOrNoChooseTui("Do you really want to delete this rival?")
 		if secq {
-			rival.DeleteRivalInfo(rivalInfo.Id)
+			service.RivalInfoService.DeleteRivalInfo(rivalInfo.Id)
 		}
 	},
 }

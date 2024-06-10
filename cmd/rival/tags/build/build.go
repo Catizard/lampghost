@@ -8,6 +8,7 @@ import (
 	"github.com/Catizard/lampghost/internal/data/rival"
 	"github.com/Catizard/lampghost/internal/sqlite/service"
 	"github.com/charmbracelet/log"
+	"github.com/guregu/null/v5"
 	"github.com/spf13/cobra"
 )
 
@@ -21,7 +22,9 @@ var BuildCmd = &cobra.Command{
 			panic(err)
 		}
 		if len(rivalName) != 0 {
-			rivalInfo, err := rival.QueryRivalInfoWithChoices(rivalName)
+			msg := "Multiple rivals matched, please choose one";
+			filter := rival.RivalInfoFilter{Name: null.StringFrom(rivalName)}
+			rivalInfo, err := service.RivalInfoService.ChooseOneRival(msg, filter)
 			if err != nil {
 				panic(err)
 			}

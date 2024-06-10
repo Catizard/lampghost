@@ -1,14 +1,11 @@
 package rival
 
 import (
-	"errors"
 	"fmt"
-	"os"
-	"path"
 
 	"github.com/Catizard/lampghost/internal/common"
 	"github.com/Catizard/lampghost/internal/data/score"
-	"github.com/Catizard/lampghost/internal/tui/choose"
+	"github.com/guregu/null/v5"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -26,7 +23,7 @@ type RivalInfoService interface {
 	// ---------- basic methods ----------
 	FindRivalInfoList(filter RivalInfoFilter) ([]*RivalInfo, int, error)
 	FindRivalInfoById(id int) (*RivalInfo, error)
-	InsertRivalInfo(dth *RivalInfo) error
+	InsertRivalInfo(r *RivalInfo) error
 	DeleteRivalInfo(id int) error
 
 	// Simple wrapper of FindRivalInfoList
@@ -36,8 +33,8 @@ type RivalInfoService interface {
 
 type RivalInfoFilter struct {
 	// Filtering fields
-	Id   *int
-	Name *string
+	Id null.Int  `db:"id"`
+	Name null.String `db:"name"`
 }
 
 type RivalInfoUpdate struct {
@@ -77,27 +74,6 @@ func (r *RivalInfo) LoadDataForcely() error {
 	return nil
 }
 
-// Save one rival info(or say, meta data) to disk.
-func (info *RivalInfo) SaveRivalInfo() error {
-	// Sane check before saving rival
-	if path.IsAbs(info.ScoreLogPath) {
-		return fmt.Errorf("sorry, absolute path is not supported")
-	}
-	if _, err := os.Stat(info.ScoreLogPath); errors.Is(err, os.ErrNotExist) {
-		return fmt.Errorf("cannot stat %s on your file system", info.ScoreLogPath)
-	}
-	if _, err := os.Stat(info.SongDataPath); errors.Is(err, os.ErrNotExist) {
-		return fmt.Errorf("cannot stat %s on your file system", info.SongDataPath)
-	}
-
-	db := common.OpenDB()
-	defer db.Close()
-	if _, err := db.NamedExec(`INSERT INTO rival_info (name, score_log_path, song_data_path) VALUES (:name,:score_log_path,:song_data_path)`, info); err != nil {
-		return err
-	}
-	return nil
-}
-
 // Query rival's info by name.
 // Returns error when no result.
 func QueryRivalInfo(name string) ([]RivalInfo, error) {
@@ -109,32 +85,6 @@ func QueryRivalInfo(name string) ([]RivalInfo, error) {
 		err = fmt.Errorf("query doesn't return any result")
 	}
 	return ret, err
-}
-
-// Simple wrapper of QueryRivalInfo.
-// Returns error if no result matched.
-// Open tui application when multiple results matched.
-func QueryRivalInfoWithChoices(name string) (RivalInfo, error) {
-	rivalArr, err := QueryRivalInfo(name)
-	if err != nil {
-		return RivalInfo{}, err
-	}
-	choices := make([]string, 0)
-	for _, r := range rivalArr {
-		choices = append(choices, r.String())
-	}
-	index := choose.OpenChooseTuiSkippable(choices, fmt.Sprintf("Multiple rivals named %s, please choose one:", name))
-	return rivalArr[index], nil
-}
-
-func DeleteRivalInfo(id int) error {
-	db := common.OpenDB()
-	defer db.Close()
-	_, err := db.Exec(`DELETE FROM rival_info where id=?`, id)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func (r *RivalInfo) loadRivalScoreLog() error {

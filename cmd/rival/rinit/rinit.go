@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// TODO: unused
 // initCmd represents the init command
 var InitCmd = &cobra.Command{
 	Use:   "init",

@@ -5,6 +5,7 @@ package add
 
 import (
 	"github.com/Catizard/lampghost/internal/data/rival"
+	"github.com/Catizard/lampghost/internal/sqlite/service"
 	"github.com/spf13/cobra"
 )
 
@@ -24,20 +25,11 @@ var AddCmd = &cobra.Command{
 			SongDataPath: songDataPath,
 		}
 
-		if err := rivalInfo.SaveRivalInfo(); err != nil {
+		if err := service.RivalInfoService.InsertRivalInfo(rivalInfo); err != nil {
 			panic(err)
 		}
 	},
 }
 
 func init() {
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// addCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// addCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

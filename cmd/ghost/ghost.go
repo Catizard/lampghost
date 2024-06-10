@@ -9,9 +9,9 @@ import (
 	"github.com/Catizard/lampghost/internal/data/difftable"
 	"github.com/Catizard/lampghost/internal/data/rival"
 	"github.com/Catizard/lampghost/internal/sqlite/service"
-	"github.com/Catizard/lampghost/internal/tui/choose"
 	ghostTui "github.com/Catizard/lampghost/internal/tui/ghost"
 	"github.com/charmbracelet/log"
+	"github.com/guregu/null/v5"
 	"github.com/spf13/cobra"
 )
 
@@ -21,8 +21,14 @@ var GhostCmd = &cobra.Command{
 	Short: "Open ghost tui application",
 	Args:  cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		selfInfo := queryAndLoadRival(args[0])
-		ghostInfo := queryAndLoadRival(args[1])
+		selfInfo, err := queryAndLoadRival(args[0])
+		if err != nil {
+			log.Fatal(err)
+		}
+		ghostInfo, err := queryAndLoadRival(args[1])
+		if err != nil {
+			log.Fatal(err)
+		}
 
 		// Difficult table header
 		// TODO: give difftable argument
@@ -55,7 +61,7 @@ var GhostCmd = &cobra.Command{
 				log.Infof("Choosed %s, time=%d\n", tag.TagName, tag.TimeStamp)
 			}
 		}
-		ghostTui.OpenGhostTui(dth, diffTable, &selfInfo, &ghostInfo)
+		ghostTui.OpenGhostTui(dth, diffTable, selfInfo, ghostInfo)
 	},
 }
 
@@ -63,19 +69,15 @@ func init() {
 	GhostCmd.Flags().Bool("tag", false, "When flagged, only logs before the chosen tag would be used")
 }
 
-func queryAndLoadRival(rivalName string) rival.RivalInfo {
-	rivalInfoArr, err := rival.QueryRivalInfo(rivalName)
+func queryAndLoadRival(rivalName string) (*rival.RivalInfo, error) {
+	msg := "Multiple rivals matched, please choose one"
+	filter := rival.RivalInfoFilter{Name: null.StringFrom(rivalName)}
+	rivalInfo, err := service.RivalInfoService.ChooseOneRival(msg, filter)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	rivalNameArr := make([]string, 0)
-	for _, r := range rivalInfoArr {
-		rivalNameArr = append(rivalNameArr, r.String())
-	}
-	index := choose.OpenChooseTuiSkippable(rivalNameArr, fmt.Sprintf("Multiple rivals named %s, please choose one:", rivalName))
-	rivalInfo := rivalInfoArr[index]
 	if err := rivalInfo.LoadDataIfNil(); err != nil {
-		panic(err)
+		return nil, err
 	}
-	return rivalInfo
+	return rivalInfo, nil
 }

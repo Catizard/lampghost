@@ -6,6 +6,7 @@ import (
 
 	"github.com/Catizard/lampghost/internal/data/rival"
 	"github.com/Catizard/lampghost/internal/tui/choose"
+	"github.com/guregu/null/v5"
 )
 
 var _ rival.RivalInfoService = (*RivalInfoService)(nil)
@@ -83,21 +84,16 @@ func (s *RivalInfoService) ChooseOneRival(msg string, filter rival.RivalInfoFilt
 	}
 }
 
-func findRivalInfoList(tx *Tx, filter rival.RivalInfoFilter) (_ []*rival.RivalInfo, n int, err error) {
-	where := []string{"1 = 1"}
-	if v := filter.Id; v != nil {
-		where = append(where, "id = :id")
 func findRivalInfoList(tx *Tx, filter rival.RivalInfoFilter) (_ []*rival.RivalInfo, _ int, err error) {
+	where := []string{"1=1"}
+	if v := filter.Id; v.Valid {
+		where = append(where, "id=:id")
 	}
-	if v := filter.Name; v != nil {
-		where = append(where, "name = :name")
+	if v := filter.Name; v.Valid {
+		where = append(where, "name=:name")
 	}
 
-	rows, err := tx.NamedQuery(`
-		SELECT *
-		FROM rival_info
-		WHERE `+strings.Join(where, " AND "),
-		filter)
+	rows, err := tx.NamedQuery("SELECT * FROM rival_info WHERE " + strings.Join(where, " AND "), filter)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -120,7 +116,7 @@ func findRivalInfoList(tx *Tx, filter rival.RivalInfoFilter) (_ []*rival.RivalIn
 }
 
 func findRivalInfoById(tx *Tx, id int) (*rival.RivalInfo, error) {
-	arr, _, err := findRivalInfoList(tx, rival.RivalInfoFilter{Id: &id})
+	arr, _, err := findRivalInfoList(tx, rival.RivalInfoFilter{Id: null.IntFrom(int64(id))})
 	if err != nil {
 		return nil, err
 	} else if len(arr) == 0 {

@@ -10,7 +10,9 @@
 
 - Diff yours and other players' lamp status
 - Diff yours and other players' previous lamp status
-- Support lr2
+- Support combination of player's data (e.g songdata.db+scorelog.db or score.db+scorelog.db and even merge them)
+- Support lr2 score import
+
 
 LampGhost aims at diff with previous status. For example, you are a ★4 player while your friend is already ★8.If you ask for some lamp suggestions, you might not get too much useful infomation. LampGhost could do: only use the scorelog before your friend arrive ★5, construcing a previous status to diff.
 
@@ -18,7 +20,7 @@ This project so called "lampghost" is because it's like the "ghost record" in ca
 
 ## Further
 
-- Use context package when command begins
+- I'm new to go language, need some help for managing packages (especially service part)
 - Better frustation (need advice & help)
 - Add configuration file support
 - Support "shrink" mode: only one songdata.db file is used across everywhere, only scorelog.db need be loaded. One songdata.db file would be around 60MB~150MB which is too large for collecting

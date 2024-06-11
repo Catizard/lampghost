@@ -210,7 +210,7 @@ func (s *RivalTagService) BuildTags(r *rival.RivalInfo, courseArr []*difftable.C
 	if err := syncGeneratedTags(tx, r, tags); err != nil {
 		panic(err)
 	}
-	return nil
+	return tx.Commit()
 }
 
 func (s *RivalTagService) SyncGeneratedTags(r *rival.RivalInfo, tags []*rival.RivalTag) error {
@@ -273,7 +273,7 @@ func deleteRivalTagById(tx *Tx, id int) error {
 }
 
 func deleteRivalTag(tx *Tx, filter rival.RivalTagFilter) error {
-	_, err := tx.Exec("DELETE FROM rival_tag WHERE "+filter.GenerateWhereClause(), filter)
+	_, err := tx.NamedExec("DELETE FROM rival_tag WHERE "+filter.GenerateWhereClause(), filter)
 	return err
 }
 

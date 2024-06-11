@@ -10,9 +10,11 @@ import (
 var DiffTableHeaderService difftable.DiffTableHeaderService
 var CourseInfoService difftable.CourseInfoService
 var RivalInfoService rival.RivalInfoService
+var RivalTagService rival.RivalTagService
 
 func InitService(db *sqlite.DB) {
 	DiffTableHeaderService = sqlite.NewDiffTableHeaderService(db)
 	CourseInfoService = sqlite.NewCourseInfoService(db)
 	RivalInfoService = sqlite.NewRivalInfoService(db)
+	RivalTagService = sqlite.NewRivalTagService(db)
 }

@@ -22,19 +22,18 @@ var BuildCmd = &cobra.Command{
 			panic(err)
 		}
 		if len(rivalName) != 0 {
-			msg := "Multiple rivals matched, please choose one";
+			msg := "Multiple rivals matched, please choose one"
 			filter := rival.RivalInfoFilter{Name: null.StringFrom(rivalName)}
 			rivalInfo, err := service.RivalInfoService.ChooseOneRival(msg, filter)
 			if err != nil {
-				panic(err)
+				log.Fatal(err)
 			}
 			courseInfoArr, _, err := service.CourseInfoService.FindCourseInfoList(difftable.CourseInfoFilter{})
 			if err != nil {
-				panic(err)
+				log.Fatal(err)
 			}
-			err = rivalInfo.BuildTags(courseInfoArr)
-			if err != nil {
-				panic(err)
+			if err := service.RivalTagService.BuildTags(rivalInfo, courseInfoArr); err != nil {
+				log.Fatal(err)
 			}
 		} else {
 			log.Fatal("unsupported, too bad...")

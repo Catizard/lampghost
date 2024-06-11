@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/guregu/null/v5"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -22,7 +23,23 @@ type ScoreLog struct {
 	TimeStamp int64 `db:"date"`
 }
 
-func ReadScoreLogFromSqlite(filePath string) ([]ScoreLog, error) {
+type ScoreLogFilter struct {
+	BeginTime null.Int `db:"beginTime"`
+	EndTime   null.Int `db:"endTime"`
+}
+
+func (f *ScoreLogFilter) GenerateWhereClause() string {
+	where := []string{"1=1"}
+	if v := f.BeginTime; v.Valid {
+		where = append(where, "date>=:beginTime")
+	}
+	if v := f.EndTime; v.Valid {
+		where = append(where, "date<=:endTime")
+	}
+	return strings.Join(where, " AND ")
+}
+
+func ReadScoreLogFromSqlite(filePath string, filter ScoreLogFilter) ([]ScoreLog, error) {
 	if !strings.HasSuffix(filePath, ".db") {
 		return nil, fmt.Errorf("try reading from sqlite database file while path doesn't contains a .db suffix")
 	}
@@ -32,7 +49,7 @@ func ReadScoreLogFromSqlite(filePath string) ([]ScoreLog, error) {
 	}
 	defer db.Close()
 
-	rows, err := db.Queryx("select * from scorelog")
+	rows, err := db.NamedQuery("select * from scorelog where "+filter.GenerateWhereClause(), filter)
 	if err != nil {
 		return nil, err
 	}

@@ -110,7 +110,7 @@ func (s *RivalTagService) BuildTags(r *rival.RivalInfo, courseArr []*difftable.C
 	if len(courseArr) == 0 {
 		return nil
 	}
-	if err := r.LoadDataIfNil(); err != nil {
+	if err := r.LoadDataIfNil(nil); err != nil {
 		panic(err)
 	}
 

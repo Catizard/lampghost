@@ -5,6 +5,7 @@ import (
 
 	"github.com/Catizard/lampghost/internal/common"
 	"github.com/Catizard/lampghost/internal/data/score"
+	"github.com/charmbracelet/log"
 	"github.com/guregu/null/v5"
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -33,7 +34,7 @@ type RivalInfoService interface {
 
 type RivalInfoFilter struct {
 	// Filtering fields
-	Id null.Int  `db:"id"`
+	Id   null.Int    `db:"id"`
 	Name null.String `db:"name"`
 }
 
@@ -48,9 +49,14 @@ func (r *RivalInfo) String() string {
 // Simple wrapper of LoadRivalScoreLog and LoadRivalSongData
 // Only loads if field is nil
 // If any error occurs, data on r cannot be insured
-func (r *RivalInfo) LoadDataIfNil() error {
+// TODO: Refactor its behaviour to "load data if file specified and exists, and merge them"
+func (r *RivalInfo) LoadDataIfNil(tag *RivalTag) error {
 	if r.ScoreLog == nil {
-		if err := r.loadRivalScoreLog(); err != nil {
+		filter := score.ScoreLogFilter{}
+		if tag != nil {
+			filter.EndTime = null.IntFrom(tag.TimeStamp)
+		}
+		if err := r.loadRivalScoreLog(filter); err != nil {
 			return err
 		}
 	}
@@ -59,17 +65,6 @@ func (r *RivalInfo) LoadDataIfNil() error {
 		if err := r.loadRivalSongData(); err != nil {
 			return err
 		}
-	}
-	return nil
-}
-
-// Like LoadDataIfNil, without nil check
-func (r *RivalInfo) LoadDataForcely() error {
-	if err := r.loadRivalScoreLog(); err != nil {
-		return err
-	}
-	if err := r.loadRivalSongData(); err != nil {
-		return err
 	}
 	return nil
 }
@@ -87,12 +82,13 @@ func QueryRivalInfo(name string) ([]RivalInfo, error) {
 	return ret, err
 }
 
-func (r *RivalInfo) loadRivalScoreLog() error {
-	scoreLog, err := score.ReadScoreLogFromSqlite(r.ScoreLogPath)
+func (r *RivalInfo) loadRivalScoreLog(filter score.ScoreLogFilter) error {
+	scoreLog, err := score.ReadScoreLogFromSqlite(r.ScoreLogPath, filter)
 	if err != nil {
 		return err
 	}
 	r.ScoreLog = scoreLog
+	log.Infof("loaded %d logs\n", len(r.ScoreLog))
 	return nil
 }
 

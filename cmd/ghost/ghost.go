@@ -17,67 +17,73 @@ import (
 
 // ghostCmd represents the ghost command
 var GhostCmd = &cobra.Command{
-	Use:   "ghost [self] [ghost]",
+	Use:   "ghost self-name ghost-name [--tag] [--table table-name]",
 	Short: "Open ghost tui application",
 	Args:  cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		selfInfo, err := queryAndLoadRival(args[0])
+		// 1) Load self and ghost
+		msg := "Multiple rivals matched, please choose one"
+		selfInfo, err := service.RivalInfoService.ChooseOneRival(msg, rival.RivalInfoFilter{Name: null.StringFrom(args[0])})
 		if err != nil {
 			log.Fatal(err)
 		}
-		ghostInfo, err := queryAndLoadRival(args[1])
+		ghostInfo, err := service.RivalInfoService.ChooseOneRival(msg, rival.RivalInfoFilter{Name: null.StringFrom(args[1])})
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		// Difficult table header
-		// TODO: give difftable argument
-		dthNameLike := "insane"
-		filter := difftable.DiffTableHeaderFilter{
-			NameLike: null.StringFrom(dthNameLike),
+		log.Infof("self name=%s, scorelog_path=%s\n", selfInfo.Name, selfInfo.ScoreLogPath)
+		log.Infof("ghost name=%s, scorelog_path=%s\n", ghostInfo.Name, ghostInfo.ScoreLogPath)
+
+		// 2) Load table data
+		dthNameLike, err := cmd.Flags().GetString("table-name")
+		if err != nil {
+			log.Fatal(err)
 		}
-		msg := fmt.Sprintf("Multiple tables matched with %s, choose one:", dthNameLike)
+
+		filter := difftable.DiffTableHeaderFilter{}
+		msg = "Choose one difftable to ghost"
+		if len(dthNameLike) > 0 {
+			filter.NameLike = null.StringFrom(dthNameLike)
+			msg = fmt.Sprintf("Multiple tables matched with %s, choose one:", dthNameLike)
+		}
 		dth, err := service.DiffTableHeaderService.FindDiffTableHeaderListWithChoices(msg, filter)
 		if err != nil {
 			panic(err)
 		}
 
-		// Difficult table data
 		diffTable, err := difftable.ReadDiffTable(dth.DataLocation)
 		if err != nil {
 			panic(err)
 		}
 
+		// 3) Load song/log data
+
+		// Note: Tags can only be applied on ghost
+		if err := selfInfo.LoadDataIfNil(nil); err != nil {
+			log.Fatal(err)
+		}
+
+		var tag *rival.RivalTag
 		// If tag flagged
 		if b, err := cmd.Flags().GetBool("tag"); err != nil {
 			panic(err)
-		} else {
-			if b {
-				// You have to choose a tag first
-				tag, err := service.RivalTagService.ChooseOneTag("Choose one tag to ghost", rival.RivalTagFilter{})
-				if err != nil {
-					panic(err)
-				}
-				log.Infof("Choosed %s, time=%d\n", tag.TagName, tag.TimeStamp)
+		} else if b {
+			// You have to choose a tag first
+			tag, err = service.RivalTagService.ChooseOneTag("Choose one tag to ghost", rival.RivalTagFilter{})
+			if err != nil {
+				panic(err)
 			}
+			log.Infof("Choosed %s, time=%d\n", tag.TagName, tag.TimeStamp)
+		}
+		if err := ghostInfo.LoadDataIfNil(tag); err != nil {
+			log.Fatal(err)
 		}
 		ghostTui.OpenGhostTui(dth, diffTable, selfInfo, ghostInfo)
 	},
 }
 
 func init() {
-	GhostCmd.Flags().Bool("tag", false, "When flagged, only logs before the chosen tag would be used")
-}
-
-func queryAndLoadRival(rivalName string) (*rival.RivalInfo, error) {
-	msg := "Multiple rivals matched, please choose one"
-	filter := rival.RivalInfoFilter{Name: null.StringFrom(rivalName)}
-	rivalInfo, err := service.RivalInfoService.ChooseOneRival(msg, filter)
-	if err != nil {
-		return nil, err
-	}
-	if err := rivalInfo.LoadDataIfNil(); err != nil {
-		return nil, err
-	}
-	return rivalInfo, nil
+	GhostCmd.Flags().Bool("tag", false, "When flagged, only the logs that before the chosen tag would be used")
+	GhostCmd.Flags().StringP("table-name", "T", "", "Filtering argument for table selection")
 }

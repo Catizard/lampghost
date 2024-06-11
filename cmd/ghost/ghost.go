@@ -43,7 +43,7 @@ var GhostCmd = &cobra.Command{
 		}
 
 		// Difficult table data
-		diffTable, err := difftable.ReadDiffTable(dth.Name + ".json")
+		diffTable, err := difftable.ReadDiffTable(dth.DataLocation)
 		if err != nil {
 			panic(err)
 		}

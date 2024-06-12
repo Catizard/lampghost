@@ -11,13 +11,15 @@ import (
 )
 
 type RivalInfo struct {
-	Id           int    `db:"id"`
-	Name         string `db:"name"`
-	ScoreLogPath string `db:"score_log_path"`
-	SongDataPath string `db:"song_data_path"`
-	Tags         []RivalTag
-	ScoreLog     []score.ScoreLog
-	SongData     []score.SongData
+	Id              int         `db:"id"`
+	Name            string      `db:"name"`
+	ScoreLogPath    null.String `db:"score_log_path"`
+	SongDataPath    null.String `db:"song_data_path"`
+	LR2ScoreLogPath null.String `db:"lr2_score_log_path"`
+	Tags            []RivalTag
+	// TODO: I'm gonna to rename ScoreLog to OrajaScoreLog or something else
+	ScoreLog []score.ScoreLog
+	SongData []score.SongData
 }
 
 type RivalInfoService interface {
@@ -43,7 +45,7 @@ type RivalInfoUpdate struct {
 }
 
 func (r *RivalInfo) String() string {
-	return fmt.Sprintf("%s (log=[%s],data=[%s])", r.Name, r.ScoreLogPath, r.SongDataPath)
+	return fmt.Sprintf("%s (log=[%s],data=[%s])", r.Name, r.ScoreLogPath.ValueOrZero(), r.SongDataPath.ValueOrZero())
 }
 
 // Simple wrapper of LoadRivalScoreLog and LoadRivalSongData
@@ -83,7 +85,7 @@ func QueryRivalInfo(name string) ([]RivalInfo, error) {
 }
 
 func (r *RivalInfo) loadRivalScoreLog(filter score.ScoreLogFilter) error {
-	scoreLog, err := score.ReadScoreLogFromSqlite(r.ScoreLogPath, filter)
+	scoreLog, err := score.ReadScoreLogFromSqlite(r.ScoreLogPath.ValueOrZero(), filter)
 	if err != nil {
 		return err
 	}
@@ -93,7 +95,7 @@ func (r *RivalInfo) loadRivalScoreLog(filter score.ScoreLogFilter) error {
 }
 
 func (r *RivalInfo) loadRivalSongData() error {
-	songData, err := score.ReadSongDataFromSqlite(r.SongDataPath)
+	songData, err := score.ReadSongDataFromSqlite(r.SongDataPath.ValueOrZero())
 	if err != nil {
 		return err
 	}

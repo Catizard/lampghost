@@ -65,6 +65,11 @@ func ReadScoreLogFromSqlite(filePath string, filter ScoreLogFilter) ([]ScoreLog,
 	return scoreLogArray, nil
 }
 
+type LR2ScoreLog struct {
+	Md5 string `db:"hash"` 
+	Clear int `db:"clear"`
+}
+
 type CommonScoreLog struct {
 	Sha256    null.String
 	Md5       null.String

@@ -16,6 +16,9 @@ LampGhost aims at diff with previous status, which means you can "revert" other 
 
 This project so called "lampghost" is because it's like the "ghost record" in car racing game. 
 
+> ![NOTE]
+> Unfortunatly, LR2 database file doesn't record the timestamp of the play. Which means LampGhost cannot build LR2 user's previous status. But you can still use ghost command with no `--tag` flag set.
+
 ## Quick start
 
 ### Build this project

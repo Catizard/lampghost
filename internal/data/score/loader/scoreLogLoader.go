@@ -8,4 +8,5 @@ import (
 type ScoreLogLoader interface {
 	interest(r *rival.RivalInfo) bool
 	load(r *rival.RivalInfo) ([]*score.CommonScoreLog, error)
+	// loadWithFilter(r *rival.RivalInfo, filter ???) ([]*score.CommonScoreLog, error)
 }

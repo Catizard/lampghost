@@ -32,8 +32,8 @@ var GhostCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		log.Infof("self name=%s, scorelog_path=%s\n", selfInfo.Name, selfInfo.ScoreLogPath)
-		log.Infof("ghost name=%s, scorelog_path=%s\n", ghostInfo.Name, ghostInfo.ScoreLogPath)
+		log.Infof("self name=%s, scorelog_path=%s\n", selfInfo.Name, selfInfo.ScoreLogPath.ValueOrZero())
+		log.Infof("ghost name=%s, scorelog_path=%s\n", ghostInfo.Name, ghostInfo.ScoreLogPath.ValueOrZero())
 
 		// 2) Load table data
 		dthNameLike, err := cmd.Flags().GetString("table-name")

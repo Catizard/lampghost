@@ -73,14 +73,14 @@ type LR2ScoreLog struct {
 type CommonScoreLog struct {
 	Sha256    null.String
 	Md5       null.String
-	Mode      string
 	Clear     int32
-	OldClear  int32
-	Score     int32
-	OldScore  int32
-	Combo     int32
-	OldCombo  int32
-	Minbp     int32
-	OldMinbp  int32
-	TimeStamp int64 `db:"date"`
+	TimeStamp null.Int
+}
+
+func NewCommonScoreLog(log ScoreLog) *CommonScoreLog {
+	return &CommonScoreLog{
+		Sha256: null.StringFrom(log.Sha256),
+		Clear: log.Clear,
+		TimeStamp: null.IntFrom(log.TimeStamp),
+	}
 }

@@ -137,7 +137,7 @@ func (s *RivalTagService) BuildTags(r *rival.RivalInfo, courseArr []*difftable.C
 			}
 		}
 		if !valid {
-			log.Warnf("Course %s builds up failed due to lack of data, songdata path=%s", course.Name, r.SongDataPath)
+			log.Warnf("Course %s builds up failed due to lack of data, songdata path=%s", course.Name, r.SongDataPath.ValueOrZero())
 			continue
 		}
 		log.Debug("course name=%s, sha256=%s\n", course.Name, sha256)

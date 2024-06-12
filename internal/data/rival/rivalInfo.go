@@ -3,7 +3,6 @@ package rival
 import (
 	"fmt"
 
-	"github.com/Catizard/lampghost/internal/common"
 	"github.com/Catizard/lampghost/internal/data/score"
 	"github.com/charmbracelet/log"
 	"github.com/guregu/null/v5"
@@ -69,19 +68,6 @@ func (r *RivalInfo) LoadDataIfNil(tag *RivalTag) error {
 		}
 	}
 	return nil
-}
-
-// Query rival's info by name.
-// Returns error when no result.
-func QueryRivalInfo(name string) ([]RivalInfo, error) {
-	db := common.OpenDB()
-	defer db.Close()
-	var ret []RivalInfo
-	err := db.Select(&ret, "SELECT * FROM rival_info where name=?", name)
-	if err == nil && len(ret) == 0 {
-		err = fmt.Errorf("query doesn't return any result")
-	}
-	return ret, err
 }
 
 func (r *RivalInfo) loadRivalScoreLog(filter score.ScoreLogFilter) error {

@@ -6,6 +6,7 @@ import (
 	"github.com/Catizard/lampghost/internal/data/rival"
 	"github.com/Catizard/lampghost/internal/data/score"
 	"github.com/Catizard/lampghost/internal/sqlite"
+	"github.com/guregu/null/v5"
 )
 
 // TODO: OrajaDataLoader is obviously not a good name if there was multiple log loader for oraja exist.
@@ -50,7 +51,28 @@ func (l *orajaDataLoader) Load(r *rival.RivalInfo) ([]*score.CommonScoreLog, err
 	}
 	// This is a workaround, since interface's defininition is (r) => ([]*commonlog, error)
 	// There is no place for songdata to return while LR2's data form has only one field: log
+	// TODO: remove this?
 	r.SongData = rawSongs
 
-	return logs, nil
+	// 3) Assign md5 to log based on songdata.db
+	// Note: Unassigned logs are ignored, because we cannot do anything further on it.
+	// TODO: And, course's log should be treated specially.
+	sha256MapsToMd5 := make(map[string]string)
+	for _, v := range rawSongs {
+		sha256MapsToMd5[v.Sha256] = v.Md5
+	}
+
+	finalLogs := make([]*score.CommonScoreLog, 0)
+	for _, log := range logs {
+		if md5, ok := sha256MapsToMd5[log.Sha256.String]; ok {
+			log.Md5 = null.StringFrom(md5)
+			finalLogs = append(finalLogs, log)
+			// TODO: remove me!
+			if !finalLogs[len(finalLogs)-1].Md5.Valid {
+				panic("panic: no md5")
+			}
+		}
+	}
+
+	return finalLogs, nil
 }

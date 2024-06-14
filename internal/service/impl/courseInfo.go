@@ -1,10 +1,11 @@
-package sqlite
+package impl
 
 import (
 	"fmt"
 	"strings"
 
 	"github.com/Catizard/lampghost/internal/data/difftable"
+	"github.com/Catizard/lampghost/internal/sqlite"
 )
 
 var (
@@ -20,10 +21,10 @@ var _ difftable.CourseInfoService = (*CourseInfoService)(nil)
 
 // Represents a service component for managing course info
 type CourseInfoService struct {
-	db *DB
+	db *sqlite.DB
 }
 
-func NewCourseInfoService(db *DB) *CourseInfoService {
+func NewCourseInfoService(db *sqlite.DB) *CourseInfoService {
 	return &CourseInfoService{db: db}
 }
 
@@ -71,7 +72,7 @@ func (s *CourseInfoService) DeleteCourseInfo(id int) error {
 	return nil
 }
 
-func findCourseInfoList(tx *Tx, filter difftable.CourseInfoFilter) (_ []*difftable.CourseInfo, _ int, err error) {
+func findCourseInfoList(tx *sqlite.Tx, filter difftable.CourseInfoFilter) (_ []*difftable.CourseInfo, _ int, err error) {
 	where := []string{"1 = 1"}
 	if v := filter.Id; v != nil {
 		where = append(where, "id = :id")
@@ -107,7 +108,7 @@ func findCourseInfoList(tx *Tx, filter difftable.CourseInfoFilter) (_ []*difftab
 	return ret, len(ret), nil
 }
 
-func findCourseInfoById(tx *Tx, id int) (*difftable.CourseInfo, error) {
+func findCourseInfoById(tx *sqlite.Tx, id int) (*difftable.CourseInfo, error) {
 	arr, _, err := findCourseInfoList(tx, difftable.CourseInfoFilter{Id: &id})
 	if err != nil {
 		return nil, err
@@ -118,12 +119,12 @@ func findCourseInfoById(tx *Tx, id int) (*difftable.CourseInfo, error) {
 	return arr[0], nil
 }
 
-func insertCourseInfo(tx *Tx, courseInfo *difftable.CourseInfo) error {
+func insertCourseInfo(tx *sqlite.Tx, courseInfo *difftable.CourseInfo) error {
 	_, err := tx.NamedExec("INSERT INTO course_info(name, md5s, source) VALUES(:name, :md5s, :source)", courseInfo)
 	return err
 }
 
-func deleteCourseInfo(tx *Tx, id int) error {
+func deleteCourseInfo(tx *sqlite.Tx, id int) error {
 	if _, err := findCourseInfoById(tx, id); err != nil {
 		return err
 	}
@@ -133,7 +134,7 @@ func deleteCourseInfo(tx *Tx, id int) error {
 }
 
 // Save course info from difficult table's fetch result
-func saveCourseInfoFromTableHeader(tx *Tx, dth *difftable.DiffTableHeader) error {
+func saveCourseInfoFromTableHeader(tx *sqlite.Tx, dth *difftable.DiffTableHeader) error {
 	// If there is no course...
 	if dth.Course == nil || len(dth.Course) == 0 || len(dth.Course[0]) == 0 {
 		return nil

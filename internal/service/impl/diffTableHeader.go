@@ -1,4 +1,4 @@
-package sqlite
+package impl
 
 import (
 	"fmt"
@@ -10,6 +10,7 @@ import (
 	"github.com/Catizard/lampghost/internal/common"
 	"github.com/Catizard/lampghost/internal/config"
 	"github.com/Catizard/lampghost/internal/data/difftable"
+	"github.com/Catizard/lampghost/internal/sqlite"
 	"github.com/Catizard/lampghost/internal/tui/choose"
 	"github.com/charmbracelet/log"
 	"github.com/guregu/null/v5"
@@ -20,10 +21,10 @@ var _ difftable.DiffTableHeaderService = (*DiffTableHeaderService)(nil)
 
 // Represents a service component for managing difficult table header
 type DiffTableHeaderService struct {
-	db *DB
+	db *sqlite.DB
 }
 
-func NewDiffTableHeaderService(db *DB) *DiffTableHeaderService {
+func NewDiffTableHeaderService(db *sqlite.DB) *DiffTableHeaderService {
 	return &DiffTableHeaderService{db: db}
 }
 
@@ -145,7 +146,7 @@ func (s *DiffTableHeaderService) FindDiffTableHeaderListWithChoices(msg string, 
 	}
 }
 
-func insertDiffTableHeader(tx *Tx, dth *difftable.DiffTableHeader) error {
+func insertDiffTableHeader(tx *sqlite.Tx, dth *difftable.DiffTableHeader) error {
 	_, err := tx.NamedExec(`
 		INSERT INTO difftable_header(
 			data_url,
@@ -159,7 +160,7 @@ func insertDiffTableHeader(tx *Tx, dth *difftable.DiffTableHeader) error {
 	return err
 }
 
-func findDiffTableHeaderList(tx *Tx, filter difftable.DiffTableHeaderFilter) (_ []*difftable.DiffTableHeader, _ int, err error) {
+func findDiffTableHeaderList(tx *sqlite.Tx, filter difftable.DiffTableHeaderFilter) (_ []*difftable.DiffTableHeader, _ int, err error) {
 	where := []string{"1 = 1"}
 	if v := filter.Id; v.Valid {
 		where = append(where, "id = :id")
@@ -197,7 +198,7 @@ func findDiffTableHeaderList(tx *Tx, filter difftable.DiffTableHeaderFilter) (_ 
 	return ret, len(ret), nil
 }
 
-func findDiffTableHeaderById(tx *Tx, id int) (*difftable.DiffTableHeader, error) {
+func findDiffTableHeaderById(tx *sqlite.Tx, id int) (*difftable.DiffTableHeader, error) {
 	arr, _, err := findDiffTableHeaderList(tx, difftable.DiffTableHeaderFilter{Id: null.IntFrom(int64(id))})
 	if err != nil {
 		return nil, err
@@ -207,7 +208,7 @@ func findDiffTableHeaderById(tx *Tx, id int) (*difftable.DiffTableHeader, error)
 	return arr[0], nil
 }
 
-func updateDiffTableHeader(tx *Tx, id int, upd difftable.DiffTableHeaderUpdate) (*difftable.DiffTableHeader, error) {
+func updateDiffTableHeader(tx *sqlite.Tx, id int, upd difftable.DiffTableHeaderUpdate) (*difftable.DiffTableHeader, error) {
 	dth, err := findDiffTableHeaderById(tx, id)
 	if err != nil {
 		return dth, err
@@ -225,7 +226,7 @@ func updateDiffTableHeader(tx *Tx, id int, upd difftable.DiffTableHeaderUpdate) 
 	return dth, nil
 }
 
-func deleteDiffTableHeader(tx *Tx, id int) error {
+func deleteDiffTableHeader(tx *sqlite.Tx, id int) error {
 	if _, err := findDiffTableHeaderById(tx, id); err != nil {
 		return err
 	}
@@ -243,7 +244,7 @@ func fetchDiffTableFromURL(url string) (*difftable.DiffTableHeader, error) {
 	return dth, nil
 }
 
-func existsByName(tx *Tx, name string) (bool, error) {
+func existsByName(tx *sqlite.Tx, name string) (bool, error) {
 	filter := difftable.DiffTableHeaderFilter{
 		Name: null.StringFrom(name),
 	}

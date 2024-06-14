@@ -5,7 +5,7 @@ package del
 
 import (
 	"github.com/Catizard/lampghost/internal/data/rival"
-	"github.com/Catizard/lampghost/internal/sqlite/service"
+	"github.com/Catizard/lampghost/internal/service"
 	"github.com/Catizard/lampghost/internal/tui/choose"
 	"github.com/charmbracelet/log"
 	"github.com/guregu/null/v5"

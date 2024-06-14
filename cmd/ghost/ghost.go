@@ -8,7 +8,7 @@ import (
 
 	"github.com/Catizard/lampghost/internal/data/difftable"
 	"github.com/Catizard/lampghost/internal/data/rival"
-	"github.com/Catizard/lampghost/internal/sqlite/service"
+	"github.com/Catizard/lampghost/internal/service"
 	ghostTui "github.com/Catizard/lampghost/internal/tui/ghost"
 	"github.com/charmbracelet/log"
 	"github.com/guregu/null/v5"
@@ -60,7 +60,7 @@ var GhostCmd = &cobra.Command{
 		// 3) Load song/log data
 
 		// Note: Tags can only be applied on ghost
-		if err := selfInfo.LoadDataIfNil(nil); err != nil {
+		if err := selfInfo.LoadData(nil); err != nil {
 			log.Fatal(err)
 		}
 
@@ -76,7 +76,7 @@ var GhostCmd = &cobra.Command{
 			}
 			log.Infof("Choosed %s, time=%d\n", tag.TagName, tag.TimeStamp)
 		}
-		if err := ghostInfo.LoadDataIfNil(tag); err != nil {
+		if err := ghostInfo.LoadData(tag); err != nil {
 			log.Fatal(err)
 		}
 		ghostTui.OpenGhostTui(dth, diffTable, selfInfo, ghostInfo)

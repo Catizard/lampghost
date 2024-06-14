@@ -1,10 +1,12 @@
-package sqlite
+package impl
 
 import (
 	"fmt"
 	"strings"
 
 	"github.com/Catizard/lampghost/internal/data/rival"
+	"github.com/Catizard/lampghost/internal/data/score/loader"
+	"github.com/Catizard/lampghost/internal/sqlite"
 	"github.com/Catizard/lampghost/internal/tui/choose"
 	"github.com/guregu/null/v5"
 )
@@ -12,10 +14,10 @@ import (
 var _ rival.RivalInfoService = (*RivalInfoService)(nil)
 
 type RivalInfoService struct {
-	db *DB
+	db *sqlite.DB
 }
 
-func NewRivalInfoService(db *DB) *RivalInfoService {
+func NewRivalInfoService(db *sqlite.DB) *RivalInfoService {
 	return &RivalInfoService{db: db}
 }
 
@@ -84,7 +86,17 @@ func (s *RivalInfoService) ChooseOneRival(msg string, filter rival.RivalInfoFilt
 	}
 }
 
-func findRivalInfoList(tx *Tx, filter rival.RivalInfoFilter) (_ []*rival.RivalInfo, _ int, err error) {
+func (s *RivalInfoService) LoadRivalData(r *rival.RivalInfo) error {
+	loader := chooseLoader(r)
+	logs, err := loader.Load(r)
+	if err != nil {
+		return err
+	}
+	r.CommonScoreLog = logs
+	return nil
+}
+
+func findRivalInfoList(tx *sqlite.Tx, filter rival.RivalInfoFilter) (_ []*rival.RivalInfo, _ int, err error) {
 	where := []string{"1=1"}
 	if v := filter.Id; v.Valid {
 		where = append(where, "id=:id")
@@ -93,7 +105,7 @@ func findRivalInfoList(tx *Tx, filter rival.RivalInfoFilter) (_ []*rival.RivalIn
 		where = append(where, "name=:name")
 	}
 
-	rows, err := tx.NamedQuery("SELECT * FROM rival_info WHERE " + strings.Join(where, " AND "), filter)
+	rows, err := tx.NamedQuery("SELECT * FROM rival_info WHERE "+strings.Join(where, " AND "), filter)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -115,7 +127,7 @@ func findRivalInfoList(tx *Tx, filter rival.RivalInfoFilter) (_ []*rival.RivalIn
 	return ret, len(ret), nil
 }
 
-func findRivalInfoById(tx *Tx, id int) (*rival.RivalInfo, error) {
+func findRivalInfoById(tx *sqlite.Tx, id int) (*rival.RivalInfo, error) {
 	arr, _, err := findRivalInfoList(tx, rival.RivalInfoFilter{Id: null.IntFrom(int64(id))})
 	if err != nil {
 		return nil, err
@@ -125,16 +137,40 @@ func findRivalInfoById(tx *Tx, id int) (*rival.RivalInfo, error) {
 	return arr[0], nil
 }
 
-func insertRivalInfo(tx *Tx, rivalInfo *rival.RivalInfo) error {
-	_, err := tx.NamedExec(`INSERT INTO rival_info (name, score_log_path, song_data_path) VALUES (:name,:score_log_path,:song_data_path)`, rivalInfo);
+func insertRivalInfo(tx *sqlite.Tx, rivalInfo *rival.RivalInfo) error {
+	_, err := tx.NamedExec(`INSERT INTO rival_info (name, score_log_path, song_data_path) VALUES (:name,:score_log_path,:song_data_path)`, rivalInfo)
 	return err
 }
 
-func deleteRivalInfo(tx *Tx, id int) error {
+func deleteRivalInfo(tx *sqlite.Tx, id int) error {
 	if _, err := findRivalInfoById(tx, id); err != nil {
 		return err
 	}
 
 	_, err := tx.Exec("DELETE FROM rival_info WHERE id=?", id)
 	return err
+}
+
+func chooseLoader(r *rival.RivalInfo) loader.ScoreLogLoader {
+	if loader.OrajaLogLoader.Interest(r) && loader.LR2LogLoader.Interest(r) {
+		// Okay, we got a trouble
+		msg := "The rival [%s] registered both LR2 file and Oraja file, you have to choose one to use"
+		i := choose.OpenChooseTui([]string{"LR2", "Oraja"}, fmt.Sprintf(msg), false)
+		if i == 0 {
+			r.Prefer = null.StringFrom("LR2")
+		} else {
+			r.Prefer = null.StringFrom("Oraja")
+		}
+	} else if loader.OrajaLogLoader.Interest(r) {
+		r.Prefer = null.StringFrom("LR2")
+	} else if loader.LR2LogLoader.Interest(r) {
+		r.Prefer = null.StringFrom("Oraja")
+	}
+	if !r.Prefer.Valid {
+		panic("panic: no loader")
+	}
+	if r.Prefer.Equal(null.StringFrom("LR2")) {
+		return loader.LR2LogLoader
+	}
+	return loader.OrajaLogLoader
 }

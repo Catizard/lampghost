@@ -6,7 +6,7 @@ package add
 import (
 	"log"
 
-	"github.com/Catizard/lampghost/internal/sqlite/service"
+	"github.com/Catizard/lampghost/internal/service"
 	"github.com/spf13/cobra"
 )
 

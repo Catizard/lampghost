@@ -8,7 +8,7 @@ import (
 	"log"
 
 	"github.com/Catizard/lampghost/internal/data/difftable"
-	"github.com/Catizard/lampghost/internal/sqlite/service"
+	"github.com/Catizard/lampghost/internal/service"
 	"github.com/Catizard/lampghost/internal/tui/choose"
 	"github.com/guregu/null/v5"
 	"github.com/spf13/cobra"

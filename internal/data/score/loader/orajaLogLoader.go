@@ -19,17 +19,17 @@ func newOrajaLogLoader() *orajaLogLoader {
 	return &orajaLogLoader{}
 }
 
-func (l *orajaLogLoader) interest(r *rival.RivalInfo) bool {
+func (l *orajaLogLoader) Interest(r *rival.RivalInfo) bool {
 	return r.SongDataPath.Valid && r.ScoreLogPath.Valid
 }
 
-func (l *orajaLogLoader) load(r *rival.RivalInfo) ([]*score.CommonScoreLog, error) {
-	if !l.interest(r) {
+func (l *orajaLogLoader) Load(r *rival.RivalInfo) ([]*score.CommonScoreLog, error) {
+	if !l.Interest(r) {
 		return nil, fmt.Errorf("[OrajaLogLoader] cannot load")
 	}
 
 	// database initialize
-	db := sqlite.NewDB(r.SongDataPath.String)	
+	db := sqlite.NewDB(r.SongDataPath.String)
 	if err := db.Open(); err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (l *orajaLogLoader) load(r *rival.RivalInfo) ([]*score.CommonScoreLog, erro
 	// Convert raw data to common form
 	logs := make([]*score.CommonScoreLog, 0)
 	for _, rawLog := range rawLogs {
-		logs = append(logs, score.NewCommonScoreLog(rawLog))
+		logs = append(logs, score.NewCommonScoreLogFromOraja(rawLog))
 	}
 
 	if err := tx.Commit(); err != nil {
@@ -68,4 +68,3 @@ func (l *orajaLogLoader) load(r *rival.RivalInfo) ([]*score.CommonScoreLog, erro
 
 	return logs, nil
 }
-

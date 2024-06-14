@@ -66,8 +66,8 @@ func ReadScoreLogFromSqlite(filePath string, filter ScoreLogFilter) ([]ScoreLog,
 }
 
 type LR2ScoreLog struct {
-	Md5 string `db:"hash"` 
-	Clear int `db:"clear"`
+	Md5   string `db:"hash"`
+	Clear int    `db:"clear"`
 }
 
 type CommonScoreLog struct {
@@ -77,10 +77,17 @@ type CommonScoreLog struct {
 	TimeStamp null.Int
 }
 
-func NewCommonScoreLog(log ScoreLog) *CommonScoreLog {
+func NewCommonScoreLogFromOraja(log ScoreLog) *CommonScoreLog {
 	return &CommonScoreLog{
-		Sha256: null.StringFrom(log.Sha256),
-		Clear: log.Clear,
+		Sha256:    null.StringFrom(log.Sha256),
+		Clear:     log.Clear,
 		TimeStamp: null.IntFrom(log.TimeStamp),
+	}
+}
+
+func NewCommonScoreLogFromLR2(log LR2ScoreLog) *CommonScoreLog {
+	return &CommonScoreLog{
+		Md5:   null.StringFrom(log.Md5),
+		Clear: int32(log.Clear),
 	}
 }

@@ -17,8 +17,10 @@ type RivalInfo struct {
 	LR2ScoreLogPath null.String `db:"lr2_score_log_path"`
 	Tags            []RivalTag
 	// TODO: I'm gonna to rename ScoreLog to OrajaScoreLog or something else
-	ScoreLog []score.ScoreLog
-	SongData []score.SongData
+	ScoreLog       []score.ScoreLog
+	SongData       []score.SongData
+	Prefer         null.String // Prefer to use LR2 or Oraja database file
+	CommonScoreLog []*score.CommonScoreLog
 }
 
 type RivalInfoService interface {
@@ -31,6 +33,9 @@ type RivalInfoService interface {
 	// Simple wrapper of FindRivalInfoList
 	// After query, open tui app and wait user select one
 	ChooseOneRival(msg string, filter RivalInfoFilter) (*RivalInfo, error)
+
+	// Load rival's data, depends on rival's config
+	LoadRivalData(r *RivalInfo) error
 }
 
 type RivalInfoFilter struct {
@@ -47,25 +52,19 @@ func (r *RivalInfo) String() string {
 	return fmt.Sprintf("%s (log=[%s],data=[%s])", r.Name, r.ScoreLogPath.ValueOrZero(), r.SongDataPath.ValueOrZero())
 }
 
-// Simple wrapper of LoadRivalScoreLog and LoadRivalSongData
-// Only loads if field is nil
-// If any error occurs, data on r cannot be insured
+// Load rival's data depends on its settings
 // TODO: Refactor its behaviour to "load data if file specified and exists, and merge them"
-func (r *RivalInfo) LoadDataIfNil(tag *RivalTag) error {
-	if r.ScoreLog == nil {
-		filter := score.ScoreLogFilter{}
-		if tag != nil {
-			filter.EndTime = null.IntFrom(tag.TimeStamp)
-		}
-		if err := r.loadRivalScoreLog(filter); err != nil {
-			return err
-		}
+func (r *RivalInfo) LoadData(tag *RivalTag) error {
+	filter := score.ScoreLogFilter{}
+	if tag != nil {
+		filter.EndTime = null.IntFrom(tag.TimeStamp)
+	}
+	if err := r.loadRivalScoreLog(filter); err != nil {
+		return err
 	}
 	// TODO: support "shrink" mode
-	if r.SongData == nil {
-		if err := r.loadRivalSongData(); err != nil {
-			return err
-		}
+	if err := r.loadRivalSongData(); err != nil {
+		return err
 	}
 	return nil
 }

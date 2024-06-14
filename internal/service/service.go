@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/Catizard/lampghost/internal/data/difftable"
 	"github.com/Catizard/lampghost/internal/data/rival"
+	"github.com/Catizard/lampghost/internal/service/impl"
 	"github.com/Catizard/lampghost/internal/sqlite"
 )
 
@@ -13,8 +14,8 @@ var RivalInfoService rival.RivalInfoService
 var RivalTagService rival.RivalTagService
 
 func InitService(db *sqlite.DB) {
-	DiffTableHeaderService = sqlite.NewDiffTableHeaderService(db)
-	CourseInfoService = sqlite.NewCourseInfoService(db)
-	RivalInfoService = sqlite.NewRivalInfoService(db)
-	RivalTagService = sqlite.NewRivalTagService(db)
+	DiffTableHeaderService = impl.NewDiffTableHeaderService(db)
+	CourseInfoService = impl.NewCourseInfoService(db)
+	RivalInfoService = impl.NewRivalInfoService(db)
+	RivalTagService = impl.NewRivalTagService(db)
 }

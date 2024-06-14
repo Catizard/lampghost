@@ -1,4 +1,4 @@
-package sqlite
+package impl
 
 import (
 	"fmt"
@@ -8,6 +8,7 @@ import (
 	"github.com/Catizard/lampghost/internal/data/difftable"
 	"github.com/Catizard/lampghost/internal/data/rival"
 	"github.com/Catizard/lampghost/internal/data/score"
+	"github.com/Catizard/lampghost/internal/sqlite"
 	"github.com/Catizard/lampghost/internal/tui/choose"
 	"github.com/charmbracelet/log"
 	"github.com/guregu/null/v5"
@@ -16,10 +17,10 @@ import (
 var _ rival.RivalTagService = (*RivalTagService)(nil)
 
 type RivalTagService struct {
-	db *DB
+	db *sqlite.DB
 }
 
-func NewRivalTagService(db *DB) *RivalTagService {
+func NewRivalTagService(db *sqlite.DB) *RivalTagService {
 	return &RivalTagService{db: db}
 }
 
@@ -110,7 +111,7 @@ func (s *RivalTagService) BuildTags(r *rival.RivalInfo, courseArr []*difftable.C
 	if len(courseArr) == 0 {
 		return nil
 	}
-	if err := r.LoadDataIfNil(nil); err != nil {
+	if err := r.LoadData(nil); err != nil {
 		panic(err)
 	}
 
@@ -225,7 +226,7 @@ func (s *RivalTagService) SyncGeneratedTags(r *rival.RivalInfo, tags []*rival.Ri
 	return tx.Commit()
 }
 
-func findRivalTagList(tx *Tx, filter rival.RivalTagFilter) (_ []*rival.RivalTag, _ int, err error) {
+func findRivalTagList(tx *sqlite.Tx, filter rival.RivalTagFilter) (_ []*rival.RivalTag, _ int, err error) {
 	rows, err := tx.NamedQuery("SELECT * FROM rival_tag WHERE "+filter.GenerateWhereClause(), filter)
 	if err != nil {
 		return nil, 0, err
@@ -248,7 +249,7 @@ func findRivalTagList(tx *Tx, filter rival.RivalTagFilter) (_ []*rival.RivalTag,
 	return ret, len(ret), nil
 }
 
-func findRivalTagById(tx *Tx, id int) (*rival.RivalTag, error) {
+func findRivalTagById(tx *sqlite.Tx, id int) (*rival.RivalTag, error) {
 	arr, _, err := findRivalTagList(tx, rival.RivalTagFilter{Id: null.IntFrom(int64(id))})
 	if err != nil {
 		return nil, err
@@ -258,12 +259,12 @@ func findRivalTagById(tx *Tx, id int) (*rival.RivalTag, error) {
 	return arr[0], nil
 }
 
-func insertRivalTag(tx *Tx, rivalTag *rival.RivalTag) error {
+func insertRivalTag(tx *sqlite.Tx, rivalTag *rival.RivalTag) error {
 	_, err := tx.NamedExec(`INSERT INTO rival_tag(rival_id,tag_name,generated,timestamp) VALUES(:rival_id,:tag_name,:generated,:timestamp)`, rivalTag)
 	return err
 }
 
-func deleteRivalTagById(tx *Tx, id int) error {
+func deleteRivalTagById(tx *sqlite.Tx, id int) error {
 	if _, err := findRivalTagById(tx, id); err != nil {
 		return err
 	}
@@ -272,12 +273,12 @@ func deleteRivalTagById(tx *Tx, id int) error {
 	return err
 }
 
-func deleteRivalTag(tx *Tx, filter rival.RivalTagFilter) error {
+func deleteRivalTag(tx *sqlite.Tx, filter rival.RivalTagFilter) error {
 	_, err := tx.NamedExec("DELETE FROM rival_tag WHERE "+filter.GenerateWhereClause(), filter)
 	return err
 }
 
-func syncGeneratedTags(tx *Tx, r *rival.RivalInfo, tags []*rival.RivalTag) error {
+func syncGeneratedTags(tx *sqlite.Tx, r *rival.RivalInfo, tags []*rival.RivalTag) error {
 	if len(tags) == 0 {
 		log.Warn("No tags to sync")
 		return nil // Okay dokey

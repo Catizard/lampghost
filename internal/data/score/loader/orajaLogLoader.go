@@ -8,52 +8,33 @@ import (
 	"github.com/Catizard/lampghost/internal/sqlite"
 )
 
-// TODO: OrajaLogLoader is obviously not a good name if there was multiple log loader for oraja exist.
-// Note: orajaLogLoader is designed to be stateless, so we can expose it directly
-var OrajaLogLoader ScoreLogLoader = newOrajaLogLoader()
+// TODO: OrajaDataLoader is obviously not a good name if there was multiple log loader for oraja exist.
+// Note: orajaDataLoader is designed to be stateless, so we can expose it directly
+var OrajaDataLoader RivalDataLoader = newOrajaDataLoader()
 
-type orajaLogLoader struct {
+type orajaDataLoader struct {
 }
 
-func newOrajaLogLoader() *orajaLogLoader {
-	return &orajaLogLoader{}
+func newOrajaDataLoader() *orajaDataLoader {
+	return &orajaDataLoader{}
 }
 
-func (l *orajaLogLoader) Interest(r *rival.RivalInfo) bool {
+func (l *orajaDataLoader) Interest(r *rival.RivalInfo) bool {
 	return r.SongDataPath.Valid && r.ScoreLogPath.Valid
 }
 
-func (l *orajaLogLoader) Load(r *rival.RivalInfo) ([]*score.CommonScoreLog, error) {
+// The default OrajaDataLoader loads 2 files: songdata.db and scorelog.db
+// TODO: ignore the results, directly modify rival?
+func (l *orajaDataLoader) Load(r *rival.RivalInfo) ([]*score.CommonScoreLog, error) {
 	if !l.Interest(r) {
-		return nil, fmt.Errorf("[OrajaLogLoader] cannot load")
+		return nil, fmt.Errorf("[OrajaDataLoader] cannot load")
 	}
 
-	// database initialize
-	db := sqlite.NewDB(r.SongDataPath.String)
-	if err := db.Open(); err != nil {
-		return nil, err
-	}
-	defer db.Close()
-
-	tx, err := db.BeginTx()
-	if err != nil {
-		return nil, err
-	}
-	defer tx.Rollback()
-
+	// 1) Loads scorelog
 	// Directly read from scorelog table
-	rows, err := tx.Queryx("SELECT * FROM scorelog")
+	rawLogs, err := sqlite.DirectlyLoadTable[score.ScoreLog](r.ScoreLogPath.String, "scorelog")
 	if err != nil {
 		return nil, err
-	}
-	rawLogs := make([]score.ScoreLog, 0)
-	for rows.Next() {
-		var log score.ScoreLog
-		err = rows.StructScan(&log)
-		if err != nil {
-			return nil, err
-		}
-		rawLogs = append(rawLogs, log)
 	}
 
 	// Convert raw data to common form
@@ -62,9 +43,14 @@ func (l *orajaLogLoader) Load(r *rival.RivalInfo) ([]*score.CommonScoreLog, erro
 		logs = append(logs, score.NewCommonScoreLogFromOraja(rawLog))
 	}
 
-	if err := tx.Commit(); err != nil {
+	// 2) Loads songdata.db
+	rawSongs, err := sqlite.DirectlyLoadTable[score.SongData](r.SongDataPath.String, "song")
+	if err != nil {
 		return nil, err
 	}
+	// This is a workaround, since interface's defininition is (r) => ([]*commonlog, error)
+	// There is no place for songdata to return while LR2's data form has only one field: log
+	r.SongData = rawSongs
 
 	return logs, nil
 }

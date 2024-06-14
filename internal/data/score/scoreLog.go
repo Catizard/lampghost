@@ -77,7 +77,7 @@ type CommonScoreLog struct {
 	TimeStamp null.Int
 }
 
-func NewCommonScoreLogFromOraja(log ScoreLog) *CommonScoreLog {
+func NewCommonScoreLogFromOraja(log *ScoreLog) *CommonScoreLog {
 	return &CommonScoreLog{
 		Sha256:    null.StringFrom(log.Sha256),
 		Clear:     log.Clear,
@@ -85,7 +85,7 @@ func NewCommonScoreLogFromOraja(log ScoreLog) *CommonScoreLog {
 	}
 }
 
-func NewCommonScoreLogFromLR2(log LR2ScoreLog) *CommonScoreLog {
+func NewCommonScoreLogFromLR2(log *LR2ScoreLog) *CommonScoreLog {
 	return &CommonScoreLog{
 		Md5:   null.StringFrom(log.Md5),
 		Clear: int32(log.Clear),

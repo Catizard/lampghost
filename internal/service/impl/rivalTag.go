@@ -111,7 +111,7 @@ func (s *RivalTagService) BuildTags(r *rival.RivalInfo, courseArr []*difftable.C
 	if len(courseArr) == 0 {
 		return nil
 	}
-	if err := r.LoadData(nil); err != nil {
+	if err := loadRivalData(r); err != nil {
 		panic(err)
 	}
 
@@ -119,7 +119,7 @@ func (s *RivalTagService) BuildTags(r *rival.RivalInfo, courseArr []*difftable.C
 	// Maps songdata by md5
 	md5MapsToSongData := make(map[string]score.SongData)
 	for _, v := range r.SongData {
-		md5MapsToSongData[v.Md5] = v
+		md5MapsToSongData[v.Md5] = *v
 	}
 
 	// TODO: genocide 2018 course contains some mutations like no speed/no good. They contain the exactly same md5 so sha256 would be the same
@@ -147,20 +147,30 @@ func (s *RivalTagService) BuildTags(r *rival.RivalInfo, courseArr []*difftable.C
 	}
 
 	// Maps scorelog by sha256
-	sha256MapsToScoreLog := make(map[string][]score.ScoreLog)
+	sha256MapsToScoreLog := make(map[string][]score.CommonScoreLog)
 	// Before doing iteration, make sure scorelog is sorted by time
-	sort.Slice(r.ScoreLog, func(i, j int) bool {
-		return r.ScoreLog[i].TimeStamp < r.ScoreLog[j].TimeStamp
+	sort.Slice(r.CommonScoreLog, func(i, j int) bool {
+		left := r.CommonScoreLog[i].TimeStamp.Int64
+		right := r.CommonScoreLog[j].TimeStamp.Int64
+		if !r.CommonScoreLog[i].TimeStamp.Valid {
+			panic("panic: timestamp")
+		}
+		if !r.CommonScoreLog[j].TimeStamp.Valid {
+			panic("panic: timestamp")
+		}
+		return left < right
 	})
-	for _, v := range r.ScoreLog {
+	for _, v := range r.CommonScoreLog {
+		// TODO: LR2 doesn't use sha256
+		sha256 := v.Sha256.String
 		// Skip
-		if _, ok := interestSha256[v.Sha256]; !ok {
+		if _, ok := interestSha256[sha256]; !ok {
 			continue
 		}
-		if _, ok := sha256MapsToScoreLog[v.Sha256]; !ok {
-			sha256MapsToScoreLog[v.Sha256] = make([]score.ScoreLog, 0)
+		if _, ok := sha256MapsToScoreLog[sha256]; !ok {
+			sha256MapsToScoreLog[sha256] = make([]score.CommonScoreLog, 0)
 		}
-		sha256MapsToScoreLog[v.Sha256] = append(sha256MapsToScoreLog[v.Sha256], v)
+		sha256MapsToScoreLog[sha256] = append(sha256MapsToScoreLog[sha256], *v)
 	}
 
 	// For now, only "first clear" and "first hard clear" tags are generated
@@ -177,7 +187,7 @@ func (s *RivalTagService) BuildTags(r *rival.RivalInfo, courseArr []*difftable.C
 					fct := rival.RivalTag{
 						TagName:   course.Name + " First Clear",
 						Generated: true,
-						TimeStamp: log.TimeStamp,
+						TimeStamp: log.TimeStamp.Int64,
 					}
 					tags = append(tags, &fct)
 					break
@@ -195,7 +205,7 @@ func (s *RivalTagService) BuildTags(r *rival.RivalInfo, courseArr []*difftable.C
 					fct := rival.RivalTag{
 						TagName:   course.Name + " First Hard Clear",
 						Generated: true,
-						TimeStamp: log.TimeStamp,
+						TimeStamp: log.TimeStamp.Int64,
 					}
 					tags = append(tags, &fct)
 					break

@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/Catizard/lampghost/internal/data/score"
-	"github.com/charmbracelet/log"
 	"github.com/guregu/null/v5"
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -16,11 +15,9 @@ type RivalInfo struct {
 	SongDataPath    null.String `db:"song_data_path"`
 	LR2ScoreLogPath null.String `db:"lr2_score_log_path"`
 	Tags            []RivalTag
-	// TODO: I'm gonna to rename ScoreLog to OrajaScoreLog or something else
-	ScoreLog       []score.ScoreLog
-	SongData       []score.SongData
-	Prefer         null.String // Prefer to use LR2 or Oraja database file
-	CommonScoreLog []*score.CommonScoreLog
+	SongData        []*score.SongData
+	Prefer          null.String // Prefer to use LR2 or Oraja database file
+	CommonScoreLog  []*score.CommonScoreLog
 }
 
 type RivalInfoService interface {
@@ -50,40 +47,4 @@ type RivalInfoUpdate struct {
 
 func (r *RivalInfo) String() string {
 	return fmt.Sprintf("%s (log=[%s],data=[%s])", r.Name, r.ScoreLogPath.ValueOrZero(), r.SongDataPath.ValueOrZero())
-}
-
-// Load rival's data depends on its settings
-// TODO: Refactor its behaviour to "load data if file specified and exists, and merge them"
-func (r *RivalInfo) LoadData(tag *RivalTag) error {
-	filter := score.ScoreLogFilter{}
-	if tag != nil {
-		filter.EndTime = null.IntFrom(tag.TimeStamp)
-	}
-	if err := r.loadRivalScoreLog(filter); err != nil {
-		return err
-	}
-	// TODO: support "shrink" mode
-	if err := r.loadRivalSongData(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (r *RivalInfo) loadRivalScoreLog(filter score.ScoreLogFilter) error {
-	scoreLog, err := score.ReadScoreLogFromSqlite(r.ScoreLogPath.ValueOrZero(), filter)
-	if err != nil {
-		return err
-	}
-	r.ScoreLog = scoreLog
-	log.Infof("loaded %d logs\n", len(r.ScoreLog))
-	return nil
-}
-
-func (r *RivalInfo) loadRivalSongData() error {
-	songData, err := score.ReadSongDataFromSqlite(r.SongDataPath.ValueOrZero())
-	if err != nil {
-		return err
-	}
-	r.SongData = songData
-	return nil
 }

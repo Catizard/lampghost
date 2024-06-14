@@ -216,10 +216,10 @@ func OpenGhostTui(dth *difftable.DiffTableHeader, dt []difftable.DiffTableData, 
 	// NOTE: merge songData -> diffTable, scoreLog -> diffTable before any operation
 	// Merge self
 	mergeSha256FromSongData(dt, selfInfo.SongData)
-	mergeLampFromScoreLog(dt, selfInfo.ScoreLog)
+	mergeLampFromScoreLog(dt, selfInfo.CommonScoreLog)
 	// Merge ghost
 	mergeSha256FromSongData(dt, ghostInfo.SongData)
-	mergeGhostLampFromScoreLog(dt, ghostInfo.ScoreLog)
+	mergeGhostLampFromScoreLog(dt, ghostInfo.CommonScoreLog)
 	// After two merge functions, dt now contains lamp info
 	if _, err := tea.NewProgram(newModel(dth, dt)).Run(); err != nil {
 		log.Fatal(err)
@@ -228,10 +228,10 @@ func OpenGhostTui(dth *difftable.DiffTableHeader, dt []difftable.DiffTableData, 
 
 // Merge Sha256 field from song data
 // In place function, do not return a new array
-func mergeSha256FromSongData(dtArray []difftable.DiffTableData, songData []score.SongData) {
+func mergeSha256FromSongData(dtArray []difftable.DiffTableData, songData []*score.SongData) {
 	songDataMd5Map := make(map[string]score.SongData)
 	for _, v := range songData {
-		songDataMd5Map[v.Md5] = v
+		songDataMd5Map[v.Md5] = *v
 	}
 	for i, dt := range dtArray {
 		if songData, ok := songDataMd5Map[dt.Md5]; ok {
@@ -242,26 +242,26 @@ func mergeSha256FromSongData(dtArray []difftable.DiffTableData, songData []score
 
 // Merge maximum lamp from scorelog
 // In place function, do not return a new array
-func mergeLampFromScoreLog(dtArray []difftable.DiffTableData, scoreLog []score.ScoreLog) {
+func mergeLampFromScoreLog(dtArray []difftable.DiffTableData, scoreLog []*score.CommonScoreLog) {
 	dtSha256Map := make(map[string]*difftable.DiffTableData)
 	for i, v := range dtArray {
 		dtSha256Map[v.Sha256] = &dtArray[i]
 	}
 	for _, v := range scoreLog {
-		if t, ok := dtSha256Map[v.Sha256]; ok {
+		if t, ok := dtSha256Map[v.Sha256.String]; ok {
 			t.Lamp = max(t.Lamp, v.Clear)
 		}
 	}
 }
 
 // Same with above function, the only difference is target
-func mergeGhostLampFromScoreLog(dtArray []difftable.DiffTableData, scoreLog []score.ScoreLog) {
+func mergeGhostLampFromScoreLog(dtArray []difftable.DiffTableData, scoreLog []*score.CommonScoreLog) {
 	dtSha256Map := make(map[string]*difftable.DiffTableData)
 	for i, v := range dtArray {
 		dtSha256Map[v.Sha256] = &dtArray[i]
 	}
 	for _, v := range scoreLog {
-		if t, ok := dtSha256Map[v.Sha256]; ok {
+		if t, ok := dtSha256Map[v.Sha256.String]; ok {
 			t.GhostLamp = max(t.GhostLamp, v.Clear)
 		}
 	}

@@ -60,7 +60,7 @@ var GhostCmd = &cobra.Command{
 		// 3) Load song/log data
 
 		// Note: Tags can only be applied on ghost
-		if err := selfInfo.LoadData(nil); err != nil {
+		if err := service.RivalInfoService.LoadRivalData(selfInfo); err != nil {
 			log.Fatal(err)
 		}
 
@@ -76,7 +76,7 @@ var GhostCmd = &cobra.Command{
 			}
 			log.Infof("Choosed %s, time=%d\n", tag.TagName, tag.TimeStamp)
 		}
-		if err := ghostInfo.LoadData(tag); err != nil {
+		if err := service.RivalInfoService.LoadRivalData(ghostInfo); err != nil {
 			log.Fatal(err)
 		}
 		ghostTui.OpenGhostTui(dth, diffTable, selfInfo, ghostInfo)

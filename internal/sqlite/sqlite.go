@@ -150,3 +150,35 @@ func (db *DB) BeginTx() (*Tx, error) {
 		db: db,
 	}, nil
 }
+
+// Boilerplate code that directly read rows from external database
+func DirectlyLoadTable[T interface{}](path string, tb string) ([]*T, error) {
+	// database initialize
+	db := NewDB(path)
+	if err := db.Open(); err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	tx, err := db.BeginTx()
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+
+	rows, err := tx.Queryx(fmt.Sprintf("SELECT * FROM %s", tb))
+	if err != nil {
+		return nil, err
+	}
+
+	ret := make([]*T, 0)
+	for rows.Next() {
+		var obj T
+		err = rows.StructScan(&obj)
+		if err != nil {
+			return nil, err
+		}
+		ret = append(ret, &obj)
+	}
+	return ret, nil
+}

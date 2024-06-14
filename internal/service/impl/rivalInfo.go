@@ -8,6 +8,7 @@ import (
 	"github.com/Catizard/lampghost/internal/data/score/loader"
 	"github.com/Catizard/lampghost/internal/sqlite"
 	"github.com/Catizard/lampghost/internal/tui/choose"
+	"github.com/charmbracelet/log"
 	"github.com/guregu/null/v5"
 )
 
@@ -87,6 +88,10 @@ func (s *RivalInfoService) ChooseOneRival(msg string, filter rival.RivalInfoFilt
 }
 
 func (s *RivalInfoService) LoadRivalData(r *rival.RivalInfo) error {
+	return loadRivalData(r)
+}
+
+func loadRivalData(r *rival.RivalInfo) error {
 	loader := chooseLoader(r)
 	logs, err := loader.Load(r)
 	if err != nil {
@@ -151,26 +156,27 @@ func deleteRivalInfo(tx *sqlite.Tx, id int) error {
 	return err
 }
 
-func chooseLoader(r *rival.RivalInfo) loader.ScoreLogLoader {
-	if loader.OrajaLogLoader.Interest(r) && loader.LR2LogLoader.Interest(r) {
+func chooseLoader(r *rival.RivalInfo) loader.RivalDataLoader {
+	if loader.OrajaDataLoader.Interest(r) && loader.LR2DataLoader.Interest(r) {
 		// Okay, we got a trouble
 		msg := "The rival [%s] registered both LR2 file and Oraja file, you have to choose one to use"
-		i := choose.OpenChooseTui([]string{"LR2", "Oraja"}, fmt.Sprintf(msg), false)
+		i := choose.OpenChooseTui([]string{"LR2", "Oraja"}, fmt.Sprintf(msg, r.Name), false)
 		if i == 0 {
 			r.Prefer = null.StringFrom("LR2")
 		} else {
 			r.Prefer = null.StringFrom("Oraja")
 		}
-	} else if loader.OrajaLogLoader.Interest(r) {
-		r.Prefer = null.StringFrom("LR2")
-	} else if loader.LR2LogLoader.Interest(r) {
+	} else if loader.OrajaDataLoader.Interest(r) {
 		r.Prefer = null.StringFrom("Oraja")
+	} else if loader.LR2DataLoader.Interest(r) {
+		r.Prefer = null.StringFrom("LR2")
 	}
+	log.Infof("Rival [%s]'s prefer [%s]", r.Name, r.Prefer.String)
 	if !r.Prefer.Valid {
 		panic("panic: no loader")
 	}
 	if r.Prefer.Equal(null.StringFrom("LR2")) {
-		return loader.LR2LogLoader
+		return loader.LR2DataLoader
 	}
-	return loader.OrajaLogLoader
+	return loader.OrajaDataLoader
 }

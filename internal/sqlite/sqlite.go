@@ -142,7 +142,7 @@ type Tx struct {
 func (db *DB) BeginTx() (*Tx, error) {
 	tx, err := db.db.Beginx()
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	return &Tx{

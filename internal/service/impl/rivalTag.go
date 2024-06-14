@@ -150,14 +150,14 @@ func (s *RivalTagService) BuildTags(r *rival.RivalInfo, courseArr []*difftable.C
 	sha256MapsToScoreLog := make(map[string][]score.CommonScoreLog)
 	// Before doing iteration, make sure scorelog is sorted by time
 	sort.Slice(r.CommonScoreLog, func(i, j int) bool {
-		left := r.CommonScoreLog[i].TimeStamp.Int64
-		right := r.CommonScoreLog[j].TimeStamp.Int64
 		if !r.CommonScoreLog[i].TimeStamp.Valid {
 			panic("panic: timestamp")
 		}
 		if !r.CommonScoreLog[j].TimeStamp.Valid {
 			panic("panic: timestamp")
 		}
+		left := r.CommonScoreLog[i].TimeStamp.Int64
+		right := r.CommonScoreLog[j].TimeStamp.Int64
 		return left < right
 	})
 	for _, v := range r.CommonScoreLog {

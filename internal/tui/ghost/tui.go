@@ -213,56 +213,31 @@ func (m mainModel) View() string {
 // left is the specified difficult table's levels
 // right is the related song list and lamp status
 func OpenGhostTui(dth *difftable.DiffTableHeader, dt []difftable.DiffTableData, selfInfo *rival.RivalInfo, ghostInfo *rival.RivalInfo) {
-	// NOTE: merge songData -> diffTable, scoreLog -> diffTable before any operation
 	// Merge self
-	mergeSha256FromSongData(dt, selfInfo.SongData)
-	mergeLampFromScoreLog(dt, selfInfo.CommonScoreLog)
+	mergeLampFromScoreLog(dt, selfInfo.CommonScoreLog, func (data *difftable.DiffTableData, log *score.CommonScoreLog) {
+		data.Lamp = max(data.Lamp, log.Clear)
+	})
 	// Merge ghost
-	mergeSha256FromSongData(dt, ghostInfo.SongData)
-	mergeGhostLampFromScoreLog(dt, ghostInfo.CommonScoreLog)
+	mergeLampFromScoreLog(dt, ghostInfo.CommonScoreLog, func (data *difftable.DiffTableData, log *score.CommonScoreLog) {
+		data.GhostLamp = max(data.GhostLamp, log.Clear)
+	})
 	// After two merge functions, dt now contains lamp info
 	if _, err := tea.NewProgram(newModel(dth, dt)).Run(); err != nil {
 		log.Fatal(err)
 	}
 }
 
-// Merge Sha256 field from song data
-// In place function, do not return a new array
-func mergeSha256FromSongData(dtArray []difftable.DiffTableData, songData []*score.SongData) {
-	songDataMd5Map := make(map[string]score.SongData)
-	for _, v := range songData {
-		songDataMd5Map[v.Md5] = *v
-	}
-	for i, dt := range dtArray {
-		if songData, ok := songDataMd5Map[dt.Md5]; ok {
-			dtArray[i].Sha256 = songData.Sha256
-		}
-	}
-}
 
 // Merge maximum lamp from scorelog
 // In place function, do not return a new array
-func mergeLampFromScoreLog(dtArray []difftable.DiffTableData, scoreLog []*score.CommonScoreLog) {
-	dtSha256Map := make(map[string]*difftable.DiffTableData)
+func mergeLampFromScoreLog(dtArray []difftable.DiffTableData, scoreLog []*score.CommonScoreLog, merge func (*difftable.DiffTableData, *score.CommonScoreLog)) {
+	dtMD5Map := make(map[string]*difftable.DiffTableData)
 	for i, v := range dtArray {
-		dtSha256Map[v.Sha256] = &dtArray[i]
+		dtMD5Map[v.Md5] = &dtArray[i]
 	}
 	for _, v := range scoreLog {
-		if t, ok := dtSha256Map[v.Sha256.String]; ok {
-			t.Lamp = max(t.Lamp, v.Clear)
-		}
-	}
-}
-
-// Same with above function, the only difference is target
-func mergeGhostLampFromScoreLog(dtArray []difftable.DiffTableData, scoreLog []*score.CommonScoreLog) {
-	dtSha256Map := make(map[string]*difftable.DiffTableData)
-	for i, v := range dtArray {
-		dtSha256Map[v.Sha256] = &dtArray[i]
-	}
-	for _, v := range scoreLog {
-		if t, ok := dtSha256Map[v.Sha256.String]; ok {
-			t.GhostLamp = max(t.GhostLamp, v.Clear)
+		if t, ok := dtMD5Map[v.Md5.String]; ok {
+			merge(t, v)
 		}
 	}
 }

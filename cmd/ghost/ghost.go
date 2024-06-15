@@ -32,9 +32,6 @@ var GhostCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		log.Infof("self name=%s, scorelog_path=%s\n", selfInfo.Name, selfInfo.ScoreLogPath.ValueOrZero())
-		log.Infof("ghost name=%s, scorelog_path=%s\n", ghostInfo.Name, ghostInfo.ScoreLogPath.ValueOrZero())
-
 		// 2) Load table data
 		dthNameLike, err := cmd.Flags().GetString("table-name")
 		if err != nil {
@@ -57,7 +54,7 @@ var GhostCmd = &cobra.Command{
 			panic(err)
 		}
 
-		// 3) Load song/log data
+		// 3) Load log data
 
 		// Note: Tags can only be applied on ghost
 		if err := service.RivalInfoService.LoadRivalData(selfInfo); err != nil {
@@ -76,9 +73,11 @@ var GhostCmd = &cobra.Command{
 			}
 			log.Infof("Choosed %s, time=%d\n", tag.TagName, tag.TimeStamp)
 		}
+		// TODO: make tags back
 		if err := service.RivalInfoService.LoadRivalData(ghostInfo); err != nil {
 			log.Fatal(err)
 		}
+		// 4) Open tui application
 		ghostTui.OpenGhostTui(dth, diffTable, selfInfo, ghostInfo)
 	},
 }

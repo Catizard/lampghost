@@ -4,8 +4,11 @@ Copyright © 2024 Catizard <1185032459@qq.com>
 package add
 
 import (
+	"strings"
+
 	"github.com/Catizard/lampghost/internal/data/rival"
 	"github.com/Catizard/lampghost/internal/service"
+	"github.com/Catizard/lampghost/internal/tui/choose"
 	"github.com/charmbracelet/log"
 	"github.com/guregu/null/v5"
 	"github.com/spf13/cobra"
@@ -18,6 +21,21 @@ var AddCmd = &cobra.Command{
 	Short: "Register a rival's info",
 	Run: func(cmd *cobra.Command, args []string) {
 		rivalName := args[0]
+		// Before we go...
+		if dups, n, err := service.RivalInfoService.FindRivalInfoList(rival.RivalInfoFilter{Name: null.StringFrom(rivalName)}); err != nil {
+			log.Fatal(err)
+		} else if n > 0 {
+			prints := make([]string, n)
+			for i := range dups {
+				prints[i] = dups[i].String()
+			}
+			log.Warnf("There are already some rival named with %s\n%s", rivalName, strings.Join(prints, "\n"))
+			if b := choose.OpenYesOrNoChooseTui("Are you really want to add this rival?"); !b {
+				log.Info("Add command skipped")
+				return 
+			}
+		}
+
 		scoreLogPath, err := cmd.Flags().GetString("scorelog")
 		if err != nil {
 			log.Error(err)

@@ -69,7 +69,7 @@ func (s *CourseInfoService) DeleteCourseInfo(id int) error {
 	if err := deleteCourseInfo(tx, id); err != nil {
 		return err
 	}
-	return nil
+	return tx.Commit()
 }
 
 func findCourseInfoList(tx *sqlite.Tx, filter difftable.CourseInfoFilter) (_ []*difftable.CourseInfo, _ int, err error) {

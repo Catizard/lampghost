@@ -85,7 +85,7 @@ func (s *DiffTableHeaderService) DeleteDiffTableHeader(id int) error {
 	if err := deleteDiffTableHeader(tx, id); err != nil {
 		return err
 	}
-	return nil
+	return tx.Commit()
 }
 
 func (s *DiffTableHeaderService) FetchAndSaveDiffTableHeader(url string, alias string) (*difftable.DiffTableHeader, error) {

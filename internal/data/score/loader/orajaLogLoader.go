@@ -3,6 +3,7 @@ package loader
 import (
 	"fmt"
 
+	"github.com/Catizard/lampghost/internal/data"
 	"github.com/Catizard/lampghost/internal/data/rival"
 	"github.com/Catizard/lampghost/internal/data/score"
 	"github.com/Catizard/lampghost/internal/sqlite"
@@ -26,7 +27,7 @@ func (l *orajaDataLoader) Interest(r *rival.RivalInfo) bool {
 
 // The default OrajaDataLoader loads 2 files: songdata.db and scorelog.db
 // TODO: ignore the results, directly modify rival?
-func (l *orajaDataLoader) Load(r *rival.RivalInfo) ([]*score.CommonScoreLog, error) {
+func (l *orajaDataLoader) Load(r *rival.RivalInfo, filter null.Value[data.Filter]) ([]*score.CommonScoreLog, error) {
 	if !l.Interest(r) {
 		return nil, fmt.Errorf("[OrajaDataLoader] cannot load")
 	}

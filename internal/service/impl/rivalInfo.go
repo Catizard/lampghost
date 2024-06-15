@@ -3,6 +3,7 @@ package impl
 import (
 	"fmt"
 
+	"github.com/Catizard/lampghost/internal/data"
 	"github.com/Catizard/lampghost/internal/data/rival"
 	"github.com/Catizard/lampghost/internal/data/score/loader"
 	"github.com/Catizard/lampghost/internal/sqlite"
@@ -92,7 +93,7 @@ func (s *RivalInfoService) LoadRivalData(r *rival.RivalInfo) error {
 
 func loadRivalData(r *rival.RivalInfo) error {
 	loader := chooseLoader(r)
-	logs, err := loader.Load(r)
+	logs, err := loader.Load(r, data.NullFilter)
 	if err != nil {
 		return err
 	}

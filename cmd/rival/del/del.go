@@ -19,7 +19,7 @@ var DelCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		name := args[0]
 		msg := "Multiple rivals matched, please choose one"
-		filter := rival.RivalInfoFilter{Name: null.StringFrom(name)}
+		filter := rival.RivalInfoFilter{NameLike: null.StringFrom(name)}
 		rivalInfo, err := service.RivalInfoService.ChooseOneRival(msg, filter)
 		if err != nil {
 			log.Fatal(err)

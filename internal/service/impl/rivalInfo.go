@@ -2,7 +2,6 @@ package impl
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/Catizard/lampghost/internal/data/rival"
 	"github.com/Catizard/lampghost/internal/data/score/loader"
@@ -63,7 +62,7 @@ func (s *RivalInfoService) DeleteRivalInfo(id int) error {
 	if err := deleteRivalInfo(tx, id); err != nil {
 		return err
 	}
-	return nil
+	return tx.Commit()
 }
 
 func (s *RivalInfoService) ChooseOneRival(msg string, filter rival.RivalInfoFilter) (*rival.RivalInfo, error) {
@@ -102,15 +101,7 @@ func loadRivalData(r *rival.RivalInfo) error {
 }
 
 func findRivalInfoList(tx *sqlite.Tx, filter rival.RivalInfoFilter) (_ []*rival.RivalInfo, _ int, err error) {
-	where := []string{"1=1"}
-	if v := filter.Id; v.Valid {
-		where = append(where, "id=:id")
-	}
-	if v := filter.Name; v.Valid {
-		where = append(where, "name=:name")
-	}
-
-	rows, err := tx.NamedQuery("SELECT * FROM rival_info WHERE "+strings.Join(where, " AND "), filter)
+	rows, err := tx.NamedQuery("SELECT * FROM rival_info WHERE "+filter.GenerateWhereClause(), filter)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -143,7 +134,7 @@ func findRivalInfoById(tx *sqlite.Tx, id int) (*rival.RivalInfo, error) {
 }
 
 func insertRivalInfo(tx *sqlite.Tx, rivalInfo *rival.RivalInfo) error {
-	_, err := tx.NamedExec(`INSERT INTO rival_info (name, score_log_path, song_data_path) VALUES (:name,:score_log_path,:song_data_path)`, rivalInfo)
+	_, err := tx.NamedExec(`INSERT INTO rival_info (name, score_log_path, song_data_path, lr2_user_data_path) VALUES (:name,:score_log_path,:song_data_path,:lr2_user_data_path)`, rivalInfo)
 	return err
 }
 

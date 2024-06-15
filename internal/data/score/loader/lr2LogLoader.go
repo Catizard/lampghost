@@ -18,7 +18,7 @@ func newLR2DataLoader() *lr2DataLoader {
 }
 
 func (l *lr2DataLoader) Interest(r *rival.RivalInfo) bool {
-	return r.LR2ScoreLogPath.Valid
+	return r.LR2UserDataPath.Valid
 }
 
 func (l *lr2DataLoader) Load(r *rival.RivalInfo) ([]*score.CommonScoreLog, error) {
@@ -27,7 +27,7 @@ func (l *lr2DataLoader) Load(r *rival.RivalInfo) ([]*score.CommonScoreLog, error
 	}
 
 	// Directly read from scorelog table
-	rawLogs, err := sqlite.DirectlyLoadTable[score.LR2ScoreLog](r.LR2ScoreLogPath.String, "score")
+	rawLogs, err := sqlite.DirectlyLoadTable[score.LR2ScoreLog](r.LR2UserDataPath.String, "score")
 	if err != nil {
 		return nil, err
 	}

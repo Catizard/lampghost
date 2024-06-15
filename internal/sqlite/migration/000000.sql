@@ -19,8 +19,9 @@ CREATE TABLE course_info (
 CREATE TABLE rival_info (
     name TEXT(255) NOT NULL,
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    score_log_path TEXT(255) NOT NULL,
-    song_data_path TEXT(255) NOT NULL
+    score_log_path TEXT(255),
+    song_data_path TEXT(255),
+    lr2_user_data_path TEXT(255) 
 );
 
 CREATE TABLE rival_tag (

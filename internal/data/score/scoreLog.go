@@ -108,8 +108,14 @@ func NewCommonScoreLogFromOraja(log *ScoreLog) *CommonScoreLog {
 }
 
 func NewCommonScoreLogFromLR2(log *LR2ScoreLog) *CommonScoreLog {
-	return &CommonScoreLog{
+	ret := &CommonScoreLog{
 		Md5:   null.StringFrom(log.Md5),
 		Clear: int32(log.Clear),
 	}
+	// Note: Workaround for LR2 log, because LR2 doesn't have assist lamp
+	// So except no play(=0) and fail(=1), clear should += 2
+	if ret.Clear > 1 {
+		ret.Clear += 2
+	}
+	return ret
 }

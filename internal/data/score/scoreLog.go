@@ -68,6 +68,28 @@ func ReadScoreLogFromSqlite(filePath string, filter ScoreLogFilter) ([]ScoreLog,
 type LR2ScoreLog struct {
 	Md5   string `db:"hash"`
 	Clear int    `db:"clear"`
+	Perfect int `db:"perfect"`
+	Great int `db:"great"`
+	Good int `db:"good"`
+	Bad int `db:"bad"`
+	Poor int `db:"poor"`
+	TotalNotes int `db:"totalnotes"`
+	MaxCombo int `db:"maxcombo"`
+	MinBP int `db:"minbp"`
+	PlayCount int `db:"playcount"`
+	ClearCount int `db:"clearcount"`
+	FailCount int `db:"failcount"`
+	Rank int `db:"rank"`
+	Rate int `db:"rate"`
+	ClearDB int `db:"clear_db"`
+	OPHistory int `db:"op_history"`
+	ScoreHash string `db:"scorehash"`
+	Ghost null.String `db:"ghost"`
+	ClearSD int `db:"clear_sd"`
+	ClearEX int `db:"clear_ex"`
+	OPBest int `db:"op_best"`
+	RSeed int `db:"rseed"`
+	Complete int `db:"complete"`
 }
 
 type CommonScoreLog struct {

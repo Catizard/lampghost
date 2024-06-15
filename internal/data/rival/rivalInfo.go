@@ -48,11 +48,11 @@ func (f *RivalInfoFilter) GenerateWhereClause() string {
 	if v := f.Id; v.Valid {
 		where = append(where, "id=:id")
 	}
-	if v := f.Name; v.Valid {
+	if v := f.Name; v.Valid && len(v.ValueOrZero()) > 0 {
 		where = append(where, "name=:name")
 	}
-	if v := f.NameLike; v.Valid {
-		where = append(where, "name like concat('%', :name, '%')")
+	if v := f.NameLike; v.Valid && len(v.ValueOrZero()) > 0 {
+		where = append(where, "name like concat('%', :nameLike, '%')")
 	}
 	return strings.Join(where, " AND ")
 }

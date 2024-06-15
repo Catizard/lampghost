@@ -4,7 +4,6 @@ import (
 	"errors"
 	"os"
 
-	"github.com/Catizard/lampghost/internal/common"
 	"github.com/charmbracelet/log"
 )
 
@@ -34,7 +33,7 @@ func CheckInitialize() {
 // Get LampGhost application's datasource name
 // LampGhost will keep using one single datasource, so this is fine
 func GetDSN() string {
-	return WorkingDirectory + common.DBFileName
+	return WorkingDirectory + DBFileName
 }
 
 func JoinWorkingDirectory(relativePath string) string {

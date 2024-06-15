@@ -13,13 +13,17 @@ import (
 )
 
 var DelCmd = &cobra.Command{
-	Use:   "del [name]",
+	Use:   "del",
 	Short: "Delete a rival",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.ExactArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
-		name := args[0]
+		name, err := cmd.Flags().GetString("name")
+		if err != nil {
+			log.Fatal(err)
+		}
 		msg := "Multiple rivals matched, please choose one"
 		filter := rival.RivalInfoFilter{NameLike: null.StringFrom(name)}
+		log.Infof("filter=%s\n", filter.GenerateWhereClause())
 		rivalInfo, err := service.RivalInfoService.ChooseOneRival(msg, filter)
 		if err != nil {
 			log.Fatal(err)
@@ -32,4 +36,5 @@ var DelCmd = &cobra.Command{
 }
 
 func init() {
+	DelCmd.Flags().StringP("name", "n", "", "the deleting rival's name")
 }

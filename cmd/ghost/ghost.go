@@ -8,6 +8,7 @@ import (
 
 	"github.com/Catizard/lampghost/internal/data/difftable"
 	"github.com/Catizard/lampghost/internal/data/rival"
+	"github.com/Catizard/lampghost/internal/data/score/loader"
 	"github.com/Catizard/lampghost/internal/service"
 	ghostTui "github.com/Catizard/lampghost/internal/tui/ghost"
 	"github.com/charmbracelet/log"
@@ -57,7 +58,7 @@ var GhostCmd = &cobra.Command{
 		// 3) Load log data
 
 		// Note: Tags can only be applied on ghost
-		if err := service.RivalInfoService.LoadRivalData(selfInfo); err != nil {
+		if err := loader.LoadRivalData(selfInfo); err != nil {
 			log.Fatal(err)
 		}
 
@@ -74,7 +75,7 @@ var GhostCmd = &cobra.Command{
 			log.Infof("Choosed %s, time=%d\n", tag.TagName, tag.TimeStamp)
 		}
 		// TODO: make tags back
-		if err := service.RivalInfoService.LoadRivalData(ghostInfo); err != nil {
+		if err := loader.LoadRivalData(ghostInfo); err != nil {
 			log.Fatal(err)
 		}
 		// 4) Open tui application

@@ -28,6 +28,7 @@ CREATE TABLE rival_tag (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     rival_id INTEGER NOT NULL,
     tag_name TEXT(255) NOT NULL,
+    tag_source TEXT(255) NOT NULL,
     'generated' INTEGER DEFAULT (0) NOT NULL,
-    'timestamp' TEXT NOT NULL
+    'timestamp' TEXT NOT NULL,
 )

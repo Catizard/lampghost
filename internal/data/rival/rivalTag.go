@@ -16,6 +16,7 @@ type RivalTag struct {
 	TagName   string `db:"tag_name"`
 	Generated bool   `db:"generated"`
 	TimeStamp int64  `db:"timestamp"`
+	TagSource string `db:"tag_source"` // "LR2" | "Oraja"
 }
 
 func (r *RivalTag) String() string {
@@ -36,7 +37,8 @@ type RivalTagService interface {
 	ChooseOneTag(msg string, filter RivalTagFilter) (*RivalTag, error)
 
 	// Build tags for one rival based on passed course data
-	// Note: this function can be seen as re-build all generated tags
+	// Note: This function can be seen as re-build all generated tags
+	// Note: This function must be called after loading rival's data
 	BuildTags(r *RivalInfo, courseArr []*difftable.CourseInfo) error
 
 	// Sync generated tags for one rival

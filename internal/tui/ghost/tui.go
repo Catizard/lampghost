@@ -212,17 +212,17 @@ func (m mainModel) View() string {
 // The terminal would be split into 2 pieces:
 // left is the specified difficult table's levels
 // right is the related song list and lamp status
-func OpenGhostTui(dth *difftable.DiffTableHeader, dt []difftable.DiffTableData, selfInfo *rival.RivalInfo, ghostInfo *rival.RivalInfo) {
+func OpenGhostTui(dth *difftable.DiffTableHeader, selfInfo *rival.RivalInfo, ghostInfo *rival.RivalInfo) {
 	// Merge self
-	mergeLampFromScoreLog(dt, selfInfo.CommonScoreLog, func (data *difftable.DiffTableData, log *score.CommonScoreLog) {
+	mergeLampFromScoreLog(dth.Data, selfInfo.CommonScoreLog, func (data *difftable.DiffTableData, log *score.CommonScoreLog) {
 		data.Lamp = max(data.Lamp, log.Clear)
 	})
 	// Merge ghost
-	mergeLampFromScoreLog(dt, ghostInfo.CommonScoreLog, func (data *difftable.DiffTableData, log *score.CommonScoreLog) {
+	mergeLampFromScoreLog(dth.Data, ghostInfo.CommonScoreLog, func (data *difftable.DiffTableData, log *score.CommonScoreLog) {
 		data.GhostLamp = max(data.GhostLamp, log.Clear)
 	})
 	// After two merge functions, dt now contains lamp info
-	if _, err := tea.NewProgram(newModel(dth, dt)).Run(); err != nil {
+	if _, err := tea.NewProgram(newModel(dth, dth.Data)).Run(); err != nil {
 		log.Fatal(err)
 	}
 }

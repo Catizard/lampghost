@@ -50,8 +50,7 @@ var GhostCmd = &cobra.Command{
 			panic(err)
 		}
 
-		diffTable, err := difftable.ReadDiffTable(dth.DataLocation)
-		if err != nil {
+		if err := dth.LoadData(); err != nil {
 			panic(err)
 		}
 
@@ -79,7 +78,7 @@ var GhostCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 		// 4) Open tui application
-		ghostTui.OpenGhostTui(dth, diffTable, selfInfo, ghostInfo)
+		ghostTui.OpenGhostTui(dth, selfInfo, ghostInfo)
 	},
 }
 

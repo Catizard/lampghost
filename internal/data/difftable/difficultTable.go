@@ -1,7 +1,10 @@
 package difftable
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
+	"os"
 	"strings"
 
 	"github.com/Catizard/lampghost/internal/data"
@@ -10,15 +13,19 @@ import (
 )
 
 type DiffTableHeader struct {
-	Id           int            `db:"id"`
-	DataUrl      string         `json:"data_url" db:"data_url"`
-	DataLocation string         `db:"data_location"`
-	LastUpdate   string         `json:"last_update" db:"last_update"`
-	Name         string         `json:"name" db:"name"`
-	OriginalUrl  null.String    `json:"original_url" db:"original_url"`
-	Symbol       string         `json:"symbol" db:"symbol"`
-	Alias        string         `json:"alias" db:"alias"`
-	Course       [][]CourseInfo `json:"course"`
+	Id           int         `db:"id"`
+	DataUrl      string      `json:"data_url" db:"data_url"`
+	DataLocation string      `db:"data_location"`
+	LastUpdate   string      `json:"last_update" db:"last_update"`
+	Name         string      `json:"name" db:"name"`
+	OriginalUrl  null.String `json:"original_url" db:"original_url"`
+	Symbol       string      `json:"symbol" db:"symbol"`
+	Alias        string      `json:"alias" db:"alias"`
+	// Not database related fields
+	Course [][]CourseInfo `json:"course"`
+	Data []DiffTableData
+	// Maps Data by level field?
+	// DataLevelMap []map[string][]*DiffTableData
 }
 
 func (header *DiffTableHeader) String() string {
@@ -26,6 +33,25 @@ func (header *DiffTableHeader) String() string {
 		return fmt.Sprintf("%s(%s) [symbol=%s, url=%s]", header.Name, header.Alias, header.Symbol, header.Alias)
 	}
 	return fmt.Sprintf("%s [symbol=%s, url=%s]", header.Name, header.Symbol, header.Alias)
+}
+
+func (header *DiffTableHeader) LoadData() error {
+	f, err := os.Open(header.DataLocation)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	body, err := io.ReadAll(f)
+	if err != nil {
+		return err
+	}
+	var local []DiffTableData
+	err = json.Unmarshal(body, &local)
+	if err != nil {
+		return err
+	}
+	header.Data = local
+	return nil
 }
 
 type DiffTableHeaderService interface {
@@ -76,4 +102,20 @@ type DiffTableHeaderUpdate struct {
 func (d *DiffTableHeader) MergeUpdate(upd DiffTableHeaderUpdate) {
 	d.Name = *upd.Name
 	d.Symbol = *upd.Symbol
+}
+
+// struct DiffTableData represents one content of a difficult table
+type DiffTableData struct {
+	Artist    string
+	Comment   string
+	Level     string
+	Lr2BmsId  string `json:"lr2_bmdid"`
+	Md5       string
+	NameDiff  string
+	Title     string
+	Url       string `json:"url"`
+	UrlDiff   string `json:"url_diff"`
+	Sha256    string `json:"-"`
+	Lamp      int32  `json:"-"`
+	GhostLamp int32  `json:"-"`
 }

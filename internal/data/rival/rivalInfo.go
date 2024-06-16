@@ -16,7 +16,6 @@ type RivalInfo struct {
 	SongDataPath    null.String `db:"song_data_path"`
 	LR2UserDataPath null.String `db:"lr2_user_data_path"`
 	Tags            []RivalTag
-	SongData        []*score.SongData
 	Prefer          null.String // Prefer to use LR2 or Oraja database file
 	CommonScoreLog  []*score.CommonScoreLog
 }
@@ -32,9 +31,6 @@ type RivalInfoService interface {
 	// Simple wrapper of FindRivalInfoList
 	// After query, open tui app and wait user select one
 	ChooseOneRival(msg string, filter RivalInfoFilter) (*RivalInfo, error)
-
-	// Load rival's data, depends on rival's config
-	LoadRivalData(r *RivalInfo) error
 }
 
 type RivalInfoFilter struct {

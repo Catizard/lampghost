@@ -4,9 +4,12 @@ import (
 	"fmt"
 
 	"github.com/Catizard/lampghost/internal/data"
+	"github.com/Catizard/lampghost/internal/data/difftable"
 	"github.com/Catizard/lampghost/internal/data/rival"
 	"github.com/Catizard/lampghost/internal/data/score"
+	"github.com/Catizard/lampghost/internal/service"
 	"github.com/Catizard/lampghost/internal/sqlite"
+	"github.com/charmbracelet/log"
 	"github.com/guregu/null/v5"
 )
 
@@ -26,7 +29,6 @@ func (l *orajaDataLoader) Interest(r *rival.RivalInfo) bool {
 }
 
 // The default OrajaDataLoader loads 2 files: songdata.db and scorelog.db
-// TODO: ignore the results, directly modify rival?
 func (l *orajaDataLoader) Load(r *rival.RivalInfo, filter null.Value[data.Filter]) ([]*score.CommonScoreLog, error) {
 	if !l.Interest(r) {
 		return nil, fmt.Errorf("[OrajaDataLoader] cannot load")
@@ -50,22 +52,44 @@ func (l *orajaDataLoader) Load(r *rival.RivalInfo, filter null.Value[data.Filter
 	if err != nil {
 		return nil, err
 	}
-	// This is a workaround, since interface's defininition is (r) => ([]*commonlog, error)
-	// There is no place for songdata to return while LR2's data form has only one field: log
-	// TODO: remove this?
-	r.SongData = rawSongs
 
 	// 3) Assign md5 to log based on songdata.db
 	// Note: Unassigned logs are ignored, because we cannot do anything further on it.
-	// TODO: And, course's log should be treated specially.
-	sha256MapsToMd5 := make(map[string]string)
+	sha256MapsToMD5 := make(map[string]string)
+	md5MapsToSha256 := make(map[string]string)
 	for _, v := range rawSongs {
-		sha256MapsToMd5[v.Sha256] = v.Md5
+		sha256MapsToMD5[v.Sha256] = v.Md5
+		md5MapsToSha256[v.Md5] = v.Sha256
+	}
+
+	// Workaround: Courses are also related on md5
+	// TODO: cannot use service package here (import cycle)
+	courses, _, err := service.CourseInfoService.FindCourseInfoList(difftable.CourseInfoFilter{})
+	if err != nil {
+		return nil, err
+	}
+	for _, course := range courses {
+		sha256 := ""
+		valid := true
+		for _, v := range course.Md5 {
+			if hash, ok := md5MapsToSha256[v]; ok {
+				sha256 += hash
+			} else {
+				valid = false
+				break
+			}
+		}
+		if !valid {
+			log.Warnf("[%s] is skipped because of lack of data", course.Name)
+			continue
+		}
+		// Hack on sha256MapsToMD5
+		sha256MapsToMD5[sha256] = course.Md5s
 	}
 
 	finalLogs := make([]*score.CommonScoreLog, 0)
 	for _, log := range logs {
-		if md5, ok := sha256MapsToMd5[log.Sha256.String]; ok {
+		if md5, ok := sha256MapsToMD5[log.Sha256.String]; ok {
 			log.Md5 = null.StringFrom(md5)
 			finalLogs = append(finalLogs, log)
 			// TODO: remove me!

@@ -66,30 +66,30 @@ func ReadScoreLogFromSqlite(filePath string, filter ScoreLogFilter) ([]ScoreLog,
 }
 
 type LR2ScoreLog struct {
-	Md5   string `db:"hash"`
-	Clear int    `db:"clear"`
-	Perfect int `db:"perfect"`
-	Great int `db:"great"`
-	Good int `db:"good"`
-	Bad int `db:"bad"`
-	Poor int `db:"poor"`
-	TotalNotes int `db:"totalnotes"`
-	MaxCombo int `db:"maxcombo"`
-	MinBP int `db:"minbp"`
-	PlayCount int `db:"playcount"`
-	ClearCount int `db:"clearcount"`
-	FailCount int `db:"failcount"`
-	Rank int `db:"rank"`
-	Rate int `db:"rate"`
-	ClearDB int `db:"clear_db"`
-	OPHistory int `db:"op_history"`
-	ScoreHash string `db:"scorehash"`
-	Ghost null.String `db:"ghost"`
-	ClearSD int `db:"clear_sd"`
-	ClearEX int `db:"clear_ex"`
-	OPBest int `db:"op_best"`
-	RSeed int `db:"rseed"`
-	Complete int `db:"complete"`
+	Md5        string      `db:"hash"`
+	Clear      int         `db:"clear"`
+	Perfect    int         `db:"perfect"`
+	Great      int         `db:"great"`
+	Good       int         `db:"good"`
+	Bad        int         `db:"bad"`
+	Poor       int         `db:"poor"`
+	TotalNotes int         `db:"totalnotes"`
+	MaxCombo   int         `db:"maxcombo"`
+	MinBP      int         `db:"minbp"`
+	PlayCount  int         `db:"playcount"`
+	ClearCount int         `db:"clearcount"`
+	FailCount  int         `db:"failcount"`
+	Rank       int         `db:"rank"`
+	Rate       int         `db:"rate"`
+	ClearDB    int         `db:"clear_db"`
+	OPHistory  int         `db:"op_history"`
+	ScoreHash  string      `db:"scorehash"`
+	Ghost      null.String `db:"ghost"`
+	ClearSD    int         `db:"clear_sd"`
+	ClearEX    int         `db:"clear_ex"`
+	OPBest     int         `db:"op_best"`
+	RSeed      int         `db:"rseed"`
+	Complete   int         `db:"complete"`
 }
 
 type CommonScoreLog struct {
@@ -97,6 +97,7 @@ type CommonScoreLog struct {
 	Md5       null.String
 	Clear     int32
 	TimeStamp null.Int
+	LogType   string
 }
 
 func NewCommonScoreLogFromOraja(log *ScoreLog) *CommonScoreLog {
@@ -118,4 +119,37 @@ func NewCommonScoreLogFromLR2(log *LR2ScoreLog) *CommonScoreLog {
 		ret.Clear += 2
 	}
 	return ret
+}
+
+// Oraja songdata.db entity
+type SongData struct {
+	Md5        string
+	Sha256     string
+	Title      string
+	SubTitle   string
+	Genre      string
+	Artist     string
+	SubArtist  string
+	Tag        string
+	Path       string
+	Folder     string
+	StageFile  string
+	Banner     string
+	BackBmp    string
+	Preview    string
+	Parent     string
+	Level      int32
+	Difficulty int32
+	MaxBpm     int32
+	MinBpm     int32
+	Length     int32
+	Mode       int32
+	Judge      int32
+	Feature    int32
+	Content    int32
+	Date       int64
+	Favorite   int32
+	AddDate    int64
+	Notes      int32
+	ChartHash  string
 }

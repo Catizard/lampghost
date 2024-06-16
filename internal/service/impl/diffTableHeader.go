@@ -9,6 +9,7 @@ import (
 
 	"github.com/Catizard/lampghost/internal/common"
 	"github.com/Catizard/lampghost/internal/config"
+	"github.com/Catizard/lampghost/internal/data"
 	"github.com/Catizard/lampghost/internal/data/difftable"
 	"github.com/Catizard/lampghost/internal/sqlite"
 	"github.com/Catizard/lampghost/internal/tui/choose"
@@ -28,7 +29,7 @@ func NewDiffTableHeaderService(db *sqlite.DB) *DiffTableHeaderService {
 	return &DiffTableHeaderService{db: db}
 }
 
-func (s *DiffTableHeaderService) FindDiffTableHeaderList(filter difftable.DiffTableHeaderFilter) ([]*difftable.DiffTableHeader, int, error) {
+func (s *DiffTableHeaderService) FindDiffTableHeaderList(filter data.Filter) ([]*difftable.DiffTableHeader, int, error) {
 	tx, err := s.db.BeginTx()
 	if err != nil {
 		return nil, 0, err
@@ -126,7 +127,7 @@ func (s *DiffTableHeaderService) FetchAndSaveDiffTableHeader(url string, alias s
 	return dth, nil
 }
 
-func (s *DiffTableHeaderService) FindDiffTableHeaderListWithChoices(msg string, filter difftable.DiffTableHeaderFilter) (*difftable.DiffTableHeader, error) {
+func (s *DiffTableHeaderService) FindDiffTableHeaderListWithChoices(msg string, filter data.Filter) (*difftable.DiffTableHeader, error) {
 	tx, err := s.db.BeginTx()
 	if err != nil {
 		return nil, err
@@ -160,22 +161,11 @@ func insertDiffTableHeader(tx *sqlite.Tx, dth *difftable.DiffTableHeader) error 
 	return err
 }
 
-func findDiffTableHeaderList(tx *sqlite.Tx, filter difftable.DiffTableHeaderFilter) (_ []*difftable.DiffTableHeader, _ int, err error) {
-	where := []string{"1 = 1"}
-	if v := filter.Id; v.Valid {
-		where = append(where, "id = :id")
-	}
-	if v := filter.Name; v.Valid {
-		where = append(where, "name = :name")
-	}
-	if v := filter.NameLike; v.Valid {
-		where = append(where, "name like concat('%', :nameLike, '%') or alias like concat('%', :nameLike, '%')")
-	}
-
+func findDiffTableHeaderList(tx *sqlite.Tx, filter data.Filter) (_ []*difftable.DiffTableHeader, _ int, err error) {
 	rows, err := tx.NamedQuery(`
 		SELECT *
 		FROM difftable_header
-		WHERE `+strings.Join(where, " AND "),
+		WHERE `+filter.GenerateWhereClause(),
 		filter)
 	if err != nil {
 		return nil, 0, err

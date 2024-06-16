@@ -2,7 +2,9 @@ package difftable
 
 import (
 	"fmt"
+	"strings"
 
+	"github.com/Catizard/lampghost/internal/data"
 	"github.com/guregu/null/v5"
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -28,7 +30,7 @@ func (header *DiffTableHeader) String() string {
 
 type DiffTableHeaderService interface {
 	// ---------- basic methods ----------
-	FindDiffTableHeaderList(filter DiffTableHeaderFilter) ([]*DiffTableHeader, int, error)
+	FindDiffTableHeaderList(filter data.Filter) ([]*DiffTableHeader, int, error)
 	FindDiffTableHeaderById(id int) (*DiffTableHeader, error)
 	InsertDiffTableHeader(dth *DiffTableHeader) error
 	UpdateDiffTableHeader(id int, upd DiffTableHeaderUpdate) (*DiffTableHeader, error)
@@ -42,7 +44,7 @@ type DiffTableHeaderService interface {
 
 	// Simple wrapper of FindDiffTableHeaderList
 	// After query, open tui app and wait user select one
-	FindDiffTableHeaderListWithChoices(msg string, filter DiffTableHeaderFilter) (*DiffTableHeader, error)
+	FindDiffTableHeaderListWithChoices(msg string, filter data.Filter) (*DiffTableHeader, error)
 }
 
 type DiffTableHeaderFilter struct {
@@ -50,6 +52,20 @@ type DiffTableHeaderFilter struct {
 	Id       null.Int    `db:"id"`
 	Name     null.String `db:"name"`
 	NameLike null.String `db:"nameLike"`
+}
+
+func (f DiffTableHeaderFilter) GenerateWhereClause() string {
+	where := []string{"1 = 1"}
+	if v := f.Id; v.Valid {
+		where = append(where, "id = :id")
+	}
+	if v := f.Name; v.Valid {
+		where = append(where, "name = :name")
+	}
+	if v := f.NameLike; v.Valid {
+		where = append(where, "name like concat('%', :nameLike, '%') or alias like concat('%', :nameLike, '%')")
+	}
+	return strings.Join(where, " AND ")
 }
 
 type DiffTableHeaderUpdate struct {

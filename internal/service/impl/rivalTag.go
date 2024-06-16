@@ -108,118 +108,8 @@ func (s *RivalTagService) BuildTags(r *rival.RivalInfo, courseArr []*difftable.C
 		return err
 	}
 	defer tx.Rollback()
-	if len(courseArr) == 0 {
-		return nil
-	}
-	if err := loadRivalData(r); err != nil {
-		panic(err)
-	}
-
-	// TODO: Structure of this procdure should be changed
-	// Maps songdata by md5
-	md5MapsToSongData := make(map[string]score.SongData)
-	for _, v := range r.SongData {
-		md5MapsToSongData[v.Md5] = *v
-	}
-
-	// TODO: genocide 2018 course contains some mutations like no speed/no good. They contain the exactly same md5 so sha256 would be the same
-	// This causes tag generation actually works incorectly, I think delete them directly from course would be the easist way to handle this problem
-	// At current development stage, the specific implementation is difftable/saveCourseInfoFromTableHeader (Actaully hasn't implemented now)
-	interestSha256 := make(map[string]struct{}, 0)
-	for i, course := range courseArr {
-		var sha256 string
-		valid := true
-		// Iteration on plain array should be sequential
-		for _, md5 := range course.Md5 {
-			if songData, ok := md5MapsToSongData[md5]; ok {
-				sha256 += songData.Sha256
-			} else {
-				valid = false
-			}
-		}
-		if !valid {
-			log.Warnf("Course %s builds up failed due to lack of data, songdata path=%s", course.Name, r.SongDataPath.ValueOrZero())
-			continue
-		}
-		log.Debug("course name=%s, sha256=%s\n", course.Name, sha256)
-		courseArr[i].Sha256s = sha256
-		interestSha256[sha256] = struct{}{}
-	}
-
-	// Maps scorelog by sha256
-	sha256MapsToScoreLog := make(map[string][]score.CommonScoreLog)
-	// Before doing iteration, make sure scorelog is sorted by time
-	sort.Slice(r.CommonScoreLog, func(i, j int) bool {
-		if !r.CommonScoreLog[i].TimeStamp.Valid {
-			panic("panic: timestamp")
-		}
-		if !r.CommonScoreLog[j].TimeStamp.Valid {
-			panic("panic: timestamp")
-		}
-		left := r.CommonScoreLog[i].TimeStamp.Int64
-		right := r.CommonScoreLog[j].TimeStamp.Int64
-		return left < right
-	})
-	for _, v := range r.CommonScoreLog {
-		// TODO: LR2 doesn't use sha256
-		sha256 := v.Sha256.String
-		// Skip
-		if _, ok := interestSha256[sha256]; !ok {
-			continue
-		}
-		if _, ok := sha256MapsToScoreLog[sha256]; !ok {
-			sha256MapsToScoreLog[sha256] = make([]score.CommonScoreLog, 0)
-		}
-		sha256MapsToScoreLog[sha256] = append(sha256MapsToScoreLog[sha256], *v)
-	}
-
-	// For now, only "first clear" and "first hard clear" tags are generated
-
-	// TODO: extract this part out
-	tags := make([]*rival.RivalTag, 0)
-	// First Clear Tag
-	for _, course := range courseArr {
-		if logs, ok := sha256MapsToScoreLog[course.Sha256s]; !ok {
-			continue // No record, continue
-		} else {
-			for _, log := range logs {
-				if log.Clear >= clearType.Normal {
-					fct := rival.RivalTag{
-						TagName:   course.Name + " First Clear",
-						Generated: true,
-						TimeStamp: log.TimeStamp.Int64,
-					}
-					tags = append(tags, &fct)
-					break
-				}
-			}
-		}
-	}
-	// First Hard Clear Tag
-	for _, course := range courseArr {
-		if logs, ok := sha256MapsToScoreLog[course.Sha256s]; !ok {
-			continue // No record, continue
-		} else {
-			for _, log := range logs {
-				if log.Clear >= clearType.Hard {
-					fct := rival.RivalTag{
-						TagName:   course.Name + " First Hard Clear",
-						Generated: true,
-						TimeStamp: log.TimeStamp.Int64,
-					}
-					tags = append(tags, &fct)
-					break
-				}
-			}
-		}
-	}
-	// Add rival's id all together
-	for i := range tags {
-		tags[i].RivalId = r.Id
-	}
-	// Sync rival's generated tag
-	if err := syncGeneratedTags(tx, r, tags); err != nil {
-		panic(err)
+	if err := buildTags(tx, r, courseArr); err != nil {
+		return err
 	}
 	return tx.Commit()
 }
@@ -305,6 +195,101 @@ func syncGeneratedTags(tx *sqlite.Tx, r *rival.RivalInfo, tags []*rival.RivalTag
 		if err := insertRivalTag(tx, tag); err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func buildTags(tx *sqlite.Tx, r *rival.RivalInfo, courseArr []*difftable.CourseInfo) error {
+	if len(courseArr) == 0 {
+		return nil
+	}
+
+	// TODO: Structure of this procdure should be changed
+	md5MapsToCourse := make(map[string]*difftable.CourseInfo)
+	for _, v := range courseArr {
+		md5MapsToCourse[v.Md5s] = v 
+	}
+
+	// TODO: genocide 2018 course contains some mutations like no speed/no good. They contain the exactly same md5 so sha256 would be the same
+	// This causes tag generation actually works incorectly, I think delete them directly from course would be the easist way to handle this problem
+	// At current development stage, the specific implementation is difftable/saveCourseInfoFromTableHeader (Actaully hasn't implemented now)
+	// Maps scorelog by md5 
+	md5MapsToScoreLog := make(map[string][]score.CommonScoreLog)
+	// TODO: LR2 log doesn't give a timestamp, should we do a hack on it?(based on insertion order)
+	// Before doing iteration, make sure scorelog is sorted by time
+	sort.Slice(r.CommonScoreLog, func(i, j int) bool {
+		if !r.CommonScoreLog[i].TimeStamp.Valid {
+			panic("panic: timestamp")
+		}
+		if !r.CommonScoreLog[j].TimeStamp.Valid {
+			panic("panic: timestamp")
+		}
+		left := r.CommonScoreLog[i].TimeStamp.Int64
+		right := r.CommonScoreLog[j].TimeStamp.Int64
+		return left < right
+	})
+	for _, v := range r.CommonScoreLog {
+		md5 := v.Md5.ValueOrZero()
+		// Skip
+		if _, ok := md5MapsToCourse[md5]; !ok {
+			continue
+		}
+		if _, ok := md5MapsToScoreLog[md5]; !ok {
+			md5MapsToScoreLog[md5] = make([]score.CommonScoreLog, 0)
+		}
+		md5MapsToScoreLog[md5] = append(md5MapsToScoreLog[md5], *v)
+	}
+
+	// For now, only "first clear" and "first hard clear" tags are generated
+
+	// TODO: extract this part out
+	tags := make([]*rival.RivalTag, 0)
+	// First Clear Tag
+	for _, course := range courseArr {
+		if logs, ok := md5MapsToScoreLog[course.Md5s]; !ok {
+			continue // No record, continue
+		} else {
+			for _, log := range logs {
+				if log.Clear >= clearType.Normal {
+					fct := rival.RivalTag{
+						TagName:   course.Name + " First Clear",
+						Generated: true,
+						TimeStamp: log.TimeStamp.Int64,
+						TagSource: r.Prefer.ValueOrZero(),
+					}
+					tags = append(tags, &fct)
+					break
+				}
+			}
+		}
+	}
+	// First Hard Clear Tag
+	for _, course := range courseArr {
+		if logs, ok := md5MapsToScoreLog[course.Md5s]; !ok {
+			continue // No record, continue
+		} else {
+			for _, log := range logs {
+				if log.Clear >= clearType.Hard {
+					fct := rival.RivalTag{
+						TagName:   course.Name + " First Hard Clear",
+						Generated: true,
+						TimeStamp: log.TimeStamp.Int64,
+						TagSource: r.Prefer.ValueOrZero(),
+					}
+					tags = append(tags, &fct)
+					break
+				}
+			}
+		}
+	}
+	log.Infof("Generated %d tags for [%s]", len(tags), r.Name)
+	// Add rival's id all together
+	for i := range tags {
+		tags[i].RivalId = r.Id
+	}
+	// Sync rival's generated tag
+	if err := syncGeneratedTags(tx, r, tags); err != nil {
+		return err
 	}
 	return nil
 }

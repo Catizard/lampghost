@@ -3,9 +3,7 @@ package impl
 import (
 	"fmt"
 
-	"github.com/Catizard/lampghost/internal/data"
 	"github.com/Catizard/lampghost/internal/data/rival"
-	"github.com/Catizard/lampghost/internal/data/score/loader"
 	"github.com/Catizard/lampghost/internal/sqlite"
 	"github.com/Catizard/lampghost/internal/tui/choose"
 	"github.com/charmbracelet/log"
@@ -102,20 +100,6 @@ func (s *RivalInfoService) ChooseOneRival(msg string, filter rival.RivalInfoFilt
 	}
 }
 
-func (s *RivalInfoService) LoadRivalData(r *rival.RivalInfo) error {
-	return loadRivalData(r)
-}
-
-func loadRivalData(r *rival.RivalInfo) error {
-	loader := chooseLoader(r)
-	logs, err := loader.Load(r, data.NullFilter)
-	if err != nil {
-		return err
-	}
-	r.CommonScoreLog = logs
-	return nil
-}
-
 func findRivalInfoList(tx *sqlite.Tx, filter rival.RivalInfoFilter) (_ []*rival.RivalInfo, _ int, err error) {
 	rows, err := tx.NamedQuery("SELECT * FROM rival_info WHERE "+filter.GenerateWhereClause(), filter)
 	if err != nil {
@@ -175,29 +159,4 @@ func deleteRivalInfo(tx *sqlite.Tx, id int) error {
 
 	_, err := tx.Exec("DELETE FROM rival_info WHERE id=?", id)
 	return err
-}
-
-func chooseLoader(r *rival.RivalInfo) loader.RivalDataLoader {
-	if loader.OrajaDataLoader.Interest(r) && loader.LR2DataLoader.Interest(r) {
-		// Okay, we got a trouble
-		msg := "The rival [%s] registered both LR2 file and Oraja file, you have to choose one to use"
-		i := choose.OpenChooseTui([]string{"LR2", "Oraja"}, fmt.Sprintf(msg, r.Name), false)
-		if i == 0 {
-			r.Prefer = null.StringFrom("LR2")
-		} else {
-			r.Prefer = null.StringFrom("Oraja")
-		}
-	} else if loader.OrajaDataLoader.Interest(r) {
-		r.Prefer = null.StringFrom("Oraja")
-	} else if loader.LR2DataLoader.Interest(r) {
-		r.Prefer = null.StringFrom("LR2")
-	}
-	log.Infof("Rival [%s]'s prefer [%s]", r.Name, r.Prefer.String)
-	if !r.Prefer.Valid {
-		panic("panic: no loader")
-	}
-	if r.Prefer.Equal(null.StringFrom("LR2")) {
-		return loader.LR2DataLoader
-	}
-	return loader.OrajaDataLoader
 }

@@ -227,7 +227,6 @@ func OpenGhostTui(dth *difftable.DiffTableHeader, selfInfo *rival.RivalInfo, gho
 	}
 }
 
-
 // Merge maximum lamp from scorelog
 // In place function, do not return a new array
 func mergeLampFromScoreLog(dtArray []difftable.DiffTableData, scoreLog []*score.CommonScoreLog, merge func (*difftable.DiffTableData, *score.CommonScoreLog)) {

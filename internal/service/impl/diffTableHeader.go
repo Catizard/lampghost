@@ -118,6 +118,7 @@ func (s *DiffTableHeaderService) FetchAndSaveDiffTableHeader(url string, alias s
 		return nil, err
 	}
 	// 5) Save course info
+	// Note: step 5 must be executed after step 4 because of the header's id 
 	if err := saveCourseInfoFromTableHeader(tx, dth); err != nil {
 		return nil, err
 	}
@@ -148,7 +149,7 @@ func (s *DiffTableHeaderService) FindDiffTableHeaderListWithChoices(msg string, 
 }
 
 func insertDiffTableHeader(tx *sqlite.Tx, dth *difftable.DiffTableHeader) error {
-	_, err := tx.NamedExec(`
+	ret, err := tx.NamedExec(`
 		INSERT INTO difftable_header(
 			data_url,
 			data_location,
@@ -158,6 +159,11 @@ func insertDiffTableHeader(tx *sqlite.Tx, dth *difftable.DiffTableHeader) error 
 			alias
 		)
 		VALUES (:data_url, :data_location, :last_update, :name, :symbol, :alias)`, dth)
+	if id, err := ret.LastInsertId(); err != nil {
+		return err
+	} else {
+		dth.Id = int(id)
+	}
 	return err
 }
 

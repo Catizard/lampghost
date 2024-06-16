@@ -12,7 +12,8 @@ CREATE TABLE difftable_header (
 CREATE TABLE course_info (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    source TEXT NOT NULL,
+    source_name TEXT NOT NULL,
+    source_id int NOT NULL,
     md5s TEXT NOT NULL
 );
 

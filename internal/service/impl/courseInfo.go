@@ -153,7 +153,7 @@ func saveCourseInfoFromTableHeader(tx *sqlite.Tx, dth *difftable.DiffTableHeader
 			skipFlag := false
 			// Skip 1: There is a same course exists
 			for _, p := range courseArr {
-				if v.Name == p.Name && v.Md5s == p.Md5s && v.Source == p.Source {
+				if v.Name == p.Name && v.Md5s == p.Md5s {
 					skipFlag = true
 					break
 				}
@@ -181,7 +181,8 @@ func saveCourseInfoFromTableHeader(tx *sqlite.Tx, dth *difftable.DiffTableHeader
 // Prerequisite before save function on CourseInfo
 func prepareBeforeSave(c *difftable.CourseInfo, dth *difftable.DiffTableHeader) {
 	c.Md5s = strings.Join(c.Md5, ",")
-	c.Source = dth.Name
+	c.SourceName = dth.Name
+	c.SourceId = dth.Id
 }
 
 // Preqrequiste after read function on CourseInfo

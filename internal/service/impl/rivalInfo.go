@@ -53,6 +53,21 @@ func (s *RivalInfoService) InsertRivalInfo(dth *rival.RivalInfo) error {
 	return tx.Commit()
 }
 
+func (s *RivalInfoService) UpdateRivalInfo(id int, updater rival.RivalInfoUpdater) (*rival.RivalInfo, error) {
+	tx, err := s.db.BeginTx()
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+
+	nv, err := updateRivalInfo(tx, id, updater)
+	if err != nil {
+		return nil, err
+	}
+	err = tx.Commit()
+	return nv, err
+}
+
 func (s *RivalInfoService) DeleteRivalInfo(id int) error {
 	tx, err := s.db.BeginTx()
 	if err != nil {
@@ -137,6 +152,20 @@ func findRivalInfoById(tx *sqlite.Tx, id int) (*rival.RivalInfo, error) {
 func insertRivalInfo(tx *sqlite.Tx, rivalInfo *rival.RivalInfo) error {
 	_, err := tx.NamedExec(`INSERT INTO rival_info (name, score_log_path, song_data_path, lr2_user_data_path) VALUES (:name,:score_log_path,:song_data_path,:lr2_user_data_path)`, rivalInfo)
 	return err
+}
+
+func updateRivalInfo(tx *sqlite.Tx, id int, updater rival.RivalInfoUpdater) (*rival.RivalInfo, error) {
+	r, err := findRivalInfoById(tx, id)
+	if err != nil {
+		return r, err
+	}
+	if updater.GenerateSetClause() == "" {
+		log.Warn("Updater has no field, skip")
+		return r, nil
+	}
+	updater.MergeUpdate(r)
+	_, err = tx.NamedExec("UPDATE rival_info SET " + updater.GenerateSetClause() + " WHERE id=:id", updater)
+	return r, err
 }
 
 func deleteRivalInfo(tx *sqlite.Tx, id int) error {

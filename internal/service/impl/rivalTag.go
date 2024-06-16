@@ -204,7 +204,6 @@ func buildTags(tx *sqlite.Tx, r *rival.RivalInfo, courseArr []*difftable.CourseI
 		return nil
 	}
 
-	// TODO: Structure of this procdure should be changed
 	md5MapsToCourse := make(map[string]*difftable.CourseInfo)
 	for _, v := range courseArr {
 		md5MapsToCourse[v.Md5s] = v 

@@ -23,7 +23,6 @@ var DelCmd = &cobra.Command{
 		}
 		msg := "Multiple rivals matched, please choose one"
 		filter := rival.RivalInfoFilter{NameLike: null.StringFrom(name)}
-		log.Infof("filter=%s\n", filter.GenerateWhereClause())
 		rivalInfo, err := service.RivalInfoService.ChooseOneRival(msg, filter)
 		if err != nil {
 			log.Fatal(err)

@@ -7,7 +7,6 @@ import (
 	"github.com/Catizard/lampghost/cmd/rival/add"
 	"github.com/Catizard/lampghost/cmd/rival/del"
 	"github.com/Catizard/lampghost/cmd/rival/edit"
-	rinit "github.com/Catizard/lampghost/cmd/rival/rinit"
 	"github.com/Catizard/lampghost/cmd/rival/sync"
 	"github.com/Catizard/lampghost/cmd/rival/tags"
 	"github.com/spf13/cobra"
@@ -24,7 +23,6 @@ var RivalCmd = &cobra.Command{
 
 func init() {
 	RivalCmd.AddCommand(add.AddCmd)
-	RivalCmd.AddCommand(rinit.InitCmd)
 	RivalCmd.AddCommand(tags.TagsCmd)
 	RivalCmd.AddCommand(sync.SyncCmd)
 	RivalCmd.AddCommand(del.DelCmd)

@@ -9,7 +9,6 @@ import (
 type TagBuildParam struct {
 	RivalInfo *rival.RivalInfo
 	DiffTableHeader []*difftable.DiffTableHeader
-	// TODO: How to connect DiffTableHeader & DiffTableData?
 	CommonScoreLog []*score.CommonScoreLog
 }
 
@@ -21,8 +20,8 @@ type TagBuilder interface {
 }
 
 // Exposes TagBuilders here
-var AvaiableTagBuilders []TagBuilder
+var AvaiableTagBuilders []TagBuilder = make([]TagBuilder, 0)
 
 func init() {
-	// Register TagBuilders here
+	AvaiableTagBuilders = append(AvaiableTagBuilders, NewOrajaCourseTagBuilder())
 }

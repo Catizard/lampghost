@@ -3,6 +3,7 @@ package loader
 import (
 	"fmt"
 
+	"github.com/Catizard/lampghost/internal/common/source"
 	"github.com/Catizard/lampghost/internal/data"
 	"github.com/Catizard/lampghost/internal/data/difftable"
 	"github.com/Catizard/lampghost/internal/data/rival"
@@ -63,7 +64,8 @@ func (l *orajaDataLoader) Load(r *rival.RivalInfo, filter null.Value[data.Filter
 	}
 
 	// Workaround: Courses are also related on md5
-	// TODO: cannot use service package here (import cycle)
+	// Note: We need to know a hash is whether generated from course or single song
+	coursesHashSet := make(map[string]struct{})
 	courses, _, err := service.CourseInfoService.FindCourseInfoList(difftable.CourseInfoFilter{})
 	if err != nil {
 		return nil, err
@@ -85,12 +87,21 @@ func (l *orajaDataLoader) Load(r *rival.RivalInfo, filter null.Value[data.Filter
 		}
 		// Hack on sha256MapsToMD5
 		sha256MapsToMD5[sha256] = course.Md5s
+		// Mark it as a course hash
+		coursesHashSet[sha256] = struct{}{}
 	}
 
 	finalLogs := make([]*score.CommonScoreLog, 0)
 	for _, log := range logs {
-		if md5, ok := sha256MapsToMD5[log.Sha256.String]; ok {
+		logHash := log.Sha256.ValueOrZero()
+		if md5, ok := sha256MapsToMD5[logHash]; ok {
+			// Warn: Any modification on 'log' wouldn't take affect
 			log.Md5 = null.StringFrom(md5)
+			if _, isCourse := coursesHashSet[logHash]; isCourse {
+				log.LogType = source.Course
+			} else {
+				log.LogType = source.Song
+			}
 			finalLogs = append(finalLogs, log)
 			// TODO: remove me!
 			if !finalLogs[len(finalLogs)-1].Md5.Valid {

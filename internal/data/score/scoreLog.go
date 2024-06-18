@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Catizard/lampghost/internal/common/source"
+	"github.com/charmbracelet/log"
 	"github.com/guregu/null/v5"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
@@ -90,6 +92,7 @@ type LR2ScoreLog struct {
 	OPBest     int         `db:"op_best"`
 	RSeed      int         `db:"rseed"`
 	Complete   int         `db:"complete"`
+	RowId      int         `db:"rowid"`
 }
 
 type CommonScoreLog struct {
@@ -108,15 +111,38 @@ func NewCommonScoreLogFromOraja(log *ScoreLog) *CommonScoreLog {
 	}
 }
 
-func NewCommonScoreLogFromLR2(log *LR2ScoreLog) *CommonScoreLog {
+func NewCommonScoreLogFromLR2(scoreLog *LR2ScoreLog) *CommonScoreLog {
+	// Hack: Take row_id as timestamp
 	ret := &CommonScoreLog{
-		Md5:   null.StringFrom(log.Md5),
-		Clear: int32(log.Clear),
+		Md5:       null.StringFrom(scoreLog.Md5),
+		Clear:     int32(scoreLog.Clear),
+		TimeStamp: null.IntFrom(int64(scoreLog.RowId)),
 	}
 	// Note: Workaround for LR2 log, because LR2 doesn't have assist lamp
 	// So except no play(=0) and fail(=1), clear should += 2
 	if ret.Clear > 1 {
 		ret.Clear += 2
+	}
+	// Hack: If len(MD5) > 32, erase the first 32 numbers
+	// Then join the last every 32 numbers with ','
+	hash := ret.Md5.ValueOrZero()
+	// If len cannot be divided by 32, report it
+	if len(hash) % 32 != 0 { 
+		log.Warnf("Corrupted data: len(hash) cannot divide 32, report this to the author.")
+	}
+	if len(hash) > 32 {
+		hash = hash[32:]
+		joined := ""
+		for i := 0; i < len(hash); i += 32 {
+			if i != 0 {
+				joined += ","
+			}
+			joined += hash[i:i+32]
+		}
+		ret.Md5 = null.StringFrom(joined)
+		ret.LogType = source.Course
+	} else {
+		ret.LogType = source.Song
 	}
 	return ret
 }

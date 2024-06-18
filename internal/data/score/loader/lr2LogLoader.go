@@ -28,10 +28,32 @@ func (l *lr2DataLoader) Load(r *rival.RivalInfo, filter null.Value[data.Filter])
 		return nil, fmt.Errorf("[LR2DataLoader] cannot load")
 	}
 
-	// Directly read from scorelog table
-	rawLogs, err := sqlite.DirectlyLoadTable[score.LR2ScoreLog](r.LR2UserDataPath.String, "score")
+	// database initialize
+	db := sqlite.NewDB(r.LR2UserDataPath.ValueOrZero())
+	if err := db.Open(); err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	tx, err := db.BeginTx()
 	if err != nil {
 		return nil, err
+	}
+
+	// Hack: Take _rowid_ as timestamp (as insert sequence)
+	rows, err := tx.Queryx("SELECT *, _rowid_ FROM score")
+	if err != nil {
+		return nil, err
+	}
+
+	rawLogs := make([]*score.LR2ScoreLog, 0)
+	for rows.Next() {
+		var obj score.LR2ScoreLog
+		err = rows.StructScan(&obj)
+		if err != nil {
+			return nil, err
+		}
+		rawLogs = append(rawLogs, &obj)
 	}
 
 	// Convert raw data to common form

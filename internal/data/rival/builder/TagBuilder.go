@@ -14,7 +14,6 @@ type TagBuildParam struct {
 	Courses         []*difftable.CourseInfo
 }
 
-// TODO: How can we generate LR2 users' tags?
 type TagBuilder interface {
 	// Returns whether a TagBuilder can proceed or not
 	Interest(ctxp TagBuildParam) bool
@@ -23,15 +22,16 @@ type TagBuilder interface {
 }
 
 // Exposes TagBuilders here
-var AvaiableTagBuilders []TagBuilder = make([]TagBuilder, 0)
+var AvailableTagBuilders []TagBuilder = make([]TagBuilder, 0)
 
 func init() {
-	AvaiableTagBuilders = append(AvaiableTagBuilders, NewOrajaCourseTagBuilder())
+	AvailableTagBuilders = append(AvailableTagBuilders, NewOrajaCourseTagBuilder())
+	AvailableTagBuilders = append(AvailableTagBuilders, NewLR2CourseTagBuilder())
 }
 
 func Build(ctxp TagBuildParam) []*rival.RivalTag {
 	tags := make([]*rival.RivalTag, 0)
-	for _, builder := range AvaiableTagBuilders {
+	for _, builder := range AvailableTagBuilders {
 		if builder.Interest(ctxp) {
 			tags = append(tags, builder.Build(ctxp)...)
 		}

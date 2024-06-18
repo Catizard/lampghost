@@ -9,18 +9,19 @@ import (
 )
 
 // Build two kinds of tags: First Clear and First Hard Clear
-type orajaCourseTagBuilder struct {
+type lr2CourseTagBuilder struct {
+} 
+
+func NewLR2CourseTagBuilder() *lr2CourseTagBuilder {
+	return &lr2CourseTagBuilder{}
 }
 
-func NewOrajaCourseTagBuilder() *orajaCourseTagBuilder {
-	return &orajaCourseTagBuilder{}
+func (builder *lr2CourseTagBuilder) Interest(ctxp TagBuildParam) bool {
+	return ctxp.RivalInfo.Prefer.ValueOrZero() == source.LR2
 }
 
-func (builder *orajaCourseTagBuilder) Interest(ctxp TagBuildParam) bool {
-	return ctxp.RivalInfo.Prefer.ValueOrZero() == source.Oraja
-}
-
-func (builder *orajaCourseTagBuilder) Build(ctxp TagBuildParam) []*rival.RivalTag {
+// TODO: Below method has no difference with oraja one, could be merged later
+func (builder *lr2CourseTagBuilder) Build(ctxp TagBuildParam) []*rival.RivalTag {
 	md5MapsToCourse := make(map[string]*difftable.CourseInfo)
 	for _, v := range ctxp.Courses {
 		md5MapsToCourse[v.Md5s] = v
@@ -77,18 +78,4 @@ func (builder *orajaCourseTagBuilder) Build(ctxp TagBuildParam) []*rival.RivalTa
 		}
 	}
 	return tags
-}
-
-// Build percentage tags, e.g: 50% HC in satellite4
-// TODO: make options on tables, let user to choose percentage and lamp
-// For now, it's not registered
-type orajaPercentageTagBuilder struct {
-}
-
-func (builer *orajaPercentageTagBuilder) Interest(ctxp TagBuildParam) bool {
-	return ctxp.RivalInfo.Prefer.ValueOrZero() == source.Oraja
-}
-
-func (builder *orajaPercentageTagBuilder) Build(ctxp TagBuildParam) []*rival.RivalTag {
-	return nil
 }

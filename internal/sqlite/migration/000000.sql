@@ -13,7 +13,7 @@ CREATE TABLE course_info (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     source_name TEXT NOT NULL,
-    source_id int NOT NULL,
+    source_id INTEGER NOT NULL,
     md5s TEXT NOT NULL
 );
 
@@ -31,5 +31,5 @@ CREATE TABLE rival_tag (
     tag_name TEXT(255) NOT NULL,
     tag_source TEXT(255) NOT NULL,
     'generated' INTEGER DEFAULT (0) NOT NULL,
-    'timestamp' TEXT NOT NULL,
-)
+    'timestamp' TEXT NOT NULL
+);

@@ -92,6 +92,7 @@ func (l *orajaDataLoader) Load(r *rival.RivalInfo, filter null.Value[data.Filter
 	}
 
 	finalLogs := make([]*score.CommonScoreLog, 0)
+	ignored := 0
 	for _, log := range logs {
 		logHash := log.Sha256.ValueOrZero()
 		if md5, ok := sha256MapsToMD5[logHash]; ok {
@@ -103,11 +104,13 @@ func (l *orajaDataLoader) Load(r *rival.RivalInfo, filter null.Value[data.Filter
 				log.LogType = source.Song
 			}
 			finalLogs = append(finalLogs, log)
-			// TODO: remove me!
-			if !finalLogs[len(finalLogs)-1].Md5.Valid {
-				panic("panic: no md5")
-			}
+		} else {
+			ignored++
 		}
+	}
+
+	if ignored > 0 {
+		log.Warnf("%d logs are ignored", ignored)
 	}
 
 	return finalLogs, nil

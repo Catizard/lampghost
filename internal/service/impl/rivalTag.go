@@ -2,11 +2,11 @@ package impl
 
 import (
 	"fmt"
-	"sort"
 
-	"github.com/Catizard/lampghost/internal/common/clearType"
+	"github.com/Catizard/lampghost/internal/common/source"
 	"github.com/Catizard/lampghost/internal/data/difftable"
 	"github.com/Catizard/lampghost/internal/data/rival"
+	"github.com/Catizard/lampghost/internal/data/rival/builder"
 	"github.com/Catizard/lampghost/internal/data/score"
 	"github.com/Catizard/lampghost/internal/sqlite"
 	"github.com/Catizard/lampghost/internal/tui/choose"
@@ -160,7 +160,7 @@ func findRivalTagById(tx *sqlite.Tx, id int) (*rival.RivalTag, error) {
 }
 
 func insertRivalTag(tx *sqlite.Tx, rivalTag *rival.RivalTag) error {
-	_, err := tx.NamedExec(`INSERT INTO rival_tag(rival_id,tag_name,generated,timestamp) VALUES(:rival_id,:tag_name,:generated,:timestamp)`, rivalTag)
+	_, err := tx.NamedExec(`INSERT INTO rival_tag(rival_id,tag_name,generated,timestamp,tag_source) VALUES(:rival_id,:tag_name,:generated,:timestamp,:tag_source)`, rivalTag)
 	return err
 }
 
@@ -204,83 +204,33 @@ func buildTags(tx *sqlite.Tx, r *rival.RivalInfo, courseArr []*difftable.CourseI
 		return nil
 	}
 
-	md5MapsToCourse := make(map[string]*difftable.CourseInfo)
-	for _, v := range courseArr {
-		md5MapsToCourse[v.Md5s] = v 
+	// Preparation
+	headers, _, err := findDiffTableHeaderList(tx, difftable.DiffTableHeaderFilter{})
+	if err != nil {
+		return err
 	}
-
-	// TODO: genocide 2018 course contains some mutations like no speed/no good. They contain the exactly same md5 so sha256 would be the same
-	// This causes tag generation actually works incorectly, I think delete them directly from course would be the easist way to handle this problem
-	// At current development stage, the specific implementation is difftable/saveCourseInfoFromTableHeader (Actaully hasn't implemented now)
-	// Maps scorelog by md5 
-	md5MapsToScoreLog := make(map[string][]score.CommonScoreLog)
-	// TODO: LR2 log doesn't give a timestamp, should we do a hack on it?(based on insertion order)
-	// Before doing iteration, make sure scorelog is sorted by time
-	sort.Slice(r.CommonScoreLog, func(i, j int) bool {
-		if !r.CommonScoreLog[i].TimeStamp.Valid {
-			panic("panic: timestamp")
-		}
-		if !r.CommonScoreLog[j].TimeStamp.Valid {
-			panic("panic: timestamp")
-		}
-		left := r.CommonScoreLog[i].TimeStamp.Int64
-		right := r.CommonScoreLog[j].TimeStamp.Int64
-		return left < right
-	})
+	courses, _, err := findCourseInfoList(tx, difftable.CourseInfoFilter{})
+	if err != nil {
+		return err
+	}
+	// Split logs
+	songScoreLog := make([]*score.CommonScoreLog, 0)
+	courseScoreLog := make([]*score.CommonScoreLog, 0)
 	for _, v := range r.CommonScoreLog {
-		md5 := v.Md5.ValueOrZero()
-		// Skip
-		if _, ok := md5MapsToCourse[md5]; !ok {
-			continue
+		if v.LogType == source.Course {
+			courseScoreLog = append(courseScoreLog, v)
+		} else {
+			songScoreLog = append(songScoreLog, v)
 		}
-		if _, ok := md5MapsToScoreLog[md5]; !ok {
-			md5MapsToScoreLog[md5] = make([]score.CommonScoreLog, 0)
-		}
-		md5MapsToScoreLog[md5] = append(md5MapsToScoreLog[md5], *v)
 	}
 
-	// For now, only "first clear" and "first hard clear" tags are generated
-
-	// TODO: extract this part out
-	tags := make([]*rival.RivalTag, 0)
-	// First Clear Tag
-	for _, course := range courseArr {
-		if logs, ok := md5MapsToScoreLog[course.Md5s]; !ok {
-			continue // No record, continue
-		} else {
-			for _, log := range logs {
-				if log.Clear >= clearType.Normal {
-					fct := rival.RivalTag{
-						TagName:   course.Name + " First Clear",
-						Generated: true,
-						TimeStamp: log.TimeStamp.Int64,
-						TagSource: r.Prefer.ValueOrZero(),
-					}
-					tags = append(tags, &fct)
-					break
-				}
-			}
-		}
-	}
-	// First Hard Clear Tag
-	for _, course := range courseArr {
-		if logs, ok := md5MapsToScoreLog[course.Md5s]; !ok {
-			continue // No record, continue
-		} else {
-			for _, log := range logs {
-				if log.Clear >= clearType.Hard {
-					fct := rival.RivalTag{
-						TagName:   course.Name + " First Hard Clear",
-						Generated: true,
-						TimeStamp: log.TimeStamp.Int64,
-						TagSource: r.Prefer.ValueOrZero(),
-					}
-					tags = append(tags, &fct)
-					break
-				}
-			}
-		}
-	}
+	tags := builder.Build(builder.TagBuildParam{
+		RivalInfo:       r,
+		DiffTableHeader: headers,
+		SongScoreLog:    songScoreLog,
+		CourseScoreLog:  courseScoreLog,
+		Courses:         courses,
+	})
 	log.Infof("Generated %d tags for [%s]", len(tags), r.Name)
 	// Add rival's id all together
 	for i := range tags {

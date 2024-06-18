@@ -1,22 +1,22 @@
 # LampGhost: The ghost system for BMS lamp tracker
 
 > [!CAUTION]
-> Do not directly copy LampGhost to your oraja directory, this might ruin your own songdata.db and scorelog.db file. Copy them to other directory is recommanded.
+> Do not directly copy LampGhost to your oraja/LR2 directory, this might ruin your own save file. Copy them altogether to antother directory is recommanded.
 
 > [!CAUTION]
-> This project is still in heavy development. Any change to database related code would destroy your current database.
+> This project is still in heavy development. Any change to database related code would destroy your current database. You have to delete .lampghost directory at your home directory to give a fresh start.
 
 ## Main Goals
 
 - [x] Diff yours and other players' lamp status at some point in the past
-- [ ] Support lr2 score import
+- [x] Support lr2 score import
 
 
 LampGhost aims at diff with previous status, which means you can "revert" other players' play record after some point (e.g only using the record before the rival reaches ★4)
 
 This project so called "lampghost" is because it's like the "ghost record" in car racing game. 
 
-> ![NOTE]
+> [!NOTE]
 > Unfortunatly, LR2 database file doesn't record the timestamp of the play. Which means LampGhost cannot build LR2 user's previous status. But you can still use ghost command with no `--tag` flag set.
 
 ## Quick start

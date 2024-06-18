@@ -120,7 +120,7 @@ func findCourseInfoById(tx *sqlite.Tx, id int) (*difftable.CourseInfo, error) {
 }
 
 func insertCourseInfo(tx *sqlite.Tx, courseInfo *difftable.CourseInfo) error {
-	_, err := tx.NamedExec("INSERT INTO course_info(name, md5s, source) VALUES(:name, :md5s, :source)", courseInfo)
+	_, err := tx.NamedExec("INSERT INTO course_info(name, md5s, source_id, source_name) VALUES(:name, :md5s, :source_id, :source_name)", courseInfo)
 	return err
 }
 

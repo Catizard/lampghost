@@ -75,10 +75,10 @@ func buildLevelList(dth *difftable.DiffTableHeader, diffTable []difftable.DiffTa
 
 	items := make([]list.Item, 0)
 	for _, v := range sortedLevels {
-		title := dth.Symbol + " " + v
+		title := dth.Symbol + v
 		n := item{
 			title: title,
-			desc:  "発狂BMS難易度表" + title,
+			desc:  dth.Name + " " + title,
 			level: v,
 		}
 		items = append(items, n)
@@ -214,11 +214,11 @@ func (m mainModel) View() string {
 // right is the related song list and lamp status
 func OpenGhostTui(dth *difftable.DiffTableHeader, selfInfo *rival.RivalInfo, ghostInfo *rival.RivalInfo) {
 	// Merge self
-	mergeLampFromScoreLog(dth.Data, selfInfo.CommonScoreLog, func (data *difftable.DiffTableData, log *score.CommonScoreLog) {
+	mergeLampFromScoreLog(dth.Data, selfInfo.CommonScoreLog, func(data *difftable.DiffTableData, log *score.CommonScoreLog) {
 		data.Lamp = max(data.Lamp, log.Clear)
 	})
 	// Merge ghost
-	mergeLampFromScoreLog(dth.Data, ghostInfo.CommonScoreLog, func (data *difftable.DiffTableData, log *score.CommonScoreLog) {
+	mergeLampFromScoreLog(dth.Data, ghostInfo.CommonScoreLog, func(data *difftable.DiffTableData, log *score.CommonScoreLog) {
 		data.GhostLamp = max(data.GhostLamp, log.Clear)
 	})
 	// After two merge functions, dt now contains lamp info
@@ -229,7 +229,7 @@ func OpenGhostTui(dth *difftable.DiffTableHeader, selfInfo *rival.RivalInfo, gho
 
 // Merge maximum lamp from scorelog
 // In place function, do not return a new array
-func mergeLampFromScoreLog(dtArray []difftable.DiffTableData, scoreLog []*score.CommonScoreLog, merge func (*difftable.DiffTableData, *score.CommonScoreLog)) {
+func mergeLampFromScoreLog(dtArray []difftable.DiffTableData, scoreLog []*score.CommonScoreLog, merge func(*difftable.DiffTableData, *score.CommonScoreLog)) {
 	dtMD5Map := make(map[string]*difftable.DiffTableData)
 	for i, v := range dtArray {
 		dtMD5Map[v.Md5] = &dtArray[i]

@@ -24,7 +24,7 @@ var DelCmd = &cobra.Command{
 			panic(err)
 		}
 		filter := difftable.DiffTableHeaderFilter{
-			Name: null.StringFrom(name),
+			NameLike: null.StringFrom(name),
 		}
 		msg := fmt.Sprintf("Multiple tables matched with %s, choose one to delete:", name)
 		dth, err := service.DiffTableHeaderService.FindDiffTableHeaderListWithChoices(msg, filter)

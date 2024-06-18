@@ -118,7 +118,7 @@ func (s *DiffTableHeaderService) FetchAndSaveDiffTableHeader(url string, alias s
 		return nil, err
 	}
 	// 5) Save course info
-	// Note: step 5 must be executed after step 4 because of the header's id 
+	// Note: step 5 must be executed after step 4 because of the header's id
 	if err := saveCourseInfoFromTableHeader(tx, dth); err != nil {
 		return nil, err
 	}
@@ -223,11 +223,17 @@ func updateDiffTableHeader(tx *sqlite.Tx, id int, upd difftable.DiffTableHeaderU
 }
 
 func deleteDiffTableHeader(tx *sqlite.Tx, id int) error {
-	if _, err := findDiffTableHeaderById(tx, id); err != nil {
+	h, err := findDiffTableHeaderById(tx, id)
+	if err != nil {
 		return err
 	}
 
-	_, err := tx.Exec("DELETE FROM difftable_header WHERE id=?", id)
+	filePath := h.DataLocation
+	if err := os.Remove(filePath); err != nil {
+		log.Warnf("Removing [%s] failed with [%v]", filePath, err)
+		// Supress error
+	}
+	_, err = tx.Exec("DELETE FROM difftable_header WHERE id=?", id)
 	return err
 }
 

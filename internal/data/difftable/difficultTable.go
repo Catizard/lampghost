@@ -23,7 +23,7 @@ type DiffTableHeader struct {
 	Alias        string      `json:"alias" db:"alias"`
 	// Not database related fields
 	Course [][]CourseInfo `json:"course"`
-	Data []DiffTableData
+	Data   []DiffTableData
 	// Maps Data by level field?
 	// DataLevelMap []map[string][]*DiffTableData
 }
@@ -85,10 +85,10 @@ func (f DiffTableHeaderFilter) GenerateWhereClause() string {
 	if v := f.Id; v.Valid {
 		where = append(where, "id = :id")
 	}
-	if v := f.Name; v.Valid {
+	if v := f.Name; v.Valid && len(v.ValueOrZero()) > 0 {
 		where = append(where, "name = :name")
 	}
-	if v := f.NameLike; v.Valid {
+	if v := f.NameLike; v.Valid && len(v.ValueOrZero()) > 0 {
 		where = append(where, "name like concat('%', :nameLike, '%') or alias like concat('%', :nameLike, '%')")
 	}
 	return strings.Join(where, " AND ")

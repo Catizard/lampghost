@@ -10,14 +10,12 @@
 
 - [x] Diff yours and other players' lamp status at some point in the past
 - [x] Support lr2 score import
+- [ ] Full docs support
 
 
 LampGhost aims at diff with previous status, which means you can "revert" other players' play record after some point (e.g only using the record before the rival reaches ★4)
 
 This project so called "lampghost" is because it's like the "ghost record" in car racing game. 
-
-> [!NOTE]
-> Unfortunatly, LR2 database file doesn't record the timestamp of the play. Which means LampGhost cannot build LR2 user's previous status. But you can still use ghost command with no `--tag` flag set.
 
 ## Quick start
 
@@ -49,6 +47,9 @@ $ ./lampghost table add --alias insane2 "http://zris.work/bmstable/insane2/insan
 ```
 
 > [!NOTE]
+> By calling a command with no argument provide or with `--help` would print help message for a command.
+
+> [!WARNING]
 > Just like setting up your oraja steps, you have to import "NEW GENERATION INSANE" table to get courses data. The insane table doesn't contain it!
 
 ### Copy database file
@@ -74,9 +75,17 @@ After this step done, your directory may look like:
 Register Catizard and Red into LampGhost
 
 ```bash
-$ ./lampghost rival add "Catizard" ./Catizard/scorelog.db ./Catizard/songdata.db
-$ ./lampghost rival add "Red" ./Red/red_scorelog.db ./Red/songdata.db
+$ ./lampghost rival add "Catizard" --scorelog ./Catizard/scorelog.db --songdata ./Catizard/songdata.db
+$ ./lampghost rival add "Red" --scorelog ./Red/red_scorelog.db --songdata ./Red/songdata.db
 ```
+
+If you are LR2 user:
+```
+$ ./lampghost rival add "Catizard" --user ./Catizard/Catizard.db
+```
+
+> [!NOTE]
+> You can configure a rival with oraja database file and LR2 database file both exists.
 
 ### Build tags(Optional)
 
@@ -91,6 +100,8 @@ $ ./lampghost rival build tags --rival "Red"
 ```bash
 $ ./lampghost ghost Catizard Red --tags
 ```
+
+Hint: use H/J/K/L or arrow keys to move, enter to select, esc to back
 
 > [!NOTE]
 > If you haven't generate any tags, remove '--tag' flag.

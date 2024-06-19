@@ -1,6 +1,8 @@
 package list
 
 import (
+	"fmt"
+
 	"github.com/Catizard/lampghost/internal/data/rival"
 	"github.com/Catizard/lampghost/internal/service"
 	"github.com/charmbracelet/log"
@@ -18,13 +20,16 @@ var ListCmd = &cobra.Command{
 			log.Fatal("Please input rival's name")
 		}
 		msg := "Multiple rivals matched, please choose one"
-		rivalInfo, err := service.RivalInfoService.ChooseOneRival(msg, rival.RivalInfoFilter{})
+		rivalInfo, err := service.RivalInfoService.ChooseOneRival(msg, rival.RivalInfoFilter{NameLike: null.StringFrom(rivalName)})
 		if err != nil {
 			log.Fatal(err)
 		}
 		tags, _, err := service.RivalTagService.FindRivalTagList(rival.RivalTagFilter{RivalId: null.IntFrom(int64(rivalInfo.Id))})
 		if err != nil {
 			log.Fatal(err)
+		}
+		for _, v := range tags {
+			fmt.Println(v.String())
 		}
 	},
 }

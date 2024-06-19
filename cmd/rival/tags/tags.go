@@ -6,6 +6,7 @@ package tags
 import (
 	tags "github.com/Catizard/lampghost/cmd/rival/tags/add"
 	"github.com/Catizard/lampghost/cmd/rival/tags/build"
+	"github.com/Catizard/lampghost/cmd/rival/tags/list"
 	"github.com/spf13/cobra"
 )
 
@@ -21,4 +22,5 @@ var TagsCmd = &cobra.Command{
 func init() {
 	TagsCmd.AddCommand(tags.AddCmd)
 	TagsCmd.AddCommand(build.BuildCmd)
+	TagsCmd.AddCommand(list.ListCmd)
 }

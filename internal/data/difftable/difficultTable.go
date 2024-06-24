@@ -66,6 +66,7 @@ type DiffTableHeaderService interface {
 	//
 	// Support url forms:
 	// 1) .json file
+	// 2) .html file
 	FetchAndSaveDiffTableHeader(url string, alias string) (*DiffTableHeader, error)
 
 	// Simple wrapper of FindDiffTableHeaderList

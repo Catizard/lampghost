@@ -1,6 +1,7 @@
 package impl
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"net/http"
@@ -238,11 +239,61 @@ func deleteDiffTableHeader(tx *sqlite.Tx, id int) error {
 }
 
 func fetchDiffTableFromURL(url string) (*difftable.DiffTableHeader, error) {
-	if !strings.HasSuffix(url, ".json") {
-		return nil, fmt.Errorf("only .json format url is supported, sorry :(")
+	jsonUrl := ""
+	if strings.HasSuffix(url, ".html") {
+		resp, err := http.Get(url)
+		if err != nil {
+			return nil, err
+		}
+		defer resp.Body.Close()
+
+		scanner := bufio.NewScanner(resp.Body)
+		for scanner.Scan() {
+			if err := scanner.Err(); err != nil {
+				return nil, err
+			}
+			line := strings.Trim(scanner.Text(), " ")
+			// TODO: Any other cases?
+			// Its pattern should be <meta name="bmstable" content="xxx.json" />
+			if strings.HasPrefix(line, "<meta name=\"bmstable\"") {
+				startp := strings.Index(line, "content") + len("content=\"") - 1
+				if startp == -1 {
+					log.Fatalf("Cannot find 'content' field in %s", url)
+				}
+				endp := -1
+				// Finds the end position
+				first := false
+				for i := startp; i < len(line); i++ {
+					if line[i] == '"' {
+						if !first {
+							first = true
+						} else {
+							endp = i
+							break
+						}
+					}
+				}
+				if endp == -1 {
+					log.Fatalf("Cannot find 'content' field in %s", url)
+				}
+
+				// Construct the json url path
+				splitUrl := strings.Split(url, "/")
+				splitUrl[len(splitUrl)-1] = line[startp+1 : endp]
+				jsonUrl = strings.Join(splitUrl, "/")
+				log.Infof("Construct json url [%s] from [%s]", jsonUrl, url)
+				break
+			}
+		}
+	} else if strings.HasSuffix(url, ".json") {
+		// Okay dokey
+		jsonUrl = url
+	}
+	if jsonUrl == "" {
+		log.Fatalf("Cannot fetch %s", url)
 	}
 	dth := &difftable.DiffTableHeader{}
-	common.FetchJson(url, &dth)
+	common.FetchJson(jsonUrl, &dth)
 	return dth, nil
 }
 

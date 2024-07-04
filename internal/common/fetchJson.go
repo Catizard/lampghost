@@ -5,11 +5,14 @@ import (
 	"io"
 	"net/http"
 	"os"
+
+	"github.com/charmbracelet/log"
 )
 
 // Simple wrapper for reading json from url
 // Panic when error occured
 func FetchJson(url string, v interface{}) {
+	log.Infof("Fetching json from %s", url)
 	resp, err := http.Get(url)
 	if err != nil {
 		panic(err)

@@ -53,6 +53,7 @@ func (db *DB) Open() (err error) {
 // Executes every sql file under 'sqlite/migration/'
 // This method insure all or nothing (expect directory)
 func InitializeDatabase() error {
+	os.RemoveAll(filepath.Dir(config.WorkingDirectory))
 	// Create working directory
 	if err := os.MkdirAll(filepath.Dir(config.WorkingDirectory), 0700); err != nil {
 		return err

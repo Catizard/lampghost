@@ -241,6 +241,7 @@ func deleteDiffTableHeader(tx *sqlite.Tx, id int) error {
 func fetchDiffTableFromURL(url string) (*difftable.DiffTableHeader, error) {
 	jsonUrl := ""
 	if strings.HasSuffix(url, ".html") {
+		log.Infof("Fetch difficult table data from %s", url)
 		resp, err := http.Get(url)
 		if err != nil {
 			return nil, err

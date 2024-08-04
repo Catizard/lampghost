@@ -67,7 +67,10 @@ var GhostCmd = &cobra.Command{
 			panic(err)
 		} else if b {
 			// You have to choose a tag first
-			tag, err = service.RivalTagService.ChooseOneTag("Choose one tag to ghost", rival.RivalTagFilter{})
+			filter := rival.RivalTagFilter{
+				RivalId: null.IntFrom(int64(ghostInfo.Id)),
+			}
+			tag, err = service.RivalTagService.ChooseOneTag("Choose one tag to ghost", filter)
 			if err != nil {
 				panic(err)
 			}

@@ -28,6 +28,20 @@ func LoadRivalData(r *rival.RivalInfo) error {
 	return nil
 }
 
+func LoadTaggedRivalData(r *rival.RivalInfo, tag *rival.RivalTag) error {
+	loader := chooseLoader(r)
+	// hack, which breaks on LR2 :(
+	var filter data.Filter = data.SimpleFilter {
+		WhereClause: fmt.Sprintf(" where date <= %d", tag.TimeStamp),
+	}
+	logs, err := loader.Load(r, null.NewValue(filter, true))
+	if err != nil {
+		return err
+	}
+	r.CommonScoreLog = logs
+	return nil
+}
+
 func chooseLoader(r *rival.RivalInfo) RivalDataLoader {
 	if OrajaDataLoader.Interest(r) && LR2DataLoader.Interest(r) {
 		// Okay, we got a trouble

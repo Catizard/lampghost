@@ -1,9 +1,5 @@
 package difftable
 
-import (
-	_ "github.com/mattn/go-sqlite3"
-)
-
 // Represents one course
 type CourseInfo struct {
 	Id         int      `db:"id"`

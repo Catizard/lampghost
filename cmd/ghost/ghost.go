@@ -61,7 +61,7 @@ var GhostCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		var tag *rival.RivalTag
+		var tag *rival.RivalTag = nil
 		// If tag flagged
 		if b, err := cmd.Flags().GetBool("tag"); err != nil {
 			panic(err)
@@ -76,10 +76,17 @@ var GhostCmd = &cobra.Command{
 			}
 			log.Infof("Choosed %s, time=%d\n", tag.TagName, tag.TimeStamp)
 		}
-		// TODO: make tags back
-		if err := loader.LoadRivalData(ghostInfo); err != nil {
-			log.Fatal(err)
+		// TODO: Support LR2
+		if (tag == nil) {
+			if err := loader.LoadRivalData(ghostInfo); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			if err := loader.LoadTaggedRivalData(ghostInfo, tag); err != nil {
+				log.Fatal(err)
+			}
 		}
+		
 		// 4) Open tui application
 		ghostTui.OpenGhostTui(dth, selfInfo, ghostInfo)
 	},

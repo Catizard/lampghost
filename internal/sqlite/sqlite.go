@@ -9,7 +9,9 @@ import (
 	"sort"
 
 	"github.com/Catizard/lampghost/internal/config"
+	"github.com/Catizard/lampghost/internal/data"
 	"github.com/charmbracelet/log"
+	"github.com/guregu/null/v5"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -154,6 +156,10 @@ func (db *DB) BeginTx() (*Tx, error) {
 
 // Boilerplate code that directly read rows from external database
 func DirectlyLoadTable[T interface{}](path string, tb string) ([]*T, error) {
+	return DirectlyLoadTableWithFilter[T](path, tb, data.NullFilter)	
+}
+
+func DirectlyLoadTableWithFilter[T interface{}](path string, tb string, filter null.Value[data.Filter]) ([]*T, error) {
 	// database initialize
 	db := NewDB(path)
 	if err := db.Open(); err != nil {
@@ -167,7 +173,12 @@ func DirectlyLoadTable[T interface{}](path string, tb string) ([]*T, error) {
 	}
 	defer tx.Rollback()
 
-	rows, err := tx.Queryx(fmt.Sprintf("SELECT * FROM %s", tb))
+	boilerplateSql := fmt.Sprintf("SELECT * FROM %s", tb)
+	if filter.Valid {
+		boilerplateSql += " " + filter.ValueOrZero().GenerateWhereClause()
+	}
+	log.Debugf("boilerplateSql=%s", boilerplateSql)
+	rows, err := tx.Queryx(boilerplateSql)
 	if err != nil {
 		return nil, err
 	}

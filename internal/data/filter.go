@@ -18,3 +18,11 @@ func newNullFilter() Filter {
 }
 
 var NullFilter null.Value[Filter] = null.NewValue(newNullFilter(), false)
+
+type SimpleFilter struct {
+	WhereClause string
+}
+
+func (f SimpleFilter) GenerateWhereClause() string {
+	return f.WhereClause
+}

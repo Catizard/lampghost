@@ -36,8 +36,8 @@ func (l *orajaDataLoader) Load(r *rival.RivalInfo, filter null.Value[data.Filter
 	}
 
 	// 1) Loads scorelog
-	// Directly read from scorelog table
-	rawLogs, err := sqlite.DirectlyLoadTable[score.ScoreLog](r.ScoreLogPath.String, "scorelog")
+	// Loads from scorelog db
+	rawLogs, err := sqlite.DirectlyLoadTableWithFilter[score.ScoreLog](r.ScoreLogPath.String, "scorelog", filter)
 	if err != nil {
 		return nil, err
 	}

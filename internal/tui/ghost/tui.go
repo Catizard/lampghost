@@ -1,10 +1,9 @@
 package ghost
 
 import (
-	"sort"
-	"strconv"
 	"time"
 
+	"github.com/Catizard/lampghost/internal/data"
 	"github.com/Catizard/lampghost/internal/data/difftable"
 	"github.com/Catizard/lampghost/internal/data/rival"
 	"github.com/Catizard/lampghost/internal/data/score"
@@ -50,28 +49,7 @@ type mainModel struct {
 }
 
 func buildLevelList(dth *difftable.DiffTableHeader, diffTable []difftable.DiffTableData) ([]list.Item, string) {
-	// convert diffTable to list items
-	levels := make(map[string]interface{})
-	for _, v := range diffTable {
-		levels[v.Level] = new(interface{})
-	}
-	if len(levels) == 0 {
-		panic("tableHeader.json file corrupted, no level found")
-	}
-	sortedLevels := make([]string, 0)
-	for level := range levels {
-		sortedLevels = append(sortedLevels, level)
-	}
-	sort.Slice(sortedLevels, func(i, j int) bool {
-		ll := sortedLevels[i]
-		rr := sortedLevels[j]
-		ill, errL := strconv.Atoi(ll)
-		irr, errR := strconv.Atoi(rr)
-		if errL == nil && errR == nil {
-			return ill < irr
-		}
-		return ll < rr
-	})
+	sortedLevels := data.BuildSortedLevelList(dth)	
 
 	items := make([]list.Item, 0)
 	for _, v := range sortedLevels {
@@ -214,11 +192,11 @@ func (m mainModel) View() string {
 // right is the related song list and lamp status
 func OpenGhostTui(dth *difftable.DiffTableHeader, selfInfo *rival.RivalInfo, ghostInfo *rival.RivalInfo) {
 	// Merge self
-	mergeLampFromScoreLog(dth.Data, selfInfo.CommonScoreLog, func(data *difftable.DiffTableData, log *score.CommonScoreLog) {
+	MergeLampFromScoreLog(dth.Data, selfInfo.CommonScoreLog, func(data *difftable.DiffTableData, log *score.CommonScoreLog) {
 		data.Lamp = max(data.Lamp, log.Clear)
 	})
 	// Merge ghost
-	mergeLampFromScoreLog(dth.Data, ghostInfo.CommonScoreLog, func(data *difftable.DiffTableData, log *score.CommonScoreLog) {
+	MergeLampFromScoreLog(dth.Data, ghostInfo.CommonScoreLog, func(data *difftable.DiffTableData, log *score.CommonScoreLog) {
 		data.GhostLamp = max(data.GhostLamp, log.Clear)
 	})
 	// After two merge functions, dt now contains lamp info
@@ -229,7 +207,7 @@ func OpenGhostTui(dth *difftable.DiffTableHeader, selfInfo *rival.RivalInfo, gho
 
 // Merge maximum lamp from scorelog
 // In place function, do not return a new array
-func mergeLampFromScoreLog(dtArray []difftable.DiffTableData, scoreLog []*score.CommonScoreLog, merge func(*difftable.DiffTableData, *score.CommonScoreLog)) {
+func MergeLampFromScoreLog(dtArray []difftable.DiffTableData, scoreLog []*score.CommonScoreLog, merge func(*difftable.DiffTableData, *score.CommonScoreLog)) {
 	dtMD5Map := make(map[string]*difftable.DiffTableData)
 	for i, v := range dtArray {
 		dtMD5Map[v.Md5] = &dtArray[i]

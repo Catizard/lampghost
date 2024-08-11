@@ -77,7 +77,7 @@ var GhostCmd = &cobra.Command{
 			log.Infof("Choosed %s, time=%d\n", tag.TagName, tag.TimeStamp)
 		}
 		// TODO: Support LR2
-		if (tag == nil) {
+		if tag == nil {
 			if err := loader.LoadRivalData(ghostInfo); err != nil {
 				log.Fatal(err)
 			}

@@ -114,4 +114,5 @@ Hint: use H/J/K/L or arrow keys to move, enter to select, esc to back
 - Support "shrink" mode: only one songdata.db file is used across everywhere, only scorelog.db need be loaded. One songdata.db file would be around 60MB~150MB which is too large for collecting
 - Form of LampGhost is not good: you need ask your friend to give you the scorelog.db and songdata.db file. Website is a better choice. like [cinnamon](http://cinnamon.link).
 - Draw charts of your (or others) progression
+- Remove CGO dependency
 - Full tui support?

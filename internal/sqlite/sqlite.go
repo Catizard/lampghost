@@ -9,7 +9,7 @@ import (
 	"sort"
 
 	"github.com/Catizard/lampghost/internal/config"
-	"github.com/Catizard/lampghost/internal/data"
+	"github.com/Catizard/lampghost/internal/data/filter"
 	"github.com/charmbracelet/log"
 	"github.com/guregu/null/v5"
 	"github.com/jmoiron/sqlx"
@@ -156,10 +156,10 @@ func (db *DB) BeginTx() (*Tx, error) {
 
 // Boilerplate code that directly read rows from external database
 func DirectlyLoadTable[T interface{}](path string, tb string) ([]*T, error) {
-	return DirectlyLoadTableWithFilter[T](path, tb, data.NullFilter)	
+	return DirectlyLoadTableWithFilter[T](path, tb, filter.NullFilter)	
 }
 
-func DirectlyLoadTableWithFilter[T interface{}](path string, tb string, filter null.Value[data.Filter]) ([]*T, error) {
+func DirectlyLoadTableWithFilter[T interface{}](path string, tb string, filter null.Value[filter.Filter]) ([]*T, error) {
 	// database initialize
 	db := NewDB(path)
 	if err := db.Open(); err != nil {

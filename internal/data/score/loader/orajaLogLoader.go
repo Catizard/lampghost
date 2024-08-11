@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/Catizard/lampghost/internal/common/source"
-	"github.com/Catizard/lampghost/internal/data"
 	"github.com/Catizard/lampghost/internal/data/difftable"
+	"github.com/Catizard/lampghost/internal/data/filter"
 	"github.com/Catizard/lampghost/internal/data/rival"
 	"github.com/Catizard/lampghost/internal/data/score"
 	"github.com/Catizard/lampghost/internal/service"
@@ -30,7 +30,7 @@ func (l *orajaDataLoader) Interest(r *rival.RivalInfo) bool {
 }
 
 // The default OrajaDataLoader loads 2 files: songdata.db and scorelog.db
-func (l *orajaDataLoader) Load(r *rival.RivalInfo, filter null.Value[data.Filter]) ([]*score.CommonScoreLog, error) {
+func (l *orajaDataLoader) Load(r *rival.RivalInfo, filter null.Value[filter.Filter]) ([]*score.CommonScoreLog, error) {
 	if !l.Interest(r) {
 		return nil, fmt.Errorf("[OrajaDataLoader] cannot load")
 	}

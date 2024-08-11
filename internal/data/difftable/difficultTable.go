@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Catizard/lampghost/internal/data"
+	"github.com/Catizard/lampghost/internal/data/filter"
 	"github.com/guregu/null/v5"
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -56,7 +56,7 @@ func (header *DiffTableHeader) LoadData() error {
 
 type DiffTableHeaderService interface {
 	// ---------- basic methods ----------
-	FindDiffTableHeaderList(filter data.Filter) ([]*DiffTableHeader, int, error)
+	FindDiffTableHeaderList(filter filter.Filter) ([]*DiffTableHeader, int, error)
 	FindDiffTableHeaderById(id int) (*DiffTableHeader, error)
 	InsertDiffTableHeader(dth *DiffTableHeader) error
 	UpdateDiffTableHeader(id int, upd DiffTableHeaderUpdate) (*DiffTableHeader, error)
@@ -71,7 +71,7 @@ type DiffTableHeaderService interface {
 
 	// Simple wrapper of FindDiffTableHeaderList
 	// After query, open tui app and wait user select one
-	FindDiffTableHeaderListWithChoices(msg string, filter data.Filter) (*DiffTableHeader, error)
+	FindDiffTableHeaderListWithChoices(msg string, filter filter.Filter) (*DiffTableHeader, error)
 }
 
 type DiffTableHeaderFilter struct {
@@ -117,6 +117,7 @@ type DiffTableData struct {
 	Url       string `json:"url"`
 	UrlDiff   string `json:"url_diff"`
 	Sha256    string `json:"-"`
+	// Lamp status
 	Lamp      int32  `json:"-"`
 	GhostLamp int32  `json:"-"`
 }

@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/Catizard/lampghost/internal/common/source"
-	"github.com/Catizard/lampghost/internal/data"
+	"github.com/Catizard/lampghost/internal/data/filter"
 	"github.com/Catizard/lampghost/internal/data/rival"
 	"github.com/Catizard/lampghost/internal/data/score"
 	"github.com/Catizard/lampghost/internal/tui/choose"
@@ -14,13 +14,13 @@ import (
 
 type RivalDataLoader interface {
 	Interest(r *rival.RivalInfo) bool
-	Load(r *rival.RivalInfo, filter null.Value[data.Filter]) ([]*score.CommonScoreLog, error)
+	Load(r *rival.RivalInfo, filter null.Value[filter.Filter]) ([]*score.CommonScoreLog, error)
 	// loadWithFilter(r *rival.RivalInfo, filter ???) ([]*score.CommonScoreLog, error)
 }
 
 func LoadRivalData(r *rival.RivalInfo) error {
 	loader := chooseLoader(r)
-	logs, err := loader.Load(r, data.NullFilter)
+	logs, err := loader.Load(r, filter.NullFilter)
 	if err != nil {
 		return err
 	}
@@ -31,7 +31,7 @@ func LoadRivalData(r *rival.RivalInfo) error {
 func LoadTaggedRivalData(r *rival.RivalInfo, tag *rival.RivalTag) error {
 	loader := chooseLoader(r)
 	// hack, which breaks on LR2 :(
-	var filter data.Filter = data.SimpleFilter {
+	var filter filter.Filter = filter.SimpleFilter {
 		WhereClause: fmt.Sprintf(" where date <= %d", tag.TimeStamp),
 	}
 	logs, err := loader.Load(r, null.NewValue(filter, true))

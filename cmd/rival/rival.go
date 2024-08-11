@@ -7,6 +7,7 @@ import (
 	"github.com/Catizard/lampghost/cmd/rival/add"
 	"github.com/Catizard/lampghost/cmd/rival/del"
 	"github.com/Catizard/lampghost/cmd/rival/edit"
+	"github.com/Catizard/lampghost/cmd/rival/export"
 	"github.com/Catizard/lampghost/cmd/rival/list"
 	"github.com/Catizard/lampghost/cmd/rival/sync"
 	"github.com/Catizard/lampghost/cmd/rival/tags"
@@ -29,4 +30,5 @@ func init() {
 	RivalCmd.AddCommand(del.DelCmd)
 	RivalCmd.AddCommand(edit.EditCmd)	
 	RivalCmd.AddCommand(list.ListCmd)
+	RivalCmd.AddCommand(export.ExportCmd)
 }

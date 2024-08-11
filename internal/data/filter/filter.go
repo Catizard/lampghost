@@ -1,4 +1,4 @@
-package data
+package filter
 
 import "github.com/guregu/null/v5"
 

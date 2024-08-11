@@ -10,8 +10,8 @@ import (
 
 	"github.com/Catizard/lampghost/internal/common"
 	"github.com/Catizard/lampghost/internal/config"
-	"github.com/Catizard/lampghost/internal/data"
 	"github.com/Catizard/lampghost/internal/data/difftable"
+	"github.com/Catizard/lampghost/internal/data/filter"
 	"github.com/Catizard/lampghost/internal/sqlite"
 	"github.com/Catizard/lampghost/internal/tui/choose"
 	"github.com/charmbracelet/log"
@@ -30,7 +30,7 @@ func NewDiffTableHeaderService(db *sqlite.DB) *DiffTableHeaderService {
 	return &DiffTableHeaderService{db: db}
 }
 
-func (s *DiffTableHeaderService) FindDiffTableHeaderList(filter data.Filter) ([]*difftable.DiffTableHeader, int, error) {
+func (s *DiffTableHeaderService) FindDiffTableHeaderList(filter filter.Filter) ([]*difftable.DiffTableHeader, int, error) {
 	tx, err := s.db.BeginTx()
 	if err != nil {
 		return nil, 0, err
@@ -129,7 +129,7 @@ func (s *DiffTableHeaderService) FetchAndSaveDiffTableHeader(url string, alias s
 	return dth, nil
 }
 
-func (s *DiffTableHeaderService) FindDiffTableHeaderListWithChoices(msg string, filter data.Filter) (*difftable.DiffTableHeader, error) {
+func (s *DiffTableHeaderService) FindDiffTableHeaderListWithChoices(msg string, filter filter.Filter) (*difftable.DiffTableHeader, error) {
 	tx, err := s.db.BeginTx()
 	if err != nil {
 		return nil, err
@@ -168,7 +168,7 @@ func insertDiffTableHeader(tx *sqlite.Tx, dth *difftable.DiffTableHeader) error 
 	return err
 }
 
-func findDiffTableHeaderList(tx *sqlite.Tx, filter data.Filter) (_ []*difftable.DiffTableHeader, _ int, err error) {
+func findDiffTableHeaderList(tx *sqlite.Tx, filter filter.Filter) (_ []*difftable.DiffTableHeader, _ int, err error) {
 	rows, err := tx.NamedQuery(`
 		SELECT *
 		FROM difftable_header

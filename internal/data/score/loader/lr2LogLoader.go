@@ -3,7 +3,7 @@ package loader
 import (
 	"fmt"
 
-	"github.com/Catizard/lampghost/internal/data"
+	"github.com/Catizard/lampghost/internal/data/filter"
 	"github.com/Catizard/lampghost/internal/data/rival"
 	"github.com/Catizard/lampghost/internal/data/score"
 	"github.com/Catizard/lampghost/internal/sqlite"
@@ -23,7 +23,7 @@ func (l *lr2DataLoader) Interest(r *rival.RivalInfo) bool {
 	return r.LR2UserDataPath.Valid
 }
 
-func (l *lr2DataLoader) Load(r *rival.RivalInfo, filter null.Value[data.Filter]) ([]*score.CommonScoreLog, error) {
+func (l *lr2DataLoader) Load(r *rival.RivalInfo, filter null.Value[filter.Filter]) ([]*score.CommonScoreLog, error) {
 	if !l.Interest(r) {
 		return nil, fmt.Errorf("[LR2DataLoader] cannot load")
 	}

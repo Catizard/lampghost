@@ -13,7 +13,8 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/guregu/null/v5"
 	"github.com/jmoiron/sqlx"
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/ncruces/go-sqlite3/driver"
+	_ "github.com/ncruces/go-sqlite3/embed"
 )
 
 //go:embed migration/*.sql

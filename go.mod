@@ -9,8 +9,13 @@ require (
 	github.com/charmbracelet/lipgloss v0.11.0
 	github.com/charmbracelet/log v0.4.0
 	github.com/jmoiron/sqlx v1.4.0
-	github.com/mattn/go-sqlite3 v1.14.22
+	github.com/ncruces/go-sqlite3 v0.17.1
 	github.com/spf13/cobra v1.8.0
+)
+
+require (
+	github.com/ncruces/julianday v1.0.0 // indirect
+	github.com/tetratelabs/wazero v1.7.3 // indirect
 )
 
 require (
@@ -25,7 +30,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/erikgeiser/coninput v0.0.0-20211004153227-1c3628e74d0f // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
-	github.com/guregu/null/v5 v5.0.0 
+	github.com/guregu/null/v5 v5.0.0
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
@@ -41,6 +46,6 @@ require (
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	golang.org/x/exp v0.0.0-20240530194437-404ba88c7ed0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/sys v0.20.0 // indirect
-	golang.org/x/text v0.15.0 // indirect
+	golang.org/x/sys v0.24.0 // indirect
+	golang.org/x/text v0.16.0 // indirect
 )

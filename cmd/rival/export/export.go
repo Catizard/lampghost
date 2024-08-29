@@ -15,15 +15,24 @@ import (
 	"github.com/Catizard/lampghost/internal/data/score/loader"
 	"github.com/Catizard/lampghost/internal/service"
 	"github.com/Catizard/lampghost/internal/tui/ghost"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/log"
 	"github.com/guregu/null/v5"
 	"github.com/spf13/cobra"
 )
 
+var (
+	flBlock = lipgloss.NewStyle().SetString(" ").Background(lipgloss.Color("#FF0000"))
+	ezBlock = lipgloss.NewStyle().SetString(" ").Background(lipgloss.Color("#00FF00"))
+	nrBlock = lipgloss.NewStyle().SetString(" ").Background(lipgloss.Color("#0000FF"))
+	hcBlock = lipgloss.NewStyle().SetString(" ").Background(lipgloss.Color("#00CCFF"))
+	blBlock = lipgloss.NewStyle().SetString(" ").Background(lipgloss.Color("#000000"))
+)
+
 var ExportCmd = &cobra.Command{
 	Use:   "export [rival's name] [--tag] [--table table's name]",
 	Short: "Export one rival's lamp status",
-	Args: cobra.ExactArgs(1),
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		msg := "Multiple rivals matched, please choose one"
 		rivalInfo, err := service.RivalInfoService.ChooseOneRival(msg, rival.RivalInfoFilter{NameLike: null.StringFrom(args[0])})
@@ -55,7 +64,7 @@ var ExportCmd = &cobra.Command{
 		if b, err := cmd.Flags().GetBool("tag"); err != nil {
 			log.Fatal(err)
 		} else if b {
-			filter := rival.RivalTagFilter {
+			filter := rival.RivalTagFilter{
 				RivalId: null.IntFrom(int64(rivalInfo.Id)),
 			}
 			tag, err = service.RivalTagService.ChooseOneTag("Choose one tag to use", filter)
@@ -78,13 +87,13 @@ var ExportCmd = &cobra.Command{
 		}
 
 		// Borrow calculate method from GhostTui package
-		ghost.MergeLampFromScoreLog(dth.Data, rivalInfo.CommonScoreLog, func (data *difftable.DiffTableData, log *score.CommonScoreLog) {
+		ghost.MergeLampFromScoreLog(dth.Data, rivalInfo.CommonScoreLog, func(data *difftable.DiffTableData, log *score.CommonScoreLog) {
 			data.Lamp = max(data.Lamp, log.Clear)
 		})
 
 		// Build sorted levels slice
 		sortedLevels := data.BuildSortedLevelList(dth)
-		log.Debugf("sorted levels=%v", sortedLevels)	
+		log.Debugf("sorted levels=%v", sortedLevels)
 
 		// Level maps to song info array
 		songDataMap := make(map[string][]difftable.DiffTableData)
@@ -96,28 +105,62 @@ var ExportCmd = &cobra.Command{
 		}
 
 		log.Infof("Exporting %s lamp status on %s", rivalInfo.Name, dth.Name)
-		for _, v := range sortedLevels {
-			fmt.Printf("[%s%v]\n", dth.Symbol, v)
-			for _, data := range songDataMap[v] {
-				if data.Lamp == 0 {
-					continue
+		if b, err := cmd.Flags().GetBool("block"); err != nil {
+			log.Fatal(err)
+		} else if !b {
+			for _, v := range sortedLevels {
+				fmt.Printf("[%s%v]\n", dth.Symbol, v)
+				for _, data := range songDataMap[v] {
+					if data.Lamp == 0 {
+						continue
+					}
+					// TODO: Give pattern argument?
+					pattern := "[%s] %s"
+					if rivalInfo.Prefer.String == source.Oraja {
+						fmt.Printf(pattern+"\n", data.Title, clearType.ConvOraja(data.Lamp))
+					} else if rivalInfo.Prefer.String == source.LR2 {
+						fmt.Printf(pattern+"\n", data.Title, clearType.ConvLR2(data.Lamp))
+					} else {
+						log.Fatalf("unexpected prefer: %s", rivalInfo.Prefer.String)
+					}
 				}
-				// TODO: Give pattern argument?
-				pattern := "[%s] %s"
-				if rivalInfo.Prefer.String == source.Oraja {
-					fmt.Printf(pattern + "\n", data.Title, clearType.ConvOraja(data.Lamp))
-				} else if rivalInfo.Prefer.String == source.LR2 {
-					fmt.Printf(pattern + "\n", data.Title, clearType.ConvLR2(data.Lamp))
-				} else {
-					log.Fatalf("unexpected prefer: %s", rivalInfo.Prefer.String)
+			}
+		} else {
+			for _, v := range sortedLevels {
+				fmt.Printf("[%s%v]\n", dth.Symbol, v)
+				cntlamp := make(map[int]int)
+				all := len(songDataMap[v])
+				for _, data := range songDataMap[v] {
+					cntlamp[int(data.Lamp)]++
 				}
-			}		
+				width := 100
+				buf := ""
+				if cntlamp[clearType.Hard] > 0 {
+					per := float64(cntlamp[clearType.Hard]) / float64(all)
+					buf += hcBlock.Width(int(per * float64(width))).String()
+				}
+				if cntlamp[clearType.Normal] > 0 {
+					per := float64(cntlamp[clearType.Normal]) / float64(all)
+					buf += nrBlock.Width(int(per * float64(width))).String()
+				}
+				if cntlamp[clearType.Easy] > 0 {
+					per := float64(cntlamp[clearType.Easy]) / float64(all)
+					buf += ezBlock.Width(int(per * float64(width))).String()
+				}
+				if cntlamp[clearType.Failed] > 0 {
+					per := float64(cntlamp[clearType.Failed]) / float64(all)
+					buf += flBlock.Width(int(per * float64(width))).String()
+				}
+				fmt.Printf("%s\n", buf)
+			}
 		}
+
 	},
 }
 
 func init() {
 	ExportCmd.Flags().Bool("tag", false, "When flagged, only the logs that before the chosen tag would be used")
 	ExportCmd.Flags().StringP("table-name", "T", "", "Filtering argument for table selection")
+	ExportCmd.Flags().Bool("block", false, "When flagged, display color block other than text info")
 	// TODO: Do not ignore NO_PLAY?
 }

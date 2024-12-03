@@ -1,45 +1,108 @@
-<script setup>
-import {reactive} from 'vue'
-import {Greet} from '../../wailsjs/go/main/App'
-import { useMessage } from 'naive-ui'
-
-const message = useMessage()
-
-const data = reactive({
-  name: "",
-  resultText: "Please enter your name below 👇",
-})
-
-function greet() {
-  Greet(data.name).then(result => {
-    message.info(result)
-  })
-}
-
-
-</script>
-
 <template>
-  <main>
-    <div class="result">{{ data.resultText }}</div>
-    <div class="input-box">
-      <n-input v-model:value="data.name" type="text" placeholder="input name" class="input"/>
-      <n-button type="info" @click="greet"> Greet </n-button>
-    </div>
-  </main>
+  <n-layout has-sider style="height: 100%;">
+    <n-layout-sider bordered show-trigger collapse-mode="width" :collapsed-width="64" :width="240"
+      :native-scrollbar="false" :inverted="inverted">
+      <n-menu :inverted="inverted" :collapsed-width="64" :collapsed-icon-size="22" :options="menuOptions" />
+    </n-layout-sider>
+    <n-layout />
+  </n-layout>
 </template>
 
-<style scoped>
-.result {
-  height: 20px;
-  line-height: 20px;
-  margin: 1.5rem auto;
+<script lang="ts">
+import type { Component } from 'vue'
+import {
+  BookOutline as BookIcon,
+  PersonOutline as PersonIcon,
+  WineOutline as WineIcon
+} from '@vicons/ionicons5'
+import { NIcon } from 'naive-ui'
+import { defineComponent, h, ref } from 'vue'
+
+function renderIcon(icon: Component) {
+  return () => h(NIcon, null, { default: () => h(icon) })
 }
-.input-box {
-  text-align: center;
-}
-.input {
-  width: 200px;
-  margin-right: 10px;
-}
-</style>
+
+const menuOptions = [
+  {
+    label: '且听风吟',
+    key: 'hear-the-wind-sing',
+    icon: renderIcon(BookIcon)
+  },
+  {
+    label: '1973年的弹珠玩具',
+    key: 'pinball-1973',
+    icon: renderIcon(BookIcon),
+    disabled: true,
+    children: [
+      {
+        label: '鼠',
+        key: 'rat'
+      }
+    ]
+  },
+  {
+    label: '寻羊冒险记',
+    key: 'a-wild-sheep-chase',
+    disabled: true,
+    icon: renderIcon(BookIcon)
+  },
+  {
+    label: '舞，舞，舞',
+    key: 'dance-dance-dance',
+    icon: renderIcon(BookIcon),
+    children: [
+      {
+        type: 'group',
+        label: '人物',
+        key: 'people',
+        children: [
+          {
+            label: '叙事者',
+            key: 'narrator',
+            icon: renderIcon(PersonIcon)
+          },
+          {
+            label: '羊男',
+            key: 'sheep-man',
+            icon: renderIcon(PersonIcon)
+          }
+        ]
+      },
+      {
+        label: '饮品',
+        key: 'beverage',
+        icon: renderIcon(WineIcon),
+        children: [
+          {
+            label: '威士忌',
+            key: 'whisky'
+          }
+        ]
+      },
+      {
+        label: '食物',
+        key: 'food',
+        children: [
+          {
+            label: '三明治',
+            key: 'sandwich'
+          }
+        ]
+      },
+      {
+        label: '过去增多，未来减少',
+        key: 'the-past-increases-the-future-recedes'
+      }
+    ]
+  }
+]
+
+export default defineComponent({
+  setup() {
+    return {
+      inverted: ref(false),
+      menuOptions
+    }
+  }
+})
+</script>

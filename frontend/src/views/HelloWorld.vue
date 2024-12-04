@@ -4,9 +4,9 @@
       :native-scrollbar="false" :inverted="inverted">
       <n-menu :inverted="inverted" :collapsed-width="64" :collapsed-icon-size="22" :options="menuOptions" />
     </n-layout-sider>
-    <n-layout>
+    <n-layout-content>
       1234
-    </n-layout>
+    </n-layout-content>
   </n-layout>
 </template>
 

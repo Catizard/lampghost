@@ -9,7 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.2.25"
+    "vue": "^3.2.25",
+    "vue-router": "^4.5.0"
   },
   "devDependencies": {
     "@vicons/ionicons5": "^0.12.0",

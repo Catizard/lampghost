@@ -1,12 +1,10 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import wailsLogo from './/assets/images/logo-universal.png'
-import naiveLogo from './assets/images/naive-logo.svg'
+import { RouterView } from 'vue-router';
 </script>
 
 <template>
   <div class="content">
-    <HelloWorld />
+    <RouterView />
   </div>
 </template>
 

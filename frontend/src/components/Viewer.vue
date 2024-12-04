@@ -1,4 +1,5 @@
 <template>
+    {{ router.currentRoute }}
     <RouterView />
 </template>
 

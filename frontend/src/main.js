@@ -9,4 +9,6 @@ const app = createApp(App)
 app.use(naive)
 app.use(router)
 
+router.replace("/home");
+
 app.mount('#app')

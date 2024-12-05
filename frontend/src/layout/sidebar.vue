@@ -14,20 +14,29 @@ import {
 } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
 import { computed, h, ref, watchEffect } from 'vue'
+import { RouterLink } from 'vue-router';
 
 function renderIcon(icon: Component) {
     return () => h(NIcon, null, { default: () => h(icon) })
 }
 
+function renderOption(path: string, name: string) {
+    return () => h(
+        RouterLink,
+        { to: { name: path } },
+        { default: () => name }
+    );
+}
+
 const inverted = ref(false);
 const menuOptions = [
     {
-        label: 'home',
+        label: renderOption("home", "home"),
         key: 'home',
         icon: renderIcon(PersonIcon)
     },
     {
-        label: "rivals",
+        label: renderOption("rivals", "rivals"),
         key: 'rivals',
         icon: renderIcon(WineIcon)
     }

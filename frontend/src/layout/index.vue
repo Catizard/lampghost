@@ -1,9 +1,7 @@
 <template>
     <n-layout position="absolute" has-sider>
         <Sidebar />
-        <n-layout>
-            <p>1234</p> 
-        </n-layout>
+        <Content />
     </n-layout>
 </template>
 

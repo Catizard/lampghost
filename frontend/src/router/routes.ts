@@ -5,6 +5,11 @@ const mainRoutes: RouteRecordRaw[] = [
         name: "home",
         path: "/home",
         component: () => import("../views/HelloWorld.vue"),
+    },
+    {
+        name: "rivals",
+        path: "/rivals",
+        component: () => import("../views/rivals.vue"),
     }
 ];
 

@@ -1,54 +1,56 @@
 <template>
-  <n-h1 prefix="bar" style="text-align: start;">
-    <n-text type="primary">
-      也许是玩家信息
-    </n-text>
-  </n-h1>
-  <n-grid :cols="12">
-    <n-gi :span="4">
-      <n-flex>
-        Player Name: {{ playerData.playerName }}
-        <n-divider />
-        Total Play: {{ playerData.playCount }}
-        <n-divider />
-        Play Time : {{ playerData.playTime }}
-        <n-divider />
-        <n-button>同步最新存档数据,大概</n-button>
-      </n-flex>
-    </n-gi>
-    <n-gi :span="8">
-      <vue-apex-charts height="100%" type="line" :options="playCountChartOptions"
-        :series="playCountChartOptions.series" />
-    </n-gi>
-  </n-grid>
-  <n-divider />
-  <n-h1 prefix="bar" style="text-align: start;">
-    <n-text type="primary">
-      报告,我是点灯信息
-    </n-text>
-  </n-h1>
-  <n-grid :cols="12" min-height="200px">
-    <n-gi :span="4">
-      这里应该有个难度表选择列表？
-      <n-scrollbar style="max-height: 350px">
-        <n-flex vertical>
-          <n-button>発狂BMS難易度表</n-button>
-          <n-button>Satellite</n-button>
-          <n-button>NEW GENERATION 発狂難易度表</n-button>
-          <n-button>発狂BMS難易度表</n-button>
-          <n-button>Satellite</n-button>
-          <n-button>NEW GENERATION 発狂難易度表</n-button>
-          <n-button>発狂BMS難易度表</n-button>
-          <n-button>Satellite</n-button>
-          <n-button>NEW GENERATION 発狂難易度表</n-button>
+  <perfect-scrollbar>
+    <n-h1 prefix="bar" style="text-align: start;">
+      <n-text type="primary">
+        也许是玩家信息
+      </n-text>
+    </n-h1>
+    <n-grid :cols="12">
+      <n-gi :span="4">
+        <n-flex>
+          Player Name: {{ playerData.playerName }}
+          <n-divider />
+          Total Play: {{ playerData.playCount }}
+          <n-divider />
+          Play Time : {{ playerData.playTime }}
+          <n-divider />
+          <n-button>同步最新存档数据,大概</n-button>
         </n-flex>
-      </n-scrollbar>
-    </n-gi>
-    <n-gi :span="8">
-      <vue-apex-charts height="350px" type="bar" :options="lampCountChartOptions"
-        :series="lampCountChartOptions.series" />
-    </n-gi>
-  </n-grid>
+      </n-gi>
+      <n-gi :span="8">
+        <vue-apex-charts height="100%" type="line" :options="playCountChartOptions"
+          :series="playCountChartOptions.series" />
+      </n-gi>
+    </n-grid>
+    <n-divider />
+    <n-h1 prefix="bar" style="text-align: start;">
+      <n-text type="primary">
+        报告,我是点灯信息
+      </n-text>
+    </n-h1>
+    <n-grid :cols="12" min-height="200px">
+      <n-gi :span="4">
+        这里应该有个难度表选择列表？
+        <perfect-scrollbar style="height: 350px">
+          <n-flex vertical>
+            <n-button>発狂BMS難易度表</n-button>
+            <n-button>Satellite</n-button>
+            <n-button>NEW GENERATION 発狂難易度表</n-button>
+            <n-button>発狂BMS難易度表</n-button>
+            <n-button>Satellite</n-button>
+            <n-button>NEW GENERATION 発狂難易度表</n-button>
+            <n-button>発狂BMS難易度表</n-button>
+            <n-button>Satellite</n-button>
+            <n-button>NEW GENERATION 発狂難易度表</n-button>
+          </n-flex>
+        </perfect-scrollbar>
+      </n-gi>
+      <n-gi :span="8">
+        <vue-apex-charts height="350px" type="bar" :options="lampCountChartOptions"
+          :series="lampCountChartOptions.series" />
+      </n-gi>
+    </n-grid>
+  </perfect-scrollbar>
 </template>
 
 <script setup>
@@ -164,5 +166,9 @@ const playerData = reactive({
 
 .n-button {
   width: 80%
+}
+
+.ps {
+  height: 100%;
 }
 </style>

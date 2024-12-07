@@ -1,4 +1,4 @@
-module lampghost_wails
+module github.com/Catizard/lampghost_wails
 
 go 1.21
 

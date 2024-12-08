@@ -3,6 +3,9 @@ package main
 import (
 	"embed"
 
+	"github.com/Catizard/lampghost_wails/internal/config"
+	"github.com/Catizard/lampghost_wails/internal/database"
+	"github.com/charmbracelet/log"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
@@ -13,6 +16,13 @@ import (
 var assets embed.FS
 
 func main() {
+	db := database.NewDatabase(config.GetDSN())
+	if err := db.Open(); err != nil {
+		panic(err)
+	}
+	db.Automigrate()
+	log.SetLevel(log.DebugLevel)
+	log.Debugf("Initialized database at %s\n", db.DSN)
 	// Create an instance of the app structure
 	app := NewApp()
 
@@ -29,7 +39,7 @@ func main() {
 		Bind: []interface{}{
 			app,
 		},
-		Mac: &mac.Options {
+		Mac: &mac.Options{
 			WebviewIsTransparent: true,
 		},
 	})

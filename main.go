@@ -4,7 +4,9 @@ import (
 	"embed"
 
 	"github.com/Catizard/lampghost_wails/internal/config"
+	"github.com/Catizard/lampghost_wails/internal/controller"
 	"github.com/Catizard/lampghost_wails/internal/database"
+	"github.com/Catizard/lampghost_wails/internal/service"
 	"github.com/charmbracelet/log"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -25,10 +27,21 @@ func main() {
 	if err := c.Provide(database.NewDatabase); err != nil {
 		panic(err)
 	}
-	c.Invoke(func(db *database.DB) error {
-		// Invoke database initialize
+	if err := c.Provide(service.NewRivalInfoService); err != nil {
+		panic(err)
+	}
+	if err := c.Provide(controller.NewRivalInfoController); err != nil {
+		panic(err)
+	}
+
+	var bind []interface{}
+	if err := c.Invoke(func(controller *controller.RivalInfoController) error {
+		bind = append(bind, controller)
 		return nil
-	})
+	}); err != nil {
+		panic(err)
+	}
+
 	// Create an instance of the app structure
 	app := NewApp()
 
@@ -42,9 +55,7 @@ func main() {
 		},
 		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1},
 		OnStartup:        app.startup,
-		Bind: []interface{}{
-			app,
-		},
+		Bind:             bind,
 		Mac: &mac.Options{
 			WebviewIsTransparent: true,
 		},

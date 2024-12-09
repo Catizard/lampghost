@@ -56,6 +56,7 @@
 <script setup>
 import VueApexCharts from 'vue3-apexcharts';
 import { reactive, ref, toRefs } from 'vue';
+import { QueryUserInfo } from '../../wailsjs/go/controller/RivalInfoController'
 
 const playCountChartOptions = ref({
   chart: {
@@ -151,6 +152,14 @@ const playerData = reactive({
   playCount: 114514,
   playTime: "24:17:30"
 })
+
+function initUser() {
+  QueryUserInfo().then(result => {
+    playerData.playerName = result.Name
+  })
+}
+
+initUser();
 </script>
 
 <style scoped>

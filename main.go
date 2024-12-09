@@ -10,19 +10,25 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	"github.com/wailsapp/wails/v2/pkg/options/mac"
+	"go.uber.org/dig"
 )
 
 //go:embed all:frontend/dist
 var assets embed.FS
 
 func main() {
-	db := database.NewDatabase(config.GetDSN())
-	if err := db.Open(); err != nil {
+	log.SetLevel(log.DebugLevel)
+	c := dig.New()
+	if err := c.Provide(config.NewDatabaseConfig); err != nil {
 		panic(err)
 	}
-	db.Automigrate()
-	log.SetLevel(log.DebugLevel)
-	log.Debugf("Initialized database at %s\n", db.DSN)
+	if err := c.Provide(database.NewDatabase); err != nil {
+		panic(err)
+	}
+	c.Invoke(func(db *database.DB) error {
+		// Invoke database initialize
+		return nil
+	})
 	// Create an instance of the app structure
 	app := NewApp()
 

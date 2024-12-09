@@ -3,7 +3,9 @@ package database
 import (
 	"fmt"
 
+	"github.com/Catizard/lampghost_wails/internal/config"
 	"github.com/Catizard/lampghost_wails/internal/entity"
+	"github.com/charmbracelet/log"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -13,10 +15,21 @@ type DB struct {
 	DSN string
 }
 
-func NewDatabase(DSN string) *DB {
-	return &DB{
-		DSN: DSN,
+func NewDatabase(config *config.DatabaseConfig) (*DB, error) {
+	out := &DB{
+		DSN: config.DSN,
 	}
+
+	if err := out.Open(); err != nil {
+		return nil, err
+	}
+
+	if err := out.Automigrate(); err != nil {
+		return nil, err
+	}
+
+	log.Debugf("Initialized database at %s\n", out.DSN)
+	return out, nil
 }
 
 func (db *DB) Open() (err error) {
@@ -31,6 +44,6 @@ func (db *DB) Open() (err error) {
 	return err
 }
 
-func (db *DB) Automigrate() {
-	db.db.Table("rival_info").AutoMigrate(&entity.RivalInfo{})
+func (db *DB) Automigrate() error {
+	return db.db.Table("rival_info").AutoMigrate(&entity.RivalInfo{})
 }

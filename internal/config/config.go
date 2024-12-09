@@ -32,6 +32,16 @@ func init() {
 	}
 }
 
+type DatabaseConfig struct {
+	DSN string
+}
+
+func NewDatabaseConfig() *DatabaseConfig {
+	return &DatabaseConfig{
+		DSN: WorkingDirectory + DBFileName,
+	}
+}
+
 func CheckInitialize() {
 	if _, err := os.Stat(GetDSN()); errors.Is(err, os.ErrNotExist) {
 		panic("Call init command before you do anything")

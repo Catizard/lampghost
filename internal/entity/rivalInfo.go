@@ -9,4 +9,9 @@ type RivalInfo struct {
 	Name         string
 	ScoreLogPath *string
 	SongDataPath *string
+	PlayCount    int
+}
+
+func (RivalInfo) TableName() string {
+	return "rival_info"
 }

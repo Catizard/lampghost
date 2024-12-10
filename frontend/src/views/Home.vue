@@ -14,7 +14,9 @@
           <n-divider />
           Play Time : {{ playerData.playTime }}
           <n-divider />
-          <n-button>同步最新存档数据,大概</n-button>
+          <n-button @click="handleSyncClick" :loading="syncLoading">
+            同步最新存档数据,大概
+          </n-button>
         </n-flex>
       </n-gi>
       <n-gi :span="8">
@@ -55,8 +57,8 @@
 
 <script setup>
 import VueApexCharts from 'vue3-apexcharts';
-import { reactive, ref, toRefs } from 'vue';
-import { QueryUserInfo } from '../../wailsjs/go/controller/RivalInfoController'
+import { reactive, ref } from 'vue';
+import { QueryUserInfoByID, SyncRivalScoreLog } from '../../wailsjs/go/controller/RivalInfoController'
 
 const playCountChartOptions = ref({
   chart: {
@@ -154,8 +156,22 @@ const playerData = reactive({
 })
 
 function initUser() {
-  QueryUserInfo().then(result => {
+  // TODO: Remove another magic 1
+  QueryUserInfoByID(1).then(result => {
     playerData.playerName = result.Name
+    playerData.playCount = result.PlayCount
+  })
+}
+
+const syncLoading = ref(false);
+function handleSyncClick() {
+  // TODO: Remove magic 1
+  syncLoading.value = true;
+  SyncRivalScoreLog(1).then(result => {
+    console.log('sync result:', result)
+    syncLoading.value = false;
+  }).catch(err => {
+    console.log('sync returns error:', err)
   })
 }
 

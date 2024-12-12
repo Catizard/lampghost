@@ -3,6 +3,7 @@ package service
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -24,13 +25,23 @@ func NewDiffTableService(db *gorm.DB) *DiffTableService {
 
 func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHeader, error) {
 	url = strings.TrimSpace(url)
+	log.Debugf("[DiffTableService] calling AddDiffTableHeader with url: %s", url)
+	if err := s.checkDuplicateHeaderUrl(url); err != nil {
+		return nil, err
+	}
 	header, err := fetchDiffTableFromURL(url)
 	if err != nil {
 		return nil, err
 	}
-	// TODO: handle duplication
+	if header.DataUrl == "" {
+		return nil, fmt.Errorf("assert: header.DataUrl cannot be empty")
+	}
+	log.Debugf("[DiffTableService] Got header data: %s", header)
+	if err := s.checkDuplicateDataUrl(header.DataUrl); err != nil {
+		return nil, err
+	}
 	var data []entity.DiffTableData
-	if err := fetchJson(header.DataUrl, data); err != nil {
+	if err := fetchJson(header.DataUrl, &data); err != nil {
 		return nil, err
 	}
 
@@ -41,20 +52,46 @@ func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHead
 		if err := tx.Unscoped().Where("header_id = ?", header.ID).Delete(&entity.DiffTableData{}).Error; err != nil {
 			return err
 		}
+		for i := range data {
+			data[i].HeaderID = header.ID
+		}
 		if err := tx.Create(&data).Error; err != nil {
 			return err
 		}
 		return nil
 	}); err != nil {
+		log.Errorf("[DiffTableService] Add difftable header failed with %v", err)
 		return nil, err
 	}
+	log.Infof("[DiffTableService] Inserted one header with %d contents", len(data))
 	return header, nil
+}
+
+func (s *DiffTableService) checkDuplicateHeaderUrl(headerUrl string) error {
+	var dupCount int64
+	if err := s.db.Model(&entity.DiffTableHeader{}).Where("header_url = ?", headerUrl).Count(&dupCount).Error; err != nil {
+		return err
+	}
+	if dupCount > 0 {
+		return fmt.Errorf("header url: %s is duplicated", headerUrl)
+	}
+	return nil
+}
+
+func (s *DiffTableService) checkDuplicateDataUrl(dataUrl string) error {
+	var dupCount int64
+	if err := s.db.Model(&entity.DiffTableHeader{}).Where("data_url = ?", dataUrl).Count(&dupCount).Error; err != nil {
+		return err
+	}
+	if dupCount > 0 {
+		return fmt.Errorf("data url: %s is duplicated", dataUrl)
+	}
+	return nil
 }
 
 func fetchDiffTableFromURL(url string) (*entity.DiffTableHeader, error) {
 	jsonUrl := ""
 	if strings.HasSuffix(url, ".html") {
-		log.Infof("Fetch difficult table data from %s", url)
 		resp, err := http.Get(url)
 		if err != nil {
 			return nil, err
@@ -106,9 +143,10 @@ func fetchDiffTableFromURL(url string) (*entity.DiffTableHeader, error) {
 	if jsonUrl == "" {
 		log.Fatalf("Cannot fetch %s", url)
 	}
-	dth := &entity.DiffTableHeader{}
+	dth := entity.DiffTableHeader{}
+	log.Debugf("before calling fetchJson, url=%s", jsonUrl)
 	fetchJson(jsonUrl, &dth)
-	return dth, nil
+	return &dth, nil
 }
 
 func fetchJson(url string, v interface{}) error {

@@ -15,6 +15,8 @@ func NewDatabase(config *config.DatabaseConfig) (db *gorm.DB, err error) {
 
 	db.Table("rival_info").AutoMigrate(&entity.RivalInfo{})
 	db.Table("rival_score_log").AutoMigrate(&entity.RivalScoreLog{})
+	db.Table("difftable_header").AutoMigrate(&entity.DiffTableHeader{})
+	db.Table("difftable_data").AutoMigrate(&entity.DiffTableData{})
 
 	log.Debugf("Initialized database at %s\n", config.DSN)
 	return db, err

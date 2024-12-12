@@ -30,12 +30,24 @@ func main() {
 	if err := c.Provide(service.NewRivalInfoService); err != nil {
 		panic(err)
 	}
+	if err := c.Provide(service.NewDiffTableService); err != nil {
+		panic(err)
+	}
 	if err := c.Provide(controller.NewRivalInfoController); err != nil {
+		panic(err)
+	}
+	if err := c.Provide(controller.NewDiffTableController); err != nil {
 		panic(err)
 	}
 
 	var bind []interface{}
 	if err := c.Invoke(func(controller *controller.RivalInfoController) error {
+		bind = append(bind, controller)
+		return nil
+	}); err != nil {
+		panic(err)
+	}
+	if err := c.Invoke(func(controller *controller.DiffTableController) error {
 		bind = append(bind, controller)
 		return nil
 	}); err != nil {

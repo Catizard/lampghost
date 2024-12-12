@@ -39,6 +39,11 @@ const menuOptions = [
         label: renderOption("rivals", "rivals"),
         key: 'rivals',
         icon: renderIcon(WineIcon)
+    },
+    {
+        label: renderOption("difftable", "difftable"),
+        key: "difftable",
+        icon: renderIcon(BookIcon)
     }
 ]
 </script>

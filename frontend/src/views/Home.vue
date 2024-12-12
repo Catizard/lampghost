@@ -59,7 +59,6 @@
 import VueApexCharts from 'vue3-apexcharts';
 import { reactive, ref } from 'vue';
 import { QueryUserInfoByID, SyncRivalScoreLog } from '../../wailsjs/go/controller/RivalInfoController'
-import { AddDiffTableHeader } from '../../wailsjs/go/controller/DiffTableController'
 
 const playCountChartOptions = ref({
   chart: {
@@ -177,17 +176,6 @@ function handleSyncClick() {
 }
 
 initUser();
-
-function addDiffTableHeader() {
-  const url = "http://zris.work/bmstable/insane/insane_header.json"
-  AddDiffTableHeader(url).then(result => {
-    console.log(result)
-  }).catch(err => {
-    console.log(err)
-  })
-}
-
-addDiffTableHeader();
 </script>
 
 <style scoped>

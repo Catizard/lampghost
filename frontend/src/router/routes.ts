@@ -10,6 +10,11 @@ const mainRoutes: RouteRecordRaw[] = [
         name: "rivals",
         path: "/rivals",
         component: () => import("../views/rivals.vue"),
+    },
+    {
+        name: "difftable",
+        path: "/difftable",
+        component: () => import("../views/DifficultTable.vue")
     }
 ];
 

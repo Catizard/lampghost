@@ -55,6 +55,7 @@ func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHead
 		for i := range data {
 			data[i].HeaderID = header.ID
 		}
+		// TODO: Create course info here
 		if err := tx.Create(&data).Error; err != nil {
 			return err
 		}
@@ -65,6 +66,15 @@ func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHead
 	}
 	log.Infof("[DiffTableService] Inserted one header with %d contents", len(data))
 	return header, nil
+}
+
+func (s *DiffTableService) FindDiffTableHeader() ([]*entity.DiffTableHeader, int, error) {
+	var headers []*entity.DiffTableHeader
+	if err := s.db.Find(&headers).Error; err != nil {
+		log.Error("[DiffTableService] Find difftable header failed with %v", err)
+		return nil, 0, err
+	}
+	return headers, len(headers), nil
 }
 
 func (s *DiffTableService) checkDuplicateHeaderUrl(headerUrl string) error {

@@ -18,34 +18,21 @@
 import type { DataTableColumns } from 'naive-ui'
 import { NButton, useMessage } from 'naive-ui'
 import { useNotification } from 'naive-ui'
-import { defineComponent, h } from 'vue'
-import { AddDiffTableHeader } from '../../wailsjs/go/controller/DiffTableController'
+import { defineComponent, h, Ref, ref } from 'vue'
+import { AddDiffTableHeader, FindDiffTableHeader } from '../../wailsjs/go/controller/DiffTableController'
+import { entity } from '../../wailsjs/go/models'
 
 const notification = useNotification();
 
-interface Song {
-    no: number
-    title: string
-    length: string
-}
-
-function createColumns({
-    play
-}: {
-    play: (row: Song) => void
-}): DataTableColumns<Song> {
+function createColumns({ play }: { play: (row: entity.DiffTableHeader) => void }): DataTableColumns<entity.DiffTableHeader> {
     return [
         {
-            title: 'No',
-            key: 'no'
+            title: "Name",
+            key: "name"
         },
         {
-            title: 'Title',
-            key: 'title'
-        },
-        {
-            title: 'Length',
-            key: 'length'
+            title: "url",
+            key: "HeaderUrl"
         },
         {
             title: 'Action',
@@ -66,11 +53,7 @@ function createColumns({
     ]
 }
 
-const data: Song[] = [
-    { no: 3, title: 'Wonderwall', length: '4:18' },
-    { no: 4, title: 'Don\'t Look Back in Anger', length: '4:48' },
-    { no: 12, title: 'Champagne Supernova', length: '7:27' }
-]
+let data: Ref<Array<entity.DiffTableHeader>> = ref([]);
 
 function addDiffTableHeader(url: string) {
     AddDiffTableHeader(url).then(result => {
@@ -90,17 +73,29 @@ function addDiffTableHeader(url: string) {
     })
 }
 
+function loadDiffTableData() {
+    FindDiffTableHeader().then(result => {
+        data.value = [...result]
+        console.log(result)
+    }).catch(err => {
+        console.error(err)
+    })
+}
+
 export default defineComponent({
     setup() {
         const message = useMessage()
+        loadDiffTableData();
         return {
             data,
             columns: createColumns({
-                play(row: Song) {
-                    message.info(`Play ${row.title}`)
+                play(row: entity.DiffTableHeader) {
+                    message.info(`Play ${row.name}`)
                 }
             }),
-            pagination: false as const
+            pagination: false as const,
+            loadDiffTableData,
+            notification,
         }
     }
 })

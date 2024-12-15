@@ -3,3 +3,5 @@
 import {entity} from '../models';
 
 export function AddDiffTableHeader(arg1:string):Promise<entity.DiffTableHeader>;
+
+export function FindDiffTableHeader():Promise<Array<entity.DiffTableHeader>>;

@@ -1,13 +1,15 @@
 <template>
     <n-config-provider :theme="theme">
-        <n-global-style />
-        <n-loading-bar-provider>
-            <n-message-provider>
-                <n-dialog-provider>
-                    <slot />
-                </n-dialog-provider>
-            </n-message-provider>
-        </n-loading-bar-provider>
+        <n-modal-provider>
+            <n-global-style />
+            <n-loading-bar-provider>
+                <n-message-provider>
+                    <n-dialog-provider>
+                        <slot />
+                    </n-dialog-provider>
+                </n-message-provider>
+            </n-loading-bar-provider>
+        </n-modal-provider>
     </n-config-provider>
 </template>
 

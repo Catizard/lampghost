@@ -30,6 +30,7 @@ func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHead
 		return nil, err
 	}
 	header, err := fetchDiffTableFromURL(url)
+	header.HeaderUrl = url
 	if err != nil {
 		return nil, err
 	}

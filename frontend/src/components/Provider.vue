@@ -1,5 +1,5 @@
 <template>
-  <n-config-provider :theme="theme">
+  <n-config-provider>
     <n-notification-provider>
       <n-modal-provider>
         <n-global-style />

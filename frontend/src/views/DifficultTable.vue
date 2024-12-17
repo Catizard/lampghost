@@ -21,12 +21,13 @@
 
 <script lang="ts" setup>
 import type { DataTableColumns, FormInst } from "naive-ui";
-import { NButton, useMessage } from "naive-ui";
+import { NButton, useDialog, useMessage } from "naive-ui";
 import { useNotification } from "naive-ui";
 import { defineComponent, h, Ref, ref } from "vue";
 import {
   AddDiffTableHeader,
   FindDiffTableHeader,
+  DelDiffTableHeader
 } from "../../wailsjs/go/controller/DiffTableController";
 import { entity } from "../../wailsjs/go/models";
 
@@ -44,24 +45,18 @@ const rules = {
   },
 };
 
-const message = useMessage();
 const notification = useNotification();
+const dialog = useDialog();
 loadDiffTableData();
 
 function createColumns({
-  play,
+  deleteHeader,
 }: {
-  play: (row: entity.DiffTableHeader) => void;
+  deleteHeader: (row: entity.DiffTableHeader) => void;
 }): DataTableColumns<entity.DiffTableHeader> {
   return [
-    {
-      title: "Name",
-      key: "name",
-    },
-    {
-      title: "url",
-      key: "HeaderUrl",
-    },
+    { title: "Name", key: "name", },
+    { title: "url", key: "HeaderUrl", },
     {
       title: "Action",
       key: "actions",
@@ -72,9 +67,9 @@ function createColumns({
             strong: true,
             tertiary: true,
             size: "small",
-            onClick: () => play(row),
+            onClick: () => deleteHeader(row),
           },
-          { default: () => "Play" },
+          { default: () => "删除" },
         );
       },
     },
@@ -84,8 +79,15 @@ function createColumns({
 let data: Ref<Array<entity.DiffTableHeader>> = ref([]);
 const pagination = false as const;
 const columns = createColumns({
-  play(row: entity.DiffTableHeader) {
-    message.info(`Play ${row.name}`)
+  deleteHeader(row: entity.DiffTableHeader) {
+    dialog.warning({
+      title: "确定要删除么?",
+      positiveText: "确定",
+      negativeText: "取消",
+      onPositiveClick: () => {
+        delDiffTableHeader(row.ID)  
+      }
+    })
   }
 });
 
@@ -95,21 +97,27 @@ function addDiffTableHeader(url: string) {
       if (result.Code != 200) {
         return Promise.reject(result.Msg);
       }
-      notification.success({
-        content: "新增难度表似乎成功了，后台返回结果: " + result.Msg,
-        duration: 5000,
-        keepAliveOnHover: true,
-      });
+      notifySuccess("新增难度表似乎成功了，后台返回结果: " + result.Msg);
       loadDiffTableData();
     })
     .catch((err) => {
-      notification.error({
-        content: "新增难度表似乎失败了，后台返回错误: " + err,
-        duration: 5000,
-        keepAliveOnHover: true,
-      });
+      notifyError("新增难度表似乎失败了，后台返回错误: " + err)
       loadDiffTableData();
     });
+}
+
+function delDiffTableHeader(id: number) {
+  DelDiffTableHeader(id)
+  .then(result => {
+    if (result.Code != 200) {
+      return Promise.reject(result.Msg)
+    }
+    notifySuccess("删除成功")
+    loadDiffTableData();
+  }).catch(err => {
+    notifyError(err)
+    loadDiffTableData();
+  })
 }
 
 function handlePositiveClick(): boolean {
@@ -140,5 +148,21 @@ function loadDiffTableData() {
         keepAliveOnHover: true
       })
     });
+}
+
+function notifySuccess(msg: string) {
+  notification.success({
+    content: msg,
+    duration: 5000,
+    keepAliveOnHover: true
+  })
+}
+
+function notifyError(msg: string) {
+  notification.error({
+    content: msg,
+    duration: 5000,
+    keepAliveOnHover: true
+  })
 }
 </script>

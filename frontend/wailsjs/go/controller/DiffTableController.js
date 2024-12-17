@@ -6,6 +6,10 @@ export function AddDiffTableHeader(arg1) {
   return window['go']['controller']['DiffTableController']['AddDiffTableHeader'](arg1);
 }
 
+export function DelDiffTableHeader(arg1) {
+  return window['go']['controller']['DiffTableController']['DelDiffTableHeader'](arg1);
+}
+
 export function FindDiffTableHeader() {
   return window['go']['controller']['DiffTableController']['FindDiffTableHeader']();
 }

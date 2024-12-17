@@ -81,6 +81,25 @@ func (s *DiffTableService) FindDiffTableHeader() ([]*entity.DiffTableHeader, int
 	return headers, len(headers), nil
 }
 
+func (s *DiffTableService) DelDiffTableHeader(ID uint) error {
+	if err := s.db.Transaction(func(tx *gorm.DB) error {
+		var candidate entity.DiffTableHeader
+		if err := tx.First(&candidate, ID).Error; err != nil {
+			return err
+		}
+		if err := tx.Unscoped().Where("header_id = ?", candidate.ID).Delete(&entity.DiffTableData{}).Error; err != nil {
+			return err
+		}
+		if err := tx.Delete(&entity.DiffTableHeader{}, candidate.ID).Error; err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *DiffTableService) checkDuplicateHeaderUrl(headerUrl string) error {
 	var dupCount int64
 	if err := s.db.Model(&entity.DiffTableHeader{}).Where("header_url = ?", headerUrl).Count(&dupCount).Error; err != nil {

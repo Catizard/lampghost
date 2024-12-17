@@ -27,6 +27,16 @@ func (ctl *DiffTableController) AddDiffTableHeader(url string) result.RtnMessage
 	return result.SUCCESS
 }
 
+func (ctl *DiffTableController) DelDiffTableHeader(ID uint) result.RtnMessage {
+	log.Info("[Controller] calling DiffTableController.DelDiffTableHeader")
+	err := ctl.diffTableService.DelDiffTableHeader(ID)
+	if err != nil {
+		log.Errorf("[DiffTableController] returning err: %v", err)
+		return result.NewErrorMessage(err)
+	}
+	return result.SUCCESS
+}
+
 func (ctl *DiffTableController) FindDiffTableHeader() []*entity.DiffTableHeader {
 	log.Info("[Controller] calling DiffTableController.FindDiffTableHeader")
 	ret, _, err := ctl.diffTableService.FindDiffTableHeader()

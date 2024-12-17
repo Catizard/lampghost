@@ -5,4 +5,6 @@ import {entity} from '../models';
 
 export function AddDiffTableHeader(arg1:string):Promise<result.RtnMessage>;
 
+export function DelDiffTableHeader(arg1:number):Promise<result.RtnMessage>;
+
 export function FindDiffTableHeader():Promise<Array<entity.DiffTableHeader>>;

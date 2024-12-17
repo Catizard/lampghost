@@ -86,6 +86,22 @@ func (s *RivalInfoService) SyncRivalScoreLog(rivalInfo *entity.RivalInfo) error 
 	return nil
 }
 
+func (s *RivalInfoService) DelRivalInfo(ID uint) error {
+	if err := s.db.Transaction(func(tx *gorm.DB) error {
+		var candidate entity.RivalInfo
+		if err := tx.First(&candidate, ID).Error; err != nil {
+			return err
+		}
+		if err := tx.Delete(&entity.RivalInfo{}, candidate.ID).Error; err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *RivalInfoService) SyncRivalScoreLogByID(rivalID uint) error {
 	if rivalInfo, err := s.FindRivalInfoByID(rivalID); err != nil {
 		return err

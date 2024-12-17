@@ -31,5 +31,25 @@ func (ctl *RivalInfoController) SyncRivalScoreLog(rivalID uint) error {
 	return ctl.rivalInfoService.SyncRivalScoreLogByID(rivalID)
 }
 
+func (ctl *RivalInfoController) FindRivalInfoList() result.RtnDataList {
+	log.Info("[Controller] calling RivalInfoController.FindRivalInfoList")
+	rows, _, err := ctl.rivalInfoService.FindRivalInfoList()
+	if err != nil {
+		log.Errorf("[RivalInfoController] returning error: %v", err)
+		return result.NewErrorDataList(err)
+	}
+	return result.NewRtnDataList(rows)
+}
+
+func (ctl *RivalInfoController) DelRivalInfo(ID uint) result.RtnMessage {
+	log.Info("[Controller] calling RivalInfoController.DelRivalInfo")
+	err := ctl.rivalInfoService.DelRivalInfo(ID)
+	if err != nil {
+		log.Errorf("[RivalInfoController] returning err: %v", err)
+		return result.NewErrorMessage(err)
+	}
+	return result.SUCCESS
+}
+
 // TODO: 目前wails不支持泛型代码生成，这个方法用于让wails知道需要生成entity下的数据
 func (ctl *RivalInfoController) GENERATOR_RIVAL_INFO() *entity.RivalInfo { return nil }

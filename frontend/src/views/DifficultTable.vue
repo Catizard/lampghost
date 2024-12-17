@@ -96,10 +96,11 @@ function addDiffTableHeader(url: string) {
         return Promise.reject(result.Msg);
       }
       notification.success({
-        content: "新增难度表似乎成功了，后台返回结果: " + result,
+        content: "新增难度表似乎成功了，后台返回结果: " + result.Msg,
         duration: 5000,
         keepAliveOnHover: true,
       });
+      loadDiffTableData();
     })
     .catch((err) => {
       notification.error({
@@ -107,6 +108,7 @@ function addDiffTableHeader(url: string) {
         duration: 5000,
         keepAliveOnHover: true,
       });
+      loadDiffTableData();
     });
 }
 
@@ -132,7 +134,11 @@ function loadDiffTableData() {
       console.log(result);
     })
     .catch((err) => {
-      console.error(err);
+      notification.error({
+        content: "读取难度表信息出错:" + err,
+        duration: 5000,
+        keepAliveOnHover: true
+      })
     });
 }
 </script>

@@ -30,6 +30,9 @@ func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHead
 		return nil, err
 	}
 	header, err := fetchDiffTableFromURL(url)
+	if err != nil {
+		return nil, err
+	}
 	header.HeaderUrl = url
 	if err != nil {
 		return nil, err
@@ -152,7 +155,7 @@ func fetchDiffTableFromURL(url string) (*entity.DiffTableHeader, error) {
 		jsonUrl = url
 	}
 	if jsonUrl == "" {
-		log.Fatalf("Cannot fetch %s", url)
+		return nil, fmt.Errorf("cannot fetch from %s", url)
 	}
 	dth := entity.DiffTableHeader{}
 	log.Debugf("before calling fetchJson, url=%s", jsonUrl)

@@ -16,9 +16,13 @@ func NewDiffTableController(diffTableService *service.DiffTableService) *DiffTab
 	}
 }
 
-func (ctl *DiffTableController) AddDiffTableHeader(url string) (*entity.DiffTableHeader, error) {
+func (ctl *DiffTableController) AddDiffTableHeader(url string) *entity.DiffTableHeader {
 	log.Info("[Controller] calling DiffTableController.AddDiffTableHeader")
-	return ctl.diffTableService.AddDiffTableHeader(url)
+	ret, err := ctl.diffTableService.AddDiffTableHeader(url)
+	if err != nil {
+		log.Errorf("[DiffTableController] returning err: %v", err)
+	}
+	return ret
 }
 
 func (ctl *DiffTableController) FindDiffTableHeader() []*entity.DiffTableHeader {

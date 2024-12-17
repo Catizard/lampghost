@@ -13,3 +13,7 @@ export function DelDiffTableHeader(arg1) {
 export function FindDiffTableHeader() {
   return window['go']['controller']['DiffTableController']['FindDiffTableHeader']();
 }
+
+export function GENERATOR_TABLE_HEADER() {
+  return window['go']['controller']['DiffTableController']['GENERATOR_TABLE_HEADER']();
+}

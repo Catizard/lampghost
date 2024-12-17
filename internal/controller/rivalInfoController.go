@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/Catizard/lampghost_wails/internal/entity"
+	"github.com/Catizard/lampghost_wails/internal/result"
 	"github.com/Catizard/lampghost_wails/internal/service"
 	"github.com/charmbracelet/log"
 )
@@ -16,14 +17,19 @@ func NewRivalInfoController(rivalInfoService *service.RivalInfoService) *RivalIn
 	}
 }
 
-// TODO: 使用统一的返回类，不要把原始类型丢出controller
-func (ctl *RivalInfoController) QueryUserInfoByID(rivalID uint) *entity.RivalInfo {
+func (ctl *RivalInfoController) QueryUserInfoByID(rivalID uint) result.RtnData {
 	log.Info("[Controller] calling RivalInfoController.QueryUserInfo")
-	out, _ := ctl.rivalInfoService.FindRivalInfoByID(rivalID)
-	return out
+	data, err := ctl.rivalInfoService.FindRivalInfoByID(rivalID)
+	if err != nil {
+		return result.NewErrorData(err)
+	}
+	return result.NewRtnData(data)
 }
 
 func (ctl *RivalInfoController) SyncRivalScoreLog(rivalID uint) error {
 	log.Info("[Controller] calling RivalInfoController.SyncRivalScorelog")
 	return ctl.rivalInfoService.SyncRivalScoreLogByID(rivalID)
 }
+
+// TODO: 目前wails不支持泛型代码生成，这个方法用于让wails知道需要生成entity下的数据
+func (ctl *RivalInfoController) GENERATOR_RIVAL_INFO() *entity.RivalInfo { return nil }

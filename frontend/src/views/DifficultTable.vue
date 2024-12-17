@@ -76,10 +76,10 @@ function createColumns({
   ];
 }
 
-let data: Ref<Array<entity.DiffTableHeader>> = ref([]);
+let data: Ref<Array<any>> = ref([]);
 const pagination = false as const;
 const columns = createColumns({
-  deleteHeader(row: entity.DiffTableHeader) {
+  deleteHeader(row: any) {
     dialog.warning({
       title: "确定要删除么?",
       positiveText: "确定",
@@ -137,9 +137,11 @@ function handleNegativeClick() {
 
 function loadDiffTableData() {
   FindDiffTableHeader()
-    .then((result) => {
-      data.value = [...result];
-      console.log(result);
+    .then(result => {
+      if (result.Code != 200) {
+        return Promise.reject(result.Msg);
+      }
+      data.value = [...result.Rows];
     })
     .catch((err) => {
       notification.error({

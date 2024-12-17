@@ -37,11 +37,14 @@ func (ctl *DiffTableController) DelDiffTableHeader(ID uint) result.RtnMessage {
 	return result.SUCCESS
 }
 
-func (ctl *DiffTableController) FindDiffTableHeader() []*entity.DiffTableHeader {
+func (ctl *DiffTableController) FindDiffTableHeader() result.RtnDataList {
 	log.Info("[Controller] calling DiffTableController.FindDiffTableHeader")
-	ret, _, err := ctl.diffTableService.FindDiffTableHeader()
+	rows, _, err := ctl.diffTableService.FindDiffTableHeader()
 	if err != nil {
 		log.Errorf("[DiffTableController] returning error: %v", err)
+		return result.NewErrorDataList(err)
 	}
-	return ret
+	return result.NewRtnDataList(rows)
 }
+
+func (ctl *DiffTableController) GENERATOR_TABLE_HEADER() *entity.DiffTableHeader { return nil }

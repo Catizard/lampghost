@@ -190,7 +190,7 @@ initUser();
 }
 
 .n-button {
-  width: 80%
+  width: 80%;
   white-space: normal; 
 }
 

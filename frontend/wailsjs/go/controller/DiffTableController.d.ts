@@ -7,6 +7,6 @@ export function AddDiffTableHeader(arg1:string):Promise<result.RtnMessage>;
 
 export function DelDiffTableHeader(arg1:number):Promise<result.RtnMessage>;
 
-export function FindDiffTableHeader():Promise<result.RtnDataList>;
+export function FindDiffTableHeaderList():Promise<result.RtnDataList>;
 
 export function GENERATOR_TABLE_HEADER():Promise<entity.DiffTableHeader>;

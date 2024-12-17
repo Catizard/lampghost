@@ -10,8 +10,8 @@ export function DelDiffTableHeader(arg1) {
   return window['go']['controller']['DiffTableController']['DelDiffTableHeader'](arg1);
 }
 
-export function FindDiffTableHeader() {
-  return window['go']['controller']['DiffTableController']['FindDiffTableHeader']();
+export function FindDiffTableHeaderList() {
+  return window['go']['controller']['DiffTableController']['FindDiffTableHeaderList']();
 }
 
 export function GENERATOR_TABLE_HEADER() {

@@ -26,7 +26,7 @@ import { useNotification } from "naive-ui";
 import { defineComponent, h, Ref, ref } from "vue";
 import {
   AddDiffTableHeader,
-  FindDiffTableHeader,
+  FindDiffTableHeaderList,
   DelDiffTableHeader
 } from "../../wailsjs/go/controller/DiffTableController";
 import { entity } from "../../wailsjs/go/models";
@@ -136,7 +136,7 @@ function handleNegativeClick() {
 }
 
 function loadDiffTableData() {
-  FindDiffTableHeader()
+  FindDiffTableHeaderList()
     .then(result => {
       if (result.Code != 200) {
         return Promise.reject(result.Msg);

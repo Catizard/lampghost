@@ -72,7 +72,7 @@ func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHead
 	return header, nil
 }
 
-func (s *DiffTableService) FindDiffTableHeader() ([]entity.DiffTableHeader, int, error) {
+func (s *DiffTableService) FindDiffTableHeaderList() ([]entity.DiffTableHeader, int, error) {
 	var headers []entity.DiffTableHeader
 	if err := s.db.Find(&headers).Error; err != nil {
 		log.Error("[DiffTableService] Find difftable header failed with %v", err)

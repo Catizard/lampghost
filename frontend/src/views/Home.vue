@@ -8,11 +8,11 @@
     <n-grid :cols="12">
       <n-gi :span="4">
         <n-flex>
-          Player Name: {{ playerData.playerName }}
+          你是?: {{ playerData.playerName }}
           <n-divider />
-          Total Play: {{ playerData.playCount }}
+          玩了多少次: {{ playerData.playCount }}
           <n-divider />
-          Play Time : {{ playerData.playTime }}
+          最后同步时间 : {{ playerData.lastUpdate }}
           <n-divider />
           <n-button @click="handleSyncClick" :loading="syncLoading">
             同步最新存档数据,大概
@@ -59,6 +59,10 @@
 import VueApexCharts from 'vue3-apexcharts';
 import { reactive, ref } from 'vue';
 import { QueryUserInfoByID, SyncRivalScoreLog } from '../../wailsjs/go/controller/RivalInfoController'
+import { useNotification } from 'naive-ui';
+import dayjs from 'dayjs';
+
+const notification = useNotification();
 
 const playCountChartOptions = ref({
   chart: {
@@ -152,14 +156,27 @@ const lampCountChartOptions = ref({
 const playerData = reactive({
   playerName: "Catizard",
   playCount: 114514,
-  playTime: "24:17:30"
+  lastUpdate: "",
 })
 
 function initUser() {
   // TODO: Remove another magic 1
   QueryUserInfoByID(1).then(result => {
-    playerData.playerName = result.Name
-    playerData.playCount = result.PlayCount
+    if (result.Code != 200) {
+      return Promise.reject()
+    }
+    const { Data } = result;
+    console.log(Data)
+    playerData.playerName = Data.Name
+    playerData.playCount = Data.PlayCount
+    playerData.lastUpdate = dayjs(Data.UpdatedAt).format('YYYY-MM-DD HH:mm:ss')
+    console.log(playerData.lastUpdate)
+  }).catch(err => {
+    notification.error({
+      content: "获取用户数据失败: " + err,
+      duration: 3000,
+      keepAliveOnHover: true
+    })
   })
 }
 
@@ -168,10 +185,21 @@ function handleSyncClick() {
   // TODO: Remove magic 1
   syncLoading.value = true;
   SyncRivalScoreLog(1).then(result => {
-    console.log('sync result:', result)
+    if (result.Code != 200) {
+      return Promise.reject();
+    }
     syncLoading.value = false;
+    notification.success({
+      content: "同步成功",
+      duration: 3000,
+    });
   }).catch(err => {
-    console.log('sync returns error:', err)
+    notification.error({
+      content: "同步数据失败, 错误结果: " + err,
+      duration: 3000,
+      keepAliveOnHover: true,
+    });
+    syncLoading.value = false;
   })
 }
 
@@ -191,7 +219,7 @@ initUser();
 
 .n-button {
   width: 80%;
-  white-space: normal; 
+  white-space: normal;
 }
 
 .ps {

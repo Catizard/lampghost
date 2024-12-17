@@ -3,10 +3,12 @@
 import {result} from '../models';
 import {entity} from '../models';
 
-export function FindRivalInfo():Promise<result.RtnDataList>;
+export function DelRivalInfo(arg1:number):Promise<result.RtnMessage>;
+
+export function FindRivalInfoList():Promise<result.RtnDataList>;
 
 export function GENERATOR_RIVAL_INFO():Promise<entity.RivalInfo>;
 
 export function QueryUserInfoByID(arg1:number):Promise<result.RtnData>;
 
-export function SyncRivalScoreLog(arg1:number):Promise<void>;
+export function SyncRivalScoreLog(arg1:number):Promise<result.RtnMessage>;

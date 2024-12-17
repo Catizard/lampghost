@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "apexcharts": "^4.1.0",
+    "dayjs": "^1.11.13",
     "vue": "^3.2.25",
     "vue-router": "^4.5.0",
     "vue3-apexcharts": "^1.8.0",

@@ -20,6 +20,13 @@
         </n-flex>
       </n-gi>
       <n-gi :span="8">
+        <n-grid :cols="12">
+          <n-gi :span="4">
+            <n-dropdown trigger="hover" :options="playCountChartYearOptions" @select="handleSelect">
+              <n-button>选择年份</n-button>
+            </n-dropdown>
+          </n-gi>
+        </n-grid>
         <vue-apex-charts height="100%" type="line" :options="playCountChartOptions"
           :series="playCountChartOptions.series" />
       </n-gi>
@@ -79,6 +86,21 @@ const playCountChartOptions = ref({
     }
   ]
 });
+
+const playCountChartYearOptions = ref([
+  {
+    label: "2024",
+    key: "2024",
+  },
+  {
+    label: "2023",
+    key: "2023",
+  },
+  {
+    label: "2022",
+    keys: "2022",
+  }
+])
 
 const lampCountChartOptions = ref({
   chart: {
@@ -209,6 +231,13 @@ function handleSyncClick() {
     });
     syncLoading.value = false;
   })
+}
+
+function handleSelect() {
+  notification.error({
+    content: "噢，不好意思，这个功能还没实现",
+    duration: 3000,
+  });
 }
 
 initUser();

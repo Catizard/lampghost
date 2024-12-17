@@ -58,7 +58,7 @@
 <script setup>
 import VueApexCharts from 'vue3-apexcharts';
 import { reactive, ref } from 'vue';
-import { QueryUserInfoByID, SyncRivalScoreLog } from '../../wailsjs/go/controller/RivalInfoController'
+import { QueryUserInfoByID, SyncRivalScoreLog, QueryUserPlayCountInYear } from '../../wailsjs/go/controller/RivalInfoController'
 import { useNotification } from 'naive-ui';
 import dayjs from 'dayjs';
 
@@ -70,12 +70,12 @@ const playCountChartOptions = ref({
     type: 'line'
   },
   xaxis: {
-    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
   },
   series: [
     {
-      name: "series 1",
-      data: [30, 40, 35, 50, 49, 60, 70, 91, 125]
+      name: "游玩次数",
+      data: [30, 40, 35, 50, 49, 60, 70, 91, 125, 0, 0, 0]
     }
   ]
 });
@@ -163,7 +163,7 @@ function initUser() {
   // TODO: Remove another magic 1
   QueryUserInfoByID(1).then(result => {
     if (result.Code != 200) {
-      return Promise.reject()
+      return Promise.reject(result.Msg)
     }
     const { Data } = result;
     console.log(Data)
@@ -171,6 +171,14 @@ function initUser() {
     playerData.playCount = Data.PlayCount
     playerData.lastUpdate = dayjs(Data.UpdatedAt).format('YYYY-MM-DD HH:mm:ss')
     console.log(playerData.lastUpdate)
+    return QueryUserPlayCountInYear(1, 2024)
+  }).then(result => {
+    if (result.Code != 200) {
+      return Promise.reject(result.Msg)
+    }
+    const { Rows } = result;
+    console.log(Rows);
+    playCountChartOptions.value.series[0].data = [...Rows];
   }).catch(err => {
     notification.error({
       content: "获取用户数据失败: " + err,

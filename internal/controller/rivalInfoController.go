@@ -26,6 +26,15 @@ func (ctl *RivalInfoController) QueryUserInfoByID(rivalID uint) result.RtnData {
 	return result.NewRtnData(data)
 }
 
+func (ctl *RivalInfoController) QueryUserPlayCountInYear(ID uint, yearNum int) result.RtnDataList {
+	log.Info("[Controller] calling RivalInfoController.QueryUserPlayCountInYear")
+	pc, err := ctl.rivalInfoService.QueryUserPlayCountInYear(ID, yearNum)
+	if err != nil {
+		return result.NewErrorDataList(err)
+	}
+	return result.NewRtnDataList(pc)
+}
+
 func (ctl *RivalInfoController) SyncRivalScoreLog(rivalID uint) result.RtnMessage {
 	log.Info("[Controller] calling RivalInfoController.SyncRivalScorelog")
 	if err := ctl.rivalInfoService.SyncRivalScoreLogByID(rivalID); err != nil {

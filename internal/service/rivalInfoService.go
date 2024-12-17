@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/charmbracelet/log"
@@ -100,6 +101,22 @@ func (s *RivalInfoService) DelRivalInfo(ID uint) error {
 		return err
 	}
 	return nil
+}
+
+func (s *RivalInfoService) QueryUserPlayCountInYear(ID uint, yearNum int) ([]int, error) {
+	var playData []entity.RivalScoreLog
+	if err := s.db.Where(&entity.RivalScoreLog{RivalId: ID}).Find(&playData).Error; err != nil {
+		return nil, err
+	}
+	ret := make([]int, 12)
+	for i := range ret {
+		ret[i] = 0
+	}
+	for _, playLog := range playData {
+		date := time.Unix(playLog.TimeStamp, 0)
+		ret[date.Month()-1]++
+	}
+	return ret, nil
 }
 
 func (s *RivalInfoService) SyncRivalScoreLogByID(rivalID uint) error {

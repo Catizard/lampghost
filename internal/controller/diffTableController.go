@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/Catizard/lampghost_wails/internal/entity"
+	"github.com/Catizard/lampghost_wails/internal/result"
 	"github.com/Catizard/lampghost_wails/internal/service"
 	"github.com/charmbracelet/log"
 )
@@ -16,13 +17,14 @@ func NewDiffTableController(diffTableService *service.DiffTableService) *DiffTab
 	}
 }
 
-func (ctl *DiffTableController) AddDiffTableHeader(url string) *entity.DiffTableHeader {
+func (ctl *DiffTableController) AddDiffTableHeader(url string) result.RtnMessage {
 	log.Info("[Controller] calling DiffTableController.AddDiffTableHeader")
-	ret, err := ctl.diffTableService.AddDiffTableHeader(url)
+	_, err := ctl.diffTableService.AddDiffTableHeader(url)
 	if err != nil {
 		log.Errorf("[DiffTableController] returning err: %v", err)
+		return result.NewErrorMessage(err)
 	}
-	return ret
+	return result.SUCCESS
 }
 
 func (ctl *DiffTableController) FindDiffTableHeader() []*entity.DiffTableHeader {

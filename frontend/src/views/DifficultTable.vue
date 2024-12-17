@@ -6,24 +6,11 @@
       </n-h1>
       <n-button @click="showAddModal = true"> 新增一个难度表 </n-button>
     </n-space>
-    <n-data-table
-      :columns="columns"
-      :data="data"
-      :pagination="pagination"
-      :bordered="false"
-    />
+    <n-data-table :columns="columns" :data="data" :pagination="pagination" :bordered="false" />
   </perfect-scrollbar>
 
-  <n-modal
-    v-model:show="showAddModal"
-    preset="dialog"
-    title="新增难度表信息"
-    positive-text="新增"
-    negative-text="取消"
-    @positive-click="handlePositiveClick"
-    @negative-click="handleNegativeClick"
-    :mask-closable="false"
-  >
+  <n-modal v-model:show="showAddModal" preset="dialog" title="新增难度表信息" positive-text="新增" negative-text="取消"
+    @positive-click="handlePositiveClick" @negative-click="handleNegativeClick" :mask-closable="false">
     <n-form ref="formRef" :model="formData" :rules="rules">
       <n-form-item label="地址" path="url">
         <n-input v-model:value="formData.url" placeholder="输入地址" />
@@ -97,27 +84,27 @@ function createColumns({
 let data: Ref<Array<entity.DiffTableHeader>> = ref([]);
 const pagination = false as const;
 const columns = createColumns({
-    play(row: entity.DiffTableHeader) {
-        message.info(`Play ${row.name}`)
-    }
+  play(row: entity.DiffTableHeader) {
+    message.info(`Play ${row.name}`)
+  }
 });
 
 function addDiffTableHeader(url: string) {
-  console.log("trying add ", url);
   AddDiffTableHeader(url)
     .then((result) => {
+      if (result.Code != 200) {
+        return Promise.reject(result.Msg);
+      }
       notification.success({
         content: "新增难度表似乎成功了，后台返回结果: " + result,
-        meta: "成功?",
-        duration: 2500,
+        duration: 5000,
         keepAliveOnHover: true,
       });
     })
     .catch((err) => {
       notification.error({
         content: "新增难度表似乎失败了，后台返回错误: " + err,
-        meta: "失败?",
-        duration: 2500,
+        duration: 5000,
         keepAliveOnHover: true,
       });
     });
@@ -130,7 +117,7 @@ function handlePositiveClick(): boolean {
       addDiffTableHeader(formData.value.url);
       showAddModal.value = false;
     })
-    .catch((err) => {});
+    .catch((err) => { });
   return false;
 }
 

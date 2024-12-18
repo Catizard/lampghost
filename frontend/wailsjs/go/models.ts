@@ -61,6 +61,7 @@ export namespace entity {
 	    ScoreLogPath?: string;
 	    SongDataPath?: string;
 	    PlayCount: number;
+	    MainUser: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new RivalInfo(source);
@@ -76,6 +77,7 @@ export namespace entity {
 	        this.ScoreLogPath = source["ScoreLogPath"];
 	        this.SongDataPath = source["SongDataPath"];
 	        this.PlayCount = source["PlayCount"];
+	        this.MainUser = source["MainUser"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

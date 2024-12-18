@@ -10,6 +10,7 @@ type RivalInfo struct {
 	ScoreLogPath *string
 	SongDataPath *string
 	PlayCount    int
+	MainUser     bool
 }
 
 func (RivalInfo) TableName() string {

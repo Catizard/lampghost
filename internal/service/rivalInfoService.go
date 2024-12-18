@@ -152,3 +152,11 @@ func (s *RivalInfoService) SyncRivalScoreLogByID(rivalID uint) error {
 		return s.SyncRivalScoreLog(rivalInfo)
 	}
 }
+
+func (s *RivalInfoService) QueryMainUser() (*entity.RivalInfo, error) {
+	var out entity.RivalInfo
+	if err := s.db.Where(&entity.RivalInfo{MainUser: true}).First(&out).Error; err != nil {
+		return nil, err
+	}
+	return &out, nil
+}

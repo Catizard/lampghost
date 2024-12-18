@@ -33,6 +33,9 @@ func main() {
 	if err := c.Provide(service.NewDiffTableService); err != nil {
 		panic(err)
 	}
+	if err := c.Provide(service.NewRivalSongDataService); err != nil {
+		panic(err)
+	}
 	if err := c.Provide(controller.NewRivalInfoController); err != nil {
 		panic(err)
 	}

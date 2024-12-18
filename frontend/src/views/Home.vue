@@ -42,15 +42,9 @@
         这里应该有个难度表选择列表？
         <perfect-scrollbar style="height: 350px">
           <n-flex vertical>
-            <n-button>発狂BMS難易度表</n-button>
-            <n-button>Satellite</n-button>
-            <n-button>NEW GENERATION 発狂難易度表</n-button>
-            <n-button>発狂BMS難易度表</n-button>
-            <n-button>Satellite</n-button>
-            <n-button>NEW GENERATION 発狂難易度表</n-button>
-            <n-button>発狂BMS難易度表</n-button>
-            <n-button>Satellite</n-button>
-            <n-button>NEW GENERATION 発狂難易度表</n-button>
+            <n-button v-for="{ name } in difftableHeaderList">
+              {{ name }}
+            </n-button>
           </n-flex>
         </perfect-scrollbar>
       </n-gi>
@@ -66,6 +60,7 @@
 import VueApexCharts from 'vue3-apexcharts';
 import { reactive, ref } from 'vue';
 import { QueryUserInfoByID, SyncRivalScoreLog, QueryUserPlayCountInYear } from '../../wailsjs/go/controller/RivalInfoController'
+import { FindDiffTableHeaderList } from '../../wailsjs/go/controller/DiffTableController';
 import { useNotification } from 'naive-ui';
 import dayjs from 'dayjs';
 
@@ -179,7 +174,9 @@ const playerData = reactive({
   playerName: "Catizard",
   playCount: 114514,
   lastUpdate: "",
-})
+});
+
+const difftableHeaderList = ref([]);
 
 function initUser() {
   // TODO: Remove another magic 1
@@ -207,6 +204,17 @@ function initUser() {
       duration: 3000,
       keepAliveOnHover: true
     })
+  })
+}
+
+function initDiffTable() {
+  FindDiffTableHeaderList().then(result => {
+    if (result.Code != 200) {
+      return Promise.reject(result.Msg)
+    }
+    const { Rows } = result;
+    console.log(Rows);
+    difftableHeaderList.value = [...Rows];
   })
 }
 
@@ -241,6 +249,7 @@ function handleSelect() {
 }
 
 initUser();
+initDiffTable();
 </script>
 
 <style scoped>

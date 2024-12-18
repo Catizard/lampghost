@@ -100,7 +100,7 @@ func (s *RivalInfoService) SyncRivalScoreLog(rivalInfo *entity.RivalInfo) error 
 		}
 
 		if err := tx.Model(rivalInfo).Updates(entity.RivalInfo{
-			PlayCount: n,
+			PlayCount: len(rivalScoreLog),
 		}).Error; err != nil {
 			return err
 		}

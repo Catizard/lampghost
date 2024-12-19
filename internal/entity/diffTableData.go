@@ -14,7 +14,7 @@ type DiffTableData struct {
 	Title    string
 	Url      string `json:"url"`
 	UrlDiff  string `json:"url_diff"`
-	Sha256   string `json:"-"`
+	Sha256   string 
 }
 
 func (DiffTableData) TableName() string {

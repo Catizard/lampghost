@@ -42,8 +42,8 @@
         这里应该有个难度表选择列表？
         <perfect-scrollbar style="height: 350px">
           <n-flex vertical>
-            <n-button v-for="{ name } in difftableHeaderList">
-              {{ name }}
+            <n-button v-for="{ Name } in difftableHeaderList">
+              {{ Name }}
             </n-button>
           </n-flex>
         </perfect-scrollbar>

@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/charmbracelet/log"
 	"gorm.io/gorm"
@@ -15,11 +16,13 @@ import (
 
 type DiffTableService struct {
 	db *gorm.DB
+	rivalSongDataService *RivalSongDataService
 }
 
-func NewDiffTableService(db *gorm.DB) *DiffTableService {
+func NewDiffTableService(db *gorm.DB, rivalSongDataService *RivalSongDataService) *DiffTableService {
 	return &DiffTableService{
 		db: db,
+		rivalSongDataService: rivalSongDataService,
 	}
 }
 
@@ -72,13 +75,17 @@ func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHead
 	return header, nil
 }
 
-func (s *DiffTableService) FindDiffTableHeaderList() ([]entity.DiffTableHeader, int, error) {
+func (s *DiffTableService) FindDiffTableHeaderList() ([]dto.DiffTableHeaderDto, int, error) {
 	var headers []entity.DiffTableHeader
 	if err := s.db.Find(&headers).Error; err != nil {
 		log.Error("[DiffTableService] Find difftable header failed with %v", err)
 		return nil, 0, err
 	}
-	return headers, len(headers), nil
+	ret := make([]dto.DiffTableHeaderDto, len(headers))
+	for i, header := range headers {
+		ret[i] = *dto.NewDiffTableHeaderDto(&header, nil)
+	}
+	return ret, len(ret), nil
 }
 
 func (s *DiffTableService) DelDiffTableHeader(ID uint) error {
@@ -98,6 +105,38 @@ func (s *DiffTableService) DelDiffTableHeader(ID uint) error {
 		return err
 	}
 	return nil
+}
+
+func (s *DiffTableService) QueryDiffTableInfoByID(ID uint) (*dto.DiffTableHeaderDto, error) {
+	var header entity.DiffTableHeader
+	if err := s.db.Find(&header, ID).Error; err != nil {
+		return nil, err
+	}
+	var rawContents []entity.DiffTableData
+	if err := s.db.Where(&entity.DiffTableData{HeaderID: ID}).Find(&rawContents).Error; err != nil {
+		return nil, err
+	}
+	cache, err := s.rivalSongDataService.QueryDefaultSongHashCache()
+	if err != nil {
+		return nil, err
+	}
+	// NOTE: 如果一个数据找不到对应的hash信息，则认为剔除掉该数据避免后续出错
+	contents := make([]entity.DiffTableData, 0)
+	for _, rawContent := range rawContents {
+		if rawContent.Sha256 != "" {
+			if md5, ok := cache.GetMD5(rawContent.Sha256); ok {
+				rawContent.Md5 = md5
+				contents = append(contents, rawContent)
+			}
+		} else if rawContent.Md5 != "" {
+			if sha256, ok := cache.GetSHA256(rawContent.Md5); ok { 
+				rawContent.Sha256 = sha256
+				contents = append(contents, rawContent)
+			}
+		}
+	}
+
+	return dto.NewDiffTableHeaderDto(&header, contents), nil
 }
 
 func (s *DiffTableService) checkDuplicateHeaderUrl(headerUrl string) error {

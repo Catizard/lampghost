@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/result"
 	"github.com/Catizard/lampghost_wails/internal/service"
@@ -47,4 +48,16 @@ func (ctl *DiffTableController) FindDiffTableHeaderList() result.RtnDataList {
 	return result.NewRtnDataList(rows)
 }
 
+func (ctl *DiffTableController) QueryDiffTableInfoById(ID uint) result.RtnData {
+	log.Info("[Controller calling DiffTableController.QueryDiffTableInfoById]")
+	data, err := ctl.diffTableService.QueryDiffTableInfoByID(ID)
+	if err != nil {
+		log.Errorf("[DiffTableController] returning err: %v", err)
+		return result.NewErrorData(err)
+	}
+	return result.NewRtnData(data)
+}
+
 func (ctl *DiffTableController) GENERATOR_TABLE_HEADER() *entity.DiffTableHeader { return nil }
+
+func (ctl *DiffTableController) GENERATOR_TABLE_HEADER_DTO() *dto.DiffTableHeaderDto { return nil }

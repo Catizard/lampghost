@@ -55,7 +55,7 @@ function createColumns({
   deleteHeader: (row: entity.DiffTableHeader) => void;
 }): DataTableColumns<entity.DiffTableHeader> {
   return [
-    { title: "Name", key: "name", },
+    { title: "Name", key: "Name", },
     { title: "url", key: "HeaderUrl", },
     {
       title: "Action",

@@ -17,3 +17,11 @@ export function FindDiffTableHeaderList() {
 export function GENERATOR_TABLE_HEADER() {
   return window['go']['controller']['DiffTableController']['GENERATOR_TABLE_HEADER']();
 }
+
+export function GENERATOR_TABLE_HEADER_DTO() {
+  return window['go']['controller']['DiffTableController']['GENERATOR_TABLE_HEADER_DTO']();
+}
+
+export function QueryDiffTableInfoById(arg1) {
+  return window['go']['controller']['DiffTableController']['QueryDiffTableInfoById'](arg1);
+}

@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/Catizard/lampghost_wails/internal/dto"
@@ -15,13 +17,13 @@ import (
 )
 
 type DiffTableService struct {
-	db *gorm.DB
+	db                   *gorm.DB
 	rivalSongDataService *RivalSongDataService
 }
 
 func NewDiffTableService(db *gorm.DB, rivalSongDataService *RivalSongDataService) *DiffTableService {
 	return &DiffTableService{
-		db: db,
+		db:                   db,
 		rivalSongDataService: rivalSongDataService,
 	}
 }
@@ -121,22 +123,56 @@ func (s *DiffTableService) QueryDiffTableInfoByID(ID uint) (*dto.DiffTableHeader
 		return nil, err
 	}
 	// NOTE: 如果一个数据找不到对应的hash信息，则认为剔除掉该数据避免后续出错
-	contents := make([]entity.DiffTableData, 0)
+	contents := make([]dto.DiffTableDataDto, 0)
 	for _, rawContent := range rawContents {
 		if rawContent.Sha256 != "" {
 			if md5, ok := cache.GetMD5(rawContent.Sha256); ok {
 				rawContent.Md5 = md5
-				contents = append(contents, rawContent)
+				contents = append(contents, *dto.NewDiffTableDataDto(&rawContent))
 			}
 		} else if rawContent.Md5 != "" {
-			if sha256, ok := cache.GetSHA256(rawContent.Md5); ok { 
+			if sha256, ok := cache.GetSHA256(rawContent.Md5); ok {
 				rawContent.Sha256 = sha256
-				contents = append(contents, rawContent)
+				contents = append(contents, *dto.NewDiffTableDataDto(&rawContent))
 			}
 		}
 	}
 
 	return dto.NewDiffTableHeaderDto(&header, contents), nil
+}
+
+func (s *DiffTableService) QueryLevelLayeredDiffTableInfoById(ID uint) (*dto.DiffTableHeaderDto, error) {
+	header, err := s.QueryDiffTableInfoByID(ID)
+	if err != nil {
+		return nil, err
+	}
+	levels := make(map[string]interface{})
+	levelLayeredContent := make(map[string][]dto.DiffTableDataDto)
+	for _, v := range header.Contents {
+		if _, ok := levelLayeredContent[v.Level]; !ok {
+			levelLayeredContent[v.Level] = make([]dto.DiffTableDataDto, 0)
+		}
+		if _, ok := levels[v.Level]; !ok {
+			levels[v.Level] = new(interface{})
+		}
+		levelLayeredContent[v.Level] = append(levelLayeredContent[v.Level], v)
+	}
+
+	sortedLevels := make([]string, 0)
+	for level := range levels {
+		sortedLevels = append(sortedLevels, level)
+	}
+	sort.Slice(sortedLevels, func(i, j int) bool {
+		ll := sortedLevels[i]
+		rr := sortedLevels[j]
+		ill, errL := strconv.Atoi(ll)
+		irr, errR := strconv.Atoi(rr)
+		if errL == nil && errR == nil {
+			return ill < irr
+		}
+		return ll < rr
+	})
+	return dto.NewLevelLayeredDiffTableHeaderDto(header.Entity(), sortedLevels, levelLayeredContent), nil
 }
 
 func (s *DiffTableService) checkDuplicateHeaderUrl(headerUrl string) error {

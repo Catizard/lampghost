@@ -10,7 +10,7 @@ type RivalSongDataService struct {
 	defaultSongHashCache *SongHashCache
 }
 
-func NewRivalSongDataService(db *gorm.DB, rivalInfoSerivce *RivalInfoService) *RivalSongDataService {
+func NewRivalSongDataService(db *gorm.DB) *RivalSongDataService {
 	return &RivalSongDataService{
 		db: db,
 	}

@@ -11,6 +11,8 @@ export function GENERATOR_RIVAL_INFO():Promise<entity.RivalInfo>;
 
 export function QueryUserInfoByID(arg1:number):Promise<result.RtnData>;
 
+export function QueryUserInfoWithLevelLayeredDiffTableLampStatus(arg1:number,arg2:number):Promise<result.RtnData>;
+
 export function QueryUserPlayCountInYear(arg1:number,arg2:number):Promise<result.RtnDataList>;
 
 export function SyncRivalScoreLog(arg1:number):Promise<result.RtnMessage>;

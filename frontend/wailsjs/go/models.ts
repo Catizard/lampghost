@@ -1,5 +1,43 @@
 export namespace dto {
 	
+	export class DiffTableDataDto {
+	    ID: number;
+	    HeaderID: number;
+	    Artist: string;
+	    Comment: string;
+	    Level: string;
+	    lr2_bmdid: string;
+	    Md5: string;
+	    NameDiff: string;
+	    Title: string;
+	    url: string;
+	    url_diff: string;
+	    Sha256: string;
+	    Lamp: number;
+	    GhostLamp: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new DiffTableDataDto(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.ID = source["ID"];
+	        this.HeaderID = source["HeaderID"];
+	        this.Artist = source["Artist"];
+	        this.Comment = source["Comment"];
+	        this.Level = source["Level"];
+	        this.lr2_bmdid = source["lr2_bmdid"];
+	        this.Md5 = source["Md5"];
+	        this.NameDiff = source["NameDiff"];
+	        this.Title = source["Title"];
+	        this.url = source["url"];
+	        this.url_diff = source["url_diff"];
+	        this.Sha256 = source["Sha256"];
+	        this.Lamp = source["Lamp"];
+	        this.GhostLamp = source["GhostLamp"];
+	    }
+	}
 	export class DiffTableHeaderDto {
 	    ID: number;
 	    HeaderUrl: string;
@@ -7,7 +45,9 @@ export namespace dto {
 	    Name: string;
 	    OriginalUrl?: string;
 	    Symbol: string;
-	    Contents: entity.DiffTableData[];
+	    Contents: DiffTableDataDto[];
+	    SortedLevels: string[];
+	    LevelLayeredContents: {[key: string]: DiffTableDataDto[]};
 	
 	    static createFrom(source: any = {}) {
 	        return new DiffTableHeaderDto(source);
@@ -21,7 +61,9 @@ export namespace dto {
 	        this.Name = source["Name"];
 	        this.OriginalUrl = source["OriginalUrl"];
 	        this.Symbol = source["Symbol"];
-	        this.Contents = this.convertValues(source["Contents"], entity.DiffTableData);
+	        this.Contents = this.convertValues(source["Contents"], DiffTableDataDto);
+	        this.SortedLevels = source["SortedLevels"];
+	        this.LevelLayeredContents = source["LevelLayeredContents"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -47,67 +89,6 @@ export namespace dto {
 
 export namespace entity {
 	
-	export class DiffTableData {
-	    ID: number;
-	    // Go type: time
-	    CreatedAt: any;
-	    // Go type: time
-	    UpdatedAt: any;
-	    // Go type: gorm
-	    DeletedAt: any;
-	    HeaderID: number;
-	    Artist: string;
-	    Comment: string;
-	    Level: string;
-	    lr2_bmdid: string;
-	    Md5: string;
-	    NameDiff: string;
-	    Title: string;
-	    url: string;
-	    url_diff: string;
-	    Sha256: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new DiffTableData(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.ID = source["ID"];
-	        this.CreatedAt = this.convertValues(source["CreatedAt"], null);
-	        this.UpdatedAt = this.convertValues(source["UpdatedAt"], null);
-	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
-	        this.HeaderID = source["HeaderID"];
-	        this.Artist = source["Artist"];
-	        this.Comment = source["Comment"];
-	        this.Level = source["Level"];
-	        this.lr2_bmdid = source["lr2_bmdid"];
-	        this.Md5 = source["Md5"];
-	        this.NameDiff = source["NameDiff"];
-	        this.Title = source["Title"];
-	        this.url = source["url"];
-	        this.url_diff = source["url_diff"];
-	        this.Sha256 = source["Sha256"];
-	    }
-	
-		convertValues(a: any, classs: any, asMap: boolean = false): any {
-		    if (!a) {
-		        return a;
-		    }
-		    if (a.slice && a.map) {
-		        return (a as any[]).map(elem => this.convertValues(elem, classs));
-		    } else if ("object" === typeof a) {
-		        if (asMap) {
-		            for (const key of Object.keys(a)) {
-		                a[key] = new classs(a[key]);
-		            }
-		            return a;
-		        }
-		        return new classs(a);
-		    }
-		    return a;
-		}
-	}
 	export class DiffTableHeader {
 	    ID: number;
 	    // Go type: time

@@ -18,6 +18,10 @@ export function QueryUserInfoByID(arg1) {
   return window['go']['controller']['RivalInfoController']['QueryUserInfoByID'](arg1);
 }
 
+export function QueryUserInfoWithLevelLayeredDiffTableLampStatus(arg1, arg2) {
+  return window['go']['controller']['RivalInfoController']['QueryUserInfoWithLevelLayeredDiffTableLampStatus'](arg1, arg2);
+}
+
 export function QueryUserPlayCountInYear(arg1, arg2) {
   return window['go']['controller']['RivalInfoController']['QueryUserPlayCountInYear'](arg1, arg2);
 }

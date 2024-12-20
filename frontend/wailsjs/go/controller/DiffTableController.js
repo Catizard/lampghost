@@ -25,3 +25,7 @@ export function GENERATOR_TABLE_HEADER_DTO() {
 export function QueryDiffTableInfoById(arg1) {
   return window['go']['controller']['DiffTableController']['QueryDiffTableInfoById'](arg1);
 }
+
+export function QueryLevelLayeredDiffTableInfoById(arg1) {
+  return window['go']['controller']['DiffTableController']['QueryLevelLayeredDiffTableInfoById'](arg1);
+}

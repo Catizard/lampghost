@@ -118,7 +118,11 @@ func (s *DiffTableService) QueryDiffTableInfoByID(ID uint) (*dto.DiffTableHeader
 	if err := s.db.Where(&entity.DiffTableData{HeaderID: ID}).Find(&rawContents).Error; err != nil {
 		return nil, err
 	}
-	cache, err := s.rivalSongDataService.QueryDefaultSongHashCache()
+	mainUser, err := s.QueryMainUser()
+	if err != nil {
+		return nil, err
+	}
+	cache, err := s.rivalSongDataService.QuerySongHashCache(mainUser.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -173,6 +177,15 @@ func (s *DiffTableService) QueryLevelLayeredDiffTableInfoById(ID uint) (*dto.Dif
 		return ll < rr
 	})
 	return dto.NewLevelLayeredDiffTableHeaderDto(header.Entity(), sortedLevels, levelLayeredContent), nil
+}
+
+// TODO: we are not allowed to build a cycle dependency...
+func (s *DiffTableService) QueryMainUser() (*entity.RivalInfo, error) {
+	var out entity.RivalInfo
+	if err := s.db.Where(&entity.RivalInfo{MainUser: true}).First(&out).Error; err != nil {
+		return nil, err
+	}
+	return &out, nil
 }
 
 func (s *DiffTableService) checkDuplicateHeaderUrl(headerUrl string) error {

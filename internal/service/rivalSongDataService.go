@@ -7,14 +7,12 @@ import (
 
 type RivalSongDataService struct {
 	db                   *gorm.DB
-	rivalInfoService     *RivalInfoService
 	defaultSongHashCache *SongHashCache
 }
 
 func NewRivalSongDataService(db *gorm.DB, rivalInfoSerivce *RivalInfoService) *RivalSongDataService {
 	return &RivalSongDataService{
-		db:               db,
-		rivalInfoService: rivalInfoSerivce,
+		db: db,
 	}
 }
 
@@ -24,22 +22,6 @@ func (s *RivalSongDataService) FindRivalSongDataList(filter *entity.RivalSongDat
 		return nil, 0, err
 	}
 	return songDataList, len(songDataList), nil
-}
-
-func (s *RivalSongDataService) QueryDefaultSongHashCache() (*SongHashCache, error) {
-	if s.defaultSongHashCache != nil {
-		return s.defaultSongHashCache, nil
-	}
-	mainUser, err := s.rivalInfoService.QueryMainUser()
-	if err != nil {
-		return nil, err
-	}
-	cache, err := s.QuerySongHashCache(mainUser.ID)
-	if err != nil {
-		return nil, err
-	}
-	s.defaultSongHashCache = cache
-	return cache, nil
 }
 
 func (s *RivalSongDataService) QuerySongHashCache(rivalId uint) (*SongHashCache, error) {

@@ -91,7 +91,7 @@ func (s *RivalInfoService) SyncRivalScoreLog(rivalInfo *entity.RivalInfo) error 
 			return err
 		}
 
-		if err := tx.Create(&rivalScoreLog).Error; err != nil {
+		if err := tx.CreateInBatches(&rivalScoreLog, 100).Error; err != nil {
 			return err
 		}
 

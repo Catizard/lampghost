@@ -15,13 +15,7 @@ type RivalSongData struct {
 	Artist     string
 	SubArtist  string
 	Tag        string
-	Path       string
-	Folder     string
-	StageFile  string
-	Banner     string
 	BackBmp    string
-	Preview    string
-	Parent     string
 	Level      int32
 	Difficulty int32
 	MaxBpm     int32
@@ -35,7 +29,6 @@ type RivalSongData struct {
 	Favorite   int32
 	AddDate    int64
 	Notes      int32
-	ChartHash  string
 }
 
 func (RivalSongData) TableName() string {
@@ -51,13 +44,7 @@ func FromRawSongDataToRivalSongData(songData *SongData) RivalSongData {
 		Artist:     songData.Artist,
 		SubArtist:  songData.SubArtist,
 		Tag:        songData.Tag,
-		Path:       songData.Path,
-		Folder:     songData.Folder,
-		StageFile:  songData.StageFile,
-		Banner:     songData.Banner,
 		BackBmp:    songData.BackBmp,
-		Preview:    songData.Preview,
-		Parent:     songData.Parent,
 		Level:      songData.Level,
 		Difficulty: songData.Difficulty,
 		MaxBpm:     songData.MaxBpm,
@@ -71,6 +58,5 @@ func FromRawSongDataToRivalSongData(songData *SongData) RivalSongData {
 		Favorite:   songData.Favorite,
 		AddDate:    songData.AddDate,
 		Notes:      songData.Notes,
-		ChartHash:  songData.ChartHash,
 	}
 }

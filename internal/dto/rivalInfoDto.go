@@ -13,6 +13,7 @@ type RivalInfoDto struct {
 
 func NewRivalInfoDto(rival *entity.RivalInfo) *RivalInfoDto {
 	return &RivalInfoDto{
+		ID:        rival.ID,
 		Name:      rival.Name,
 		PlayCount: rival.PlayCount,
 		MainUser:  rival.MainUser,

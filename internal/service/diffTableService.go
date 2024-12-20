@@ -111,9 +111,10 @@ func (s *DiffTableService) DelDiffTableHeader(ID uint) error {
 
 func (s *DiffTableService) QueryDiffTableInfoByID(ID uint) (*dto.DiffTableHeaderDto, error) {
 	var header entity.DiffTableHeader
-	if err := s.db.Find(&header, ID).Error; err != nil {
+	if err := s.db.Debug().First(&header, ID).Error; err != nil {
 		return nil, err
 	}
+	log.Debugf("[DiffTableService] QueryDiffTableInfoByID fetched header: %v", header)
 	var rawContents []entity.DiffTableData
 	if err := s.db.Where(&entity.DiffTableData{HeaderID: ID}).Find(&rawContents).Error; err != nil {
 		return nil, err

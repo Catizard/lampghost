@@ -157,6 +157,7 @@ func (s *RivalInfoService) FindRivalScoreLogByRivalId(ID uint) ([]entity.RivalSc
 }
 
 func (s *RivalInfoService) QueryUserInfoWithLevelLayeredDiffTableLampStatus(rivalID uint, headerID uint) (*dto.RivalInfoDto, error) {
+	log.Debugf("[RivalInfoService] QueryUserInfoWithLevelLayeredDiffTableLampStatus: rivalID=%d, headerId=%d", rivalID, headerID)
 	rivalInfo, err := s.FindRivalInfoByID(rivalID)
 	if err != nil {
 		return nil, err

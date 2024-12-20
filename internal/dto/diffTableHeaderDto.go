@@ -21,6 +21,7 @@ type DiffTableHeaderDto struct {
 
 func NewDiffTableHeaderDto(header *entity.DiffTableHeader, contents []DiffTableDataDto) *DiffTableHeaderDto {
 	return &DiffTableHeaderDto{
+		ID:          header.ID,
 		HeaderUrl:   header.HeaderUrl,
 		DataUrl:     header.DataUrl,
 		Name:        header.Name,

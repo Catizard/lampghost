@@ -37,7 +37,7 @@
         报告,我是点灯信息
       </n-text>
     </n-h1>
-    <n-grid :cols="12" min-height="200px">
+    <n-grid :cols="12" min-height="600px">
       <n-gi :span="4">
         这里应该有个难度表选择列表？
         <perfect-scrollbar style="height: 350px">
@@ -49,7 +49,7 @@
         </perfect-scrollbar>
       </n-gi>
       <n-gi :span="8">
-        <vue-apex-charts height="350px" type="bar" :options="lampCountChartOptions"
+        <vue-apex-charts height="450px" type="bar" :options="lampCountChartOptions"
           :series="lampCountChartOptions.series" />
       </n-gi>
     </n-grid>
@@ -59,10 +59,13 @@
 <script setup>
 import VueApexCharts from 'vue3-apexcharts';
 import { reactive, ref } from 'vue';
-import { QueryUserInfoByID, SyncRivalScoreLog, QueryUserPlayCountInYear } from '../../wailsjs/go/controller/RivalInfoController'
+import { QueryUserInfoWithLevelLayeredDiffTableLampStatus, SyncRivalScoreLog, QueryUserPlayCountInYear } from '../../wailsjs/go/controller/RivalInfoController'
 import { FindDiffTableHeaderList } from '../../wailsjs/go/controller/DiffTableController';
 import { useNotification } from 'naive-ui';
 import dayjs from 'dayjs';
+
+const LAMPS = [1, 4, 5, 11, 0];
+const STR_LAMPS = ["FAILED", "Easy", "Normal", "Hard+", "NO_PLAY"];
 
 const notification = useNotification();
 
@@ -77,7 +80,7 @@ const playCountChartOptions = ref({
   series: [
     {
       name: "游玩次数",
-      data: [30, 40, 35, 50, 49, 60, 70, 91, 125, 0, 0, 0]
+      data: [],
     }
   ]
 });
@@ -97,68 +100,31 @@ const playCountChartYearOptions = ref([
   }
 ])
 
-const lampCountChartOptions = ref({
+const lampCountChartOptions = reactive({
   chart: {
     type: 'bar',
     stacked: true,
+    stackType: "100%",
   },
-  series: [{
-    name: 'Marine Sprite',
-    data: [44, 55, 41, 37, 22, 43, 21]
-  }, {
-    name: 'Striking Calf',
-    data: [53, 32, 33, 52, 13, 43, 32]
-  }, {
-    name: 'Tank Picture',
-    data: [12, 17, 11, 9, 15, 11, 20]
-  }, {
-    name: 'Bucket Slope',
-    data: [9, 7, 5, 8, 6, 9, 4]
-  }, {
-    name: 'Reborn Kid',
-    data: [25, 12, 19, 32, 25, 24, 10]
-  }],
+  colors: [
+    "#FF0000",
+    "#00FF00",
+    "#0000FF",
+    "#00FFFF",
+    "#FFFFFF"
+  ],
+  series: [],
   plotOptions: {
     bar: {
       horizontal: true,
-      dataLabels: {
-        total: {
-          enabled: true,
-          offsetX: 0,
-          style: {
-            fontSize: '13px',
-            fontWeight: 900
-          }
-        }
-      }
+      columnHeight: '100%',
     },
-  },
-  stroke: {
-    width: 1,
-    colors: ['#fff']
   },
   title: {
     text: '我觉得我是当前难度表的进度'
   },
   xaxis: {
-    categories: [2008, 2009, 2010, 2011, 2012, 2013, 2014],
-    labels: {
-      formatter: function (val) {
-        return val + "K"
-      }
-    }
-  },
-  yaxis: {
-    title: {
-      text: undefined
-    },
-  },
-  tooltip: {
-    y: {
-      formatter: function (val) {
-        return val + "K"
-      }
-    }
+    categories: [],
   },
   fill: {
     opacity: 1
@@ -167,6 +133,9 @@ const lampCountChartOptions = ref({
     position: 'top',
     horizontalAlign: 'left',
     offsetX: 40
+  },
+  dataLabels: {
+    enabled: false,
   }
 });
 
@@ -179,43 +148,86 @@ const playerData = reactive({
 const difftableHeaderList = ref([]);
 
 function initUser() {
-  // TODO: Remove another magic 1
-  QueryUserInfoByID(1).then(result => {
-    if (result.Code != 200) {
-      return Promise.reject(result.Msg)
-    }
-    const { Data } = result;
-    console.log(Data)
-    playerData.playerName = Data.Name
-    playerData.playCount = Data.PlayCount
-    playerData.lastUpdate = dayjs(Data.UpdatedAt).format('YYYY-MM-DD HH:mm:ss')
-    console.log(playerData.lastUpdate)
-    return QueryUserPlayCountInYear(1, 2024)
-  }).then(result => {
-    if (result.Code != 200) {
-      return Promise.reject(result.Msg)
-    }
-    const { Rows } = result;
-    console.log(Rows);
-    playCountChartOptions.value.series[0].data = [...Rows];
-  }).catch(err => {
-    notification.error({
-      content: "获取用户数据失败: " + err,
-      duration: 3000,
-      keepAliveOnHover: true
-    })
-  })
-}
-
-function initDiffTable() {
   FindDiffTableHeaderList().then(result => {
     if (result.Code != 200) {
       return Promise.reject(result.Msg)
     }
     const { Rows } = result;
-    console.log(Rows);
     difftableHeaderList.value = [...Rows];
+    if (Rows.length > 0) {
+      return Rows[0]
+    } else {
+      return null
+    }
+  }).then(result => {
+    if (result == null) {
+      // TODO: 正确地显示无数据的情况
+      return Promise.reject("目前无法处理一个难度表都没有的情况，请至少先加入一个数据")
+    }
+    // TODO: Remove another magic 1
+    QueryUserInfoWithLevelLayeredDiffTableLampStatus(1, result.ID).then(result => {
+      if (result.Code != 200) {
+        return Promise.reject(result.Msg)
+      }
+      const { Data } = result;
+      console.log(Data)
+      playerData.playerName = Data.Name
+      playerData.playCount = Data.PlayCount
+      playerData.lastUpdate = dayjs(Data.UpdatedAt).format('YYYY-MM-DD HH:mm:ss')
+      // Apply lamp status
+      lampCountChartOptions.series = [];
+      STR_LAMPS.forEach(lampName => {
+        lampCountChartOptions.series.push({
+          name: lampName,
+          data: []
+        })
+      });
+      lampCountChartOptions.xaxis.categories = [];
+      const { DiffTableHeader } = Data;
+      for (let i = 0; i < DiffTableHeader.SortedLevels.length; ++i) {
+        const level = DiffTableHeader.SortedLevels[i];
+        const levelName = DiffTableHeader.Symbol + level;
+        lampCountChartOptions.xaxis.categories.push(levelName);
+        const dataList = DiffTableHeader.LevelLayeredContents[level];
+        for (let j = 0; j < LAMPS.length; ++j) {
+          const lampValue = LAMPS[j];
+          // TODO: wtf
+          const count = dataList.filter(data => data.Lamp == lampValue || (data.Lamp >= 6 && lampValue == 11) || (lampValue == 1 && data.Lamp < 4 && data.Lamp > 0)).length;
+          let v = {
+            x: levelName,
+            y: count
+          }
+          if (lampValue == 0) {
+            v.fillColor = '#FFFFFF'
+            v.strokeColor = '#FFFFFF'
+          }
+          lampCountChartOptions.series[j].data.push(v);
+        }
+      }
+
+      console.log(lampCountChartOptions);
+      return QueryUserPlayCountInYear(1, 2024)
+    }).then(result => {
+      if (result.Code != 200) {
+        return Promise.reject(result.Msg)
+      }
+      const { Rows } = result;
+      console.log(Rows);
+      playCountChartOptions.value.series[0].data = [...Rows];
+    }).catch(err => {
+      console.log(err)
+      notification.error({
+        content: "获取用户数据失败: " + err,
+        duration: 3000,
+        keepAliveOnHover: true
+      })
+    })
   })
+
+}
+
+function initDiffTable() {
+
 }
 
 const syncLoading = ref(false);

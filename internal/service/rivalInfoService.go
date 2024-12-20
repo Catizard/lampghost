@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/charmbracelet/log"
 	"gorm.io/driver/sqlite"
@@ -11,12 +12,14 @@ import (
 )
 
 type RivalInfoService struct {
-	db *gorm.DB
+	db               *gorm.DB
+	diffTableService *DiffTableService
 }
 
-func NewRivalInfoService(db *gorm.DB) *RivalInfoService {
+func NewRivalInfoService(db *gorm.DB, diffTableService *DiffTableService) *RivalInfoService {
 	return &RivalInfoService{
-		db: db,
+		db:               db,
+		diffTableService: diffTableService,
 	}
 }
 
@@ -141,6 +144,48 @@ func (s *RivalInfoService) QueryUserPlayCountInYear(ID uint, yearNum int) ([]int
 	for _, playLog := range playData {
 		date := time.Unix(playLog.TimeStamp, 0)
 		ret[date.Month()-1]++
+	}
+	return ret, nil
+}
+
+func (s *RivalInfoService) FindRivalScoreLogByRivalId(ID uint) ([]entity.RivalScoreLog, error) {
+	var logs []entity.RivalScoreLog
+	if err := s.db.Find(&logs).Error; err != nil {
+		return nil, err
+	}
+	return logs, nil
+}
+
+func (s *RivalInfoService) QueryUserInfoWithLevelLayeredDiffTableLampStatus(rivalID uint, headerID uint) (*dto.RivalInfoDto, error) {
+	rivalInfo, err := s.FindRivalInfoByID(rivalID)
+	if err != nil {
+		return nil, err
+	}
+	header, err := s.diffTableService.QueryLevelLayeredDiffTableInfoById(headerID)
+	if err != nil {
+		return nil, err
+	}
+	logs, err := s.FindRivalScoreLogByRivalId(rivalID)
+	if err != nil {
+		return nil, err
+	}
+
+	sha256MaxLamp := make(map[string]int32)
+	for _, log := range logs {
+		if _, ok := sha256MaxLamp[log.Sha256]; !ok {
+			sha256MaxLamp[log.Sha256] = log.Clear
+		}
+		sha256MaxLamp[log.Sha256] = max(sha256MaxLamp[log.Sha256], log.Clear)
+	}
+
+	ret := dto.NewRivalInfoDtoWithDiffTable(rivalInfo, header)
+	for _, dataList := range ret.DiffTableHeader.LevelLayeredContents {
+		for i, data := range dataList {
+			if _, ok := sha256MaxLamp[data.Sha256]; ok {
+				dataList[i].Lamp = int(sha256MaxLamp[data.Sha256])
+			}
+		}
+
 	}
 	return ret, nil
 }

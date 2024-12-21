@@ -234,6 +234,10 @@ func syncRivalScoreLog(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
 		return err
 	}
 
+	if err := tx.Unscoped().Where("rival_id = ?", rivalInfo.ID).Delete(&entity.RivalSongData{}).Error; err != nil {
+		return err
+	}
+
 	if err := tx.CreateInBatches(&rivalSongData, 100).Error; err != nil {
 		return err
 	}

@@ -6,10 +6,10 @@ type DiffTableHeader struct {
 	gorm.Model
 
 	HeaderUrl   string
-	DataUrl     string  `json:"data_url"`
-	Name        string  `json:"name"`
-	OriginalUrl *string `json:"original_url"`
-	Symbol      string  `json:"symbol"`
+	DataUrl     string
+	Name        string
+	OriginalUrl *string
+	Symbol      string
 }
 
 func (DiffTableHeader) TableName() string {

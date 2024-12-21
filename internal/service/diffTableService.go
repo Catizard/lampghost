@@ -12,6 +12,7 @@ import (
 
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
+	"github.com/Catizard/lampghost_wails/internal/vo"
 	"github.com/charmbracelet/log"
 	"gorm.io/gorm"
 )
@@ -34,47 +35,73 @@ func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHead
 	if err := s.checkDuplicateHeaderUrl(url); err != nil {
 		return nil, err
 	}
-	header, err := fetchDiffTableFromURL(url)
+	headerVo, err := fetchDiffTableFromURL(url)
 	if err != nil {
 		return nil, err
 	}
-	header.HeaderUrl = url
-	if err != nil {
-		return nil, err
-	}
-	if header.DataUrl == "" {
+	headerVo.HeaderUrl = url
+	if headerVo.DataUrl == "" {
 		return nil, fmt.Errorf("assert: header.DataUrl cannot be empty")
 	}
-	log.Debugf("[DiffTableService] Got header data: %s", header)
-	if err := s.checkDuplicateDataUrl(header.DataUrl); err != nil {
-		return nil, err
-	}
-	var data []entity.DiffTableData
-	if err := fetchJson(header.DataUrl, &data); err != nil {
+	log.Debugf("[DiffTableService] Got header data: %v", headerVo)
+	if err := s.checkDuplicateDataUrl(headerVo.DataUrl); err != nil {
 		return nil, err
 	}
 
-	if err := s.db.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Create(header).Error; err != nil {
-			return err
+	// Transaction begins from here
+	tx := s.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
 		}
-		if err := tx.Unscoped().Where("header_id = ?", header.ID).Delete(&entity.DiffTableData{}).Error; err != nil {
-			return err
-		}
-		for i := range data {
-			data[i].HeaderID = header.ID
-		}
-		// TODO: Create course info here
-		if err := tx.Create(&data).Error; err != nil {
-			return err
-		}
-		return nil
-	}); err != nil {
-		log.Errorf("[DiffTableService] Add difftable header failed with %v", err)
+	}()
+	// (1) difficult table header
+	headerEntity := headerVo.Entity()
+	if err := tx.Create(headerEntity).Error; err != nil {
+		tx.Rollback()
 		return nil, err
 	}
+	// (2) difficult related course contents
+	var courseData []entity.CourseInfo
+	for _, arr := range headerVo.Courses {
+		for _, courseInfoVo := range arr {
+			courseInfo := courseInfoVo.Entity()
+			courseInfo.HeaderID = headerEntity.ID
+			courseData = append(courseData, *courseInfo)
+		}
+	}
+	if err := tx.Unscoped().Where("header_id = ?", headerEntity.ID).Delete(&entity.CourseInfo{}).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+	if err := tx.Create(&courseData).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+	// (3) difficult table concreate contents
+	var data []entity.DiffTableData
+	if err := fetchJson(headerVo.DataUrl, &data); err != nil {
+		return nil, err
+	}
+	for i := range data {
+		data[i].HeaderID = headerEntity.ID
+	}
+	if err := tx.Unscoped().Where("header_id = ?", headerEntity.ID).Delete(&entity.DiffTableData{}).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+	if err := tx.Create(&data).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	// Transaction ends here
+	if err := tx.Commit().Error; err != nil {
+		return nil, err
+	}
+
 	log.Infof("[DiffTableService] Inserted one header with %d contents", len(data))
-	return header, nil
+	return headerEntity, nil
 }
 
 func (s *DiffTableService) FindDiffTableHeaderList() ([]dto.DiffTableHeaderDto, int, error) {
@@ -211,7 +238,7 @@ func (s *DiffTableService) checkDuplicateDataUrl(dataUrl string) error {
 	return nil
 }
 
-func fetchDiffTableFromURL(url string) (*entity.DiffTableHeader, error) {
+func fetchDiffTableFromURL(url string) (*vo.DiffTableHeaderVo, error) {
 	jsonUrl := ""
 	if strings.HasSuffix(url, ".html") {
 		resp, err := http.Get(url)
@@ -265,7 +292,7 @@ func fetchDiffTableFromURL(url string) (*entity.DiffTableHeader, error) {
 	if jsonUrl == "" {
 		return nil, fmt.Errorf("cannot fetch from %s", url)
 	}
-	dth := entity.DiffTableHeader{}
+	var dth vo.DiffTableHeaderVo
 	log.Debugf("before calling fetchJson, url=%s", jsonUrl)
 	fetchJson(jsonUrl, &dth)
 	return &dth, nil

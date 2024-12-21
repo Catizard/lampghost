@@ -164,7 +164,7 @@ function initUser() {
       router.push("/initialize")
       return Promise.reject()
     }
-    return result.Data
+    return Promise.resolve(result.Data);
   }).then(mainUser => {
     FindDiffTableHeaderList().then(result => {
       if (result.Code != 200) {
@@ -173,11 +173,12 @@ function initUser() {
       const { Rows } = result;
       difftableHeaderList.value = [...Rows];
       if (Rows.length > 0) {
-        return Rows[0]
+        return Promise.resolve(Rows[0]);
       } else {
-        return null
+        return Promise.resolve(null);
       }
     }).then(result => {
+      console.log("query difftable result:", result)
       if (result == null) {
         // TODO: 正确地显示无数据的情况
         return Promise.reject("目前无法处理一个难度表都没有的情况，请至少先加入一个数据")
@@ -232,12 +233,17 @@ function initUser() {
         console.log(Rows);
         playCountChartOptions.value.series[0].data = [...Rows];
       }).catch(err => {
-        console.log(err)
+        console.log('error: ', err)
         notification.error({
           content: "获取用户数据失败: " + err,
           duration: 3000,
           keepAliveOnHover: true
         })
+      })
+    }).catch(err => {
+      notification.error({
+        content: err,
+        duration: 3000,
       })
     })
 

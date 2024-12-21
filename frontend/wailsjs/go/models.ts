@@ -98,10 +98,10 @@ export namespace entity {
 	    // Go type: gorm
 	    DeletedAt: any;
 	    HeaderUrl: string;
-	    data_url: string;
-	    name: string;
-	    original_url?: string;
-	    symbol: string;
+	    DataUrl: string;
+	    Name: string;
+	    OriginalUrl?: string;
+	    Symbol: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new DiffTableHeader(source);
@@ -114,10 +114,10 @@ export namespace entity {
 	        this.UpdatedAt = this.convertValues(source["UpdatedAt"], null);
 	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
 	        this.HeaderUrl = source["HeaderUrl"];
-	        this.data_url = source["data_url"];
-	        this.name = source["name"];
-	        this.original_url = source["original_url"];
-	        this.symbol = source["symbol"];
+	        this.DataUrl = source["DataUrl"];
+	        this.Name = source["Name"];
+	        this.OriginalUrl = source["OriginalUrl"];
+	        this.Symbol = source["Symbol"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

@@ -17,6 +17,15 @@ func NewRivalInfoController(rivalInfoService *service.RivalInfoService) *RivalIn
 	}
 }
 
+func (ctl *RivalInfoController) InitializeMainUser(rivalInfo *entity.RivalInfo) result.RtnMessage {
+	log.Info("[Controller] calling RivalInfoController.InitializeMainUser")
+	err := ctl.rivalInfoService.InitializeMainUser(rivalInfo)
+	if err != nil {
+		return result.NewErrorMessage(err)
+	}
+	return result.SUCCESS
+}
+
 func (ctl *RivalInfoController) QueryUserInfoByID(rivalID uint) result.RtnData {
 	log.Info("[Controller] calling RivalInfoController.QueryUserInfo")
 	data, err := ctl.rivalInfoService.FindRivalInfoByID(rivalID)

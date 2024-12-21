@@ -23,6 +23,38 @@ func NewRivalInfoService(db *gorm.DB, diffTableService *DiffTableService) *Rival
 	}
 }
 
+func (s *RivalInfoService) InitializeMainUser(rivalInfo *entity.RivalInfo) error {
+	if rivalInfo.SongDataPath == nil || *rivalInfo.SongDataPath == "" {
+		return fmt.Errorf("songdata.db path cannot be empty")
+	}
+	if rivalInfo.ScoreLogPath == nil || *rivalInfo.ScoreLogPath == "" {
+		return fmt.Errorf("scorelog.db path cannot be empty")
+	}
+	var dup entity.RivalInfo
+	if err := s.db.Debug().Where("main_user = 1").First(&dup).Error; err != nil {
+		return err
+	}
+	if dup.ID > 0 {
+		return fmt.Errorf("cannot have two main user, what are you doing?")
+	}
+	rivalInfo.MainUser = true
+	tx := s.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+	if err := tx.Create(rivalInfo).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	if err := syncRivalScoreLog(tx, rivalInfo); err != nil {
+		tx.Rollback()
+		return err
+	}
+	return tx.Commit().Error
+}
+
 func (s *RivalInfoService) FindRivalInfoList() ([]*entity.RivalInfo, int, error) {
 	var rivals []*entity.RivalInfo
 	if err := s.db.Find(&rivals).Error; err != nil {
@@ -46,74 +78,17 @@ func (s *RivalInfoService) SyncRivalScoreLog(rivalInfo *entity.RivalInfo) error 
 	if rivalInfo.ScoreLogPath == nil || *rivalInfo.ScoreLogPath == "" {
 		return fmt.Errorf("Cannot sync rival %s's score log: score log file path is empty!", rivalInfo.Name)
 	}
-	log.Debugf("[RivalInfoService] Trying to read score log from %s", *rivalInfo.ScoreLogPath)
-	scoreLogDB, err := gorm.Open(sqlite.Open(*rivalInfo.ScoreLogPath))
-	if err != nil {
-		return err
-	}
-	scoreLogService := NewScoreLogService(scoreLogDB)
-	rawScoreLog, n, err := scoreLogService.FindScoreLogList()
-	if err != nil {
-		return err
-	}
-	if n == 0 {
-		return nil
-	}
-	log.Debugf("[RivalInfoService] Read %d logs from %s", n, *rivalInfo.ScoreLogPath)
-	log.Debugf("[RivalInfoService] Trying to read song data from %s", *rivalInfo.SongDataPath)
-	songDataDB, err := gorm.Open(sqlite.Open(*rivalInfo.SongDataPath))
-	if err != nil {
-		return err
-	}
-	songDataService := NewSongDataService(songDataDB)
-	rawSongData, n, err := songDataService.FindSongDataList()
-	if err != nil {
-		return err
-	}
-	log.Infof("[RivalInfoService] Read %d song data from %s", n, *rivalInfo.SongDataPath)
-	if n == 0 {
-		return nil
-	}
-
-	rivalScoreLog := make([]entity.RivalScoreLog, len(rawScoreLog))
-	for i, rawLog := range rawScoreLog {
-		rivalLog := entity.FromRawScoreLogToRivalScoreLog(rawLog)
-		rivalLog.RivalId = rivalInfo.ID
-		rivalScoreLog[i] = rivalLog
-	}
-
-	rivalSongData := make([]entity.RivalSongData, len(rawSongData))
-	for i, rawData := range rawSongData {
-		rivalData := entity.FromRawSongDataToRivalSongData(rawData)
-		rivalData.RivalId = rivalInfo.ID
-		rivalSongData[i] = rivalData
-	}
-
-	if err := s.db.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Unscoped().Where("rival_id = ?", rivalInfo.ID).Delete(&entity.RivalScoreLog{}).Error; err != nil {
-			return err
+	tx := s.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
 		}
-
-		if err := tx.CreateInBatches(&rivalScoreLog, 100).Error; err != nil {
-			return err
-		}
-
-		if err := tx.CreateInBatches(&rivalSongData, 100).Error; err != nil {
-			return err
-		}
-
-		if err := tx.Model(rivalInfo).Updates(entity.RivalInfo{
-			PlayCount: len(rivalScoreLog),
-		}).Error; err != nil {
-			return err
-		}
-		return nil
-	}); err != nil {
+	}()
+	if err := syncRivalScoreLog(tx, rivalInfo); err != nil {
+		tx.Rollback()
 		return err
 	}
-
-	log.Debugf("[RivalInfoService] Sync rival %s's %d scorelogs successfully!", rivalInfo.Name, len(rawScoreLog))
-	return nil
+	return tx.Commit().Error
 }
 
 func (s *RivalInfoService) DelRivalInfo(ID uint) error {
@@ -205,4 +180,71 @@ func (s *RivalInfoService) QueryMainUser() (*entity.RivalInfo, error) {
 		return nil, err
 	}
 	return &out, nil
+}
+
+func syncRivalScoreLog(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
+	log.Debugf("[RivalInfoService] Trying to read score log from %s", *rivalInfo.ScoreLogPath)
+	scoreLogDB, err := gorm.Open(sqlite.Open(*rivalInfo.ScoreLogPath))
+	if err != nil {
+		return err
+	}
+	scoreLogService := NewScoreLogService(scoreLogDB)
+	rawScoreLog, n, err := scoreLogService.FindScoreLogList()
+	if err != nil {
+		return err
+	}
+	if n == 0 {
+		return nil
+	}
+	log.Debugf("[RivalInfoService] Read %d logs from %s", n, *rivalInfo.ScoreLogPath)
+	log.Debugf("[RivalInfoService] Trying to read song data from %s", *rivalInfo.SongDataPath)
+	songDataDB, err := gorm.Open(sqlite.Open(*rivalInfo.SongDataPath))
+	if err != nil {
+		return err
+	}
+	songDataService := NewSongDataService(songDataDB)
+	rawSongData, n, err := songDataService.FindSongDataList()
+	if err != nil {
+		return err
+	}
+	log.Infof("[RivalInfoService] Read %d song data from %s", n, *rivalInfo.SongDataPath)
+	if n == 0 {
+		return nil
+	}
+
+	rivalScoreLog := make([]entity.RivalScoreLog, len(rawScoreLog))
+	for i, rawLog := range rawScoreLog {
+		rivalLog := entity.FromRawScoreLogToRivalScoreLog(rawLog)
+		rivalLog.RivalId = rivalInfo.ID
+		rivalScoreLog[i] = rivalLog
+	}
+
+	rivalSongData := make([]entity.RivalSongData, len(rawSongData))
+	for i, rawData := range rawSongData {
+		rivalData := entity.FromRawSongDataToRivalSongData(rawData)
+		rivalData.RivalId = rivalInfo.ID
+		rivalSongData[i] = rivalData
+	}
+
+	if err := tx.Unscoped().Where("rival_id = ?", rivalInfo.ID).Delete(&entity.RivalScoreLog{}).Error; err != nil {
+		return err
+	}
+
+	if err := tx.CreateInBatches(&rivalScoreLog, 100).Error; err != nil {
+		return err
+	}
+
+	if err := tx.CreateInBatches(&rivalSongData, 100).Error; err != nil {
+		return err
+	}
+
+	if err := tx.Model(rivalInfo).Updates(entity.RivalInfo{
+		PlayCount: len(rivalScoreLog),
+	}).Error; err != nil {
+		return err
+	}
+	return nil
+
+	log.Debugf("[RivalInfoService] Sync rival %s's %d scorelogs successfully!", rivalInfo.Name, len(rawScoreLog))
+	return nil
 }

@@ -30,11 +30,11 @@ func (s *RivalInfoService) InitializeMainUser(rivalInfo *entity.RivalInfo) error
 	if rivalInfo.ScoreLogPath == nil || *rivalInfo.ScoreLogPath == "" {
 		return fmt.Errorf("scorelog.db path cannot be empty")
 	}
-	var dup entity.RivalInfo
-	if err := s.db.Debug().Where("main_user = 1").First(&dup).Error; err != nil {
+	var cnt int64
+	if err := s.db.Model(&entity.RivalInfo{}).Where("main_user = 1").Count(&cnt).Error; err != nil {
 		return err
 	}
-	if dup.ID > 0 {
+	if cnt > 0 {
 		return fmt.Errorf("cannot have two main user, what are you doing?")
 	}
 	rivalInfo.MainUser = true

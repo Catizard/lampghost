@@ -15,10 +15,19 @@ const mainRoutes: RouteRecordRaw[] = [
         name: "difftable",
         path: "/difftable",
         component: () => import("../views/DifficultTable.vue")
+    },
+    {
+        path: "/",
+        redirect: "/home",
     }
 ];
 
 const routes: RouteRecordRaw[] = [
+    {
+        name: "initialize",
+        path: "/initialize",
+        component: () => import("../views/initialize.vue"),
+    },
     {
         name: "not-found",
         path: "/:path*",

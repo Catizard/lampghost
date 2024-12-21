@@ -9,6 +9,10 @@ export function FindRivalInfoList():Promise<result.RtnDataList>;
 
 export function GENERATOR_RIVAL_INFO():Promise<entity.RivalInfo>;
 
+export function InitializeMainUser(arg1:entity.RivalInfo):Promise<result.RtnMessage>;
+
+export function QueryMainUser():Promise<result.RtnData>;
+
 export function QueryUserInfoByID(arg1:number):Promise<result.RtnData>;
 
 export function QueryUserInfoWithLevelLayeredDiffTableLampStatus(arg1:number,arg2:number):Promise<result.RtnData>;

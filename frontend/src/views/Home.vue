@@ -59,10 +59,16 @@
 <script setup>
 import VueApexCharts from 'vue3-apexcharts';
 import { reactive, ref } from 'vue';
-import { QueryUserInfoWithLevelLayeredDiffTableLampStatus, SyncRivalScoreLog, QueryUserPlayCountInYear } from '../../wailsjs/go/controller/RivalInfoController'
+import {
+  QueryUserInfoWithLevelLayeredDiffTableLampStatus,
+  SyncRivalScoreLog,
+  QueryUserPlayCountInYear,
+  QueryMainUser
+} from '../../wailsjs/go/controller/RivalInfoController'
 import { FindDiffTableHeaderList } from '../../wailsjs/go/controller/DiffTableController';
 import { useNotification } from 'naive-ui';
 import dayjs from 'dayjs';
+import router from '../router';
 
 const LAMPS = [1, 4, 5, 11, 0];
 const STR_LAMPS = ["FAILED", "Easy", "Normal", "Hard+", "NO_PLAY"];
@@ -148,80 +154,93 @@ const playerData = reactive({
 const difftableHeaderList = ref([]);
 
 function initUser() {
-  FindDiffTableHeaderList().then(result => {
+  QueryMainUser().then(result => {
     if (result.Code != 200) {
-      return Promise.reject(result.Msg)
-    }
-    const { Rows } = result;
-    difftableHeaderList.value = [...Rows];
-    if (Rows.length > 0) {
-      return Rows[0]
-    } else {
-      return null
-    }
-  }).then(result => {
-    if (result == null) {
-      // TODO: 正确地显示无数据的情况
-      return Promise.reject("目前无法处理一个难度表都没有的情况，请至少先加入一个数据")
-    }
-    // TODO: Remove another magic 1
-    QueryUserInfoWithLevelLayeredDiffTableLampStatus(1, result.ID).then(result => {
-      if (result.Code != 200) {
-        return Promise.reject(result.Msg)
-      }
-      const { Data } = result;
-      console.log(Data)
-      playerData.playerName = Data.Name
-      playerData.playCount = Data.PlayCount
-      playerData.lastUpdate = dayjs(Data.UpdatedAt).format('YYYY-MM-DD HH:mm:ss')
-      // Apply lamp status
-      lampCountChartOptions.series = [];
-      STR_LAMPS.forEach(lampName => {
-        lampCountChartOptions.series.push({
-          name: lampName,
-          data: []
-        })
+      // TODO: 看起来现在还没有初始化主用户？
+      notification.error({
+        content: "没有主用户，请先录入你自己的存档信息",
+        duration: 3000,
       });
-      lampCountChartOptions.xaxis.categories = [];
-      const { DiffTableHeader } = Data;
-      for (let i = 0; i < DiffTableHeader.SortedLevels.length; ++i) {
-        const level = DiffTableHeader.SortedLevels[i];
-        const levelName = DiffTableHeader.Symbol + level;
-        lampCountChartOptions.xaxis.categories.push(levelName);
-        const dataList = DiffTableHeader.LevelLayeredContents[level];
-        for (let j = 0; j < LAMPS.length; ++j) {
-          const lampValue = LAMPS[j];
-          // TODO: wtf
-          const count = dataList.filter(data => data.Lamp == lampValue || (data.Lamp >= 6 && lampValue == 11) || (lampValue == 1 && data.Lamp < 4 && data.Lamp > 0)).length;
-          let v = {
-            x: levelName,
-            y: count
-          }
-          if (lampValue == 0) {
-            v.fillColor = '#FFFFFF'
-            v.strokeColor = '#FFFFFF'
-          }
-          lampCountChartOptions.series[j].data.push(v);
-        }
-      }
-
-      console.log(lampCountChartOptions);
-      return QueryUserPlayCountInYear(1, 2024)
-    }).then(result => {
+      router.push("/initialize")
+      return Promise.reject()
+    }
+    return result.Data
+  }).then(mainUser => {
+    FindDiffTableHeaderList().then(result => {
       if (result.Code != 200) {
         return Promise.reject(result.Msg)
       }
       const { Rows } = result;
-      console.log(Rows);
-      playCountChartOptions.value.series[0].data = [...Rows];
-    }).catch(err => {
-      console.log(err)
-      notification.error({
-        content: "获取用户数据失败: " + err,
-        duration: 3000,
-        keepAliveOnHover: true
+      difftableHeaderList.value = [...Rows];
+      if (Rows.length > 0) {
+        return Rows[0]
+      } else {
+        return null
+      }
+    }).then(result => {
+      if (result == null) {
+        // TODO: 正确地显示无数据的情况
+        return Promise.reject("目前无法处理一个难度表都没有的情况，请至少先加入一个数据")
+      }
+      QueryUserInfoWithLevelLayeredDiffTableLampStatus(mainUser.ID, result.ID).then(result => {
+        if (result.Code != 200) {
+          return Promise.reject(result.Msg)
+        }
+        const { Data } = result;
+        console.log(Data)
+        playerData.playerName = Data.Name
+        playerData.playCount = Data.PlayCount
+        playerData.lastUpdate = dayjs(Data.UpdatedAt).format('YYYY-MM-DD HH:mm:ss')
+        // Apply lamp status
+        lampCountChartOptions.series = [];
+        STR_LAMPS.forEach(lampName => {
+          lampCountChartOptions.series.push({
+            name: lampName,
+            data: []
+          })
+        });
+        lampCountChartOptions.xaxis.categories = [];
+        const { DiffTableHeader } = Data;
+        for (let i = 0; i < DiffTableHeader.SortedLevels.length; ++i) {
+          const level = DiffTableHeader.SortedLevels[i];
+          const levelName = DiffTableHeader.Symbol + level;
+          lampCountChartOptions.xaxis.categories.push(levelName);
+          const dataList = DiffTableHeader.LevelLayeredContents[level];
+          for (let j = 0; j < LAMPS.length; ++j) {
+            const lampValue = LAMPS[j];
+            // TODO: wtf
+            const count = dataList.filter(data => data.Lamp == lampValue || (data.Lamp >= 6 && lampValue == 11) || (lampValue == 1 && data.Lamp < 4 && data.Lamp > 0)).length;
+            let v = {
+              x: levelName,
+              y: count
+            }
+            if (lampValue == 0) {
+              v.fillColor = '#FFFFFF'
+              v.strokeColor = '#FFFFFF'
+            }
+            lampCountChartOptions.series[j].data.push(v);
+          }
+        }
+
+        console.log(lampCountChartOptions);
+        return QueryUserPlayCountInYear(1, 2024)
+      }).then(result => {
+        if (result.Code != 200) {
+          return Promise.reject(result.Msg)
+        }
+        const { Rows } = result;
+        console.log(Rows);
+        playCountChartOptions.value.series[0].data = [...Rows];
+      }).catch(err => {
+        console.log(err)
+        notification.error({
+          content: "获取用户数据失败: " + err,
+          duration: 3000,
+          keepAliveOnHover: true
+        })
       })
     })
+
   })
 
 }

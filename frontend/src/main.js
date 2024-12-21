@@ -1,4 +1,4 @@
-import {createApp} from 'vue'
+import { createApp } from 'vue'
 import naive from 'naive-ui'
 import App from './App.vue'
 import router from './router';
@@ -14,7 +14,5 @@ app.use(VueApexCharts);
 app.use(PerfectScrollbarPlugin, {
     componentName: "PerfectScrollbar"
 })
-
-router.replace("/home");
 
 app.mount('#app')

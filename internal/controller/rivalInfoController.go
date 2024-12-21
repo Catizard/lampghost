@@ -26,6 +26,15 @@ func (ctl *RivalInfoController) InitializeMainUser(rivalInfo *entity.RivalInfo) 
 	return result.SUCCESS
 }
 
+func (ctl *RivalInfoController) QueryMainUser() result.RtnData {
+	log.Info("[Controller] calling RivalInfoController.QueryMainUser")
+	rivalInfo, err := ctl.rivalInfoService.QueryMainUser()
+	if err != nil {
+		return result.NewErrorData(err)
+	}
+	return result.NewRtnData(rivalInfo)
+}
+
 func (ctl *RivalInfoController) QueryUserInfoByID(rivalID uint) result.RtnData {
 	log.Info("[Controller] calling RivalInfoController.QueryUserInfo")
 	data, err := ctl.rivalInfoService.FindRivalInfoByID(rivalID)

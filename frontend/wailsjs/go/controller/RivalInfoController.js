@@ -14,6 +14,14 @@ export function GENERATOR_RIVAL_INFO() {
   return window['go']['controller']['RivalInfoController']['GENERATOR_RIVAL_INFO']();
 }
 
+export function InitializeMainUser(arg1) {
+  return window['go']['controller']['RivalInfoController']['InitializeMainUser'](arg1);
+}
+
+export function QueryMainUser() {
+  return window['go']['controller']['RivalInfoController']['QueryMainUser']();
+}
+
 export function QueryUserInfoByID(arg1) {
   return window['go']['controller']['RivalInfoController']['QueryUserInfoByID'](arg1);
 }

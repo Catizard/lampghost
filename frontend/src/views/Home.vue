@@ -72,6 +72,7 @@ import router from '../router';
 
 const LAMPS = [1, 4, 5, 11, 0];
 const STR_LAMPS = ["FAILED", "Easy", "Normal", "Hard+", "NO_PLAY"];
+const mainUser = ref(null);
 
 const notification = useNotification();
 
@@ -164,6 +165,7 @@ function initUser() {
       router.push("/initialize")
       return Promise.reject()
     }
+    mainUser.value = result.Data
     return Promise.resolve(result.Data);
   }).then(mainUser => {
     FindDiffTableHeaderList().then(result => {
@@ -257,9 +259,8 @@ function initDiffTable() {
 
 const syncLoading = ref(false);
 function handleSyncClick() {
-  // TODO: Remove magic 1
   syncLoading.value = true;
-  SyncRivalScoreLog(1).then(result => {
+  SyncRivalScoreLog(mainUser.value.ID).then(result => {
     if (result.Code != 200) {
       return Promise.reject();
     }

@@ -60,3 +60,25 @@ func FromRawSongDataToRivalSongData(songData *SongData) RivalSongData {
 		Notes:      songData.Notes,
 	}
 }
+
+type SongHashCache struct {
+	md5KeyCache    map[string]string
+	sha256KeyCache map[string]string
+}
+
+func NewSongHashCache(md5KeyCache map[string]string, sha256KeyCache map[string]string) *SongHashCache {
+	return &SongHashCache{
+		md5KeyCache:    md5KeyCache,
+		sha256KeyCache: sha256KeyCache,
+	}
+}
+
+func (c *SongHashCache) GetSHA256(md5 string) (string, bool) {
+	v, ok := c.md5KeyCache[md5]
+	return v, ok
+}
+
+func (c *SongHashCache) GetMD5(sha256 string) (string, bool) {
+	v, ok := c.sha256KeyCache[sha256]
+	return v, ok
+}

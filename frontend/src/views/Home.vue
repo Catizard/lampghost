@@ -79,7 +79,11 @@ const notification = useNotification();
 const playCountChartOptions = ref({
   chart: {
     id: "chart-play-count",
-    type: 'line'
+    type: 'line',
+    zoom: {
+      enabled: false,
+      allowMouseWheelZoom: false,
+    }
   },
   xaxis: {
     categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
@@ -89,7 +93,7 @@ const playCountChartOptions = ref({
       name: "游玩次数",
       data: [],
     }
-  ]
+  ],
 });
 
 const playCountChartYearOptions = ref([
@@ -248,9 +252,7 @@ function initUser() {
         duration: 3000,
       })
     })
-
   })
-
 }
 
 function initDiffTable() {

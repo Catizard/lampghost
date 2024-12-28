@@ -62,21 +62,23 @@ func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHead
 		return nil, err
 	}
 	// (2) difficult related course contents
-	var courseData []entity.CourseInfo
-	for _, arr := range headerVo.Courses {
-		for _, courseInfoVo := range arr {
-			courseInfo := courseInfoVo.Entity()
-			courseInfo.HeaderID = headerEntity.ID
-			courseData = append(courseData, *courseInfo)
+	if len(headerVo.Courses) > 0 {
+		var courseData []entity.CourseInfo
+		for _, arr := range headerVo.Courses {
+			for _, courseInfoVo := range arr {
+				courseInfo := courseInfoVo.Entity()
+				courseInfo.HeaderID = headerEntity.ID
+				courseData = append(courseData, *courseInfo)
+			}
 		}
-	}
-	if err := tx.Unscoped().Where("header_id = ?", headerEntity.ID).Delete(&entity.CourseInfo{}).Error; err != nil {
-		tx.Rollback()
-		return nil, err
-	}
-	if err := tx.Create(&courseData).Error; err != nil {
-		tx.Rollback()
-		return nil, err
+		if err := tx.Unscoped().Where("header_id = ?", headerEntity.ID).Delete(&entity.CourseInfo{}).Error; err != nil {
+			tx.Rollback()
+			return nil, err
+		}
+		if err := tx.Create(&courseData).Error; err != nil {
+			tx.Rollback()
+			return nil, err
+		}
 	}
 	// (3) difficult table concreate contents
 	var data []entity.DiffTableData

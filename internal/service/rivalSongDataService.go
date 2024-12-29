@@ -14,19 +14,26 @@ func NewRivalSongDataService(db *gorm.DB) *RivalSongDataService {
 		db: db,
 	}
 }
-
-func (s *RivalSongDataService) FindRivalSongDataList(filter *entity.RivalSongData) ([]entity.RivalSongData, int, error) {
+func findRivalSongDataList(tx *gorm.DB, filter *entity.RivalSongData) ([]entity.RivalSongData, int, error) {
 	var songDataList []entity.RivalSongData
-	if err := s.db.Where(filter).Find(&songDataList).Error; err != nil {
+	if err := tx.Where(filter).Find(&songDataList).Error; err != nil {
 		return nil, 0, err
 	}
 	return songDataList, len(songDataList), nil
 }
 
-func (s *RivalSongDataService) QuerySongHashCache(rivalId uint) (*entity.SongHashCache, error) {
+func queryDefaultSongHashCache(tx *gorm.DB) (*entity.SongHashCache, error) {
+	mainUser, err := queryMainUser(tx)
+	if err != nil {
+		return nil, err
+	}
+	return querySongHashCache(tx, mainUser.ID)
+}
+
+func querySongHashCache(tx *gorm.DB, rivalID uint) (*entity.SongHashCache, error) {
 	md5KeyCache := make(map[string]string)
 	sha256KeyCache := make(map[string]string)
-	dataList, _, err := s.FindRivalSongDataList(&entity.RivalSongData{RivalId: rivalId})
+	dataList, _, err := findRivalSongDataList(tx, &entity.RivalSongData{RivalId: rivalID})
 	if err != nil {
 		return nil, err
 	}

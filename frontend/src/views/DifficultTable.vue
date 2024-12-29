@@ -21,15 +21,15 @@
 
 <script lang="ts" setup>
 import type { DataTableColumns, FormInst } from "naive-ui";
-import { NButton, useDialog, useMessage } from "naive-ui";
+import { NButton, NDataTable, useDialog, useMessage } from "naive-ui";
 import { useNotification } from "naive-ui";
-import { defineComponent, h, Ref, ref } from "vue";
+import { computed, defineComponent, h, Ref, ref } from "vue";
 import {
   AddDiffTableHeader,
-  FindDiffTableHeaderList,
-  DelDiffTableHeader
+  DelDiffTableHeader,
+  FindDiffTableHeaderListWithRival
 } from "../../wailsjs/go/controller/DiffTableController";
-import { entity } from "../../wailsjs/go/models";
+import { dto, entity } from "../../wailsjs/go/models";
 
 const showAddModal = ref(false);
 
@@ -52,9 +52,23 @@ loadDiffTableData();
 function createColumns({
   deleteHeader,
 }: {
-  deleteHeader: (row: entity.DiffTableHeader) => void;
-}): DataTableColumns<entity.DiffTableHeader> {
+  deleteHeader: (row: dto.DiffTableHeaderDto) => void;
+}): DataTableColumns<dto.DiffTableHeaderDto> {
   return [
+    {
+      type: "expand",
+      renderExpand: (rowData) => {
+        return h(
+          NDataTable,
+          {
+            columns: songDataColumns,
+            data: rowData.Contents,
+            pagination: pagination,
+            bordered: false
+          }
+        )
+      }
+    },
     { title: "Name", key: "Name", },
     { title: "url", key: "HeaderUrl", },
     {
@@ -76,6 +90,16 @@ function createColumns({
   ];
 }
 
+function createSongDataColumns(): DataTableColumns<dto.DiffTableDataDto> {
+  return [
+    { title: "Song Name", key: "Title", maxWidth: "200px", resizable: true },
+    { title: "Arist", key: "Artist", maxWidth: "200px", resizable: true },
+    { title: "Clear", key: "Lamp", minWidth: "120px", resizable: true },
+    { title: "PC", key: "PlayCount", minWidth: "120px", resizable: true },
+  ];
+}
+const songDataColumns = createSongDataColumns();
+
 let data: Ref<Array<any>> = ref([]);
 const pagination = false as const;
 const columns = createColumns({
@@ -85,7 +109,7 @@ const columns = createColumns({
       positiveText: "确定",
       negativeText: "取消",
       onPositiveClick: () => {
-        delDiffTableHeader(row.ID)  
+        delDiffTableHeader(row.ID)
       }
     })
   }
@@ -108,16 +132,16 @@ function addDiffTableHeader(url: string) {
 
 function delDiffTableHeader(id: number) {
   DelDiffTableHeader(id)
-  .then(result => {
-    if (result.Code != 200) {
-      return Promise.reject(result.Msg)
-    }
-    notifySuccess("删除成功")
-    loadDiffTableData();
-  }).catch(err => {
-    notifyError(err)
-    loadDiffTableData();
-  })
+    .then(result => {
+      if (result.Code != 200) {
+        return Promise.reject(result.Msg)
+      }
+      notifySuccess("删除成功")
+      loadDiffTableData();
+    }).catch(err => {
+      notifyError(err)
+      loadDiffTableData();
+    })
 }
 
 function handlePositiveClick(): boolean {
@@ -136,12 +160,19 @@ function handleNegativeClick() {
 }
 
 function loadDiffTableData() {
-  FindDiffTableHeaderList()
+  // TODO: remove this magic 1
+  FindDiffTableHeaderListWithRival(1)
     .then(result => {
       if (result.Code != 200) {
         return Promise.reject(result.Msg);
       }
-      data.value = [...result.Rows];
+      data.value = [...result.Rows].map(row => {
+        return {
+          key: row.ID,
+          ...row
+        }
+      });
+      console.log(data.value)
     })
     .catch((err) => {
       notification.error({

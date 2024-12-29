@@ -14,6 +14,14 @@ export function FindDiffTableHeaderList() {
   return window['go']['controller']['DiffTableController']['FindDiffTableHeaderList']();
 }
 
+export function FindDiffTableHeaderListWithRival(arg1) {
+  return window['go']['controller']['DiffTableController']['FindDiffTableHeaderListWithRival'](arg1);
+}
+
+export function GENERATOR_TABLE_DATA() {
+  return window['go']['controller']['DiffTableController']['GENERATOR_TABLE_DATA']();
+}
+
 export function GENERATOR_TABLE_HEADER() {
   return window['go']['controller']['DiffTableController']['GENERATOR_TABLE_HEADER']();
 }
@@ -24,6 +32,10 @@ export function GENERATOR_TABLE_HEADER_DTO() {
 
 export function QueryDiffTableInfoById(arg1) {
   return window['go']['controller']['DiffTableController']['QueryDiffTableInfoById'](arg1);
+}
+
+export function QueryDiffTableInfoWithRival(arg1, arg2) {
+  return window['go']['controller']['DiffTableController']['QueryDiffTableInfoWithRival'](arg1, arg2);
 }
 
 export function QueryLevelLayeredDiffTableInfoById(arg1) {

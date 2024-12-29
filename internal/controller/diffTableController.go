@@ -48,9 +48,28 @@ func (ctl *DiffTableController) FindDiffTableHeaderList() result.RtnDataList {
 	return result.NewRtnDataList(rows)
 }
 
+func (ctl *DiffTableController) FindDiffTableHeaderListWithRival(rivalID uint) result.RtnDataList {
+	log.Info("[Controller] calling DiffTableController.FindDiffTableHeaderlistWithRival")
+	rows, _, err := ctl.diffTableService.FindDiffTableHeaderListWithRival(rivalID)
+	if err != nil {
+		log.Errorf("[DiffTableController] returning err: %v", err)
+	}
+	return result.NewRtnDataList(rows)
+}
+
 func (ctl *DiffTableController) QueryDiffTableInfoById(ID uint) result.RtnData {
 	log.Info("[Controller] calling DiffTableController.QueryDiffTableInfoById")
 	data, err := ctl.diffTableService.QueryDiffTableInfoByID(ID)
+	if err != nil {
+		log.Errorf("[DiffTableController] returning err: %v", err)
+		return result.NewErrorData(err)
+	}
+	return result.NewRtnData(data)
+}
+
+func (ctl *DiffTableController) QueryDiffTableInfoWithRival(ID uint, rivalID uint) result.RtnData {
+	log.Info("[Controller] calling DiffTableController.QueryDiffTableDataWithRival")
+	data, err := ctl.diffTableService.QueryDiffTableInfoByIDWithRival(ID, rivalID)
 	if err != nil {
 		log.Errorf("[DiffTableController] returning err: %v", err)
 		return result.NewErrorData(err)
@@ -71,3 +90,5 @@ func (ctl *DiffTableController) QueryLevelLayeredDiffTableInfoById(ID uint) resu
 func (ctl *DiffTableController) GENERATOR_TABLE_HEADER() *entity.DiffTableHeader { return nil }
 
 func (ctl *DiffTableController) GENERATOR_TABLE_HEADER_DTO() *dto.DiffTableHeaderDto { return nil }
+
+func (ctl *DiffTableController) GENERATOR_TABLE_DATA() *dto.DiffTableDataDto { return nil }

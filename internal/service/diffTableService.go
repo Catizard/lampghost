@@ -106,17 +106,68 @@ func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHead
 	return headerEntity, nil
 }
 
+// Query all difficult table datas
+//
+// Returns difficult header and its contents
 func (s *DiffTableService) FindDiffTableHeaderList() ([]dto.DiffTableHeaderDto, int, error) {
 	var headers []entity.DiffTableHeader
 	if err := s.db.Find(&headers).Error; err != nil {
 		log.Error("[DiffTableService] Find difftable header failed with %v", err)
 		return nil, 0, err
 	}
+	headerIds := make([]uint, len(headers))
+	for i, header := range headers {
+		headerIds[i] = header.ID
+	}
+	rawContents, err := queryDiffTableDataByIDs(s.db, headerIds)
+	if err != nil {
+		return nil, 0, err
+	}
+
 	ret := make([]dto.DiffTableHeaderDto, len(headers))
 	for i, header := range headers {
-		ret[i] = *dto.NewDiffTableHeaderDto(&header, nil)
+		contents := make([]dto.DiffTableDataDto, 0)
+		for _, content := range rawContents {
+			if content.HeaderID == header.ID {
+				contents = append(contents, content)
+			}
+		}
+		ret[i] = *dto.NewDiffTableHeaderDto(&header, contents)
 	}
+
 	return ret, len(ret), nil
+}
+
+// Extend function for FindDiffTableHeaderList
+//
+// Adds player related field (e.g PlayCount, Lamp status)
+func (s *DiffTableService) FindDiffTableHeaderListWithRival(rivalID uint) ([]dto.DiffTableHeaderDto, int, error) {
+	headers, _, err := s.FindDiffTableHeaderList()
+	if err != nil {
+		return nil, 0, err
+	}
+	songLogs, _, err := findRivalScoreLogList(s.db, rivalID)
+	if err != nil {
+		return nil, 0, err
+	}
+	sha256ScoreLogsMap := make(map[string][]entity.RivalScoreLog)
+	for _, scoreLog := range songLogs {
+		if _, ok := sha256ScoreLogsMap[scoreLog.Sha256]; !ok {
+			sha256ScoreLogsMap[scoreLog.Sha256] = make([]entity.RivalScoreLog, 0)
+		}
+		sha256ScoreLogsMap[scoreLog.Sha256] = append(sha256ScoreLogsMap[scoreLog.Sha256], *scoreLog)
+	}
+	for i, header := range headers {
+		for j, content := range header.Contents {
+			if logs, ok := sha256ScoreLogsMap[content.Sha256]; ok {
+				headers[i].Contents[j].PlayCount = len(logs)
+				for _, log := range logs {
+					headers[i].Contents[j].Lamp = max(content.Lamp, int(log.Clear))
+				}
+			}
+		}
+	}
+	return headers, len(headers), nil
 }
 
 func (s *DiffTableService) DelDiffTableHeader(ID uint) error {
@@ -138,41 +189,49 @@ func (s *DiffTableService) DelDiffTableHeader(ID uint) error {
 	return nil
 }
 
+// Query specific difficult table's info
+//
+// Returns one header with detailed contents, ensure every content's hash field is compitable
 func (s *DiffTableService) QueryDiffTableInfoByID(ID uint) (*dto.DiffTableHeaderDto, error) {
-	var header entity.DiffTableHeader
-	if err := s.db.Debug().First(&header, ID).Error; err != nil {
-		return nil, err
-	}
-	log.Debugf("[DiffTableService] QueryDiffTableInfoByID fetched header: %v", header)
-	var rawContents []entity.DiffTableData
-	if err := s.db.Where(&entity.DiffTableData{HeaderID: ID}).Find(&rawContents).Error; err != nil {
-		return nil, err
-	}
-	mainUser, err := s.QueryMainUser()
+	header, err := queryDiffTableInfoByID(s.db, ID)
 	if err != nil {
 		return nil, err
 	}
-	cache, err := s.rivalSongDataService.QuerySongHashCache(mainUser.ID)
+	contents, err := queryDiffTableDataByHeaderID(s.db, ID)
 	if err != nil {
 		return nil, err
 	}
-	// NOTE: 如果一个数据找不到对应的hash信息，则认为剔除掉该数据避免后续出错
-	contents := make([]dto.DiffTableDataDto, 0)
-	for _, rawContent := range rawContents {
-		if rawContent.Sha256 != "" {
-			if md5, ok := cache.GetMD5(rawContent.Sha256); ok {
-				rawContent.Md5 = md5
-				contents = append(contents, *dto.NewDiffTableDataDto(&rawContent))
-			}
-		} else if rawContent.Md5 != "" {
-			if sha256, ok := cache.GetSHA256(rawContent.Md5); ok {
-				rawContent.Sha256 = sha256
-				contents = append(contents, *dto.NewDiffTableDataDto(&rawContent))
+	return dto.NewDiffTableHeaderDto(header, contents), nil
+}
+
+// Extend function for QueryDiffTableInfoByID
+//
+// Adds player related field (e.g PlayCount, Lamp status)
+func (s *DiffTableService) QueryDiffTableInfoByIDWithRival(ID uint, rivalID uint) (*dto.DiffTableHeaderDto, error) {
+	header, err := s.QueryDiffTableInfoByID(ID)
+	if err != nil {
+		return nil, err
+	}
+	songLogs, _, err := findRivalScoreLogList(s.db, rivalID)
+	if err != nil {
+		return nil, err
+	}
+	sha256ScoreLogsMap := make(map[string][]entity.RivalScoreLog)
+	for _, scoreLog := range songLogs {
+		if _, ok := sha256ScoreLogsMap[scoreLog.Sha256]; !ok {
+			sha256ScoreLogsMap[scoreLog.Sha256] = make([]entity.RivalScoreLog, 0)
+		}
+		sha256ScoreLogsMap[scoreLog.Sha256] = append(sha256ScoreLogsMap[scoreLog.Sha256], *scoreLog)
+	}
+	for i, content := range header.Contents {
+		if logs, ok := sha256ScoreLogsMap[content.Sha256]; ok {
+			header.Contents[i].PlayCount = len(logs)
+			for _, log := range logs {
+				header.Contents[i].Lamp = max(content.Lamp, int(log.Clear))
 			}
 		}
 	}
-
-	return dto.NewDiffTableHeaderDto(&header, contents), nil
+	return header, nil
 }
 
 func (s *DiffTableService) QueryLevelLayeredDiffTableInfoById(ID uint) (*dto.DiffTableHeaderDto, error) {
@@ -207,15 +266,6 @@ func (s *DiffTableService) QueryLevelLayeredDiffTableInfoById(ID uint) (*dto.Dif
 		return ll < rr
 	})
 	return dto.NewLevelLayeredDiffTableHeaderDto(header.Entity(), sortedLevels, levelLayeredContent), nil
-}
-
-// TODO: we are not allowed to build a cycle dependency...
-func (s *DiffTableService) QueryMainUser() (*entity.RivalInfo, error) {
-	var out entity.RivalInfo
-	if err := s.db.Where(&entity.RivalInfo{MainUser: true}).First(&out).Error; err != nil {
-		return nil, err
-	}
-	return &out, nil
 }
 
 func (s *DiffTableService) checkDuplicateHeaderUrl(headerUrl string) error {
@@ -298,6 +348,55 @@ func fetchDiffTableFromURL(url string) (*vo.DiffTableHeaderVo, error) {
 	log.Debugf("before calling fetchJson, url=%s", jsonUrl)
 	fetchJson(jsonUrl, &dth)
 	return &dth, nil
+}
+
+func queryDiffTableInfoByID(tx *gorm.DB, ID uint) (*entity.DiffTableHeader, error) {
+	var header entity.DiffTableHeader
+	if err := tx.First(&header, ID).Error; err != nil {
+		return nil, err
+	}
+	log.Debugf("[DiffTableService] QueryDiffTableInfoByID fetched header: %v", header)
+	return &header, nil
+}
+
+// Query specific difficult table's all contents
+// Note this function directly returns dto instead of entity form of data, which is an
+// old problem that hash field is incompitable in some difficult tables
+//
+// This function uses default user's song data to build the cache
+func queryDiffTableDataByHeaderID(tx *gorm.DB, headerID uint) ([]dto.DiffTableDataDto, error) {
+	var rawContents []entity.DiffTableData
+	if err := tx.Where("header_id = ?", headerID).Find(&rawContents).Error; err != nil {
+		return nil, err
+	}
+	cache, err := queryDefaultSongHashCache(tx)
+	if err != nil {
+		return nil, err
+	}
+	contents := make([]dto.DiffTableDataDto, 0)
+	for _, rawContent := range rawContents {
+		contents = append(contents, *dto.NewDiffTableDataDtoWithCache(&rawContent, cache))
+	}
+	return contents, nil
+}
+
+// Query multiple difficult table's contents by header ids
+//
+// Extends to queryDiffTableDataByHeaderID, which could query multiple ids
+func queryDiffTableDataByIDs(tx *gorm.DB, IDs []uint) ([]dto.DiffTableDataDto, error) {
+	var rawContents []entity.DiffTableData
+	if err := tx.Debug().Where("header_id in ?", IDs).Find(&rawContents).Error; err != nil {
+		return nil, err
+	}
+	cache, err := queryDefaultSongHashCache(tx)
+	if err != nil {
+		return nil, err
+	}
+	contents := make([]dto.DiffTableDataDto, 0)
+	for _, rawContent := range rawContents {
+		contents = append(contents, *dto.NewDiffTableDataDtoWithCache(&rawContent, cache))
+	}
+	return contents, nil
 }
 
 func fetchJson(url string, v interface{}) error {

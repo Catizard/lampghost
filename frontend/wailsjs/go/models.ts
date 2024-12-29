@@ -6,15 +6,16 @@ export namespace dto {
 	    Artist: string;
 	    Comment: string;
 	    Level: string;
-	    lr2_bmdid: string;
+	    Lr2BmsId: string;
 	    Md5: string;
 	    NameDiff: string;
 	    Title: string;
-	    url: string;
-	    url_diff: string;
+	    Url: string;
+	    UrlDiff: string;
 	    Sha256: string;
 	    Lamp: number;
 	    GhostLamp: number;
+	    PlayCount: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new DiffTableDataDto(source);
@@ -27,15 +28,16 @@ export namespace dto {
 	        this.Artist = source["Artist"];
 	        this.Comment = source["Comment"];
 	        this.Level = source["Level"];
-	        this.lr2_bmdid = source["lr2_bmdid"];
+	        this.Lr2BmsId = source["Lr2BmsId"];
 	        this.Md5 = source["Md5"];
 	        this.NameDiff = source["NameDiff"];
 	        this.Title = source["Title"];
-	        this.url = source["url"];
-	        this.url_diff = source["url_diff"];
+	        this.Url = source["Url"];
+	        this.UrlDiff = source["UrlDiff"];
 	        this.Sha256 = source["Sha256"];
 	        this.Lamp = source["Lamp"];
 	        this.GhostLamp = source["GhostLamp"];
+	        this.PlayCount = source["PlayCount"];
 	    }
 	}
 	export class DiffTableHeaderDto {

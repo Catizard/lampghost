@@ -27,7 +27,8 @@ import { computed, defineComponent, h, Ref, ref } from "vue";
 import {
   AddDiffTableHeader,
   DelDiffTableHeader,
-  FindDiffTableHeaderListWithRival
+  FindDiffTableHeaderListWithRival,
+  FindDiffTableHeaderTree
 } from "../../wailsjs/go/controller/DiffTableController";
 import { dto, entity } from "../../wailsjs/go/models";
 
@@ -62,7 +63,7 @@ function createColumns({
           NDataTable,
           {
             columns: songDataColumns,
-            data: rowData.Contents,
+            data: rowData.Children,
             pagination: pagination,
             bordered: false
           }
@@ -92,10 +93,23 @@ function createColumns({
 
 function createSongDataColumns(): DataTableColumns<dto.DiffTableDataDto> {
   return [
-    { title: "Song Name", key: "Title", maxWidth: "200px", resizable: true },
-    { title: "Arist", key: "Artist", maxWidth: "200px", resizable: true },
-    { title: "Clear", key: "Lamp", minWidth: "120px", resizable: true },
-    { title: "PC", key: "PlayCount", minWidth: "120px", resizable: true },
+    { title: "Level Name", key: "Name", maxWidth: "200px", resizable: true },
+    {
+      title: "Action",
+      key: "actions",
+      render(row) {
+        return h(
+          NButton,
+          {
+            strong: true,
+            tertiary: true,
+            size: "small",
+            onClick: () => showLevelContent(row),
+          },
+          { default: () => "详情" }
+        )
+      }
+    }
   ];
 }
 const songDataColumns = createSongDataColumns();
@@ -160,8 +174,7 @@ function handleNegativeClick() {
 }
 
 function loadDiffTableData() {
-  // TODO: remove this magic 1
-  FindDiffTableHeaderListWithRival(1)
+  FindDiffTableHeaderTree()
     .then(result => {
       if (result.Code != 200) {
         return Promise.reject(result.Msg);
@@ -181,6 +194,11 @@ function loadDiffTableData() {
         keepAliveOnHover: true
       })
     });
+}
+
+function showLevelContent(row) {
+  console.log(row)
+  notifyError("还没实现")
 }
 
 function notifySuccess(msg: string) {

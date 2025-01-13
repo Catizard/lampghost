@@ -110,9 +110,8 @@ func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHead
 //
 // Returns difficult header and its contents
 func (s *DiffTableService) FindDiffTableHeaderList() ([]dto.DiffTableHeaderDto, int, error) {
-	var headers []entity.DiffTableHeader
-	if err := s.db.Find(&headers).Error; err != nil {
-		log.Error("[DiffTableService] Find difftable header failed with %v", err)
+	headers, _, err := findDiffTableHeaderList(s.db)
+	if err != nil {
 		return nil, 0, err
 	}
 	headerIds := make([]uint, len(headers))
@@ -132,7 +131,7 @@ func (s *DiffTableService) FindDiffTableHeaderList() ([]dto.DiffTableHeaderDto, 
 				contents = append(contents, content)
 			}
 		}
-		ret[i] = *dto.NewDiffTableHeaderDto(&header, contents)
+		ret[i] = *dto.NewDiffTableHeaderDto(header, contents)
 	}
 
 	return ret, len(ret), nil
@@ -167,6 +166,56 @@ func (s *DiffTableService) FindDiffTableHeaderListWithRival(rivalID uint) ([]dto
 			}
 		}
 	}
+	return headers, len(headers), nil
+}
+
+// Query difficult table data as tree
+//
+// Example result:
+// Satelite
+//
+//	+-- satelite0
+//	+-- satelite1
+//	+-- satelite2
+//	+-- ....
+//
+// BMS Insane table
+// +-- ...
+func (s *DiffTableService) FindDiffTableHeaderTree() ([]dto.DiffTableHeaderDto, int, error) {
+	// NOTE: Don't call s.FindDiffTableHeaderList, call findDiffTableHeaderList instead
+	rawHeaders, _, err := findDiffTableHeaderList(s.db)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	if len(rawHeaders) == 0 {
+		return make([]dto.DiffTableHeaderDto, 0), 0, nil
+	}
+
+	headerIDs := make([]uint, 0)
+	for _, header := range rawHeaders {
+		headerIDs = append(headerIDs, header.ID)
+	}
+
+	pairs, err := queryRelatedLevelByIDS(s.db, headerIDs)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	headers := make([]dto.DiffTableHeaderDto, 0)
+	for _, header := range rawHeaders {
+		headerDto := dto.NewDiffTableHeaderDto(header, nil)
+		for _, pair := range pairs {
+			if header.ID == pair.header_id {
+				headerDto.Children = append(headerDto.Children, *dto.NewLevelChildNode(
+					fmt.Sprintf("%s%d", header.Symbol, pair.level),
+					pair.level,
+				))
+			}
+		}
+		headers = append(headers, *headerDto)
+	}
+
 	return headers, len(headers), nil
 }
 
@@ -397,6 +446,52 @@ func queryDiffTableDataByIDs(tx *gorm.DB, IDs []uint) ([]dto.DiffTableDataDto, e
 		contents = append(contents, *dto.NewDiffTableDataDtoWithCache(&rawContent, cache))
 	}
 	return contents, nil
+}
+
+// Query raw difficult table header
+//
+// NOTE: this function is the base query function, while s.FindDiffTableHeaderList has much more extensions
+func findDiffTableHeaderList(tx *gorm.DB) ([]*entity.DiffTableHeader, int, error) {
+	var headers []*entity.DiffTableHeader
+	if err := tx.Find(&headers).Error; err != nil {
+		log.Error("[DiffTableService] Find difftable header failed with %v", err)
+		return nil, 0, err
+	}
+	return headers, len(headers), nil
+}
+
+// Query multiple difficult table's related level list by header ids
+// When only related level list are required, this function is cheapier than load whole data content
+//
+// NOTE: parameter IDs must not be empty or the sql structure isn't correct
+// Returns a list of pair(header_id, level)
+func queryRelatedLevelByIDS(tx *gorm.DB, IDs []uint) (ret []struct {
+	header_id uint
+	level     int
+}, err error) {
+	rows, err := tx.Raw(`select dd.header_id, dd."level"
+		from difftable_data dd
+		group by dd.header_id, dd."level"
+		having dd.header_id in ? `, IDs).Rows()
+
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var header_id uint
+		var level int
+		rows.Scan(&header_id, &level)
+		ret = append(ret, struct {
+			header_id uint
+			level     int
+		}{
+			header_id: header_id,
+			level:     level,
+		})
+	}
+
+	return
 }
 
 func fetchJson(url string, v interface{}) error {

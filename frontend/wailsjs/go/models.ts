@@ -50,6 +50,8 @@ export namespace dto {
 	    Contents: DiffTableDataDto[];
 	    SortedLevels: string[];
 	    LevelLayeredContents: {[key: string]: DiffTableDataDto[]};
+	    Level: number;
+	    Children: DiffTableHeaderDto[];
 	
 	    static createFrom(source: any = {}) {
 	        return new DiffTableHeaderDto(source);
@@ -66,6 +68,8 @@ export namespace dto {
 	        this.Contents = this.convertValues(source["Contents"], DiffTableDataDto);
 	        this.SortedLevels = source["SortedLevels"];
 	        this.LevelLayeredContents = source["LevelLayeredContents"];
+	        this.Level = source["Level"];
+	        this.Children = this.convertValues(source["Children"], DiffTableHeaderDto);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

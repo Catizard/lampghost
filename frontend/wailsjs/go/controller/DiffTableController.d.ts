@@ -12,6 +12,8 @@ export function FindDiffTableHeaderList():Promise<result.RtnDataList>;
 
 export function FindDiffTableHeaderListWithRival(arg1:number):Promise<result.RtnDataList>;
 
+export function FindDiffTableHeaderTree():Promise<result.RtnDataList>;
+
 export function GENERATOR_TABLE_DATA():Promise<dto.DiffTableDataDto>;
 
 export function GENERATOR_TABLE_HEADER():Promise<entity.DiffTableHeader>;

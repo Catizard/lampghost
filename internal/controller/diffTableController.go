@@ -78,7 +78,7 @@ func (ctl *DiffTableController) QueryDiffTableInfoById(ID uint) result.RtnData {
 }
 
 func (ctl *DiffTableController) QueryDiffTableInfoWithRival(ID uint, rivalID uint) result.RtnData {
-	log.Info("[Controller] calling DiffTableController.QueryDiffTableDataWithRival")
+	log.Info("[Controller] calling DiffTableController.QueryDiffTableInfoWithRival")
 	data, err := ctl.diffTableService.QueryDiffTableInfoByIDWithRival(ID, rivalID)
 	if err != nil {
 		log.Errorf("[DiffTableController] returning err: %v", err)

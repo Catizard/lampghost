@@ -17,6 +17,12 @@
       </n-form-item>
     </n-form>
   </n-modal>
+
+  <n-modal v-model:show="showDetailModal">
+    <n-card style="width: 80%" title="详情" :bordered="false" size="huge" role="dialog" aria-modal="true">
+      <difficult-table-detail :header-id="currentShowHeaderId" :level="currentShowLevel" max-height="300px" />
+    </n-card>
+  </n-modal>
 </template>
 
 <script lang="ts" setup>
@@ -27,12 +33,16 @@ import { computed, defineComponent, h, Ref, ref } from "vue";
 import {
   AddDiffTableHeader,
   DelDiffTableHeader,
-  FindDiffTableHeaderListWithRival,
   FindDiffTableHeaderTree
-} from "../../wailsjs/go/controller/DiffTableController";
-import { dto, entity } from "../../wailsjs/go/models";
+} from "../../../wailsjs/go/controller/DiffTableController";
+import { dto, entity } from "../../../wailsjs/go/models";
+import DifficultTableDetail from "./DifficultTableDetail.vue";
 
 const showAddModal = ref(false);
+const showDetailModal = ref(false);
+
+const currentShowHeaderId: Ref<number> = ref(null);
+const currentShowLevel: Ref<number> = ref(null);
 
 const formRef = ref<FormInst | null>(null);
 const formData = ref({
@@ -196,9 +206,12 @@ function loadDiffTableData() {
     });
 }
 
-function showLevelContent(row) {
-  console.log(row)
-  notifyError("还没实现")
+function showLevelContent({ ID, Level }) {
+  currentShowHeaderId.value = ID;
+  currentShowLevel.value = Level;
+  console.log(ID)
+  console.log(Level)
+  showDetailModal.value = true;
 }
 
 function notifySuccess(msg: string) {

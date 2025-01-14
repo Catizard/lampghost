@@ -194,6 +194,7 @@ func (s *DiffTableService) FindDiffTableHeaderTree() ([]dto.DiffTableHeaderDto, 
 		for _, pair := range pairs {
 			if header.ID == pair.header_id {
 				headerDto.Children = append(headerDto.Children, *dto.NewLevelChildNode(
+					header.ID,
 					fmt.Sprintf("%s%d", header.Symbol, pair.level),
 					pair.level,
 				))
@@ -292,13 +293,15 @@ func (s *DiffTableService) QueryLevelLayeredDiffTableInfoById(ID uint) (*dto.Dif
 // Query specific difficult table's one level data contents with player related field (e.g PlayCount, Lamp status...)
 func (s *DiffTableService) QueryDiffTableDataWithRival(headerID uint, level int, rivalID uint) ([]dto.DiffTableDataDto, int, error) {
 	var rawContents []entity.DiffTableData
-	if err := s.db.Where("header_id = ? AND level = ?", headerID, level).Find(&rawContents).Error; err != nil {
+	if err := s.db.Debug().Where("header_id = ? AND level = ?", headerID, level).Find(&rawContents).Error; err != nil {
 		return nil, 0, err
 	}
+	log.Debugf("[DiffTableService] Read %d raw contents", len(rawContents))
 	contents, err := fixDiffTableDataHashField(s.db, rawContents)
 	if err != nil {
 		return nil, 0, err
 	}
+	log.Debugf("[DiffTableService] After fixing hash fields, len(contents)=%d", len(contents))
 	sha256ScoreLogsMap, err := findRivalScoreLogSha256Map(s.db, rivalID)
 	if err != nil {
 		return nil, 0, err

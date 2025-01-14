@@ -57,8 +57,9 @@ func NewLevelLayeredDiffTableHeaderDto(header *entity.DiffTableHeader, sortedLev
 // Represents one level node from a difficult table
 //
 // NOTE: almost only passed fields are significant
-func NewLevelChildNode(name string, level int) *DiffTableHeaderDto {
+func NewLevelChildNode(id uint, name string, level int) *DiffTableHeaderDto {
 	return &DiffTableHeaderDto{
+		ID:    id,
 		Name:  name,
 		Level: level,
 	}

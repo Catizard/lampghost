@@ -34,6 +34,10 @@ export function GENERATOR_TABLE_HEADER_DTO() {
   return window['go']['controller']['DiffTableController']['GENERATOR_TABLE_HEADER_DTO']();
 }
 
+export function QueryDiffTableDataWithRival(arg1, arg2, arg3) {
+  return window['go']['controller']['DiffTableController']['QueryDiffTableDataWithRival'](arg1, arg2, arg3);
+}
+
 export function QueryDiffTableInfoById(arg1) {
   return window['go']['controller']['DiffTableController']['QueryDiffTableInfoById'](arg1);
 }

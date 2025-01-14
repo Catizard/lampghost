@@ -145,16 +145,9 @@ func (s *DiffTableService) FindDiffTableHeaderListWithRival(rivalID uint) ([]dto
 	if err != nil {
 		return nil, 0, err
 	}
-	songLogs, _, err := findRivalScoreLogList(s.db, rivalID)
+	sha256ScoreLogsMap, err := findRivalScoreLogSha256Map(s.db, rivalID)
 	if err != nil {
 		return nil, 0, err
-	}
-	sha256ScoreLogsMap := make(map[string][]entity.RivalScoreLog)
-	for _, scoreLog := range songLogs {
-		if _, ok := sha256ScoreLogsMap[scoreLog.Sha256]; !ok {
-			sha256ScoreLogsMap[scoreLog.Sha256] = make([]entity.RivalScoreLog, 0)
-		}
-		sha256ScoreLogsMap[scoreLog.Sha256] = append(sha256ScoreLogsMap[scoreLog.Sha256], *scoreLog)
 	}
 	for i, header := range headers {
 		for j, content := range header.Contents {
@@ -261,17 +254,11 @@ func (s *DiffTableService) QueryDiffTableInfoByIDWithRival(ID uint, rivalID uint
 	if err != nil {
 		return nil, err
 	}
-	songLogs, _, err := findRivalScoreLogList(s.db, rivalID)
+	sha256ScoreLogsMap, err := findRivalScoreLogSha256Map(s.db, rivalID)
 	if err != nil {
 		return nil, err
 	}
-	sha256ScoreLogsMap := make(map[string][]entity.RivalScoreLog)
-	for _, scoreLog := range songLogs {
-		if _, ok := sha256ScoreLogsMap[scoreLog.Sha256]; !ok {
-			sha256ScoreLogsMap[scoreLog.Sha256] = make([]entity.RivalScoreLog, 0)
-		}
-		sha256ScoreLogsMap[scoreLog.Sha256] = append(sha256ScoreLogsMap[scoreLog.Sha256], *scoreLog)
-	}
+
 	for i, content := range header.Contents {
 		if logs, ok := sha256ScoreLogsMap[content.Sha256]; ok {
 			header.Contents[i].PlayCount = len(logs)

@@ -149,15 +149,8 @@ func (s *DiffTableService) FindDiffTableHeaderListWithRival(rivalID uint) ([]dto
 	if err != nil {
 		return nil, 0, err
 	}
-	for i, header := range headers {
-		for j, content := range header.Contents {
-			if logs, ok := sha256ScoreLogsMap[content.Sha256]; ok {
-				headers[i].Contents[j].PlayCount = len(logs)
-				for _, log := range logs {
-					headers[i].Contents[j].Lamp = max(content.Lamp, int(log.Clear))
-				}
-			}
-		}
+	for _, header := range headers {
+		mergeRivalRelatedData(sha256ScoreLogsMap, header.Contents)
 	}
 	return headers, len(headers), nil
 }
@@ -258,15 +251,7 @@ func (s *DiffTableService) QueryDiffTableInfoByIDWithRival(ID uint, rivalID uint
 	if err != nil {
 		return nil, err
 	}
-
-	for i, content := range header.Contents {
-		if logs, ok := sha256ScoreLogsMap[content.Sha256]; ok {
-			header.Contents[i].PlayCount = len(logs)
-			for _, log := range logs {
-				header.Contents[i].Lamp = max(content.Lamp, int(log.Clear))
-			}
-		}
-	}
+	mergeRivalRelatedData(sha256ScoreLogsMap, header.Contents)
 	return header, nil
 }
 
@@ -431,6 +416,23 @@ func fixDiffTableDataHashField(tx *gorm.DB, rawContents []entity.DiffTableData) 
 		contents = append(contents, *dto.NewDiffTableDataDtoWithCache(&rawContent, cache))
 	}
 	return contents, nil
+}
+
+// Merge player related data onto DiffTableDataDto (e.g PlayCount LampStatus...)
+// TODO: We can actaully combine "query rival's related data" and "merge rival's data with DiffTableDataDto" two steps together
+// The impede is mainly FindDiffTableHeaderListWithRival function, which requires redesign the data loading sequence
+//
+// This function would modify data in place rather than return a new array
+func mergeRivalRelatedData(sha256ScoreLogsMap map[string][]entity.RivalScoreLog, contents []dto.DiffTableDataDto) error {
+	for i, content := range contents {
+		if logs, ok := sha256ScoreLogsMap[content.Sha256]; ok {
+			contents[i].PlayCount = len(logs)
+			for _, log := range logs {
+				contents[i].Lamp = max(content.Lamp, int(log.Clear))
+			}
+		}
+	}
+	return nil
 }
 
 // Query raw difficult table header

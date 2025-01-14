@@ -289,6 +289,26 @@ func (s *DiffTableService) QueryLevelLayeredDiffTableInfoById(ID uint) (*dto.Dif
 	return dto.NewLevelLayeredDiffTableHeaderDto(header.Entity(), sortedLevels, levelLayeredContent), nil
 }
 
+// Query specific difficult table's one level data contents with player related field (e.g PlayCount, Lamp status...)
+func (s *DiffTableService) QueryDiffTableDataWithRival(headerID uint, level int, rivalID uint) ([]dto.DiffTableDataDto, int, error) {
+	var rawContents []entity.DiffTableData
+	if err := s.db.Where("header_id = ? AND level = ?", headerID, level).Find(&rawContents).Error; err != nil {
+		return nil, 0, err
+	}
+	contents, err := fixDiffTableDataHashField(s.db, rawContents)
+	if err != nil {
+		return nil, 0, err
+	}
+	sha256ScoreLogsMap, err := findRivalScoreLogSha256Map(s.db, rivalID)
+	if err != nil {
+		return nil, 0, err
+	}
+	if err := mergeRivalRelatedData(sha256ScoreLogsMap, contents); err != nil {
+		return nil, 0, err
+	}
+	return contents, len(contents), nil
+}
+
 func (s *DiffTableService) checkDuplicateHeaderUrl(headerUrl string) error {
 	var dupCount int64
 	if err := s.db.Model(&entity.DiffTableHeader{}).Where("header_url = ?", headerUrl).Count(&dupCount).Error; err != nil {

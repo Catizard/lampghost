@@ -87,6 +87,16 @@ func (ctl *DiffTableController) QueryDiffTableInfoWithRival(ID uint, rivalID uin
 	return result.NewRtnData(data)
 }
 
+func (ctl *DiffTableController) QueryDiffTableDataWithRival(headerID uint, level int, rivalID uint) result.RtnDataList {
+	log.Info("[Controller] calling DiffTableController.QueryDiffTableDataWithRival")
+	rows, _, err := ctl.diffTableService.QueryDiffTableDataWithRival(headerID, level, rivalID)
+	if err != nil {
+		log.Errorf("[DiffTableController] returning err: %v", err)
+		return result.NewErrorDataList(err)
+	}
+	return result.NewRtnDataList(rows)
+}
+
 func (ctl *DiffTableController) QueryLevelLayeredDiffTableInfoById(ID uint) result.RtnData {
 	log.Info("[Controller] calling QueryLevelLayeredDiffTableInfoById")
 	data, err := ctl.diffTableService.QueryLevelLayeredDiffTableInfoById(ID)

@@ -411,22 +411,12 @@ func queryDiffTableInfoByID(tx *gorm.DB, ID uint) (*entity.DiffTableHeader, erro
 // Query specific difficult table's all contents
 // Note this function directly returns dto instead of entity form of data, which is an
 // old problem that hash field is incompitable in some difficult tables
-//
-// This function uses default user's song data to build the cache
 func queryDiffTableDataByHeaderID(tx *gorm.DB, headerID uint) ([]dto.DiffTableDataDto, error) {
 	var rawContents []entity.DiffTableData
 	if err := tx.Where("header_id = ?", headerID).Find(&rawContents).Error; err != nil {
 		return nil, err
 	}
-	cache, err := queryDefaultSongHashCache(tx)
-	if err != nil {
-		return nil, err
-	}
-	contents := make([]dto.DiffTableDataDto, 0)
-	for _, rawContent := range rawContents {
-		contents = append(contents, *dto.NewDiffTableDataDtoWithCache(&rawContent, cache))
-	}
-	return contents, nil
+	return fixDiffTableDataHashField(tx, rawContents)
 }
 
 // Query multiple difficult table's contents by header ids
@@ -437,6 +427,14 @@ func queryDiffTableDataByIDs(tx *gorm.DB, IDs []uint) ([]dto.DiffTableDataDto, e
 	if err := tx.Debug().Where("header_id in ?", IDs).Find(&rawContents).Error; err != nil {
 		return nil, err
 	}
+	return fixDiffTableDataHashField(tx, rawContents)
+}
+
+// Fix the hash field on difficult table data
+//
+// NOTE: This function uses default user's song data to build the cache
+// Returns DiffTableDataDto
+func fixDiffTableDataHashField(tx *gorm.DB, rawContents []entity.DiffTableData) ([]dto.DiffTableDataDto, error) {
 	cache, err := queryDefaultSongHashCache(tx)
 	if err != nil {
 		return nil, err

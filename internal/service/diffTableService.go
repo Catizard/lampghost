@@ -195,13 +195,33 @@ func (s *DiffTableService) FindDiffTableHeaderTree() ([]dto.DiffTableHeaderDto, 
 			if header.ID == pair.header_id {
 				headerDto.Children = append(headerDto.Children, *dto.NewLevelChildNode(
 					header.ID,
-					fmt.Sprintf("%s%d", header.Symbol, pair.level),
+					fmt.Sprintf("%s%s", header.Symbol, pair.level),
 					pair.level,
 				))
 			}
 		}
 		headers = append(headers, *headerDto)
 	}
+
+	log.Debug(headers)
+
+	for headerInx, header := range headers {
+		sortedChildren := make([]dto.DiffTableHeaderDto, len(header.Children))
+		copy(sortedChildren, header.Children)
+		sort.Slice(sortedChildren, func(i, j int) bool {
+			ll := sortedChildren[i].Level
+			rr := sortedChildren[j].Level
+			ill, errL := strconv.Atoi(ll)
+			irr, errR := strconv.Atoi(rr)
+			if errL == nil && errR == nil {
+				return ill < irr
+			}
+			return ll < rr
+		})
+		headers[headerInx].Children = sortedChildren
+	}
+
+	log.Debug(headers)
 
 	return headers, len(headers), nil
 }
@@ -291,7 +311,7 @@ func (s *DiffTableService) QueryLevelLayeredDiffTableInfoById(ID uint) (*dto.Dif
 }
 
 // Query specific difficult table's one level data contents with player related field (e.g PlayCount, Lamp status...)
-func (s *DiffTableService) QueryDiffTableDataWithRival(headerID uint, level int, rivalID uint) ([]dto.DiffTableDataDto, int, error) {
+func (s *DiffTableService) QueryDiffTableDataWithRival(headerID uint, level string, rivalID uint) ([]dto.DiffTableDataDto, int, error) {
 	var rawContents []entity.DiffTableData
 	if err := s.db.Debug().Where("header_id = ? AND level = ?", headerID, level).Find(&rawContents).Error; err != nil {
 		return nil, 0, err
@@ -477,7 +497,7 @@ func findDiffTableHeaderList(tx *gorm.DB) ([]*entity.DiffTableHeader, int, error
 // Returns a list of pair(header_id, level)
 func queryRelatedLevelByIDS(tx *gorm.DB, IDs []uint) (ret []struct {
 	header_id uint
-	level     int
+	level     string
 }, err error) {
 	rows, err := tx.Raw(`select dd.header_id, dd."level"
 		from difftable_data dd
@@ -490,11 +510,11 @@ func queryRelatedLevelByIDS(tx *gorm.DB, IDs []uint) (ret []struct {
 
 	for rows.Next() {
 		var header_id uint
-		var level int
+		var level string
 		rows.Scan(&header_id, &level)
 		ret = append(ret, struct {
 			header_id uint
-			level     int
+			level     string
 		}{
 			header_id: header_id,
 			level:     level,

@@ -87,7 +87,7 @@ func (ctl *DiffTableController) QueryDiffTableInfoWithRival(ID uint, rivalID uin
 	return result.NewRtnData(data)
 }
 
-func (ctl *DiffTableController) QueryDiffTableDataWithRival(headerID uint, level int, rivalID uint) result.RtnDataList {
+func (ctl *DiffTableController) QueryDiffTableDataWithRival(headerID uint, level string, rivalID uint) result.RtnDataList {
 	log.Info("[Controller] calling DiffTableController.QueryDiffTableDataWithRival")
 	rows, _, err := ctl.diffTableService.QueryDiffTableDataWithRival(headerID, level, rivalID)
 	if err != nil {

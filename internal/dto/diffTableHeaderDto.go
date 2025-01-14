@@ -19,7 +19,7 @@ type DiffTableHeaderDto struct {
 	LevelLayeredContents map[string][]DiffTableDataDto
 
 	// Only used in tree query interface
-	Level int
+	Level string
 	// NOTE: children field should never be nil
 	Children []DiffTableHeaderDto
 }
@@ -57,7 +57,7 @@ func NewLevelLayeredDiffTableHeaderDto(header *entity.DiffTableHeader, sortedLev
 // Represents one level node from a difficult table
 //
 // NOTE: almost only passed fields are significant
-func NewLevelChildNode(id uint, name string, level int) *DiffTableHeaderDto {
+func NewLevelChildNode(id uint, name string, level string) *DiffTableHeaderDto {
 	return &DiffTableHeaderDto{
 		ID:    id,
 		Name:  name,

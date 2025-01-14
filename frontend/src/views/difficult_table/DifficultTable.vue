@@ -19,7 +19,8 @@
   </n-modal>
 
   <n-modal v-model:show="showDetailModal">
-    <n-card style="width: 80%" title="详情" :bordered="false" size="huge" role="dialog" aria-modal="true" closable>
+    <n-card style="width: 80%" title="详情" :bordered="false" size="huge" role="dialog" aria-modal="true" closable
+      @close="() => { showDetailModal = false }">
       <difficult-table-detail :header-id="currentShowHeaderId" :level="currentShowLevel" max-height="400px" />
     </n-card>
   </n-modal>

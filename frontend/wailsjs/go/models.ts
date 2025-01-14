@@ -50,7 +50,7 @@ export namespace dto {
 	    Contents: DiffTableDataDto[];
 	    SortedLevels: string[];
 	    LevelLayeredContents: {[key: string]: DiffTableDataDto[]};
-	    Level: number;
+	    Level: string;
 	    Children: DiffTableHeaderDto[];
 	
 	    static createFrom(source: any = {}) {

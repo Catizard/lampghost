@@ -39,10 +39,16 @@ func main() {
 	if err := c.Provide(service.NewRivalSongDataService); err != nil {
 		panic(err)
 	}
+	if err := c.Provide(service.NewFolderService); err != nil {
+		panic(err)
+	}
 	if err := c.Provide(controller.NewRivalInfoController); err != nil {
 		panic(err)
 	}
 	if err := c.Provide(controller.NewDiffTableController); err != nil {
+		panic(err)
+	}
+	if err := c.Provide(controller.NewFolderController); err != nil {
 		panic(err)
 	}
 

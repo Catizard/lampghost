@@ -12,6 +12,7 @@ import {
     BookOutline as BookIcon,
     PersonOutline as PersonIcon,
     WineOutline as WineIcon,
+    Bookmarks as BookmarksIcon
 } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
 import { computed, h, ref, watchEffect } from 'vue'
@@ -45,6 +46,11 @@ const menuOptions = [
         label: renderOption("difftable", "difftable"),
         key: "difftable",
         icon: renderIcon(BookIcon)
+    },
+    {
+        label: renderOption("folder", "folder"),
+        key: "folder",
+        icon: renderIcon(BookmarksIcon)
     }
 ]
 </script>

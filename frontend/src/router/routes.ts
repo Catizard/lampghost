@@ -17,6 +17,11 @@ const mainRoutes: RouteRecordRaw[] = [
         component: () => import("../views/difficult_table/DifficultTable.vue")
     },
     {
+        name: "folder",
+        path: "/folder",
+        component: () => import("../views/folder.vue")
+    },
+    {
         path: "/",
         redirect: "/home",
     }

@@ -20,6 +20,8 @@ func NewDatabase(config *config.DatabaseConfig) (db *gorm.DB, err error) {
 	db.Table("course_info").AutoMigrate(&entity.CourseInfo{})
 	db.Table("rival_song_data").AutoMigrate(&entity.RivalSongData{})
 	db.Table("rival_tag").AutoMigrate(&entity.RivalTag{})
+	db.Table("folder").AutoMigrate(&entity.Folder{})
+	db.Table("folder_content").AutoMigrate(&entity.FolderContent{})
 
 	log.Debugf("Initialized database at %s\n", config.DSN)
 	return db, err

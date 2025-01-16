@@ -12,7 +12,7 @@ const notification = useNotification();
 
 const props = defineProps<{
     headerId?: number
-    level?: number
+    level?: string
 }>()
 
 function createColumns(): DataTableColumns<dto.DiffTableDataDto> {
@@ -26,7 +26,7 @@ function createColumns(): DataTableColumns<dto.DiffTableDataDto> {
 const columns = createColumns();
 
 let data: Ref<Array<any>> = ref([]);
-function loadData(headerId: number, level: number) {
+function loadData(headerId: number, level: string) {
     // TODO: remove magic 1
     QueryDiffTableDataWithRival(headerId, level, 1)
     .then(result => {

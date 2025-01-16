@@ -6,6 +6,14 @@ export function AddFolder(arg1) {
   return window['go']['controller']['FolderController']['AddFolder'](arg1);
 }
 
+export function DelFolder(arg1) {
+  return window['go']['controller']['FolderController']['DelFolder'](arg1);
+}
+
+export function DelFolderContent(arg1) {
+  return window['go']['controller']['FolderController']['DelFolderContent'](arg1);
+}
+
 export function FindFolderTree() {
   return window['go']['controller']['FolderController']['FindFolderTree']();
 }

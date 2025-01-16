@@ -43,7 +43,7 @@ const showAddModal = ref(false);
 const showDetailModal = ref(false);
 
 const currentShowHeaderId: Ref<number> = ref(null);
-const currentShowLevel: Ref<number> = ref(null);
+const currentShowLevel: Ref<string> = ref(null);
 
 const formRef = ref<FormInst | null>(null);
 const formData = ref({

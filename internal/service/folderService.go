@@ -46,6 +46,10 @@ func (s *FolderService) AddFolder(folderName string) (*entity.Folder, error) {
 
 	nextBitIndex := findFolderBitIndex(prevFolders)
 	newFolder := entity.NewFolder(folderName, nextBitIndex)
+	if err := tx.Create(&newFolder).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
 	if err := tx.Commit().Error; err != nil {
 		tx.Rollback()
 		return nil, err
@@ -68,6 +72,14 @@ func (s *FolderService) DelFolder(ID uint) error {
 		}
 		return nil
 	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Delete specific folder content
+func (s *FolderService) DelFolderContent(contentID uint) error {
+	if err := s.db.Unscoped().Where("id = ?", contentID).Delete(&entity.FolderContent{}).Error; err != nil {
 		return err
 	}
 	return nil

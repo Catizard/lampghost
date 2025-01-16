@@ -27,6 +27,16 @@ func (ctl *FolderController) AddFolder(name string) result.RtnMessage {
 	return result.SUCCESS
 }
 
+func (ctl *FolderController) DelFolder(ID uint) result.RtnMessage {
+	log.Info("[Controller] calling FolderController.DelDiffTableHeader")
+	err := ctl.folderService.DelFolder(ID)
+	if err != nil {
+		log.Errorf("[FolderController] returning err: %v", err)
+		return result.NewErrorMessage(err)
+	}
+	return result.SUCCESS
+}
+
 func (ctl *FolderController) FindFolderTree() result.RtnDataList {
 	log.Info("[Controller] Calling FolderController.FindFolderTree")
 	rows, _, err := ctl.folderService.FindFolderTree()

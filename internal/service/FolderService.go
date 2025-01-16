@@ -53,6 +53,26 @@ func (s *FolderService) AddFolder(folderName string) (*entity.Folder, error) {
 	return &newFolder, nil
 }
 
+// Delete a folder, and its contents
+func (s *FolderService) DelFolder(ID uint) error {
+	if err := s.db.Transaction(func(tx *gorm.DB) error {
+		var candidate entity.Folder
+		if err := tx.First(&candidate, ID).Error; err != nil {
+			return err
+		}
+		if err := tx.Unscoped().Where("folder_id = ?", candidate.ID).Delete(&entity.FolderContent{}).Error; err != nil {
+			return err
+		}
+		if err := tx.Delete(&entity.Folder{}, candidate.ID).Error; err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *FolderService) FindFolderTree() ([]dto.FolderDto, int, error) {
 	rawFolders, _, err := findFolderList(s.db)
 	if err != nil {

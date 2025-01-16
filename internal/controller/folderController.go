@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/result"
 	"github.com/Catizard/lampghost_wails/internal/service"
 	"github.com/charmbracelet/log"
@@ -35,3 +36,6 @@ func (ctl *FolderController) FindFolderTree() result.RtnDataList {
 	}
 	return result.NewRtnDataList(rows)
 }
+
+func (ctl *FolderController) GENERATOR_FOLDER_DTO() *dto.FolderDto                { return nil }
+func (ctl *FolderController) GENERATOR_FOLDER_CONTENT_DTO() *dto.FolderContentDto { return nil }

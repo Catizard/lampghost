@@ -90,6 +90,62 @@ export namespace dto {
 		    return a;
 		}
 	}
+	export class FolderContentDto {
+	    ID: number;
+	    FolderID: number;
+	    FolderName: string;
+	    Sha256: string;
+	    Md5: string;
+	    Title: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new FolderContentDto(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.ID = source["ID"];
+	        this.FolderID = source["FolderID"];
+	        this.FolderName = source["FolderName"];
+	        this.Sha256 = source["Sha256"];
+	        this.Md5 = source["Md5"];
+	        this.Title = source["Title"];
+	    }
+	}
+	export class FolderDto {
+	    ID: number;
+	    FolderName: string;
+	    Contents: FolderContentDto[];
+	
+	    static createFrom(source: any = {}) {
+	        return new FolderDto(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.ID = source["ID"];
+	        this.FolderName = source["FolderName"];
+	        this.Contents = this.convertValues(source["Contents"], FolderContentDto);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 
 }
 

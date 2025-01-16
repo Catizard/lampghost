@@ -66,6 +66,13 @@ func main() {
 		panic(err)
 	}
 
+	if err := c.Invoke(func(controller *controller.FolderController) error {
+		bind = append(bind, controller)
+		return nil
+	}); err != nil {
+		panic(err)
+	}
+
 	// Create an instance of the app structure
 	app := NewApp()
 

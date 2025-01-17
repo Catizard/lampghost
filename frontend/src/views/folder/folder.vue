@@ -5,6 +5,7 @@
 				<n-text type="primary">收藏夹管理</n-text>
 			</n-h1>
 			<n-button @click="showAddModal = true">新增收藏夹</n-button>
+			<n-button @click="showJsonModal = true">生成JSON</n-button>
 		</n-space>
 		<n-data-table :columns="columns" :data="data" :pagination="pagination" :bordered="false" />
 	</perfect-scrollbar>
@@ -16,19 +17,42 @@
 				<n-input v-model:value="formData.name" placeholder="输入名称" />
 			</n-form-item>
 		</n-form>
-	</n-modal>	
+	</n-modal>
+
+	<n-modal v-model:show="showJsonModal">
+		<n-card style="width: 80%" :boarded="false" size="huge" role="dialog" aria-modal="true" closable
+			@close="() => { showJsonModal = false; }" :loading="jsonGenerateLoading">
+			<pre>{{ folderJsonCode }}</pre>
+		</n-card>
+	</n-modal>
 </template>
 
 <script setup lang="ts">
-import { h, Ref, ref } from 'vue';
-import { dto } from '../../wailsjs/go/models';
-import { DataTableColumns, FormInst, NButton, NDataTable, useDialog, useNotification, useMessage } from 'naive-ui';
-import { AddFolder, DelFolder, DelFolderContent, FindFolderTree } from '../../wailsjs/go/controller/FolderController';
+import { h, Ref, ref, watch } from "vue";
+import { dto } from "../../../wailsjs/go/models";
+import {
+	DataTableColumns,
+	FormInst,
+	NButton,
+	NDataTable,
+	useDialog,
+	useNotification,
+	useMessage,
+} from "naive-ui";
+import {
+	AddFolder,
+	DelFolder,
+	DelFolderContent,
+	FindFolderTree,
+	QueryFolderDefinition,
+} from "../../../wailsjs/go/controller/FolderController";
 
 const notification = useNotification();
 const dialog = useDialog();
 
 const showAddModal = ref(false);
+const showJsonModal = ref(false);
+const jsonGenerateLoading = ref(false);
 const pagination = false as const;
 let data: Ref<Array<any>> = ref([]);
 const columns = createColumns({
@@ -39,9 +63,9 @@ const columns = createColumns({
 			negativeText: "取消",
 			onPositiveClick: () => {
 				deleteFolder(row.ID);
-			}
+			},
 		});
-	}
+	},
 });
 const folderContentColumns = createContentColumns({
 	deleteFolderContent(row: any) {
@@ -50,11 +74,12 @@ const folderContentColumns = createContentColumns({
 			positiveText: "确定",
 			negativeText: "取消",
 			onPositiveClick: () => {
-				deleteFolderContent(row.ID)
-			}
+				deleteFolderContent(row.ID);
+			},
 		});
-	}
+	},
 });
+const folderJsonCode = ref("");
 
 const formRef = ref<FormInst | null>(null);
 const formData = ref({
@@ -79,16 +104,13 @@ function createColumns({
 		{
 			type: "expand",
 			renderExpand: (rowData) => {
-				return h(
-					NDataTable,
-					{
-						columns: folderContentColumns,
-						data: rowData.Contents,
-						pagination: pagination,
-						bordered: false
-					}
-				)
-			}
+				return h(NDataTable, {
+					columns: folderContentColumns,
+					data: rowData.Contents,
+					pagination: pagination,
+					bordered: false,
+				});
+			},
 		},
 		{ title: "Folder Name", key: "FolderName" },
 		{
@@ -104,10 +126,10 @@ function createColumns({
 						onClick: () => deleteFolder(row),
 					},
 					{ default: () => "删除" },
-				)
-			}
-		}
-	]
+				);
+			},
+		},
+	];
 }
 
 function createContentColumns({
@@ -116,7 +138,7 @@ function createContentColumns({
 	deleteFolderContent: (row: dto.FolderContentDto) => void;
 }): DataTableColumns<dto.FolderContentDto> {
 	return [
-		{ title: "Name", key: "Name", },
+		{ title: "Name", key: "Name" },
 		{
 			title: "Action",
 			key: "actions",
@@ -129,36 +151,38 @@ function createContentColumns({
 						size: "small",
 						onClick: () => deleteFolderContent(row),
 					},
-					{ default: () => "删除" }
-				)
-			}
-		}
-	]
+					{ default: () => "删除" },
+				);
+			},
+		},
+	];
 }
 
 function addFolder(name: string) {
 	AddFolder(name)
-	.then(result => {
-		if (result.Code != 200) {
-			return Promise.reject(result.Msg);
-		}
-		notifySuccess("新增收藏夹成功: " + result.Msg);
-		loadFolderData();
-	}).catch(err => {
-		notifyError("新增收藏家失败: " + err);
-		loadFolderData();
-	})
+		.then((result) => {
+			if (result.Code != 200) {
+				return Promise.reject(result.Msg);
+			}
+			notifySuccess("新增收藏夹成功: " + result.Msg);
+			loadFolderData();
+		})
+		.catch((err) => {
+			notifyError("新增收藏家失败: " + err);
+			loadFolderData();
+		});
 }
 
 function deleteFolder(id: number) {
 	DelFolder(id)
-		.then(result => {
+		.then((result) => {
 			if (result.Code != 200) {
-				return Promise.reject(result.Msg)
+				return Promise.reject(result.Msg);
 			}
-			notifySuccess("删除成功")
+			notifySuccess("删除成功");
 			loadFolderData();
-		}).catch(err => {
+		})
+		.catch((err) => {
 			notifyError(err);
 			loadFolderData();
 		});
@@ -166,64 +190,86 @@ function deleteFolder(id: number) {
 
 function deleteFolderContent(id: number) {
 	DelFolderContent(id)
-	.then(result => {
-		if (result.Code != 200) {
-			return Promise.reject(result.Msg)
-		}
-		notifySuccess("删除成功")
-		loadFolderData();
-	}).catch(err => {
-		notifyError(err);
-		loadFolderData();
-	})
+		.then((result) => {
+			if (result.Code != 200) {
+				return Promise.reject(result.Msg);
+			}
+			notifySuccess("删除成功");
+			loadFolderData();
+		})
+		.catch((err) => {
+			notifyError(err);
+			loadFolderData();
+		});
 }
 
 function loadFolderData() {
 	FindFolderTree()
-		.then(result => {
+		.then((result) => {
 			if (result.Code != 200) {
 				return Promise.reject(result.Msg);
 			}
-			data.value = [...result.Rows].map(row => {
+			data.value = [...result.Rows].map((row) => {
 				return {
 					key: row.ID,
-					...row
-				}
+					...row,
+				};
 			});
-		}).catch(err => {
-			notifyError("读取收藏夹数据出错:" + err)
+		})
+		.catch((err) => {
+			notifyError("读取收藏夹数据出错:" + err);
 		});
 }
 
 function handlePositiveClick(): boolean {
-  formRef.value
-    ?.validate()
-    .then(() => {
-      addFolder(formData.value.name);
-      showAddModal.value = false;
-    })
-    .catch((err) => { });
-  return false;
+	formRef.value
+		?.validate()
+		.then(() => {
+			addFolder(formData.value.name);
+			showAddModal.value = false;
+		})
+		.catch((err) => { });
+	return false;
 }
 
 function handleNegativeClick() {
-  formData.value.name = "";
+	formData.value.name = "";
+}
+
+function generateJson() {
+	jsonGenerateLoading.value = true;
+	QueryFolderDefinition()
+		.then(result => {
+			if (result.Code != 200) {
+				return Promise.reject(result.Msg);
+			}
+			jsonGenerateLoading.value = false;
+			folderJsonCode.value = JSON.stringify(result.Rows, null, "\t");
+		}).catch(err => {
+			notifyError("生成json失败: " + err)
+			jsonGenerateLoading.value = false;
+		})
 }
 
 function notifySuccess(msg: string) {
 	notification.success({
 		content: msg,
 		duration: 5000,
-		keepAliveOnHover: true
-	})
+		keepAliveOnHover: true,
+	});
 }
 
 function notifyError(msg: string) {
 	notification.error({
 		content: msg,
 		duration: 5000,
-		keepAliveOnHover: true
-	})
+		keepAliveOnHover: true,
+	});
 }
 
+watch(showJsonModal, (newValue, oldValue) => {
+	if (newValue == true) {
+		generateJson();
+	}
+});
 </script>

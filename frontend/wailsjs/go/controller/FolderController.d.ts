@@ -13,4 +13,10 @@ export function FindFolderTree():Promise<result.RtnDataList>;
 
 export function GENERATOR_FOLDER_CONTENT_DTO():Promise<dto.FolderContentDto>;
 
+export function GENERATOR_FOLDER_DEFINITION_DTO():Promise<dto.FolderDefinitionDto>;
+
 export function GENERATOR_FOLDER_DTO():Promise<dto.FolderDto>;
+
+export function QueryFolderDefinition():Promise<result.RtnDataList>;
+
+export function SyncSongData():Promise<result.RtnMessage>;

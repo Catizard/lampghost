@@ -19,7 +19,7 @@ const mainRoutes: RouteRecordRaw[] = [
     {
         name: "folder",
         path: "/folder",
-        component: () => import("../views/folder.vue")
+        component: () => import("../views/folder/folder.vue")
     },
     {
         path: "/",

@@ -57,5 +57,20 @@ func (ctl *FolderController) FindFolderTree() result.RtnDataList {
 	return result.NewRtnDataList(rows)
 }
 
-func (ctl *FolderController) GENERATOR_FOLDER_DTO() *dto.FolderDto                { return nil }
-func (ctl *FolderController) GENERATOR_FOLDER_CONTENT_DTO() *dto.FolderContentDto { return nil }
+func (ctl *FolderController) SyncSongData() result.RtnMessage {
+	panic("todo!")
+}
+
+func (ctl *FolderController) QueryFolderDefinition() result.RtnDataList {
+	log.Info("[Controller] Calling FolderController.GenerateJson")
+	rows, _, err := ctl.folderService.GenerateJson()
+	if err != nil {
+		log.Errorf("[FolderController] returning err: %v", err)
+		return result.NewErrorDataList(err)
+	}
+	return result.NewRtnDataList(rows)
+}
+
+func (ctl *FolderController) GENERATOR_FOLDER_DTO() *dto.FolderDto                      { return nil }
+func (ctl *FolderController) GENERATOR_FOLDER_CONTENT_DTO() *dto.FolderContentDto       { return nil }
+func (ctl *FolderController) GENERATOR_FOLDER_DEFINITION_DTO() *dto.FolderDefinitionDto { return nil }

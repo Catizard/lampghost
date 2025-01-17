@@ -124,6 +124,19 @@ func (s *FolderService) FindFolderTree() ([]dto.FolderDto, int, error) {
 	return folders, len(folders), nil
 }
 
+// Generate folder definition json with all folders
+func (s *FolderService) GenerateJson() ([]dto.FolderDefinitionDto, int, error) {
+	rawFolders, _, err := findFolderList(s.db)
+	if err != nil {
+		return nil, 0, err
+	}
+	folderDefinitions := make([]dto.FolderDefinitionDto, len(rawFolders))
+	for i, rawFolder := range rawFolders {
+		folderDefinitions[i] = *dto.NewFolderDefinitionDto(rawFolder)
+	}
+	return folderDefinitions, len(folderDefinitions), nil
+}
+
 func checkDuplicateFolderName(tx *gorm.DB, folderName string) error {
 	var dupCount int64
 	if err := tx.Model(&entity.Folder{}).Count(&dupCount).Error; err != nil {

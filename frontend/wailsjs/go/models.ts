@@ -112,6 +112,20 @@ export namespace dto {
 	        this.Title = source["Title"];
 	    }
 	}
+	export class FolderDefinitionDto {
+	    name: string;
+	    sql: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new FolderDefinitionDto(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.sql = source["sql"];
+	    }
+	}
 	export class FolderDto {
 	    ID: number;
 	    FolderName: string;

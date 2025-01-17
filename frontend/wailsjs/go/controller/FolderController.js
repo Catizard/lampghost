@@ -22,6 +22,18 @@ export function GENERATOR_FOLDER_CONTENT_DTO() {
   return window['go']['controller']['FolderController']['GENERATOR_FOLDER_CONTENT_DTO']();
 }
 
+export function GENERATOR_FOLDER_DEFINITION_DTO() {
+  return window['go']['controller']['FolderController']['GENERATOR_FOLDER_DEFINITION_DTO']();
+}
+
 export function GENERATOR_FOLDER_DTO() {
   return window['go']['controller']['FolderController']['GENERATOR_FOLDER_DTO']();
+}
+
+export function QueryFolderDefinition() {
+  return window['go']['controller']['FolderController']['QueryFolderDefinition']();
+}
+
+export function SyncSongData() {
+  return window['go']['controller']['FolderController']['SyncSongData']();
 }

@@ -29,23 +29,23 @@ let data: Ref<Array<any>> = ref([]);
 function loadData(headerId: number, level: string) {
     // TODO: remove magic 1
     QueryDiffTableDataWithRival(headerId, level, 1)
-    .then(result => {
-        if (result.Code != 200) {
-            return Promise.reject(result.Msg)
-        }
-        data.value = [...result.Rows].map(row => {
-            return {
-                key: row.ID,
-                ...row
+        .then(result => {
+            if (result.Code != 200) {
+                return Promise.reject(result.Msg)
             }
+            data.value = [...result.Rows].map(row => {
+                return {
+                    key: row.ID,
+                    ...row
+                }
+            })
+        }).catch(err => {
+            notification.error({
+                content: err,
+                duration: 3000,
+                keepAliveOnHover: true
+            })
         })
-    }).catch(err => {
-        notification.error({
-            content: err,
-            duration: 3000,
-            keepAliveOnHover: true
-        })
-    })
 }
 
 const pagination = false as const;

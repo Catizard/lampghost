@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/Catizard/lampghost_wails/internal/dto"
+	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/result"
 	"github.com/Catizard/lampghost_wails/internal/service"
 	"github.com/charmbracelet/log"
@@ -67,6 +68,16 @@ func (ctl *FolderController) FindFolderTree() result.RtnDataList {
 	return result.NewRtnDataList(rows)
 }
 
+func (ctl *FolderController) FindFolderList() result.RtnDataList {
+	log.Info("[Controller] Calling FolderController.FindFolderList")
+	rows, _, err := ctl.folderService.FindFolderList()
+	if err != nil {
+		log.Errorf("[FolderController] returning err: %v", err)
+		return result.NewErrorDataList(err)
+	}
+	return result.NewRtnDataList(rows)
+}
+
 func (ctl *FolderController) SyncSongData() result.RtnMessage {
 	panic("todo!")
 }
@@ -81,6 +92,7 @@ func (ctl *FolderController) QueryFolderDefinition() result.RtnDataList {
 	return result.NewRtnDataList(rows)
 }
 
-func (ctl *FolderController) GENERATOR_FOLDER_DTO() *dto.FolderDto                      { return nil }
-func (ctl *FolderController) GENERATOR_FOLDER_CONTENT_DTO() *dto.FolderContentDto       { return nil }
-func (ctl *FolderController) GENERATOR_FOLDER_DEFINITION_DTO() *dto.FolderDefinitionDto { return nil }
+func (FolderController) GENERATOR_FOLDER() *entity.Folder                          { return nil }
+func (FolderController) GENERATOR_FOLDER_DTO() *dto.FolderDto                      { return nil }
+func (FolderController) GENERATOR_FOLDER_CONTENT_DTO() *dto.FolderContentDto       { return nil }
+func (FolderController) GENERATOR_FOLDER_DEFINITION_DTO() *dto.FolderDefinitionDto { return nil }

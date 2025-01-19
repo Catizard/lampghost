@@ -196,6 +196,10 @@ func (s *FolderService) FindFolderTree() ([]dto.FolderDto, int, error) {
 	return folders, len(folders), nil
 }
 
+func (s *FolderService) FindFolderList() ([]*entity.Folder, int, error) {
+	return findFolderList(s.db, nil)
+}
+
 // Generate folder definition json with all folders
 func (s *FolderService) GenerateJson() ([]dto.FolderDefinitionDto, int, error) {
 	rawFolders, _, err := findFolderList(s.db, nil)

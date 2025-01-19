@@ -7,6 +7,7 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/vo"
+	"github.com/charmbracelet/log"
 	"gorm.io/gorm"
 )
 
@@ -89,11 +90,12 @@ func (s *FolderService) DelFolderContent(contentID uint) error {
 
 // Bind one song to multiple folders
 // Requirements:
-// 1) `songDataID` & `folderIDs` must be existed.
+// 1) `diffTableDataID` & `folderIDs` must be existed.
 // 2) `folderIDs` defines the final binding, for example, if the song "AIR" is currently binds to folder "1" & "2"
 // After calling BindSongToFolder("AIR", ["2", "3"]), "AIR" is now binds to "2" & "3"
 // 3) This function must keep old data. In previous example, the content which represents "AIR" and "2" won't be modified
-func (s *FolderService) BindSongToFolder(songDataID uint, folderIDs []uint) error {
+func (s *FolderService) BindSongToFolder(diffTableDataID uint, folderIDs []uint) error {
+	log.Debugf("[FolderService] Calling BindSongToFolder with diffTableDataID=%v, folderIDs=%v", diffTableDataID, folderIDs)
 	tx := s.db.Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -102,7 +104,7 @@ func (s *FolderService) BindSongToFolder(songDataID uint, folderIDs []uint) erro
 	}()
 
 	// Check existence
-	songData, err := findRivalSongDataByID(tx, songDataID)
+	songData, err := findDiffTableDataByID(tx, diffTableDataID)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -134,21 +136,27 @@ func (s *FolderService) BindSongToFolder(songDataID uint, folderIDs []uint) erro
 			unused = append(unused, prev.ID)
 		}
 	}
-	if err := tx.Unscoped().Where(scopeInIDs(unused)).Delete(&entity.FolderContent{}).Error; err != nil {
-		tx.Rollback()
-		return err
+	if len(unused) > 0 {
+		if err := tx.Unscoped().Where("id in ?", unused).Delete(&entity.FolderContent{}).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
 	}
 	// Insert new bindings
 	candidate := make([]*entity.FolderContent, 0)
 	for _, folderID := range folderIDs {
-		if slices.ContainsFunc(previous, func(prev *entity.FolderContent) bool {
+		if !slices.ContainsFunc(previous, func(prev *entity.FolderContent) bool {
+			log.Debugf("prev.ID=%v, folderID=%v, equals?=%v", prev.ID, folderID, prev.ID == folderID)
 			return prev.ID == folderID
 		}) {
-			candidate = append(candidate, entity.FromSongDataToFolderContent(folderIDMapsToSelf[folderID], songData))
+			candidate = append(candidate, entity.FromDiffTableDataToFolderContent(folderIDMapsToSelf[folderID], songData))
 		}
 	}
-	if err := tx.Create(&candidate).Error; err != nil {
-		return err
+	log.Debugf("[FolderService] New binding candidates = %v", candidate)
+	if len(candidate) > 0 {
+		if err := tx.Create(&candidate).Error; err != nil {
+			return err
+		}
 	}
 
 	if err := tx.Commit().Error; err != nil {

@@ -18,8 +18,16 @@ export function DelFolderContent(arg1) {
   return window['go']['controller']['FolderController']['DelFolderContent'](arg1);
 }
 
+export function FindFolderList() {
+  return window['go']['controller']['FolderController']['FindFolderList']();
+}
+
 export function FindFolderTree() {
   return window['go']['controller']['FolderController']['FindFolderTree']();
+}
+
+export function GENERATOR_FOLDER() {
+  return window['go']['controller']['FolderController']['GENERATOR_FOLDER']();
 }
 
 export function GENERATOR_FOLDER_CONTENT_DTO() {

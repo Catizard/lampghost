@@ -137,7 +137,7 @@ function createContentColumns({
 	deleteFolderContent: (row: dto.FolderContentDto) => void;
 }): DataTableColumns<dto.FolderContentDto> {
 	return [
-		{ title: "Name", key: "Name" },
+		{ title: "Name", key: "Title" },
 		{
 			title: "Action",
 			key: "actions",

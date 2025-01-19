@@ -139,7 +139,7 @@ func (s *FolderService) GenerateJson() ([]dto.FolderDefinitionDto, int, error) {
 
 func checkDuplicateFolderName(tx *gorm.DB, folderName string) error {
 	var dupCount int64
-	if err := tx.Model(&entity.Folder{}).Count(&dupCount).Error; err != nil {
+	if err := tx.Model(&entity.Folder{}).Where(&entity.Folder{FolderName: folderName}).Count(&dupCount).Error; err != nil {
 		return err
 	}
 	if dupCount > 0 {

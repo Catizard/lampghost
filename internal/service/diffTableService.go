@@ -203,8 +203,6 @@ func (s *DiffTableService) FindDiffTableHeaderTree() ([]dto.DiffTableHeaderDto, 
 		headers = append(headers, *headerDto)
 	}
 
-	log.Debug(headers)
-
 	for headerInx, header := range headers {
 		sortedChildren := make([]dto.DiffTableHeaderDto, len(header.Children))
 		copy(sortedChildren, header.Children)
@@ -220,8 +218,6 @@ func (s *DiffTableService) FindDiffTableHeaderTree() ([]dto.DiffTableHeaderDto, 
 		})
 		headers[headerInx].Children = sortedChildren
 	}
-
-	log.Debug(headers)
 
 	return headers, len(headers), nil
 }

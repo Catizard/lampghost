@@ -5,6 +5,7 @@ import (
 
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
+	"github.com/Catizard/lampghost_wails/internal/vo"
 	"gorm.io/gorm"
 )
 
@@ -34,7 +35,7 @@ func (s *FolderService) AddFolder(folderName string) (*entity.Folder, error) {
 		return nil, err
 	}
 
-	prevFolders, prevFoldersLen, err := findFolderList(tx)
+	prevFolders, prevFoldersLen, err := findFolderList(tx, nil)
 	if err != nil {
 		tx.Rollback()
 		return nil, err
@@ -86,7 +87,7 @@ func (s *FolderService) DelFolderContent(contentID uint) error {
 }
 
 func (s *FolderService) FindFolderTree() ([]dto.FolderDto, int, error) {
-	rawFolders, _, err := findFolderList(s.db)
+	rawFolders, _, err := findFolderList(s.db, nil)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -99,7 +100,7 @@ func (s *FolderService) FindFolderTree() ([]dto.FolderDto, int, error) {
 		folderIDs[i] = folder.ID
 	}
 
-	rawContents, _, err := findFolderContentByFolderIDs(s.db, folderIDs)
+	rawContents, _, err := findFolderContentList(s.db, &vo.FolderContentVo{FolderIDs: folderIDs})
 	if err != nil {
 		return nil, 0, err
 	}
@@ -126,7 +127,7 @@ func (s *FolderService) FindFolderTree() ([]dto.FolderDto, int, error) {
 
 // Generate folder definition json with all folders
 func (s *FolderService) GenerateJson() ([]dto.FolderDefinitionDto, int, error) {
-	rawFolders, _, err := findFolderList(s.db)
+	rawFolders, _, err := findFolderList(s.db, nil)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -148,30 +149,47 @@ func checkDuplicateFolderName(tx *gorm.DB, folderName string) error {
 	return nil
 }
 
-func findFolderList(tx *gorm.DB) ([]*entity.Folder, int, error) {
+func findFolderList(tx *gorm.DB, filter *vo.FolderVo) ([]*entity.Folder, int, error) {
+	if filter == nil {
+		var folders []*entity.Folder
+		if err := tx.Find(&folders).Error; err != nil {
+			return nil, 0, err
+		}
+		return folders, len(folders), nil
+	}
+
+	rawFilter := filter.Entity()
 	var folders []*entity.Folder
-	if err := tx.Find(&folders).Error; err != nil {
+	basicFiltered := tx.Where(rawFilter)
+	if len(filter.IDs) > 0 {
+		basicFiltered.Scopes(scopeInIDs(filter.IDs))
+	}
+	if err := basicFiltered.Find(&folders).Error; err != nil {
 		return nil, 0, err
 	}
 	return folders, len(folders), nil
 }
 
-// Find specific folder contents by folder id
-func findFolderContentByFolderID(tx *gorm.DB, folderID uint) ([]*entity.FolderContent, int, error) {
-	var contents []*entity.FolderContent
-	if err := tx.Where("folder_id = ?", folderID).Find(&contents).Error; err != nil {
-		return nil, 0, err
+// Query if there exists a folder that satisfies the condition
+func queryFolderExistence(tx *gorm.DB, filter *vo.FolderVo) (bool, error) {
+	if filter == nil {
+		var dupCount int64
+		if err := tx.Model(&entity.Folder{}).Count(&dupCount).Error; err != nil {
+			return false, err
+		}
+		return dupCount > 0, nil
 	}
-	return contents, len(contents), nil
-}
 
-// Extends to findFolderContentByFolderID, which could query multiple folders
-func findFolderContentByFolderIDs(tx *gorm.DB, folderIDs []uint) ([]*entity.FolderContent, int, error) {
-	var contents []*entity.FolderContent
-	if err := tx.Where("folder_id in ?", folderIDs).Find(&contents).Error; err != nil {
-		return nil, 0, err
+	rawFilter := filter.Entity()
+	var dupCount int64
+	basicFiltered := tx.Where(rawFilter)
+	if len(filter.IDs) > 0 {
+		basicFiltered.Scopes(scopeInIDs(filter.IDs))
 	}
-	return contents, len(contents), nil
+	if err := basicFiltered.Count(&dupCount).Error; err != nil {
+		return false, nil
+	}
+	return dupCount > 0, nil
 }
 
 func findFolderBitIndex(folders []*entity.Folder) int {

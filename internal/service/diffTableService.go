@@ -32,8 +32,11 @@ func NewDiffTableService(db *gorm.DB, rivalSongDataService *RivalSongDataService
 func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHeader, error) {
 	url = strings.TrimSpace(url)
 	log.Debugf("[DiffTableService] calling AddDiffTableHeader with url: %s", url)
-	if err := s.checkDuplicateHeaderUrl(url); err != nil {
-		return nil, err
+	if isDuplicated, err := queryDiffTableHeaderExistence(s.db, &entity.DiffTableHeader{HeaderUrl: url}); isDuplicated || err != nil {
+		if err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("Add difficult table header failed: header_url[%s] is duplicated", url)
 	}
 	headerVo, err := fetchDiffTableFromURL(url)
 	if err != nil {
@@ -44,8 +47,11 @@ func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHead
 		return nil, fmt.Errorf("assert: header.DataUrl cannot be empty")
 	}
 	log.Debugf("[DiffTableService] Got header data: %v", headerVo)
-	if err := s.checkDuplicateDataUrl(headerVo.DataUrl); err != nil {
-		return nil, err
+	if isDuplicated, err := queryDiffTableHeaderExistence(s.db, &entity.DiffTableHeader{DataUrl: headerVo.DataUrl}); isDuplicated || err != nil {
+		if err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("Add difficult table header failed: data_url[%s] is duplicated", url)
 	}
 
 	// Transaction begins from here
@@ -328,26 +334,13 @@ func (s *DiffTableService) QueryDiffTableDataWithRival(headerID uint, level stri
 	return contents, len(contents), nil
 }
 
-func (s *DiffTableService) checkDuplicateHeaderUrl(headerUrl string) error {
+// Query if there exists a header that satisfies the condition
+func queryDiffTableHeaderExistence(tx *gorm.DB, filter *entity.DiffTableHeader) (bool, error) {
 	var dupCount int64
-	if err := s.db.Model(&entity.DiffTableHeader{}).Where("header_url = ?", headerUrl).Count(&dupCount).Error; err != nil {
-		return err
+	if err := tx.Model(&entity.DiffTableHeader{}).Where(filter).Count(&dupCount).Error; err != nil {
+		return false, err
 	}
-	if dupCount > 0 {
-		return fmt.Errorf("header url: %s is duplicated", headerUrl)
-	}
-	return nil
-}
-
-func (s *DiffTableService) checkDuplicateDataUrl(dataUrl string) error {
-	var dupCount int64
-	if err := s.db.Model(&entity.DiffTableHeader{}).Where("data_url = ?", dataUrl).Count(&dupCount).Error; err != nil {
-		return err
-	}
-	if dupCount > 0 {
-		return fmt.Errorf("data url: %s is duplicated", dataUrl)
-	}
-	return nil
+	return dupCount > 0, nil
 }
 
 func fetchDiffTableFromURL(url string) (*vo.DiffTableHeaderVo, error) {

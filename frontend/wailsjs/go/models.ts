@@ -49,7 +49,7 @@ export namespace dto {
 	    Symbol: string;
 	    Contents: DiffTableDataDto[];
 	    SortedLevels: string[];
-	    LevelLayeredContents: {[key: string]: DiffTableDataDto[]};
+	    LevelLayeredContents: {[key: string]: []};
 	    Level: string;
 	    Children: DiffTableHeaderDto[];
 	

@@ -25,3 +25,14 @@ func scopeInFolderIDs(folderIDs []uint) func(db *gorm.DB) *gorm.DB {
 		return db
 	}
 }
+
+// db.Where("header_id in ?", headerIDs)
+// Requirements: len(headerIDs) > 0
+func scopeInHeaderIDs(headerIDs []uint) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if len(headerIDs) > 0 {
+			return db.Where("header_id in ?", headerIDs)
+		}
+		return db
+	}
+}

@@ -12,11 +12,11 @@ type DiffTableHeaderDto struct {
 	OriginalUrl *string
 	Symbol      string
 
-	Contents []DiffTableDataDto
+	Contents []*DiffTableDataDto
 
 	// Only used in QueryLevelLayered interface
 	SortedLevels         []string
-	LevelLayeredContents map[string][]DiffTableDataDto
+	LevelLayeredContents map[string][]*DiffTableDataDto
 
 	// Only used in tree query interface
 	Level string
@@ -24,7 +24,7 @@ type DiffTableHeaderDto struct {
 	Children []DiffTableHeaderDto
 }
 
-func NewDiffTableHeaderDto(header *entity.DiffTableHeader, contents []DiffTableDataDto) *DiffTableHeaderDto {
+func NewDiffTableHeaderDto(header *entity.DiffTableHeader, contents []*DiffTableDataDto) *DiffTableHeaderDto {
 	return &DiffTableHeaderDto{
 		ID:          header.ID,
 		HeaderUrl:   header.HeaderUrl,
@@ -47,7 +47,7 @@ func (header *DiffTableHeaderDto) Entity() *entity.DiffTableHeader {
 	}
 }
 
-func NewLevelLayeredDiffTableHeaderDto(header *entity.DiffTableHeader, sortedLevels []string, levelLayeredContents map[string][]DiffTableDataDto) *DiffTableHeaderDto {
+func NewLevelLayeredDiffTableHeaderDto(header *entity.DiffTableHeader, sortedLevels []string, levelLayeredContents map[string][]*DiffTableDataDto) *DiffTableHeaderDto {
 	ret := NewDiffTableHeaderDto(header, nil)
 	ret.SortedLevels = sortedLevels
 	ret.LevelLayeredContents = levelLayeredContents

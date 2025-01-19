@@ -1,6 +1,8 @@
 package dto
 
-import "github.com/Catizard/lampghost_wails/internal/entity"
+import (
+	"github.com/Catizard/lampghost_wails/internal/entity"
+)
 
 type DiffTableDataDto struct {
 	ID        uint
@@ -43,6 +45,15 @@ func NewDiffTableDataDtoWithCache(data *entity.DiffTableData, cache *entity.Song
 	ret := NewDiffTableDataDto(data)
 	ret.RepairHash(cache)
 	return ret
+}
+
+// []*entity.DiffTableData -> []*dto.DiffTableData
+func NewDiffTableDataDtoArray(arr []*entity.DiffTableData) []*DiffTableDataDto {
+	contents := make([]*DiffTableDataDto, len(arr))
+	for i, rawContent := range arr {
+		contents[i] = NewDiffTableDataDto(rawContent)
+	}
+	return contents
 }
 
 func (data *DiffTableDataDto) RepairHash(cache *entity.SongHashCache) bool {

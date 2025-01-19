@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
@@ -81,6 +82,76 @@ func (s *FolderService) DelFolder(ID uint) error {
 // Delete specific folder content
 func (s *FolderService) DelFolderContent(contentID uint) error {
 	if err := s.db.Unscoped().Where("id = ?", contentID).Delete(&entity.FolderContent{}).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+// Bind one song to multiple folders
+// Requirements:
+// 1) `songDataID` & `folderIDs` must be existed.
+// 2) `folderIDs` defines the final binding, for example, if the song "AIR" is currently binds to folder "1" & "2"
+// After calling BindSongToFolder("AIR", ["2", "3"]), "AIR" is now binds to "2" & "3"
+// 3) This function must keep old data. In previous example, the content which represents "AIR" and "2" won't be modified
+func (s *FolderService) BindSongToFolder(songDataID uint, folderIDs []uint) error {
+	tx := s.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// Check existence
+	songData, err := findRivalSongDataByID(tx, songDataID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	rawFolders, rlen, err := findFolderList(tx, &vo.FolderVo{IDs: folderIDs})
+	if err != nil {
+		return err
+	}
+	if rlen != len(folderIDs) {
+		return fmt.Errorf("bind song to folder failed: folder id array is cracked")
+	}
+
+	folderIDMapsToSelf := make(map[uint]*entity.Folder)
+	for _, folder := range rawFolders {
+		folderIDMapsToSelf[folder.ID] = folder
+	}
+
+	// Fetch previous bindings
+	previous, _, err := findFolderContentList(tx, &vo.FolderContentVo{FolderIDs: folderIDs})
+	if err != nil {
+		return err
+	}
+
+	// Delete unused bindings
+	unused := make([]uint, 0)
+	for _, prev := range previous {
+		if slices.Contains(folderIDs, prev.ID) {
+			unused = append(unused, prev.ID)
+		}
+	}
+	if err := tx.Unscoped().Where(scopeInIDs(unused)).Delete(&entity.FolderContent{}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	// Insert new bindings
+	candidate := make([]*entity.FolderContent, 0)
+	for _, folderID := range folderIDs {
+		if slices.ContainsFunc(previous, func(prev *entity.FolderContent) bool {
+			return prev.ID == folderID
+		}) {
+			candidate = append(candidate, entity.FromSongDataToFolderContent(folderIDMapsToSelf[folderID], songData))
+		}
+	}
+	if err := tx.Create(&candidate).Error; err != nil {
+		return err
+	}
+
+	if err := tx.Commit().Error; err != nil {
 		return err
 	}
 	return nil

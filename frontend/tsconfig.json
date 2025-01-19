@@ -3,7 +3,13 @@
         "target": "es5",
         "types": ["naive-ui/volar"],
         "lib": [
-            "es6"
-        ]
+            "ES2018"
+        ],
+        "paths": {
+            "@/*": ["./src/*"],
+            "@components/*": ["./src/components/*"],
+            "@views/*": ["./src/views/*"],
+            "@wailsjs/*": ["./wailsjs/*"]
+        }
     },
 }

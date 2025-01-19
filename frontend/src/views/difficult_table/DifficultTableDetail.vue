@@ -3,10 +3,10 @@
 </template>
 
 <script setup lang="ts">
-import { DataTableColumns, useNotification } from 'naive-ui';
-import { dto } from '../../../wailsjs/go/models';
-import { ref, Ref, watch } from 'vue';
-import { QueryDiffTableDataWithRival } from '../../../wailsjs/go/controller/DiffTableController';
+import { DataTableColumns, NButton, useNotification } from 'naive-ui';
+import { dto } from '@wailsjs/go/models';
+import { h, ref, Ref, watch } from 'vue';
+import { QueryDiffTableDataWithRival } from '@wailsjs/go/controller/DiffTableController';
 
 const notification = useNotification();
 

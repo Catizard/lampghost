@@ -35,8 +35,8 @@ import {
   AddDiffTableHeader,
   DelDiffTableHeader,
   FindDiffTableHeaderTree
-} from "../../../wailsjs/go/controller/DiffTableController";
-import { dto, entity } from "../../../wailsjs/go/models";
+} from "@wailsjs/go/controller/DiffTableController";
+import { dto, entity } from "@wailsjs/go/models";
 import DifficultTableDetail from "./DifficultTableDetail.vue";
 
 const showAddModal = ref(false);

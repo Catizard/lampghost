@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import { h, Ref, ref, watch } from "vue";
-import { dto } from "../../../wailsjs/go/models";
+import { dto } from "@wailsjs/go/models";
 import {
 	DataTableColumns,
 	FormInst,
@@ -37,7 +37,6 @@ import {
 	NDataTable,
 	useDialog,
 	useNotification,
-	useMessage,
 } from "naive-ui";
 import {
 	AddFolder,
@@ -45,7 +44,7 @@ import {
 	DelFolderContent,
 	FindFolderTree,
 	QueryFolderDefinition,
-} from "../../../wailsjs/go/controller/FolderController";
+} from "@wailsjs/go/controller/FolderController";
 
 const notification = useNotification();
 const dialog = useDialog();

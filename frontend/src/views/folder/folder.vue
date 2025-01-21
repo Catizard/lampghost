@@ -4,8 +4,9 @@
 			<n-h1 prefix="bar" style="text-align: left">
 				<n-text type="primary">收藏夹管理</n-text>
 			</n-h1>
-			<n-button @click="showAddModal = true">新增收藏夹</n-button>
-			<n-button @click="showJsonModal = true">生成JSON</n-button>
+			<n-button type="primary" @click="showAddModal = true">新增收藏夹</n-button>
+			<n-button type="primary" @click="showJsonModal = true">生成JSON</n-button>
+			<n-button type="error" @click="handleClickSync">同步数据</n-button>
 		</n-space>
 		<n-data-table :columns="columns" :data="data" :pagination="pagination" :bordered="false" />
 	</perfect-scrollbar>
@@ -44,6 +45,7 @@ import {
 	DelFolderContent,
 	FindFolderTree,
 	QueryFolderDefinition,
+	SyncSongData,
 } from "@wailsjs/go/controller/FolderController";
 
 const notification = useNotification();
@@ -264,6 +266,28 @@ function notifyError(msg: string) {
 		duration: 5000,
 		keepAliveOnHover: true,
 	});
+}
+
+function handleClickSync() {
+	dialog.warning({
+		title: "警告",
+		content: "该操作会直接修改你在本地的songdata.db文件, 移除已有的所有配置(包括你在游戏中自行设置的favorite和invisible)并重新应用当前的收藏夹配置。该操作不可逆, 请在操作前对你的数据进行备份!",
+		positiveText: "确定",
+		negativeText: "取消",
+		onPositiveClick:() => {
+			SyncSongData().then(result => {
+				if (result.Code != 200) {
+					return Promise.reject(result.Msg)
+				}
+				notifySuccess("更新成功, 后台返回:" + result.Msg)
+			}).catch(err => {
+				notifyError("更新失败, 后台返回:" + err)
+			})
+		},
+		onNegativeClick: () => {
+			// do nothing
+		}
+	})
 }
 
 watch(showJsonModal, (newValue, oldValue) => {

@@ -90,7 +90,7 @@ func (ctl *FolderController) SyncSongData() result.RtnMessage {
 
 func (ctl *FolderController) QueryFolderDefinition() result.RtnDataList {
 	log.Info("[Controller] Calling FolderController.GenerateJson")
-	rows, _, err := ctl.folderService.GenerateJson()
+	rows, _, err := ctl.folderService.GenerateFolderDefinition()
 	if err != nil {
 		log.Errorf("[FolderController] returning err: %v", err)
 		return result.NewErrorDataList(err)

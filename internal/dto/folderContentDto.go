@@ -34,3 +34,8 @@ func (folderContent *FolderContentDto) Entity() *entity.FolderContent {
 		Title:      folderContent.Title,
 	}
 }
+
+type FolderContentDefinitionDto struct {
+	Sha256 string
+	Mask   int
+}

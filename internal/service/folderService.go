@@ -64,8 +64,9 @@ func (s *FolderService) AddFolder(folderName string) (*entity.Folder, error) {
 // Sync current folder definition to main user's songdata.db file
 //
 //	WARNING:
-//	This interface would modify songdata.db directly and unrecoverable
+//	This function would modify songdata.db directly and it's unrecoverable
 func (s *FolderService) SyncSongData() error {
+	// 1) connect to songdata.db
 	mainUser, err := queryMainUser(s.db)
 	if err != nil {
 		return err
@@ -75,7 +76,13 @@ func (s *FolderService) SyncSongData() error {
 		return err
 	}
 	songDataService := NewSongDataService(songDataDB)
-
+	// 2) generate contents definition
+	contentDefinition, _, err := generateContentDefinition(s.db)
+	if err != nil {
+		return err
+	}
+	// 3) refersh data
+	return songDataService.SyncFolderContentDefinition(contentDefinition)
 }
 
 // Delete a folder, and its contents
@@ -170,7 +177,6 @@ func (s *FolderService) BindSongToFolder(diffTableDataID uint, folderIDs []uint)
 			candidate = append(candidate, entity.FromDiffTableDataToFolderContent(folderIDMapsToSelf[folderID], songData))
 		}
 	}
-	log.Debugf("[FolderService] New binding candidates = %v", candidate)
 	if len(candidate) > 0 {
 		if err := tx.Create(&candidate).Error; err != nil {
 			return err
@@ -226,9 +232,13 @@ func (s *FolderService) FindFolderList() ([]*entity.Folder, int, error) {
 	return findFolderList(s.db, nil)
 }
 
-// Generate folder definition json with all folders
-func (s *FolderService) GenerateJson() ([]dto.FolderDefinitionDto, int, error) {
-	rawFolders, _, err := findFolderList(s.db, nil)
+func (s *FolderService) GenerateFolderDefinition() ([]dto.FolderDefinitionDto, int, error) {
+	return generateFolderDefinition(s.db)
+}
+
+// Generate folder definition for each folder
+func generateFolderDefinition(tx *gorm.DB) ([]dto.FolderDefinitionDto, int, error) {
+	rawFolders, _, err := findFolderList(tx, nil)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -237,6 +247,38 @@ func (s *FolderService) GenerateJson() ([]dto.FolderDefinitionDto, int, error) {
 		folderDefinitions[i] = *dto.NewFolderDefinitionDto(rawFolder)
 	}
 	return folderDefinitions, len(folderDefinitions), nil
+}
+
+// Generate content definition for each contents within folder
+func generateContentDefinition(tx *gorm.DB) ([]dto.FolderContentDefinitionDto, int, error) {
+	rawFolders, _, err := findFolderList(tx, nil)
+	if err != nil {
+		return nil, 0, err
+	}
+	folderIDMapsToBit := make(map[uint]int)
+	for _, rawFolder := range rawFolders {
+		folderIDMapsToBit[rawFolder.ID] = rawFolder.BitIndex
+	}
+	rawContents, _, err := findFolderContentList(tx, nil)
+	if err != nil {
+		return nil, 0, err
+	}
+	sha256MapsToMask := make(map[string]int)
+	for _, rawContent := range rawContents {
+		if _, ok := sha256MapsToMask[rawContent.Sha256]; !ok {
+			sha256MapsToMask[rawContent.Sha256] = 0
+		}
+		sha256MapsToMask[rawContent.Sha256] |= 1 << folderIDMapsToBit[rawContent.FolderID]
+	}
+
+	definition := make([]dto.FolderContentDefinitionDto, 0)
+	for sha256, mask := range sha256MapsToMask {
+		definition = append(definition, dto.FolderContentDefinitionDto{
+			Sha256: sha256,
+			Mask:   mask,
+		})
+	}
+	return definition, len(definition), nil
 }
 
 func checkDuplicateFolderName(tx *gorm.DB, folderName string) error {

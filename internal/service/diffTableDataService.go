@@ -11,6 +11,9 @@ func findDiffTableDataByID(tx *gorm.DB, ID uint) (*entity.DiffTableData, error) 
 	if err := tx.Find(&data, ID).Error; err != nil {
 		return nil, err
 	}
+	if err := fixDiffTableDataHashField(tx, data); err != nil {
+		return nil, err
+	}
 	return data, nil
 }
 
@@ -21,7 +24,7 @@ func findDiffTableDataList(tx *gorm.DB, filter *vo.DiffTableDataVo) ([]*entity.D
 			return nil, 0, err
 		}
 
-		if err := fixDiffTableDataHashField(tx, contents); err != nil {
+		if err := fixDiffTableDataHashField(tx, contents...); err != nil {
 			return nil, 0, err
 		}
 		return contents, len(contents), nil
@@ -35,7 +38,7 @@ func findDiffTableDataList(tx *gorm.DB, filter *vo.DiffTableDataVo) ([]*entity.D
 		return nil, 0, err
 	}
 
-	if err := fixDiffTableDataHashField(tx, contents); err != nil {
+	if err := fixDiffTableDataHashField(tx, contents...); err != nil {
 		return nil, 0, err
 	}
 	return contents, len(contents), nil
@@ -44,7 +47,7 @@ func findDiffTableDataList(tx *gorm.DB, filter *vo.DiffTableDataVo) ([]*entity.D
 // Fix the hash field on difficult table data
 //
 // NOTE: This function uses default user's song data to build the cache
-func fixDiffTableDataHashField(tx *gorm.DB, rawContents []*entity.DiffTableData) error {
+func fixDiffTableDataHashField(tx *gorm.DB, rawContents ...*entity.DiffTableData) error {
 	cache, err := queryDefaultSongHashCache(tx)
 	if err != nil {
 		return err

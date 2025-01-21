@@ -79,7 +79,13 @@ func (ctl *FolderController) FindFolderList() result.RtnDataList {
 }
 
 func (ctl *FolderController) SyncSongData() result.RtnMessage {
-	panic("todo!")
+	log.Info("[Controller] Calling FolderController.SyncSongData")
+	err := ctl.folderService.SyncSongData()
+	if err != nil {
+		log.Errorf("[FolderController] returning err: %v", err)
+		return result.NewErrorMessage(err)
+	}
+	return result.SUCCESS
 }
 
 func (ctl *FolderController) QueryFolderDefinition() result.RtnDataList {

@@ -8,6 +8,7 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/vo"
 	"github.com/charmbracelet/log"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
@@ -58,6 +59,23 @@ func (s *FolderService) AddFolder(folderName string) (*entity.Folder, error) {
 		return nil, err
 	}
 	return &newFolder, nil
+}
+
+// Sync current folder definition to main user's songdata.db file
+//
+//	WARNING:
+//	This interface would modify songdata.db directly and unrecoverable
+func (s *FolderService) SyncSongData() error {
+	mainUser, err := queryMainUser(s.db)
+	if err != nil {
+		return err
+	}
+	songDataDB, err := gorm.Open(sqlite.Open(*mainUser.SongDataPath))
+	if err != nil {
+		return err
+	}
+	songDataService := NewSongDataService(songDataDB)
+
 }
 
 // Delete a folder, and its contents

@@ -40,7 +40,7 @@ func (ctl *DiffTableController) DelDiffTableHeader(ID uint) result.RtnMessage {
 
 func (ctl *DiffTableController) FindDiffTableHeaderList() result.RtnDataList {
 	log.Info("[Controller] calling DiffTableController.FindDiffTableHeaderList")
-	rows, _, err := ctl.diffTableService.FindDiffTableHeaderList()
+	rows, _, err := ctl.diffTableService.FindDiffTableHeaderList(nil)
 	if err != nil {
 		log.Errorf("[DiffTableController] returning error: %v", err)
 		return result.NewErrorDataList(err)

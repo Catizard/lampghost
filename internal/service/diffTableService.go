@@ -115,8 +115,8 @@ func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHead
 // Query all difficult table datas
 //
 // Returns difficult header and its contents
-func (s *DiffTableService) FindDiffTableHeaderList() ([]dto.DiffTableHeaderDto, int, error) {
-	headers, _, err := findDiffTableHeaderList(s.db)
+func (s *DiffTableService) FindDiffTableHeaderList(filter *vo.DiffTableHeaderVo) ([]dto.DiffTableHeaderDto, int, error) {
+	headers, _, err := findDiffTableHeaderList(s.db, filter)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -147,7 +147,7 @@ func (s *DiffTableService) FindDiffTableHeaderList() ([]dto.DiffTableHeaderDto, 
 //
 // Adds player related field (e.g PlayCount, Lamp status)
 func (s *DiffTableService) FindDiffTableHeaderListWithRival(rivalID uint) ([]dto.DiffTableHeaderDto, int, error) {
-	headers, _, err := s.FindDiffTableHeaderList()
+	headers, _, err := s.FindDiffTableHeaderList(nil)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -175,7 +175,7 @@ func (s *DiffTableService) FindDiffTableHeaderListWithRival(rivalID uint) ([]dto
 // +-- ...
 func (s *DiffTableService) FindDiffTableHeaderTree() ([]dto.DiffTableHeaderDto, int, error) {
 	// NOTE: Don't call s.FindDiffTableHeaderList, call findDiffTableHeaderList instead
-	rawHeaders, _, err := findDiffTableHeaderList(s.db)
+	rawHeaders, _, err := findDiffTableHeaderList(s.db, nil)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -424,10 +424,18 @@ func mergeRivalRelatedData(sha256ScoreLogsMap map[string][]entity.RivalScoreLog,
 	return nil
 }
 
-func findDiffTableHeaderList(tx *gorm.DB) ([]*entity.DiffTableHeader, int, error) {
+func findDiffTableHeaderList(tx *gorm.DB, filter *vo.DiffTableHeaderVo) ([]*entity.DiffTableHeader, int, error) {
+	if filter == nil {
+		var headers []*entity.DiffTableHeader
+		if err := tx.Find(&headers).Error; err != nil {
+			log.Error("[DiffTableService] Find difftable header failed with %v", err)
+			return nil, 0, err
+		}
+		return headers, len(headers), nil
+	}
+
 	var headers []*entity.DiffTableHeader
-	if err := tx.Find(&headers).Error; err != nil {
-		log.Error("[DiffTableService] Find difftable header failed with %v", err)
+	if err := tx.Where(filter.Entity()).Find(&headers).Error; err != nil {
 		return nil, 0, err
 	}
 	return headers, len(headers), nil

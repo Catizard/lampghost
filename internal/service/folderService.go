@@ -228,8 +228,12 @@ func (s *FolderService) FindFolderTree() ([]dto.FolderDto, int, error) {
 	return folders, len(folders), nil
 }
 
-func (s *FolderService) FindFolderList() ([]*entity.Folder, int, error) {
-	return findFolderList(s.db, nil)
+func (s *FolderService) FindFolderList(filter *vo.FolderVo) ([]*entity.Folder, int, error) {
+	return findFolderList(s.db, filter)
+}
+
+func (s *FolderService) FindFolderContentList(filter *vo.FolderContentVo) ([]*entity.FolderContent, int, error) {
+	return findFolderContentList(s.db, filter)
 }
 
 func (s *FolderService) GenerateFolderDefinition() ([]dto.FolderDefinitionDto, int, error) {

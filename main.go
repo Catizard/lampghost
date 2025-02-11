@@ -6,6 +6,7 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/config"
 	"github.com/Catizard/lampghost_wails/internal/controller"
 	"github.com/Catizard/lampghost_wails/internal/database"
+	"github.com/Catizard/lampghost_wails/internal/server"
 	"github.com/Catizard/lampghost_wails/internal/service"
 	"github.com/charmbracelet/log"
 	"github.com/wailsapp/wails/v2"
@@ -51,6 +52,9 @@ func main() {
 	if err := c.Provide(controller.NewFolderController); err != nil {
 		panic(err)
 	}
+	if err := c.Provide(server.NewInternalServer); err != nil {
+		panic(err)
+	}
 
 	var bind []interface{}
 	if err := c.Invoke(func(controller *controller.RivalInfoController) error {
@@ -69,6 +73,12 @@ func main() {
 	if err := c.Invoke(func(controller *controller.FolderController) error {
 		bind = append(bind, controller)
 		return nil
+	}); err != nil {
+		panic(err)
+	}
+
+	if err := c.Invoke(func(server *server.InternalServer) error {
+		return server.RunServer()
 	}); err != nil {
 		panic(err)
 	}

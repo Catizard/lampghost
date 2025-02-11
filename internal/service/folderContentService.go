@@ -16,7 +16,7 @@ func findFolderContentList(tx *gorm.DB, filter *vo.FolderContentVo) ([]*entity.F
 	}
 
 	var contents []*entity.FolderContent
-	if err := tx.Where(filter.Entity()).Scopes(
+	if err := tx.Debug().Where(filter.Entity()).Scopes(
 		scopeInIDs(filter.IDs),
 		scopeInFolderIDs(filter.FolderIDs),
 	).Find(&contents).Error; err != nil {

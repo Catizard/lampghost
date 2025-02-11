@@ -70,7 +70,7 @@ func (ctl *FolderController) FindFolderTree() result.RtnDataList {
 
 func (ctl *FolderController) FindFolderList() result.RtnDataList {
 	log.Info("[Controller] Calling FolderController.FindFolderList")
-	rows, _, err := ctl.folderService.FindFolderList()
+	rows, _, err := ctl.folderService.FindFolderList(nil)
 	if err != nil {
 		log.Errorf("[FolderController] returning err: %v", err)
 		return result.NewErrorDataList(err)

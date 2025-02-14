@@ -1,13 +1,15 @@
 <template>
 	<perfect-scrollbar>
-		<n-space justify="space-between">
+		<n-flex justify="space-between">
 			<n-h1 prefix="bar" style="text-align: left">
 				<n-text type="primary">收藏夹管理</n-text>
 			</n-h1>
-			<n-button type="primary" @click="showAddModal = true">新增收藏夹</n-button>
-			<n-button type="primary" @click="showJsonModal = true">生成JSON</n-button>
-			<n-button type="error" @click="handleClickSync">同步数据</n-button>
-		</n-space>
+			<n-flex justify="end">
+				<n-button type="primary" @click="showAddModal = true">新增收藏夹</n-button>
+				<n-button type="primary" @click="showJsonModal = true">生成JSON</n-button>
+				<n-button type="error" @click="handleClickSync">同步数据</n-button>
+			</n-flex>
+		</n-flex>
 		<n-data-table :columns="columns" :data="data" :pagination="pagination" :bordered="false" />
 	</perfect-scrollbar>
 
@@ -274,7 +276,7 @@ function handleClickSync() {
 		content: "该操作会直接修改你在本地的songdata.db文件, 移除已有的所有配置(包括你在游戏中自行设置的favorite和invisible)并重新应用当前的收藏夹配置。该操作不可逆, 请在操作前对你的数据进行备份!",
 		positiveText: "确定",
 		negativeText: "取消",
-		onPositiveClick:() => {
+		onPositiveClick: () => {
 			SyncSongData().then(result => {
 				if (result.Code != 200) {
 					return Promise.reject(result.Msg)

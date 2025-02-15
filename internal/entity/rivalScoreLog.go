@@ -17,7 +17,7 @@ type RivalScoreLog struct {
 	OldCombo  int32
 	Minbp     int32
 	OldMinbp  int32
-	TimeStamp int64 `gorm:"column:date"`
+	Timestamp int64 `gorm:"column:date"`
 }
 
 func (RivalScoreLog) TableName() string {
@@ -36,6 +36,6 @@ func FromRawScoreLogToRivalScoreLog(scorelog *ScoreLog) RivalScoreLog {
 		OldCombo:  scorelog.OldCombo,
 		Minbp:     scorelog.Minbp,
 		OldMinbp:  scorelog.OldMinbp,
-		TimeStamp: scorelog.TimeStamp,
+		Timestamp: scorelog.TimeStamp,
 	}
 }

@@ -49,7 +49,7 @@ export namespace dto {
 	    Symbol: string;
 	    Contents: DiffTableDataDto[];
 	    SortedLevels: string[];
-	    LevelLayeredContents: {[key: string]: []};
+	    LevelLayeredContents: Record<string, DiffTableDataDto[]>;
 	    Level: string;
 	    Children: DiffTableHeaderDto[];
 	
@@ -67,7 +67,7 @@ export namespace dto {
 	        this.Symbol = source["Symbol"];
 	        this.Contents = this.convertValues(source["Contents"], DiffTableDataDto);
 	        this.SortedLevels = source["SortedLevels"];
-	        this.LevelLayeredContents = source["LevelLayeredContents"];
+	        this.LevelLayeredContents = this.convertValues(source["LevelLayeredContents"], DiffTableDataDto[], true);
 	        this.Level = source["Level"];
 	        this.Children = this.convertValues(source["Children"], DiffTableHeaderDto);
 	    }
@@ -140,6 +140,73 @@ export namespace dto {
 	        this.ID = source["ID"];
 	        this.FolderName = source["FolderName"];
 	        this.Contents = this.convertValues(source["Contents"], FolderContentDto);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class RivalScoreLogDto {
+	    ID: number;
+	    // Go type: time
+	    CreatedAt: any;
+	    // Go type: time
+	    UpdatedAt: any;
+	    // Go type: gorm
+	    DeletedAt: any;
+	    RivalId: number;
+	    Sha256: string;
+	    Mode: string;
+	    Clear: number;
+	    OldClear: number;
+	    Score: number;
+	    OldScore: number;
+	    Combo: number;
+	    OldCombo: number;
+	    Minbp: number;
+	    OldMinbp: number;
+	    Timestamp: number;
+	    Title: string;
+	    RecordTime: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new RivalScoreLogDto(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.ID = source["ID"];
+	        this.CreatedAt = this.convertValues(source["CreatedAt"], null);
+	        this.UpdatedAt = this.convertValues(source["UpdatedAt"], null);
+	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
+	        this.RivalId = source["RivalId"];
+	        this.Sha256 = source["Sha256"];
+	        this.Mode = source["Mode"];
+	        this.Clear = source["Clear"];
+	        this.OldClear = source["OldClear"];
+	        this.Score = source["Score"];
+	        this.OldScore = source["OldScore"];
+	        this.Combo = source["Combo"];
+	        this.OldCombo = source["OldCombo"];
+	        this.Minbp = source["Minbp"];
+	        this.OldMinbp = source["OldMinbp"];
+	        this.Timestamp = source["Timestamp"];
+	        this.Title = source["Title"];
+	        this.RecordTime = source["RecordTime"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -406,6 +473,78 @@ export namespace result {
 	        this.Msg = source["Msg"];
 	        this.Timestamp = this.convertValues(source["Timestamp"], null);
 	        this.Err = source["Err"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+
+}
+
+export namespace vo {
+	
+	export class RivalScoreLogVo {
+	    ID: number;
+	    // Go type: time
+	    CreatedAt: any;
+	    // Go type: time
+	    UpdatedAt: any;
+	    // Go type: gorm
+	    DeletedAt: any;
+	    RivalId: number;
+	    Sha256: string;
+	    Mode: string;
+	    Clear: number;
+	    OldClear: number;
+	    Score: number;
+	    OldScore: number;
+	    Combo: number;
+	    OldCombo: number;
+	    Minbp: number;
+	    OldMinbp: number;
+	    Timestamp: number;
+	    Page: number;
+	    PageSize: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new RivalScoreLogVo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.ID = source["ID"];
+	        this.CreatedAt = this.convertValues(source["CreatedAt"], null);
+	        this.UpdatedAt = this.convertValues(source["UpdatedAt"], null);
+	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
+	        this.RivalId = source["RivalId"];
+	        this.Sha256 = source["Sha256"];
+	        this.Mode = source["Mode"];
+	        this.Clear = source["Clear"];
+	        this.OldClear = source["OldClear"];
+	        this.Score = source["Score"];
+	        this.OldScore = source["OldScore"];
+	        this.Combo = source["Combo"];
+	        this.OldCombo = source["OldCombo"];
+	        this.Minbp = source["Minbp"];
+	        this.OldMinbp = source["OldMinbp"];
+	        this.Timestamp = source["Timestamp"];
+	        this.Page = source["Page"];
+	        this.PageSize = source["PageSize"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

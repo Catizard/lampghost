@@ -10,6 +10,7 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/service"
 	"github.com/charmbracelet/log"
 	"github.com/wailsapp/wails/v2"
+	"github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	"github.com/wailsapp/wails/v2/pkg/options/mac"
@@ -43,6 +44,9 @@ func main() {
 	if err := c.Provide(service.NewFolderService); err != nil {
 		panic(err)
 	}
+	if err := c.Provide(service.NewRivalScoreLogService); err != nil {
+		panic(err)
+	}
 	if err := c.Provide(controller.NewRivalInfoController); err != nil {
 		panic(err)
 	}
@@ -50,6 +54,9 @@ func main() {
 		panic(err)
 	}
 	if err := c.Provide(controller.NewFolderController); err != nil {
+		panic(err)
+	}
+	if err := c.Provide(controller.NewRivalScoreLogController); err != nil {
 		panic(err)
 	}
 	if err := c.Provide(server.NewInternalServer); err != nil {
@@ -71,6 +78,13 @@ func main() {
 	}
 
 	if err := c.Invoke(func(controller *controller.FolderController) error {
+		bind = append(bind, controller)
+		return nil
+	}); err != nil {
+		panic(err)
+	}
+
+	if err := c.Invoke(func(controller *controller.RivalScoreLogController) error {
 		bind = append(bind, controller)
 		return nil
 	}); err != nil {
@@ -100,6 +114,7 @@ func main() {
 		Mac: &mac.Options{
 			WebviewIsTransparent: true,
 		},
+		LogLevel: logger.DEBUG,
 	})
 
 	if err != nil {

@@ -36,3 +36,25 @@ func scopeInHeaderIDs(headerIDs []uint) func(db *gorm.DB) *gorm.DB {
 		return db
 	}
 }
+
+// pagination with page & pageSize
+// Forcements:
+// 1) if page <= 0, set it to 1
+// 2) if pageSize >= 100, set it to 100
+// 3) if pageSize <= 0, set if to 10
+func pagination(page int, pageSize int) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if page <= 0 {
+			page = 1
+		}
+		if pageSize >= 100 {
+			pageSize = 100
+		}
+		if pageSize <= 0 {
+			pageSize = 10
+		}
+
+		offset := (page - 1) * pageSize
+		return db.Offset(offset).Limit(pageSize)
+	}
+}

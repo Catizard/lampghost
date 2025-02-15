@@ -12,7 +12,8 @@ import {
     BookOutline as BookIcon,
     PersonOutline as PersonIcon,
     WineOutline as WineIcon,
-    Bookmarks as BookmarksIcon
+    Bookmarks as BookmarksIcon,
+    TimeOutline as TimeOutlineIcon
 } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
 import { computed, h, ref, watchEffect } from 'vue'
@@ -51,6 +52,11 @@ const menuOptions = [
         label: renderOption("folder", "folder"),
         key: "folder",
         icon: renderIcon(BookmarksIcon)
+    },
+    {
+        label: renderOption("recent", "recent"),
+        key: "recent",
+        icon: renderIcon(TimeOutlineIcon)
     }
 ]
 </script>

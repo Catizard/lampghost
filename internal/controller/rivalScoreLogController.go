@@ -22,7 +22,7 @@ func (ctl *RivalScoreLogController) QueryRivalScoreLogPageList(param *vo.RivalSc
 	log.Info("[Controller] calling RivalScoreLogController.QueryRivalScoreLogPageList")
 	rows, _, err := ctl.rivalScoreLogService.QueryRivalScoreLogPageList(param)
 	if err != nil {
-		log.Error("[RivalScoreLogController] returning err: %v", err)
+		log.Errorf("[RivalScoreLogController] returning err: %v", err)
 		return result.NewErrorDataList(err)
 	}
 	return result.NewRtnDataList(rows)

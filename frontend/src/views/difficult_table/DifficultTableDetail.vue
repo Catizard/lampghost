@@ -8,9 +8,8 @@
 import { DataTableColumns, NButton, useNotification } from 'naive-ui';
 import { dto } from '@wailsjs/go/models';
 import { h, ref, Ref, watch } from 'vue';
-import { QueryDiffTableDataWithRival } from '@wailsjs/go/controller/DiffTableController';
+import { BindDiffTableDataToFolder, QueryDiffTableDataWithRival } from '@wailsjs/go/controller/DiffTableController';
 import SelectFolder from '@/views/folder/SelectFolder.vue';
-import { BindSongToFolder } from '@wailsjs/go/controller/FolderController';
 
 const notification = useNotification();
 const loading = ref<boolean>(false);
@@ -84,7 +83,7 @@ function handleAddToFolder(ID: number) {
 }
 
 function handleSubmit(selected: [any]) {
-	BindSongToFolder(candidateSongDataID.value, selected)
+	BindDiffTableDataToFolder(candidateSongDataID.value, selected)
 		.then(result => {
 			if (result.Code != 200) {
 				return Promise.reject(result.Msg);

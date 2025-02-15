@@ -22,9 +22,14 @@ type RivalScoreLogDto struct {
 	OldMinbp  int32
 	Timestamp int64 `gorm:"column:date"`
 
-	Title string
+	RivalSongDataID uint
+	Title           string
 	// yyyy-mm-dd hh:mm:ss
 	RecordTime string
+	// Pagination
+	Page      int
+	PageSize  int
+	PageCount int
 }
 
 func NewRivalScoreLogDto(rivalScoreLog *entity.RivalScoreLog) *RivalScoreLogDto {

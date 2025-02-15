@@ -15,6 +15,38 @@ func NewRivalSongDataService(db *gorm.DB) *RivalSongDataService {
 	}
 }
 
+func (s *RivalSongDataService) BindRivalSongDataToFolder(rivalSongDataID uint, folderIDs []uint) error {
+	tx := s.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	songData, err := findRivalSongDataByID(tx, rivalSongDataID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	content := entity.FolderContent{
+		Sha256: songData.Sha256,
+		Md5:    songData.Md5,
+		Title:  songData.Title,
+	}
+
+	if err := bindSongToFolder(tx, content, folderIDs); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	return nil
+}
+
 func findRivalSongDataList(tx *gorm.DB, filter *entity.RivalSongData) ([]entity.RivalSongData, int, error) {
 	var songDataList []entity.RivalSongData
 	if err := tx.Where(filter).Find(&songDataList).Error; err != nil {

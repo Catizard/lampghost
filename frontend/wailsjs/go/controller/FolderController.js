@@ -6,10 +6,6 @@ export function AddFolder(arg1) {
   return window['go']['controller']['FolderController']['AddFolder'](arg1);
 }
 
-export function BindSongToFolder(arg1, arg2) {
-  return window['go']['controller']['FolderController']['BindSongToFolder'](arg1, arg2);
-}
-
 export function DelFolder(arg1) {
   return window['go']['controller']['FolderController']['DelFolder'](arg1);
 }

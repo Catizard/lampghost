@@ -210,8 +210,6 @@ function loadDiffTableData() {
 function showLevelContent({ ID, Level }) {
   currentShowHeaderId.value = ID;
   currentShowLevel.value = Level;
-  console.log(ID)
-  console.log(Level)
   showDetailModal.value = true;
 }
 

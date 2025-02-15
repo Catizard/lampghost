@@ -6,6 +6,8 @@ import {entity} from '../models';
 
 export function AddDiffTableHeader(arg1:string):Promise<result.RtnMessage>;
 
+export function BindDiffTableDataToFolder(arg1:number,arg2:Array<number>):Promise<result.RtnMessage>;
+
 export function DelDiffTableHeader(arg1:number):Promise<result.RtnMessage>;
 
 export function FindDiffTableHeaderList():Promise<result.RtnDataList>;

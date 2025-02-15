@@ -330,6 +330,39 @@ func (s *DiffTableService) QueryDiffTableDataWithRival(headerID uint, level stri
 	return contents, len(contents), nil
 }
 
+func (s *DiffTableService) BindDiffTableDataToFolder(diffTableDataID uint, folderIDs []uint) error {
+	log.Debugf("[DiffTableService] Calling BindDiffTableToFolder with diffTableDataID=%v, folderIDs=%v", diffTableDataID, folderIDs)
+	tx := s.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	songData, err := findDiffTableDataByID(tx, diffTableDataID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	content := entity.FolderContent{
+		Sha256: songData.Sha256,
+		Md5:    songData.Md5,
+		Title:  songData.Title,
+	}
+
+	if err := bindSongToFolder(tx, content, folderIDs); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	return nil
+}
+
 // Query if there exists a header that satisfies the condition
 func queryDiffTableHeaderExistence(tx *gorm.DB, filter *entity.DiffTableHeader) (bool, error) {
 	var dupCount int64

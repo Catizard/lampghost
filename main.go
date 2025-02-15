@@ -59,6 +59,9 @@ func main() {
 	if err := c.Provide(controller.NewRivalScoreLogController); err != nil {
 		panic(err)
 	}
+	if err := c.Provide(controller.NewRivalSongDataController); err != nil {
+		panic(err)
+	}
 	if err := c.Provide(server.NewInternalServer); err != nil {
 		panic(err)
 	}
@@ -85,6 +88,13 @@ func main() {
 	}
 
 	if err := c.Invoke(func(controller *controller.RivalScoreLogController) error {
+		bind = append(bind, controller)
+		return nil
+	}); err != nil {
+		panic(err)
+	}
+
+	if err := c.Invoke(func(controller *controller.RivalSongDataController) error {
 		bind = append(bind, controller)
 		return nil
 	}); err != nil {

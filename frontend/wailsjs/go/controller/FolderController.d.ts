@@ -6,8 +6,6 @@ import {dto} from '../models';
 
 export function AddFolder(arg1:string):Promise<result.RtnMessage>;
 
-export function BindSongToFolder(arg1:number,arg2:Array<number>):Promise<result.RtnMessage>;
-
 export function DelFolder(arg1:number):Promise<result.RtnMessage>;
 
 export function DelFolderContent(arg1:number):Promise<result.RtnMessage>;

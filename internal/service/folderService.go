@@ -115,26 +115,11 @@ func (s *FolderService) DelFolderContent(contentID uint) error {
 
 // Bind one song to multiple folders
 // Requirements:
-// 1) `diffTableDataID` & `folderIDs` must be existed.
+// 1) `Sha256` & `Title` & `folderIDs` must be existed.
 // 2) `folderIDs` defines the final binding, for example, if the song "AIR" is currently binds to folder "1" & "2"
 // After calling BindSongToFolder("AIR", ["2", "3"]), "AIR" is now binds to "2" & "3"
 // 3) This function must keep old data. In previous example, the content which represents "AIR" and "2" won't be modified
-func (s *FolderService) BindSongToFolder(diffTableDataID uint, folderIDs []uint) error {
-	log.Debugf("[FolderService] Calling BindSongToFolder with diffTableDataID=%v, folderIDs=%v", diffTableDataID, folderIDs)
-	tx := s.db.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
-
-	// Check existence
-	songData, err := findDiffTableDataByID(tx, diffTableDataID)
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-
+func bindSongToFolder(tx *gorm.DB, content entity.FolderContent, folderIDs []uint) error {
 	rawFolders, rlen, err := findFolderList(tx, &vo.FolderVo{IDs: folderIDs})
 	if err != nil {
 		return err
@@ -163,7 +148,6 @@ func (s *FolderService) BindSongToFolder(diffTableDataID uint, folderIDs []uint)
 	}
 	if len(unused) > 0 {
 		if err := tx.Unscoped().Where("id in ?", unused).Delete(&entity.FolderContent{}).Error; err != nil {
-			tx.Rollback()
 			return err
 		}
 	}
@@ -174,7 +158,10 @@ func (s *FolderService) BindSongToFolder(diffTableDataID uint, folderIDs []uint)
 			log.Debugf("prev.ID=%v, folderID=%v, equals?=%v", prev.ID, folderID, prev.ID == folderID)
 			return prev.ID == folderID
 		}) {
-			candidate = append(candidate, entity.FromDiffTableDataToFolderContent(folderIDMapsToSelf[folderID], songData))
+			newContent := content
+			newContent.FolderID = folderIDMapsToSelf[folderID].ID
+			newContent.FolderName = folderIDMapsToSelf[folderID].FolderName
+			candidate = append(candidate, &newContent)
 		}
 	}
 	if len(candidate) > 0 {
@@ -183,9 +170,6 @@ func (s *FolderService) BindSongToFolder(diffTableDataID uint, folderIDs []uint)
 		}
 	}
 
-	if err := tx.Commit().Error; err != nil {
-		return err
-	}
 	return nil
 }
 

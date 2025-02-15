@@ -76,7 +76,7 @@ type DiffTableHeaderExportDto struct {
 func NewDiffTableHeaderExportDto(folder *entity.Folder, dataUrl string) *DiffTableHeaderExportDto {
 	return &DiffTableHeaderExportDto{
 		Name:    folder.FolderName,
-		Symbol:  "N",
+		Symbol:  "",
 		DataUrl: dataUrl,
 	}
 }

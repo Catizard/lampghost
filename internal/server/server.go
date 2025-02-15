@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/service"
@@ -35,6 +36,10 @@ func (s *InternalServer) RunServer() error {
 
 func (s *InternalServer) tableHandler(w http.ResponseWriter, r *http.Request) {
 	name := r.URL.Path[len("/table/"):]
+	if !strings.HasSuffix(name, ".json") {
+		http.Error(w, "No such table", 404)
+	}
+	name = name[:len(name)-len(".json")]
 	folders, n, err := s.folderService.FindFolderList(&vo.FolderVo{
 		FolderName: name,
 	})

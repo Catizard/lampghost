@@ -73,9 +73,9 @@ type DiffTableHeaderExportDto struct {
 	DataUrl string `json:"data_url"`
 }
 
-func NewDiffTableHeaderExportDto(folder *entity.Folder, dataUrl string) *DiffTableHeaderExportDto {
+func NewDiffTableHeaderExportDto(name string, dataUrl string) *DiffTableHeaderExportDto {
 	return &DiffTableHeaderExportDto{
-		Name:    folder.FolderName,
+		Name:    name,
 		Symbol:  "",
 		DataUrl: dataUrl,
 	}

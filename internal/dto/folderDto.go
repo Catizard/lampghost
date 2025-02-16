@@ -11,10 +11,10 @@ type FolderDto struct {
 	FolderName string
 
 	// Only used in tree query interface
-	Contents []FolderContentDto
+	Contents []*FolderContentDto
 }
 
-func NewFolderDto(folder *entity.Folder, contents []FolderContentDto) *FolderDto {
+func NewFolderDto(folder *entity.Folder, contents []*FolderContentDto) *FolderDto {
 	return &FolderDto{
 		ID:         folder.ID,
 		FolderName: folder.FolderName,

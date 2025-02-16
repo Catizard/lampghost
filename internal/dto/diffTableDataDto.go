@@ -72,3 +72,13 @@ func (data *DiffTableDataDto) RepairHash(cache *entity.SongHashCache) bool {
 	}
 	return false
 }
+
+// For exporting usage (i.e imported by beatoraja)
+//
+// Nothing particular, but need to modify the output for beatoraja
+type DiffTableDataExportDto struct {
+	Level  string `json:"level"`
+	Sha256 string `json:"sha256"`
+	Md5    string `json:"md5"`
+	Title  string `json:"title"`
+}

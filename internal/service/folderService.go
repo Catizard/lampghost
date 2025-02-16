@@ -173,43 +173,8 @@ func bindSongToFolder(tx *gorm.DB, content entity.FolderContent, folderIDs []uin
 	return nil
 }
 
-func (s *FolderService) FindFolderTree() ([]dto.FolderDto, int, error) {
-	rawFolders, _, err := findFolderList(s.db, nil)
-	if err != nil {
-		return nil, 0, err
-	}
-	if len(rawFolders) == 0 {
-		return nil, 0, err
-	}
-
-	folderIDs := make([]uint, len(rawFolders))
-	for i, folder := range rawFolders {
-		folderIDs[i] = folder.ID
-	}
-
-	rawContents, _, err := findFolderContentList(s.db, &vo.FolderContentVo{FolderIDs: folderIDs})
-	if err != nil {
-		return nil, 0, err
-	}
-	folderIDMapsToContents := make(map[uint][]*entity.FolderContent)
-	for _, content := range rawContents {
-		if _, ok := folderIDMapsToContents[content.FolderID]; !ok {
-			folderIDMapsToContents[content.FolderID] = make([]*entity.FolderContent, 0)
-		}
-		folderIDMapsToContents[content.FolderID] = append(folderIDMapsToContents[content.FolderID], content)
-	}
-
-	folders := make([]dto.FolderDto, len(rawFolders))
-	for i, rawFolder := range rawFolders {
-		contents := make([]dto.FolderContentDto, 0)
-		if rawContents, ok := folderIDMapsToContents[rawFolder.ID]; ok {
-			for _, rawContent := range rawContents {
-				contents = append(contents, *dto.NewFolderContentDto(rawContent))
-			}
-		}
-		folders[i] = *dto.NewFolderDto(rawFolder, contents)
-	}
-	return folders, len(folders), nil
+func (s *FolderService) FindFolderTree() ([]*dto.FolderDto, int, error) {
+	return findFolderTree(s.db, nil)
 }
 
 func (s *FolderService) FindFolderList(filter *vo.FolderVo) ([]*entity.Folder, int, error) {
@@ -297,6 +262,45 @@ func findFolderList(tx *gorm.DB, filter *vo.FolderVo) ([]*entity.Folder, int, er
 	}
 	if err := basicFiltered.Find(&folders).Error; err != nil {
 		return nil, 0, err
+	}
+	return folders, len(folders), nil
+}
+
+func findFolderTree(tx *gorm.DB, filter *vo.FolderVo) ([]*dto.FolderDto, int, error) {
+	rawFolders, _, err := findFolderList(tx, filter)
+	if err != nil {
+		return nil, 0, err
+	}
+	if len(rawFolders) == 0 {
+		return nil, 0, err
+	}
+
+	folderIDs := make([]uint, len(rawFolders))
+	for i, folder := range rawFolders {
+		folderIDs[i] = folder.ID
+	}
+
+	rawContents, _, err := findFolderContentList(tx, &vo.FolderContentVo{FolderIDs: folderIDs})
+	if err != nil {
+		return nil, 0, err
+	}
+	folderIDMapsToContents := make(map[uint][]*entity.FolderContent)
+	for _, content := range rawContents {
+		if _, ok := folderIDMapsToContents[content.FolderID]; !ok {
+			folderIDMapsToContents[content.FolderID] = make([]*entity.FolderContent, 0)
+		}
+		folderIDMapsToContents[content.FolderID] = append(folderIDMapsToContents[content.FolderID], content)
+	}
+
+	folders := make([]*dto.FolderDto, len(rawFolders))
+	for i, rawFolder := range rawFolders {
+		contents := make([]*dto.FolderContentDto, 0)
+		if rawContents, ok := folderIDMapsToContents[rawFolder.ID]; ok {
+			for _, rawContent := range rawContents {
+				contents = append(contents, dto.NewFolderContentDto(rawContent))
+			}
+		}
+		folders[i] = dto.NewFolderDto(rawFolder, contents)
 	}
 	return folders, len(folders), nil
 }

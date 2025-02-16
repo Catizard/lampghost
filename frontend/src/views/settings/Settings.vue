@@ -32,6 +32,20 @@
               style="width: 50%;" />
           </n-form-item>
         </n-p>
+        <n-p>
+          <n-form-item path="scoreFilePath">
+            <template #label>
+              <n-tooltip trigger="hover">
+                <template #trigger>
+                  <n-icon :component="HintIcon" />
+                </template>
+                添加该路径之后可以显示玩家当前的游玩时间等信息, 可加可不加
+              </n-tooltip>
+              score.db文件路径
+            </template>
+            <n-input clearable v-model:value="model.scoreFilePath" placeholder="请输入score.db文件路径" style="width: 50%;" />
+          </n-form-item>
+        </n-p>
       </n-h2>
       <n-h2>
         <n-text>
@@ -44,16 +58,17 @@
           <n-input-number :show-button="false" v-model:value="model.internalServerPort" placeholder="请输入端口号"
             :maxlength="5" style="width: 150px;" />
         </n-form-item>
-        <n-form-item label="难度表标志" path="folderSymbol">
+        <n-form-item path="folderSymbol">
+          <template #label>
+            <n-tooltip trigger="hover">
+              <template #trigger>
+                <n-icon :component="HintIcon" />
+              </template>
+              难度表标志即发狂表的🌟或satellite的sl, 建议留空。
+            </n-tooltip>
+            难度表标志
+          </template>
           <n-input v-model:value="model.folderSymbol" placeholder="默认为空" :maxlength="5" style="width: 150px;">
-            <template #prefix>
-              <n-tooltip trigger="hover">
-                <template #trigger>
-                  <n-icon :component="HintIcon" />
-                </template>
-                难度表标志即发狂表的🌟或satellite的sl, 建议留空。
-              </n-tooltip>
-            </template>
           </n-input>
         </n-form-item>
       </n-h2>
@@ -74,6 +89,7 @@ const model = ref({
   userName: null,
   scorelogFilePath: null,
   songdataFilePath: null,
+  scoreFilePath: null,
   folderSymbol: null,
 })
 

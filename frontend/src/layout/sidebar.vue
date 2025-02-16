@@ -14,7 +14,9 @@ import {
     Bookmarks as BookmarksIcon,
     TimeOutline as TimeIcon,
     SettingsOutline as SettingsIcon,
-    FishOutline as RivalIcon
+    FishOutline as RivalIcon,
+    SchoolOutline as CoursesIcon,
+    ListOutline as GoalsIcon,
 } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
 import { computed, h, ref, watchEffect } from 'vue'
@@ -58,6 +60,16 @@ const menuOptions = [
         label: renderOption("recent", "recent"),
         key: "recent",
         icon: renderIcon(TimeIcon)
+    },
+    {
+        label: renderOption("courses", "courses"),
+        key: "courses",
+        icon: renderIcon(CoursesIcon)
+    },
+    {
+        label: renderOption("goals", "goals"),
+        key: "goals",
+        icon: renderIcon(GoalsIcon),
     },
     {
         label: renderOption("settings", "settings"),

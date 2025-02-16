@@ -32,6 +32,16 @@ const mainRoutes: RouteRecordRaw[] = [
     component: () => import("../views/settings/Settings.vue"),
   },
   {
+    name: "courses",
+    path: "/courses",
+    component: () => import("../views/courses/Courses.vue"),
+  },
+  {
+    name: "goals",
+    path: "/goals",
+    component: () => import("../views/goals/Goals.vue"),
+  },
+  {
     path: "/",
     redirect: "/home",
   },

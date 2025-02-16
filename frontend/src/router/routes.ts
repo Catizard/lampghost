@@ -27,6 +27,11 @@ const mainRoutes: RouteRecordRaw[] = [
     component: () => import("../views/recent/Recent.vue"),
   },
   {
+    name: "settings",
+    path: "/settings",
+    component: () => import("../views/settings/Settings.vue"),
+  },
+  {
     path: "/",
     redirect: "/home",
   },

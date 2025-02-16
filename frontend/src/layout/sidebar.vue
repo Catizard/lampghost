@@ -13,7 +13,8 @@ import {
     PersonOutline as PersonIcon,
     WineOutline as WineIcon,
     Bookmarks as BookmarksIcon,
-    TimeOutline as TimeOutlineIcon
+    TimeOutline as TimeIcon,
+    SettingsOutline as SettingsIcon
 } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
 import { computed, h, ref, watchEffect } from 'vue'
@@ -56,7 +57,12 @@ const menuOptions = [
     {
         label: renderOption("recent", "recent"),
         key: "recent",
-        icon: renderIcon(TimeOutlineIcon)
+        icon: renderIcon(TimeIcon)
+    },
+    {
+        label: renderOption("settings", "settings"),
+        key: "settings",
+        icon: renderIcon(SettingsIcon)
     }
 ]
 </script>
@@ -78,5 +84,11 @@ const menuOptions = [
 
 .logo svg {
     height: 32px;
+}
+
+:deep(.n-menu-item:last-child) {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
 }
 </style>

@@ -11,10 +11,10 @@ import type { Component } from 'vue'
 import {
     BookOutline as BookIcon,
     PersonOutline as PersonIcon,
-    WineOutline as WineIcon,
     Bookmarks as BookmarksIcon,
     TimeOutline as TimeIcon,
-    SettingsOutline as SettingsIcon
+    SettingsOutline as SettingsIcon,
+    FishOutline as RivalIcon
 } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
 import { computed, h, ref, watchEffect } from 'vue'
@@ -42,7 +42,7 @@ const menuOptions = [
     {
         label: renderOption("rivals", "rivals"),
         key: 'rivals',
-        icon: renderIcon(WineIcon)
+        icon: renderIcon(RivalIcon)
     },
     {
         label: renderOption("difftable", "difftable"),

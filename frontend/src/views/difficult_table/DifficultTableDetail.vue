@@ -10,6 +10,7 @@ import { dto } from '@wailsjs/go/models';
 import { h, ref, Ref, watch } from 'vue';
 import { BindDiffTableDataToFolder, QueryDiffTableDataWithRival } from '@wailsjs/go/controller/DiffTableController';
 import SelectFolder from '@/views/folder/SelectFolder.vue';
+import ClearTag from '@/components/ClearTag.vue';
 
 const notification = useNotification();
 const loading = ref<boolean>(false);
@@ -24,7 +25,17 @@ function createColumns(): DataTableColumns<dto.DiffTableDataDto> {
 		{ title: "Song Name", key: "Title", resizable: true },
 		{ title: "Artist", key: "Artist", resizable: true },
 		{ title: "Play Count", key: "PlayCount", minWidth: "100px", resizable: true },
-		{ title: "Clear", key: "Lamp", minWidth: "100px", resizable: true },
+		{
+			title: "Clear", key: "Lamp", minWidth: "100px", resizable: true,
+			render(row) {
+				return h(
+					ClearTag,
+					{
+						clear: row.Lamp
+					},
+				)
+			}
+		},
 		{
 			title: "Action",
 			key: "actions",

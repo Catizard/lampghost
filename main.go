@@ -44,6 +44,9 @@ func main() {
 	if err := c.Provide(service.NewFolderService); err != nil {
 		panic(err)
 	}
+	if err := c.Provide(service.NewCourseInfoSerivce); err != nil {
+		panic(err)
+	}
 	if err := c.Provide(service.NewRivalScoreLogService); err != nil {
 		panic(err)
 	}
@@ -60,6 +63,9 @@ func main() {
 		panic(err)
 	}
 	if err := c.Provide(controller.NewRivalSongDataController); err != nil {
+		panic(err)
+	}
+	if err := c.Provide(controller.NewCourseInfoController); err != nil {
 		panic(err)
 	}
 	if err := c.Provide(server.NewInternalServer); err != nil {
@@ -95,6 +101,13 @@ func main() {
 	}
 
 	if err := c.Invoke(func(controller *controller.RivalSongDataController) error {
+		bind = append(bind, controller)
+		return nil
+	}); err != nil {
+		panic(err)
+	}
+
+	if err := c.Invoke(func(controller *controller.CourseInfoController) error {
 		bind = append(bind, controller)
 		return nil
 	}); err != nil {

@@ -1,6 +1,8 @@
 package service
 
 import (
+	"github.com/Catizard/lampghost_wails/internal/dto"
+	"github.com/Catizard/lampghost_wails/internal/vo"
 	"gorm.io/gorm"
 )
 
@@ -12,4 +14,24 @@ func NewCourseInfoSerivce(db *gorm.DB) *CourseInfoService {
 	return &CourseInfoService{
 		db: db,
 	}
+}
+
+func (s *CourseInfoService) FindCourseInfoList(filter *vo.CourseInfoVo) ([]*dto.CourseInfoDto, int, error) {
+	return findCourseInfoList(s.db, filter)
+}
+
+func findCourseInfoList(tx *gorm.DB, filter *vo.CourseInfoVo) ([]*dto.CourseInfoDto, int, error) {
+	if filter == nil {
+		var ret []*dto.CourseInfoDto
+		if err := tx.Find(&ret).Error; err != nil {
+			return nil, 0, err
+		}
+		return ret, len(ret), nil
+	}
+
+	var ret []*dto.CourseInfoDto
+	if err := tx.Where(filter.Entity()).Find(&ret).Error; err != nil {
+		return nil, 0, err
+	}
+	return ret, len(ret), nil
 }

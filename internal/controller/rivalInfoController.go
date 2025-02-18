@@ -21,6 +21,7 @@ func (ctl *RivalInfoController) InitializeMainUser(rivalInfo *entity.RivalInfo) 
 	log.Info("[Controller] calling RivalInfoController.InitializeMainUser")
 	err := ctl.rivalInfoService.InitializeMainUser(rivalInfo)
 	if err != nil {
+		log.Errorf("[RivalController] returning err: %v", err)
 		return result.NewErrorMessage(err)
 	}
 	return result.SUCCESS

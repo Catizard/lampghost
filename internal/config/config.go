@@ -4,6 +4,9 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+
+	"github.com/charmbracelet/log"
+	"github.com/spf13/viper"
 )
 
 const (
@@ -19,6 +22,15 @@ func init() {
 	}
 	// TODO: Make it configurable
 	WorkingDirectory = homeDir + "/.lampghost_wails/"
+	// Setup viper
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+	log.Infof("config directory: %s", WorkingDirectory[:len(WorkingDirectory)-1])
+	viper.AddConfigPath(WorkingDirectory[:len(WorkingDirectory)-1])
+	// Setup defaults
+	viper.SetDefault("InternalServerPort", 7391)
+	viper.SetDefault("FolderSymbol", "")
+	viper.SafeWriteConfig()
 	// Create the directory if it's not exist
 	_, err = os.Stat(WorkingDirectory)
 	if err == nil {
@@ -30,6 +42,42 @@ func init() {
 			panic(err)
 		}
 	}
+}
+
+type ApplicationConfig struct {
+	UserName           string
+	ScoreLogFilePath   string
+	SongDataFilePath   string
+	ScoreFilePath      string
+	InternalServerPort int32
+	FolderSymbol       string
+}
+
+func ReadConfig() (*ApplicationConfig, error) {
+	if err := viper.ReadInConfig(); err != nil {
+		return nil, err
+	}
+	return &ApplicationConfig{
+		UserName:           viper.GetString("UserName"),
+		ScoreLogFilePath:   viper.GetString("ScoreLogFilePath"),
+		SongDataFilePath:   viper.GetString("SongDataFilePath"),
+		ScoreFilePath:      viper.GetString("ScoreFilePath"),
+		InternalServerPort: viper.GetInt32("InternalServerPort"),
+		FolderSymbol:       viper.GetString("FolderSymbol"),
+	}, nil
+}
+
+func (c *ApplicationConfig) WriteConfig() error {
+	viper.Set("UserName", c.UserName)
+	viper.Set("ScoreLogFilePath", c.ScoreLogFilePath)
+	viper.Set("SongDataFilePath", c.SongDataFilePath)
+	viper.Set("ScoreFilePath", c.ScoreFilePath)
+	viper.Set("InternalServerPort", c.InternalServerPort)
+	viper.Set("FolderSymbol", c.FolderSymbol)
+	if err := viper.WriteConfig(); err != nil {
+		return err
+	}
+	return nil
 }
 
 type DatabaseConfig struct {

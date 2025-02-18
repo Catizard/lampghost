@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Catizard/lampghost_wails/internal/config"
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/charmbracelet/log"
@@ -39,6 +40,15 @@ func (s *RivalInfoService) InitializeMainUser(rivalInfo *entity.RivalInfo) error
 	if cnt > 0 {
 		return fmt.Errorf("cannot have two main user, what are you doing?")
 	}
+	// Initialize the config
+	config, err := config.ReadConfig()
+	if err != nil {
+		return err
+	}
+	config.UserName = rivalInfo.Name
+	config.SongDataFilePath = *rivalInfo.SongDataPath
+	config.ScoreLogFilePath = *rivalInfo.ScoreLogPath
+	config.WriteConfig()
 	rivalInfo.MainUser = true
 	tx := s.db.Begin()
 	defer func() {

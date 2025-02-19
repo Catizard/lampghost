@@ -1,7 +1,7 @@
 <template>
     <div style="padding: 20px 40px; min-height: 85vh;">
         <n-card>
-            <n-space justify="space-between" vertical>
+            <n-space justify="space-between" vertical style="width: 65%;">
                 <n-h1 prefix="bar" style="text-align: start">
                     <n-text type="primary">初始化用户信息</n-text>
                 </n-h1>
@@ -16,7 +16,7 @@
                         <n-input v-model:value="formData.scorelogPath" placeholder="请输入scorelog.db路径" />
                     </n-form-item>
                     <n-form-item>
-                        <n-button attr-type="button" @click="handleSubmit">提交</n-button>
+                        <n-button attr-type="button" @click="handleSubmit" type="primary">提交</n-button>
                     </n-form-item>
                 </n-form>
             </n-space>

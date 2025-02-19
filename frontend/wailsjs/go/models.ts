@@ -1,3 +1,30 @@
+export namespace config {
+	
+	export class ApplicationConfig {
+	    UserName: string;
+	    ScorelogFilePath: string;
+	    SongdataFilePath: string;
+	    ScoreFilePath: string;
+	    InternalServerPort: number;
+	    FolderSymbol: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ApplicationConfig(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.UserName = source["UserName"];
+	        this.ScorelogFilePath = source["ScorelogFilePath"];
+	        this.SongdataFilePath = source["SongdataFilePath"];
+	        this.ScoreFilePath = source["ScoreFilePath"];
+	        this.InternalServerPort = source["InternalServerPort"];
+	        this.FolderSymbol = source["FolderSymbol"];
+	    }
+	}
+
+}
+
 export namespace dto {
 	
 	export class CourseInfoDto {

@@ -46,8 +46,8 @@ func (s *RivalInfoService) InitializeMainUser(rivalInfo *entity.RivalInfo) error
 		return err
 	}
 	config.UserName = rivalInfo.Name
-	config.SongDataFilePath = *rivalInfo.SongDataPath
-	config.ScoreLogFilePath = *rivalInfo.ScoreLogPath
+	config.SongdataFilePath = *rivalInfo.SongDataPath
+	config.ScorelogFilePath = *rivalInfo.ScoreLogPath
 	config.WriteConfig()
 	rivalInfo.MainUser = true
 	tx := s.db.Begin()

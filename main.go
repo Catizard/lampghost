@@ -68,6 +68,9 @@ func main() {
 	if err := c.Provide(controller.NewCourseInfoController); err != nil {
 		panic(err)
 	}
+	if err := c.Provide(controller.NewConfigController); err != nil {
+		panic(err)
+	}
 	if err := c.Provide(server.NewInternalServer); err != nil {
 		panic(err)
 	}
@@ -108,6 +111,13 @@ func main() {
 	}
 
 	if err := c.Invoke(func(controller *controller.CourseInfoController) error {
+		bind = append(bind, controller)
+		return nil
+	}); err != nil {
+		panic(err)
+	}
+
+	if err := c.Invoke(func(controller *controller.ConfigController) error {
 		bind = append(bind, controller)
 		return nil
 	}); err != nil {

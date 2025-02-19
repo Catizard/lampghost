@@ -47,9 +47,20 @@ func (s *RivalScoreLogService) QueryRivalScoreLogPageList(filter *vo.RivalScoreL
 	return scoreLogs, n, nil
 }
 
-func findRivalScoreLogList(tx *gorm.DB, rivalID uint) ([]*entity.RivalScoreLog, int, error) {
-	var out []*entity.RivalScoreLog
-	if err := tx.Where("rival_id = ?", rivalID).Find(&out).Error; err != nil {
+func findRivalScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.RivalScoreLogDto, int, error) {
+	fields := `
+		rival_score_log.*,
+		datetime(rival_score_log.date, 'unixepoch') as record_time,
+		sd.title as title,
+		sd.md5 as md5,
+		sd.ID as rival_song_data_id
+	`
+	partial := tx.Model(&entity.RivalScoreLog{}).Select(fields)
+	if filter != nil {
+		partial = partial.Where(filter.Entity())
+	}
+	var out []*dto.RivalScoreLogDto
+	if err := partial.Model(&entity.RivalScoreLog{}).Find(&out).Error; err != nil {
 		return nil, 0, err
 	}
 	return out, len(out), nil
@@ -71,12 +82,10 @@ func pageRivalScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.Riva
 
 	var out []*dto.RivalScoreLogDto
 	fields := `
-		rival_score_log.id as id,
-		rival_score_log.sha256 as sha256,
-		rival_score_log.date as date,
-		rival_score_log.clear as clear,
+		rival_score_log.*,
 		datetime(rival_score_log.date, 'unixepoch') as record_time,
 		sd.title as title,
+		sd.md5 as md5,
 		sd.ID as rival_song_data_id
 	`
 	if err := tx.Table("rival_score_log").Select(fields).Order("rival_score_log.date desc").Where(filter.Entity()).Scopes(
@@ -95,17 +104,17 @@ func pageRivalScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.Riva
 // Extend function to findRivalScoreLogList
 //
 // Returns sha256 grouped array
-func findRivalScoreLogSha256Map(tx *gorm.DB, rivalID uint) (map[string][]entity.RivalScoreLog, error) {
-	scoreLogs, _, err := findRivalScoreLogList(tx, rivalID)
+func findRivalScoreLogSha256Map(tx *gorm.DB, rivalID uint) (map[string][]*dto.RivalScoreLogDto, error) {
+	scoreLogs, _, err := findRivalScoreLogList(tx, &vo.RivalScoreLogVo{RivalId: rivalID})
 	if err != nil {
 		return nil, err
 	}
-	sha256ScoreLogsMap := make(map[string][]entity.RivalScoreLog)
+	sha256ScoreLogsMap := make(map[string][]*dto.RivalScoreLogDto)
 	for _, scoreLog := range scoreLogs {
 		if _, ok := sha256ScoreLogsMap[scoreLog.Sha256]; !ok {
-			sha256ScoreLogsMap[scoreLog.Sha256] = make([]entity.RivalScoreLog, 0)
+			sha256ScoreLogsMap[scoreLog.Sha256] = make([]*dto.RivalScoreLogDto, 0)
 		}
-		sha256ScoreLogsMap[scoreLog.Sha256] = append(sha256ScoreLogsMap[scoreLog.Sha256], *scoreLog)
+		sha256ScoreLogsMap[scoreLog.Sha256] = append(sha256ScoreLogsMap[scoreLog.Sha256], scoreLog)
 	}
 	return sha256ScoreLogsMap, nil
 }

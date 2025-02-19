@@ -445,7 +445,7 @@ func queryDiffTableInfoByID(tx *gorm.DB, ID uint) (*entity.DiffTableHeader, erro
 // The impede is mainly FindDiffTableHeaderListWithRival function, which requires redesign the data loading sequence
 //
 // This function would modify data in place rather than return a new array
-func mergeRivalRelatedData(sha256ScoreLogsMap map[string][]entity.RivalScoreLog, contents []*dto.DiffTableDataDto) error {
+func mergeRivalRelatedData(sha256ScoreLogsMap map[string][]*dto.RivalScoreLogDto, contents []*dto.DiffTableDataDto) error {
 	for i, content := range contents {
 		if logs, ok := sha256ScoreLogsMap[content.Sha256]; ok {
 			contents[i].PlayCount = len(logs)

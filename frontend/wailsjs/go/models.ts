@@ -235,6 +235,7 @@ export namespace dto {
 	    Minbp: number;
 	    OldMinbp: number;
 	    Timestamp: number;
+	    Md5: string;
 	    RivalSongDataID: number;
 	    Title: string;
 	    RecordTime: string;
@@ -264,6 +265,7 @@ export namespace dto {
 	        this.Minbp = source["Minbp"];
 	        this.OldMinbp = source["OldMinbp"];
 	        this.Timestamp = source["Timestamp"];
+	        this.Md5 = source["Md5"];
 	        this.RivalSongDataID = source["RivalSongDataID"];
 	        this.Title = source["Title"];
 	        this.RecordTime = source["RecordTime"];

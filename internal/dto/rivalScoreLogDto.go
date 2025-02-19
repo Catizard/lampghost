@@ -22,6 +22,7 @@ type RivalScoreLogDto struct {
 	OldMinbp  int32
 	Timestamp int64 `gorm:"column:date"`
 
+	Md5             string
 	RivalSongDataID uint
 	Title           string
 	// yyyy-mm-dd hh:mm:ss

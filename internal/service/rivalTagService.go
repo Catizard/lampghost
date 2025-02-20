@@ -79,7 +79,6 @@ func (s *RivalTagService) syncRivalTagFromRawData(tx *gorm.DB, rivalID uint, raw
 	for _, courseInfoDto := range courseInfoDtos {
 		for _, scoreLog := range interestScoreLogs {
 			if scoreLog.Sha256 == courseInfoDto.NoSepJoinedSha256s && scoreLog.Clear >= entity.Normal {
-				log.Debugf("Got a matched log and course, log.hash=%s, course.hash=%s, log.clear=%d", scoreLog.Sha256, courseInfoDto.NoSepJoinedSha256s, scoreLog.Clear)
 				fct := entity.RivalTag{
 					RivalId:   rivalID,
 					TagName:   courseInfoDto.Name + " First Clear",

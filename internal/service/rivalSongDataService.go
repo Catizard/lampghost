@@ -79,6 +79,7 @@ func queryDefaultSongHashCache(tx *gorm.DB) (*entity.SongHashCache, error) {
 	return querySongHashCache(tx, mainUser.ID)
 }
 
+// TODO: cache it
 func querySongHashCache(tx *gorm.DB, rivalID uint) (*entity.SongHashCache, error) {
 	md5KeyCache := make(map[string]string)
 	sha256KeyCache := make(map[string]string)

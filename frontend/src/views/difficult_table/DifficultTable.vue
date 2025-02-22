@@ -6,7 +6,8 @@
       </n-h1>
       <n-button @click="showAddModal = true"> 新增一个难度表 </n-button>
     </n-space>
-    <n-data-table :columns="columns" :data="data" :pagination="pagination" :bordered="false" />
+    <n-data-table :columns="columns" :data="data" :pagination="pagination" :bordered="false"
+      :row-key="(row: dto.DiffTableHeaderDto) => row.ID" />
   </perfect-scrollbar>
 
   <n-modal v-model:show="showAddModal" preset="dialog" title="新增难度表信息" positive-text="新增" negative-text="取消"
@@ -16,13 +17,6 @@
         <n-input v-model:value="formData.url" placeholder="输入地址" />
       </n-form-item>
     </n-form>
-  </n-modal>
-
-  <n-modal v-model:show="showDetailModal">
-    <n-card style="width: 80%" title="详情" :bordered="false" size="huge" role="dialog" aria-modal="true" closable
-      @close="() => { showDetailModal = false }">
-      <difficult-table-detail :header-id="currentShowHeaderId" :level="currentShowLevel" />
-    </n-card>
   </n-modal>
 </template>
 
@@ -37,13 +31,8 @@ import {
   FindDiffTableHeaderTree
 } from "@wailsjs/go/controller/DiffTableController";
 import { dto, entity } from "@wailsjs/go/models";
-import DifficultTableDetail from "./DifficultTableDetail.vue";
 
 const showAddModal = ref(false);
-const showDetailModal = ref(false);
-
-const currentShowHeaderId: Ref<number> = ref(null);
-const currentShowLevel: Ref<string> = ref(null);
 
 const formRef = ref<FormInst | null>(null);
 const formData = ref({
@@ -67,20 +56,6 @@ function createColumns({
   deleteHeader: (row: dto.DiffTableHeaderDto) => void;
 }): DataTableColumns<dto.DiffTableHeaderDto> {
   return [
-    {
-      type: "expand",
-      renderExpand: (rowData) => {
-        return h(
-          NDataTable,
-          {
-            columns: songDataColumns,
-            data: rowData.Children,
-            pagination: pagination,
-            bordered: false
-          }
-        )
-      }
-    },
     { title: "Name", key: "Name", },
     { title: "url", key: "HeaderUrl", },
     {
@@ -101,29 +76,6 @@ function createColumns({
     },
   ];
 }
-
-function createSongDataColumns(): DataTableColumns<dto.DiffTableDataDto> {
-  return [
-    { title: "Level Name", key: "Name", maxWidth: "200px", resizable: true },
-    {
-      title: "Action",
-      key: "actions",
-      render(row) {
-        return h(
-          NButton,
-          {
-            strong: true,
-            tertiary: true,
-            size: "small",
-            onClick: () => showLevelContent(row),
-          },
-          { default: () => "详情" }
-        )
-      }
-    }
-  ];
-}
-const songDataColumns = createSongDataColumns();
 
 let data: Ref<Array<any>> = ref([]);
 const pagination = false as const;
@@ -185,32 +137,19 @@ function handleNegativeClick() {
 }
 
 function loadDiffTableData() {
-  FindDiffTableHeaderTree()
+  FindDiffTableHeaderTree(null)
     .then(result => {
       if (result.Code != 200) {
         return Promise.reject(result.Msg);
       }
-      data.value = [...result.Rows].map(row => {
-        return {
-          key: row.ID,
-          ...row
-        }
-      });
-      console.log(data.value)
-    })
-    .catch((err) => {
+      data.value = [...result.Rows]
+    }).catch((err) => {
       notification.error({
         content: "读取难度表信息出错:" + err,
         duration: 5000,
         keepAliveOnHover: true
       })
     });
-}
-
-function showLevelContent({ ID, Level }) {
-  currentShowHeaderId.value = ID;
-  currentShowLevel.value = Level;
-  showDetailModal.value = true;
 }
 
 function notifySuccess(msg: string) {

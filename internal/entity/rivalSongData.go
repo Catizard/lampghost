@@ -8,7 +8,7 @@ type RivalSongData struct {
 	gorm.Model
 	RivalId    uint
 	Md5        string
-	Sha256     string
+	Sha256     string `gorm:"index"`
 	Title      string
 	SubTitle   string
 	Genre      string

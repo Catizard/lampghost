@@ -151,7 +151,7 @@ func (s *DiffTableService) FindDiffTableHeaderListWithRival(rivalID uint) ([]dto
 	if err != nil {
 		return nil, 0, err
 	}
-	sha256ScoreLogsMap, err := findRivalScoreLogSha256Map(s.db, rivalID)
+	sha256ScoreLogsMap, err := findRivalScoreLogSha256Map(s.db, &vo.RivalScoreLogVo{RivalId: rivalID})
 	if err != nil {
 		return nil, 0, err
 	}
@@ -173,9 +173,9 @@ func (s *DiffTableService) FindDiffTableHeaderListWithRival(rivalID uint) ([]dto
 //
 // BMS Insane table
 // +-- ...
-func (s *DiffTableService) FindDiffTableHeaderTree() ([]dto.DiffTableHeaderDto, int, error) {
+func (s *DiffTableService) FindDiffTableHeaderTree(filter *vo.DiffTableHeaderVo) ([]dto.DiffTableHeaderDto, int, error) {
 	// NOTE: Don't call s.FindDiffTableHeaderList, call findDiffTableHeaderList instead
-	rawHeaders, _, err := findDiffTableHeaderList(s.db, nil)
+	rawHeaders, _, err := findDiffTableHeaderList(s.db, filter)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -271,7 +271,7 @@ func (s *DiffTableService) QueryDiffTableInfoByIDWithRival(ID uint, rivalID uint
 	if err != nil {
 		return nil, err
 	}
-	sha256ScoreLogsMap, err := findRivalScoreLogSha256Map(s.db, rivalID)
+	sha256ScoreLogsMap, err := findRivalScoreLogSha256Map(s.db, &vo.RivalScoreLogVo{RivalId: rivalID})
 	if err != nil {
 		return nil, err
 	}
@@ -320,7 +320,9 @@ func (s *DiffTableService) QueryDiffTableDataWithRival(headerID uint, level stri
 		return nil, 0, err
 	}
 	contents := dto.NewDiffTableDataDtoArray(rawContents)
-	sha256ScoreLogsMap, err := findRivalScoreLogSha256Map(s.db, rivalID)
+	sha256ScoreLogsMap, err := findRivalScoreLogSha256Map(s.db, &vo.RivalScoreLogVo{
+		RivalId: rivalID,
+	})
 	if err != nil {
 		return nil, 0, err
 	}

@@ -7,7 +7,7 @@ import (
 type RivalScoreLog struct {
 	gorm.Model
 	RivalId   uint
-	Sha256    string
+	Sha256    string `gorm:"index"`
 	Mode      string
 	Clear     int32
 	OldClear  int32

@@ -59,7 +59,6 @@ function loadData() {
         return Promise.reject(result.Msg)
       }
       data.value = [...result.Rows]
-      console.log(data.value)
     }).catch(err => {
       notification.error({
         content: err,

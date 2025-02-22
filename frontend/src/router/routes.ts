@@ -12,9 +12,12 @@ const mainRoutes: RouteRecordRaw[] = [
     component: () => import("../views/rivals.vue"),
   },
   {
-    name: "difftable",
-    path: "/difftable",
+    path: "/difftable/management",
     component: () => import("../views/difficult_table/DifficultTable.vue"),
+  },
+  {
+    path: "/difftable/scores",
+    component: () => import("../views/difficult_table/DifficultScores.vue")
   },
   {
     name: "folder",

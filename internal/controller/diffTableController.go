@@ -5,6 +5,7 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/result"
 	"github.com/Catizard/lampghost_wails/internal/service"
+	"github.com/Catizard/lampghost_wails/internal/vo"
 	"github.com/charmbracelet/log"
 )
 
@@ -57,9 +58,9 @@ func (ctl *DiffTableController) FindDiffTableHeaderListWithRival(rivalID uint) r
 	return result.NewRtnDataList(rows)
 }
 
-func (ctl *DiffTableController) FindDiffTableHeaderTree() result.RtnDataList {
+func (ctl *DiffTableController) FindDiffTableHeaderTree(filter *vo.DiffTableHeaderVo) result.RtnDataList {
 	log.Info("[Controller] calling DiffTableController.FindDiffTableHeaderTree")
-	rows, _, err := ctl.diffTableService.FindDiffTableHeaderTree()
+	rows, _, err := ctl.diffTableService.FindDiffTableHeaderTree(filter)
 	if err != nil {
 		log.Errorf("[DiffTableController] returning error: %v", err)
 		return result.NewErrorDataList(err)

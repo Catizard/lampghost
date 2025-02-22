@@ -35,6 +35,7 @@ func (rivalScoreLog *RivalScoreLogVo) Entity() *entity.RivalScoreLog {
 			UpdatedAt: rivalScoreLog.UpdatedAt,
 			DeletedAt: rivalScoreLog.DeletedAt,
 		},
+		RivalId:   rivalScoreLog.RivalId,
 		Sha256:    rivalScoreLog.Sha256,
 		Mode:      rivalScoreLog.Mode,
 		Clear:     rivalScoreLog.Clear,

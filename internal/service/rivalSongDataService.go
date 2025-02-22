@@ -1,9 +1,14 @@
 package service
 
 import (
+	"sync"
+
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"gorm.io/gorm"
 )
+
+var defaultSongHashCache *entity.SongHashCache = nil
+var defaultSongHashCacheLock sync.Mutex = sync.Mutex{}
 
 type RivalSongDataService struct {
 	db *gorm.DB
@@ -72,14 +77,25 @@ func queryRivalSongDataExistence(tx *gorm.DB, filter *entity.RivalSongData) (boo
 }
 
 func queryDefaultSongHashCache(tx *gorm.DB) (*entity.SongHashCache, error) {
+	defaultSongHashCacheLock.Lock()
+	defer defaultSongHashCacheLock.Unlock()
+	// TODO: if cache build was failed, then it would repeat itself until it success
+	// it might be a performance problem since most cases you could never build the cache
+	if defaultSongHashCache != nil {
+		return defaultSongHashCache, nil
+	}
 	mainUser, err := queryMainUser(tx)
 	if err != nil {
 		return nil, err
 	}
-	return querySongHashCache(tx, mainUser.ID)
+	cache, err := querySongHashCache(tx, mainUser.ID)
+	if err != nil {
+		return nil, err
+	}
+	defaultSongHashCache = cache
+	return cache, nil
 }
 
-// TODO: cache it
 func querySongHashCache(tx *gorm.DB, rivalID uint) (*entity.SongHashCache, error) {
 	md5KeyCache := make(map[string]string)
 	sha256KeyCache := make(map[string]string)

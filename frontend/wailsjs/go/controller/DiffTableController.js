@@ -22,8 +22,8 @@ export function FindDiffTableHeaderListWithRival(arg1) {
   return window['go']['controller']['DiffTableController']['FindDiffTableHeaderListWithRival'](arg1);
 }
 
-export function FindDiffTableHeaderTree() {
-  return window['go']['controller']['DiffTableController']['FindDiffTableHeaderTree']();
+export function FindDiffTableHeaderTree(arg1) {
+  return window['go']['controller']['DiffTableController']['FindDiffTableHeaderTree'](arg1);
 }
 
 export function GENERATOR_TABLE_DATA() {

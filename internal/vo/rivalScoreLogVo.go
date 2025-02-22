@@ -23,6 +23,8 @@ type RivalScoreLogVo struct {
 	// Pagination
 	Page     int
 	PageSize int
+	// Extra filter field
+	OnlyCourseLogs bool
 }
 
 func (rivalScoreLog *RivalScoreLogVo) Entity() *entity.RivalScoreLog {

@@ -2,6 +2,7 @@ package dto
 
 import (
 	"strings"
+	"time"
 
 	"github.com/Catizard/lampghost_wails/internal/entity"
 )
@@ -15,16 +16,21 @@ type CourseInfoDto struct {
 	Sha256             []string
 	Sha256s            string
 	NoSepJoinedSha256s string
-	Constranints       string
+	Constraints        string
+
+	Clear               int32
+	FirstClearTimestamp time.Time
+	Constraint          []string
 }
 
 func NewCourseInfoDto(courseInfo *entity.CourseInfo, cache *entity.SongHashCache) *CourseInfoDto {
 	ret := &CourseInfoDto{
-		ID:           courseInfo.ID,
-		HeaderID:     courseInfo.HeaderID,
-		Name:         courseInfo.Name,
-		Md5s:         courseInfo.Md5s,
-		Constranints: courseInfo.Constranints,
+		ID:          courseInfo.ID,
+		HeaderID:    courseInfo.HeaderID,
+		Name:        courseInfo.Name,
+		Md5s:        courseInfo.Md5s,
+		Constraints: courseInfo.Constranints,
+		Constraint:  strings.Split(courseInfo.Constranints, ","),
 	}
 	ret.Md5 = strings.Split(ret.Md5s, ",")
 	ret.Sha256 = make([]string, 0)
@@ -44,4 +50,12 @@ func NewCourseInfoDto(courseInfo *entity.CourseInfo, cache *entity.SongHashCache
 		ret.NoSepJoinedSha256s = strings.Join(ret.Sha256, "")
 	}
 	return ret
+}
+
+func (courseInfo *CourseInfoDto) GetJoinedSha256(sep string) string {
+	return strings.Join(courseInfo.Sha256, sep)
+}
+
+func (courseInfo *CourseInfoDto) GetJoinedMd5(sep string) string {
+	return strings.Join(courseInfo.Md5, sep)
 }

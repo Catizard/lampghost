@@ -1,6 +1,8 @@
 package service
 
 import (
+	"time"
+
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/vo"
@@ -19,6 +21,25 @@ func NewCourseInfoSerivce(db *gorm.DB) *CourseInfoService {
 
 func (s *CourseInfoService) FindCourseInfoList(filter *vo.CourseInfoVo) ([]*dto.CourseInfoDto, int, error) {
 	return findCourseInfoList(s.db, filter)
+}
+
+func (s *CourseInfoService) FindCourseInfoListWithRival(rivalID uint) ([]*dto.CourseInfoDto, int, error) {
+	rawCourses, n, err := findCourseInfoList(s.db, nil)
+	if err != nil {
+		return nil, 0, err
+	}
+	if n == 0 {
+		return rawCourses, n, err
+	}
+	logs, _, err := findRivalScoreLogList(s.db, &vo.RivalScoreLogVo{
+		RivalId:        rivalID,
+		OnlyCourseLogs: true,
+	})
+	if err != nil {
+		return nil, 0, err
+	}
+	mergeRivalScoreLogToCourses(rawCourses, logs)
+	return rawCourses, n, nil
 }
 
 // This function returns CourseInfoDto directly due to some historical problem
@@ -49,4 +70,21 @@ func findCourseInfoList(tx *gorm.DB, filter *vo.CourseInfoVo) ([]*dto.CourseInfo
 		out[i] = dto.NewCourseInfoDto(raw[i], cache)
 	}
 	return out, len(out), nil
+}
+
+func mergeRivalScoreLogToCourses(courses []*dto.CourseInfoDto, logs []*dto.RivalScoreLogDto) {
+	for _, course := range courses {
+		for _, log := range logs {
+			if log.Sha256 != course.GetJoinedSha256("") {
+				continue
+			}
+			course.Clear = max(course.Clear, log.Clear)
+			logTime := time.Unix(log.Timestamp, 0)
+			if course.FirstClearTimestamp.IsZero() {
+				course.FirstClearTimestamp = logTime
+			} else if course.FirstClearTimestamp.After(logTime) {
+				course.FirstClearTimestamp = logTime
+			}
+		}
+	}
 }

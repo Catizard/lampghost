@@ -6,6 +6,10 @@ export function FindCourseInfoList() {
   return window['go']['controller']['CourseInfoController']['FindCourseInfoList']();
 }
 
+export function FindCourseInfoListWithRival(arg1) {
+  return window['go']['controller']['CourseInfoController']['FindCourseInfoListWithRival'](arg1);
+}
+
 export function GENERATOR_COURSE_INFO() {
   return window['go']['controller']['CourseInfoController']['GENERATOR_COURSE_INFO']();
 }

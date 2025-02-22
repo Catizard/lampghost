@@ -28,5 +28,15 @@ func (ctl *CourseInfoController) FindCourseInfoList() result.RtnDataList {
 	return result.NewRtnDataList(rows)
 }
 
+func (ctl *CourseInfoController) FindCourseInfoListWithRival(rivalID uint) result.RtnDataList {
+	log.Info("[Controller] calling CourseInfoController.FindCourseInfoListWithRival")
+	rows, _, err := ctl.courseInfoService.FindCourseInfoListWithRival(rivalID)
+	if err != nil {
+		log.Errorf("[CourseInfoController] returning error: %v", err)
+		return result.NewErrorDataList(err)
+	}
+	return result.NewRtnDataList(rows)
+}
+
 func (*CourseInfoController) GENERATOR_COURSE_INFO() *entity.CourseInfo     { return nil }
 func (*CourseInfoController) GENERATOR_COURSE_INFO_DTO() *dto.CourseInfoDto { return nil }

@@ -58,15 +58,20 @@ func findRivalScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.Riva
 	partial := tx.Model(&entity.RivalScoreLog{}).Select(fields)
 	if filter != nil {
 		partial = partial.Where(filter.Entity())
+		// Extra filters
+		if filter.OnlyCourseLogs {
+			partial = partial.Where("length(rival_score_log.sha256) > 64")
+		}
 	}
 	var out []*dto.RivalScoreLogDto
-	if err := partial.Model(&entity.RivalScoreLog{}).Find(&out).Error; err != nil {
+	if err := partial.Joins("left join rival_song_data sd on rival_score_log.sha256 = sd.sha256").Find(&out).Error; err != nil {
 		return nil, 0, err
 	}
 	return out, len(out), nil
 }
 
 // Extend function to findRivalScoreLogList with page query parameter
+// TODO: how to merge findRivalScoreLogList and pageRivalScoreLogList?
 func pageRivalScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.RivalScoreLogDto, int, error) {
 	if filter == nil {
 		return nil, 0, fmt.Errorf("Cannot call page query without pagination parameter")

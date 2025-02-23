@@ -1,14 +1,24 @@
 package service
 
 import (
+	"slices"
 	"strconv"
+	"strings"
 	"time"
 
+	"github.com/Catizard/lampghost_wails/internal/config"
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/vo"
+	"github.com/charmbracelet/log"
 	"gorm.io/gorm"
 )
+
+var shouldIgnoreConstraintDefinition []string = []string{
+	"no_good",
+	"no_great",
+	"no_speed",
+}
 
 type CourseInfoService struct {
 	db *gorm.DB
@@ -54,6 +64,11 @@ func findCourseInfoList(tx *gorm.DB, filter *vo.CourseInfoVo) ([]*dto.CourseInfo
 	if filter != nil {
 		partial = partial.Where(filter.Entity())
 	}
+	config, err := config.ReadConfig()
+	if err != nil {
+		log.Error("cannot read in config")
+		return nil, 0, err
+	}
 	var raw []*entity.CourseInfo
 	if err := partial.Find(&raw).Error; err != nil {
 		return nil, 0, err
@@ -65,10 +80,26 @@ func findCourseInfoList(tx *gorm.DB, filter *vo.CourseInfoVo) ([]*dto.CourseInfo
 	if err != nil {
 		return nil, 0, err
 	}
-
-	out := make([]*dto.CourseInfoDto, len(raw))
+	out := make([]*dto.CourseInfoDto, 0)
 	for i := range raw {
-		out[i] = dto.NewCourseInfoDto(raw[i], cache)
+		shouldIgnore := false
+		if config.IgnoreVariantCourse != 0 {
+			match := false
+			splitedConstraints := strings.Split(raw[i].Constraints, ",")
+			for _, shouldIgnoreConstraint := range shouldIgnoreConstraintDefinition {
+				if slices.Contains(splitedConstraints, shouldIgnoreConstraint) {
+					match = true
+					break
+				}
+			}
+			if match {
+				shouldIgnore = true
+			}
+		}
+		if shouldIgnore {
+			continue
+		}
+		out = append(out, dto.NewCourseInfoDto(raw[i], cache))
 	}
 	return out, len(out), nil
 }

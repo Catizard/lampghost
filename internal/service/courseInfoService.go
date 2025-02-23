@@ -1,6 +1,7 @@
 package service
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/Catizard/lampghost_wails/internal/dto"
@@ -78,12 +79,23 @@ func mergeRivalScoreLogToCourses(courses []*dto.CourseInfoDto, logs []*dto.Rival
 			if scoreLog.Sha256 != course.GetJoinedSha256("") {
 				continue
 			}
+			// NOTE: we cannot handle the mode correctly here, see courseInfo.go for details
+			scoreLogMode, err := strconv.Atoi(scoreLog.Mode)
+			if err != nil {
+				// do nothing...
+				continue
+			}
+			if scoreLogMode/100 != course.GetConstraintMode()/100 {
+				continue
+			}
 			course.Clear = max(course.Clear, scoreLog.Clear)
-			logTime := time.Unix(scoreLog.Timestamp, 0)
-			if course.FirstClearTimestamp.IsZero() {
-				course.FirstClearTimestamp = logTime
-			} else if course.FirstClearTimestamp.After(logTime) {
-				course.FirstClearTimestamp = logTime
+			if scoreLog.Clear > entity.Failed {
+				logTime := time.Unix(scoreLog.Timestamp, 0)
+				if course.FirstClearTimestamp.IsZero() {
+					course.FirstClearTimestamp = logTime
+				} else if course.FirstClearTimestamp.After(logTime) {
+					course.FirstClearTimestamp = logTime
+				}
 			}
 		}
 	}

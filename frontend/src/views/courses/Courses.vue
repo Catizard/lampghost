@@ -41,7 +41,7 @@ function createColumns(): DataTableColumns<dto.CourseInfoDto> {
       title: "First Clear", 
       key: "FirstClearTime", 
       render(row:dto.CourseInfoDto) {
-        if (row.Clear != 0) {
+        if (row.Clear > 1) {
           return dayjs(row.FirstClearTimestamp).format('YYYY-MM-DD HH:mm:ss');
         } else {
           return "/";

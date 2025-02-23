@@ -19,6 +19,7 @@ import {
 	ListOutline as GoalsIcon,
 	Search as SearchIcon,
 	BalloonOutline as BalloonIcon,
+	MedalOutline as MedalIcon,
 } from '@vicons/ionicons5'
 import { MenuOption, NIcon } from 'naive-ui'
 import { computed, h, ref, watchEffect } from 'vue'
@@ -44,9 +45,21 @@ const menuOptions: MenuOption[] = [
 		icon: renderIcon(PersonIcon)
 	},
 	{
-		label: renderOption("/rivals", "rivals"),
-		key: 'rivals',
-		icon: renderIcon(RivalIcon)
+		label: "rivals",
+		key: "rivals",
+		icon: renderIcon(RivalIcon),
+		children: [
+			{
+				label: renderOption("/rivals/management", "management"),
+				key: "rival_management",
+				icon: renderIcon(SearchIcon),
+			},
+			{
+				label: renderOption("/rivals/tags", "tags"),
+				key: "rival_tags",
+				icon: renderIcon(MedalIcon),
+			}
+		],
 	},
 	{
 		label: "difftable",

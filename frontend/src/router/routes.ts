@@ -7,9 +7,12 @@ const mainRoutes: RouteRecordRaw[] = [
     component: () => import("../views/Home.vue"),
   },
   {
-    name: "rivals",
-    path: "/rivals",
-    component: () => import("../views/rivals.vue"),
+    path: "/rivals/management",
+    component: () => import("../views/rivals/RivalManagement.vue"),
+  },
+  {
+    path: "/rivals/tags",
+    component: () => import("../views/rivals/RivalTags.vue"),
   },
   {
     path: "/difftable/management",

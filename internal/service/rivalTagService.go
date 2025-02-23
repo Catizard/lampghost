@@ -2,9 +2,11 @@ package service
 
 import (
 	"sort"
+	"strconv"
 
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
+	"github.com/Catizard/lampghost_wails/internal/vo"
 	"github.com/charmbracelet/log"
 	"gorm.io/gorm"
 )
@@ -17,6 +19,21 @@ func NewRivalTagService(db *gorm.DB, diffTableService *DiffTableService) *RivalT
 	return &RivalTagService{
 		db: db,
 	}
+}
+
+func (s *RivalTagService) FindRivalTagList(filter *vo.RivalTagVo) ([]*dto.RivalTagDto, int, error) {
+	raw, n, err := findRivalTagList(s.db, filter)
+	if err != nil {
+		return nil, 0, err
+	}
+	if n == 0 {
+		return make([]*dto.RivalTagDto, 0), 0, err
+	}
+	ret := make([]*dto.RivalTagDto, len(raw))
+	for i := range raw {
+		ret[i] = dto.NewRivalTagDto(raw[i])
+	}
+	return ret, n, nil
 }
 
 func (s *RivalTagService) SyncRivalTagFromRawData(rivalID uint, rawScoreLog []*entity.ScoreLog, rawSongData []*entity.SongData) error {
@@ -46,19 +63,14 @@ before having the songdata.db loaded properly(which isn't in initialize phase) o
 a corrupted songdata cache. So we have to take a step back to generate the cache in time.
 */
 func (s *RivalTagService) syncRivalTagFromRawData(tx *gorm.DB, rivalID uint, rawScoreLog []*entity.ScoreLog, rawSongData []*entity.SongData) error {
-	var courseInfos []entity.CourseInfo
-	if err := tx.Find(&courseInfos).Error; err != nil {
+	courseInfoDtos, _, err := findCourseInfoList(tx, nil)
+	if err != nil {
 		return err
-	}
-	songHashCache := generateSongHashCacheFromRawData(rawSongData)
-	courseInfoDtos := make([]dto.CourseInfoDto, 0)
-	for _, courseInfo := range courseInfos {
-		courseInfoDtos = append(courseInfoDtos, *dto.NewCourseInfoDto(&courseInfo, songHashCache))
 	}
 	interestHashSet := make(map[string]interface{})
 	// NOTE: We cannot use sha256s directly, the hash from logs doesn't split hashes
 	for _, courseInfoDto := range courseInfoDtos {
-		interestHashSet[courseInfoDto.NoSepJoinedSha256s] = new(interface{})
+		interestHashSet[courseInfoDto.GetJoinedSha256("")] = new(interface{})
 	}
 	interestScoreLogs := make([]*entity.ScoreLog, 0)
 	for _, scoreLog := range rawScoreLog {
@@ -66,9 +78,8 @@ func (s *RivalTagService) syncRivalTagFromRawData(tx *gorm.DB, rivalID uint, raw
 			interestScoreLogs = append(interestScoreLogs, scoreLog)
 		}
 	}
-	log.Debugf("interest log size=%d", len(interestScoreLogs))
 	if len(interestScoreLogs) == 0 {
-		log.Warn("[RivalTagService] There's no course related tags to, skip tag build")
+		log.Warn("[RivalTagService] There's no course related play record, skip tag build")
 		return nil
 	}
 	sort.Slice(interestScoreLogs, func(i int, j int) bool {
@@ -78,16 +89,26 @@ func (s *RivalTagService) syncRivalTagFromRawData(tx *gorm.DB, rivalID uint, raw
 	tags := make([]entity.RivalTag, 0)
 	for _, courseInfoDto := range courseInfoDtos {
 		for _, scoreLog := range interestScoreLogs {
-			if scoreLog.Sha256 == courseInfoDto.NoSepJoinedSha256s && scoreLog.Clear >= entity.Normal {
-				fct := entity.RivalTag{
-					RivalId:   rivalID,
-					TagName:   courseInfoDto.Name + " First Clear",
-					Generated: true,
-					Timestamp: scoreLog.TimeStamp,
-				}
-				tags = append(tags, fct)
-				break
+			if scoreLog.Clear < entity.Normal || scoreLog.Sha256 != courseInfoDto.GetJoinedSha256("") {
+				continue
 			}
+			// see courseInfo.go for details
+			scoreLogMode, err := strconv.Atoi(scoreLog.Mode)
+			if err != nil {
+				// do nothing
+				continue
+			}
+			if scoreLogMode/100 != courseInfoDto.GetConstraintMode()/100 {
+				continue
+			}
+			fct := entity.RivalTag{
+				RivalId:   rivalID,
+				TagName:   courseInfoDto.Name + " First Clear",
+				Generated: true,
+				Timestamp: scoreLog.TimeStamp,
+			}
+			tags = append(tags, fct)
+			break
 		}
 	}
 
@@ -96,4 +117,16 @@ func (s *RivalTagService) syncRivalTagFromRawData(tx *gorm.DB, rivalID uint, raw
 	}
 
 	return tx.Create(tags).Error
+}
+
+func findRivalTagList(tx *gorm.DB, filter *vo.RivalTagVo) ([]*entity.RivalTag, int, error) {
+	partial := tx.Model(&entity.RivalTag{})
+	if filter != nil {
+		partial = partial.Where(filter.Entity())
+	}
+	var out []*entity.RivalTag
+	if err := partial.Find(&out).Error; err != nil {
+		return nil, 0, err
+	}
+	return out, len(out), nil
 }

@@ -6,7 +6,7 @@ type RivalTag struct {
 	gorm.Model
 	RivalId   uint
 	TagName   string
-	Generated bool `db:"generated"`
+	Generated bool
 	Timestamp int64
 }
 

@@ -71,6 +71,9 @@ func main() {
 	if err := c.Provide(controller.NewConfigController); err != nil {
 		panic(err)
 	}
+	if err := c.Provide(controller.NewRivalTagController); err != nil {
+		panic(err)
+	}
 	if err := c.Provide(server.NewInternalServer); err != nil {
 		panic(err)
 	}
@@ -118,6 +121,13 @@ func main() {
 	}
 
 	if err := c.Invoke(func(controller *controller.ConfigController) error {
+		bind = append(bind, controller)
+		return nil
+	}); err != nil {
+		panic(err)
+	}
+
+	if err := c.Invoke(func(controller *controller.RivalTagController) error {
 		bind = append(bind, controller)
 		return nil
 	}); err != nil {

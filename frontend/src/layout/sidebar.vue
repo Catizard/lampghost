@@ -39,12 +39,12 @@ function renderOption(path: string, name: string) {
 const inverted = ref(false);
 const menuOptions: MenuOption[] = [
 	{
-		label: renderOption("home", "home"),
+		label: renderOption("/home", "home"),
 		key: 'home',
 		icon: renderIcon(PersonIcon)
 	},
 	{
-		label: renderOption("rivals", "rivals"),
+		label: renderOption("/rivals", "rivals"),
 		key: 'rivals',
 		icon: renderIcon(RivalIcon)
 	},
@@ -66,27 +66,27 @@ const menuOptions: MenuOption[] = [
 		]
 	},
 	{
-		label: renderOption("folder", "folder"),
+		label: renderOption("/folder", "folder"),
 		key: "folder",
 		icon: renderIcon(BookmarksIcon)
 	},
 	{
-		label: renderOption("recent", "recent"),
+		label: renderOption("/recent", "recent"),
 		key: "recent",
 		icon: renderIcon(TimeIcon)
 	},
 	{
-		label: renderOption("courses", "courses"),
+		label: renderOption("/courses", "courses"),
 		key: "courses",
 		icon: renderIcon(CoursesIcon)
 	},
 	{
-		label: renderOption("goals", "goals"),
+		label: renderOption("/goals", "goals"),
 		key: "goals",
 		icon: renderIcon(GoalsIcon),
 	},
 	{
-		label: renderOption("settings", "settings"),
+		label: renderOption("/settings", "settings"),
 		key: "settings",
 		icon: renderIcon(SettingsIcon),
 	}

@@ -30,6 +30,7 @@ func init() {
 	// Setup defaults
 	viper.SetDefault("InternalServerPort", 7391)
 	viper.SetDefault("FolderSymbol", "")
+	viper.SetDefault("IgnoreVariantCourse", 0)
 	viper.SafeWriteConfig()
 	// Create the directory if it's not exist
 	_, err = os.Stat(WorkingDirectory)
@@ -45,12 +46,13 @@ func init() {
 }
 
 type ApplicationConfig struct {
-	UserName           string
-	ScorelogFilePath   string
-	SongdataFilePath   string
-	ScoreFilePath      string
-	InternalServerPort int32
-	FolderSymbol       string
+	UserName            string
+	ScorelogFilePath    string
+	SongdataFilePath    string
+	ScoreFilePath       string
+	InternalServerPort  int32
+	FolderSymbol        string
+	IgnoreVariantCourse int32
 }
 
 func ReadConfig() (*ApplicationConfig, error) {
@@ -58,12 +60,13 @@ func ReadConfig() (*ApplicationConfig, error) {
 		return nil, err
 	}
 	return &ApplicationConfig{
-		UserName:           viper.GetString("UserName"),
-		ScorelogFilePath:   viper.GetString("ScoreLogFilePath"),
-		SongdataFilePath:   viper.GetString("SongDataFilePath"),
-		ScoreFilePath:      viper.GetString("ScoreFilePath"),
-		InternalServerPort: viper.GetInt32("InternalServerPort"),
-		FolderSymbol:       viper.GetString("FolderSymbol"),
+		UserName:            viper.GetString("UserName"),
+		ScorelogFilePath:    viper.GetString("ScoreLogFilePath"),
+		SongdataFilePath:    viper.GetString("SongDataFilePath"),
+		ScoreFilePath:       viper.GetString("ScoreFilePath"),
+		InternalServerPort:  viper.GetInt32("InternalServerPort"),
+		FolderSymbol:        viper.GetString("FolderSymbol"),
+		IgnoreVariantCourse: viper.GetInt32("IgnoreVariantCourse"),
 	}, nil
 }
 
@@ -74,6 +77,7 @@ func (c *ApplicationConfig) WriteConfig() error {
 	viper.Set("ScoreFilePath", c.ScoreFilePath)
 	viper.Set("InternalServerPort", c.InternalServerPort)
 	viper.Set("FolderSymbol", c.FolderSymbol)
+	viper.Set("IgnoreVariantCourse", c.IgnoreVariantCourse)
 	if err := viper.WriteConfig(); err != nil {
 		return err
 	}

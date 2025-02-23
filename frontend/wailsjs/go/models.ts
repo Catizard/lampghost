@@ -7,6 +7,7 @@ export namespace config {
 	    ScoreFilePath: string;
 	    InternalServerPort: number;
 	    FolderSymbol: string;
+	    IgnoreVariantCourse: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new ApplicationConfig(source);
@@ -20,6 +21,7 @@ export namespace config {
 	        this.ScoreFilePath = source["ScoreFilePath"];
 	        this.InternalServerPort = source["InternalServerPort"];
 	        this.FolderSymbol = source["FolderSymbol"];
+	        this.IgnoreVariantCourse = source["IgnoreVariantCourse"];
 	    }
 	}
 

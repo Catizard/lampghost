@@ -11,10 +11,28 @@
 
     <n-form ref="formRef" :model="model">
       <n-h2>
+        通用设置
+        <n-p>
+          <n-form-item>
+            <template #label>
+              <n-tooltip trigger="hover">
+                <template #trigger>
+                  <n-icon :component="HintIcon" />
+                </template>
+                当开启时, 移除所有no_great/no_speed/no_good等变化出来的段位,仅保留原版段位
+              </n-tooltip>
+              是否隐藏变化段位
+            </template>
+            <n-select v-model:value="model.IgnoreVariantCourse" :options="yesnoOptions" style="width: 150px;" />
+          </n-form-item>
+        </n-p>
+      </n-h2>
+      <n-h2>
         存档设置
         <n-p>
           <n-form-item label="用户名, 如果你想换个用户名的话" path="userName">
-            <n-input show-count v-model:value="model.UserName" placeholder="请输入用户名" style="width: 50%;" :loading="loading" />
+            <n-input show-count v-model:value="model.UserName" placeholder="请输入用户名" style="width: 50%;"
+              :loading="loading" />
           </n-form-item>
         </n-p>
         <n-p class="alert-p">
@@ -43,7 +61,8 @@
               </n-tooltip>
               score.db文件路径
             </template>
-            <n-input clearable v-model:value="model.ScoreFilePath" placeholder="请输入score.db文件路径" style="width: 50%;" :loading="loading" />
+            <n-input clearable v-model:value="model.ScoreFilePath" placeholder="请输入score.db文件路径" style="width: 50%;"
+              :loading="loading" />
           </n-form-item>
         </n-p>
       </n-h2>
@@ -68,7 +87,8 @@
             </n-tooltip>
             难度表标志
           </template>
-          <n-input v-model:value="model.FolderSymbol" placeholder="默认为空" :maxlength="5" style="width: 150px;" :loading="loading">
+          <n-input v-model:value="model.FolderSymbol" placeholder="默认为空" :maxlength="5" style="width: 150px;"
+            :loading="loading">
           </n-input>
         </n-form-item>
       </n-h2>
@@ -77,7 +97,7 @@
 </template>
 
 <script setup lang="ts">
-import { FormInst, useNotification } from 'naive-ui';
+import { FormInst, SelectOption, useNotification } from 'naive-ui';
 import { ref } from 'vue';
 import {
   ChatboxEllipsesOutline as HintIcon,
@@ -94,8 +114,19 @@ const model = ref<config.ApplicationConfig>({
   SongdataFilePath: null,
   ScoreFilePath: null,
   FolderSymbol: null,
+  IgnoreVariantCourse: null
 });
 const loading = ref(false);
+const yesnoOptions: Array<SelectOption> = [
+  {
+    label: "是",
+    value: 1,
+  },
+  {
+    label: "否",
+    value: 0,
+  }
+];
 
 function handleSaveSettings() {
   loading.value = true;
@@ -127,7 +158,7 @@ function loadSettings() {
       if (result.Code != 200) {
         return Promise.reject(result.Msg)
       }
-      model.value = result.Data; 
+      model.value = result.Data;
     }).catch(err => {
       notification.error({
         content: err,

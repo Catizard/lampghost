@@ -473,7 +473,7 @@ export namespace entity {
 	    HeaderID: number;
 	    Name: string;
 	    Md5s: string;
-	    Constranints: string;
+	    Constraints: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new CourseInfo(source);
@@ -488,7 +488,7 @@ export namespace entity {
 	        this.HeaderID = source["HeaderID"];
 	        this.Name = source["Name"];
 	        this.Md5s = source["Md5s"];
-	        this.Constranints = source["Constranints"];
+	        this.Constraints = source["Constraints"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

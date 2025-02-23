@@ -29,8 +29,8 @@ func NewCourseInfoDto(courseInfo *entity.CourseInfo, cache *entity.SongHashCache
 		HeaderID:    courseInfo.HeaderID,
 		Name:        courseInfo.Name,
 		Md5s:        courseInfo.Md5s,
-		Constraints: courseInfo.Constranints,
-		Constraint:  strings.Split(courseInfo.Constranints, ","),
+		Constraints: courseInfo.Constraints,
+		Constraint:  strings.Split(courseInfo.Constraints, ","),
 	}
 	ret.Md5 = strings.Split(ret.Md5s, ",")
 	ret.Sha256 = make([]string, 0)

@@ -14,8 +14,8 @@ type CourseInfoVo struct {
 
 func (courseInfo *CourseInfoVo) Entity() *entity.CourseInfo {
 	return &entity.CourseInfo{
-		Name:         courseInfo.Name,
-		Md5s:         strings.Join(courseInfo.Md5, ","),
-		Constranints: strings.Join(courseInfo.Constraint, ","),
+		Name:        courseInfo.Name,
+		Md5s:        strings.Join(courseInfo.Md5, ","),
+		Constraints: strings.Join(courseInfo.Constraint, ","),
 	}
 }

@@ -74,12 +74,12 @@ func findCourseInfoList(tx *gorm.DB, filter *vo.CourseInfoVo) ([]*dto.CourseInfo
 
 func mergeRivalScoreLogToCourses(courses []*dto.CourseInfoDto, logs []*dto.RivalScoreLogDto) {
 	for _, course := range courses {
-		for _, log := range logs {
-			if log.Sha256 != course.GetJoinedSha256("") {
+		for _, scoreLog := range logs {
+			if scoreLog.Sha256 != course.GetJoinedSha256("") {
 				continue
 			}
-			course.Clear = max(course.Clear, log.Clear)
-			logTime := time.Unix(log.Timestamp, 0)
+			course.Clear = max(course.Clear, scoreLog.Clear)
+			logTime := time.Unix(scoreLog.Timestamp, 0)
 			if course.FirstClearTimestamp.IsZero() {
 				course.FirstClearTimestamp = logTime
 			} else if course.FirstClearTimestamp.After(logTime) {

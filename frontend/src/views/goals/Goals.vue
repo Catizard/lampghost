@@ -1,3 +1,4 @@
 <template>
-  goals
+  <n-empty description="TODO">
+  </n-empty>
 </template>

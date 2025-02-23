@@ -19,7 +19,9 @@
                 <template #trigger>
                   <n-icon :component="HintIcon" />
                 </template>
-                当开启时, 移除所有no_great/no_speed/no_good等变化出来的段位,仅保留原版段位
+                当开启时, 移除所有no_great/no_speed/no_good等变化出来的段位,仅保留原版段位。
+                <br>
+                注意调整该选项并不会重新生成rival的tag标记,你需要手动重新生成。
               </n-tooltip>
               是否隐藏变化段位
             </template>

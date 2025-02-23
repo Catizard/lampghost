@@ -118,7 +118,7 @@ function handleUpdateLevelTableExpandedRowKeys(keys: Array<string>) {
 }
 
 const songDataColumns: DataTableColumns<dto.DiffTableDataDto> = [
-  { title: "Song Name", key: "Title", resizable: true },
+  { title: "Song Name", key: "Title", ellipsis: true, resizable: true },
   { title: "Artist", key: "Artist", resizable: true },
   { title: "Play Count", key: "PlayCount", minWidth: "100px", resizable: true },
   {

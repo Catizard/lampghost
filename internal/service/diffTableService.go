@@ -156,7 +156,7 @@ func (s *DiffTableService) FindDiffTableHeaderListWithRival(rivalID uint) ([]dto
 		return nil, 0, err
 	}
 	for _, header := range headers {
-		mergeRivalRelatedData(sha256ScoreLogsMap, header.Contents)
+		mergeRivalRelatedData(sha256ScoreLogsMap, header.Contents, false)
 	}
 	return headers, len(headers), nil
 }
@@ -275,7 +275,7 @@ func (s *DiffTableService) QueryDiffTableInfoByIDWithRival(ID uint, rivalID uint
 	if err != nil {
 		return nil, err
 	}
-	mergeRivalRelatedData(sha256ScoreLogsMap, header.Contents)
+	mergeRivalRelatedData(sha256ScoreLogsMap, header.Contents, false)
 	return header, nil
 }
 
@@ -314,20 +314,52 @@ func (s *DiffTableService) QueryLevelLayeredDiffTableInfoById(ID uint) (*dto.Dif
 }
 
 // Query specific difficult table's one level data contents with player related field (e.g PlayCount, Lamp status...)
-func (s *DiffTableService) QueryDiffTableDataWithRival(headerID uint, level string, rivalID uint) ([]*dto.DiffTableDataDto, int, error) {
-	rawContents, _, err := findDiffTableDataList(s.db, &vo.DiffTableDataVo{HeaderID: headerID, Level: level})
+//
+// Requirements:
+//
+//	Level & ID & RivalID should not be empty
+func (s *DiffTableService) QueryDiffTableDataWithRival(filter vo.DiffTableHeaderVo) ([]*dto.DiffTableDataDto, int, error) {
+	if filter.Level == "" {
+		return nil, 0, fmt.Errorf("Level should not be empty")
+	}
+	if filter.ID <= 0 {
+		return nil, 0, fmt.Errorf("ID should > 0")
+	}
+	if filter.RivalID <= 0 {
+		return nil, 0, fmt.Errorf("RivalID should > 0")
+	}
+	rawContents, _, err := findDiffTableDataList(s.db, &vo.DiffTableDataVo{HeaderID: filter.ID, Level: filter.Level})
 	if err != nil {
 		return nil, 0, err
 	}
 	contents := dto.NewDiffTableDataDtoArray(rawContents)
 	sha256ScoreLogsMap, err := findRivalScoreLogSha256Map(s.db, &vo.RivalScoreLogVo{
-		RivalId: rivalID,
+		RivalId: filter.RivalID,
 	})
 	if err != nil {
 		return nil, 0, err
 	}
-	if err := mergeRivalRelatedData(sha256ScoreLogsMap, contents); err != nil {
+	if err := mergeRivalRelatedData(sha256ScoreLogsMap, contents, false); err != nil {
 		return nil, 0, err
+	}
+	if filter.GhostRivalID > 0 {
+		queryGhostScoreLogParam := &vo.RivalScoreLogVo{
+			RivalId: filter.GhostRivalID,
+		}
+		if filter.GhostRivalTagID > 0 {
+			tag, err := findRivalTagByID(s.db, filter.GhostRivalTagID)
+			if err != nil {
+				return nil, 0, err
+			}
+			queryGhostScoreLogParam.MaximumTimestamp = tag.Timestamp
+		}
+		ghostScoreLogsMap, err := findRivalScoreLogSha256Map(s.db, queryGhostScoreLogParam)
+		if err != nil {
+			return nil, 0, err
+		}
+		if err := mergeRivalRelatedData(ghostScoreLogsMap, contents, true); err != nil {
+			return nil, 0, err
+		}
 	}
 	return contents, len(contents), nil
 }
@@ -447,12 +479,16 @@ func queryDiffTableInfoByID(tx *gorm.DB, ID uint) (*entity.DiffTableHeader, erro
 // The impede is mainly FindDiffTableHeaderListWithRival function, which requires redesign the data loading sequence
 //
 // This function would modify data in place rather than return a new array
-func mergeRivalRelatedData(sha256ScoreLogsMap map[string][]*dto.RivalScoreLogDto, contents []*dto.DiffTableDataDto) error {
+func mergeRivalRelatedData(sha256ScoreLogsMap map[string][]*dto.RivalScoreLogDto, contents []*dto.DiffTableDataDto, isGhostRival bool) error {
 	for i, content := range contents {
 		if logs, ok := sha256ScoreLogsMap[content.Sha256]; ok {
 			contents[i].PlayCount = len(logs)
 			for _, log := range logs {
-				contents[i].Lamp = max(content.Lamp, int(log.Clear))
+				if isGhostRival {
+					contents[i].GhostLamp = max(content.GhostLamp, int(log.Clear))
+				} else {
+					contents[i].Lamp = max(content.Lamp, int(log.Clear))
+				}
 			}
 		}
 	}

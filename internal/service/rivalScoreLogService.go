@@ -62,6 +62,9 @@ func findRivalScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.Riva
 		if filter.OnlyCourseLogs {
 			partial = partial.Where("length(rival_score_log.sha256) > 64")
 		}
+		if filter.MaximumTimestamp > 0 {
+			partial = partial.Where("rival_score_log.timestramp <= ?", filter.MaximumTimestamp)
+		}
 	}
 	var out []*dto.RivalScoreLogDto
 	if err := partial.Joins("left join rival_song_data sd on rival_score_log.sha256 = sd.sha256").Find(&out).Error; err != nil {

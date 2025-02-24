@@ -13,6 +13,11 @@ type DiffTableHeaderVo struct {
 	Symbol      string           `json:"symbol"`
 	Courses     [][]CourseInfoVo `json:"course"`
 	HeaderUrl   string
+
+	Level           string
+	RivalID         uint
+	GhostRivalID    uint
+	GhostRivalTagID uint
 }
 
 func (header *DiffTableHeaderVo) Entity() *entity.DiffTableHeader {

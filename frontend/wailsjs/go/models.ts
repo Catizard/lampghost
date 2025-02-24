@@ -904,6 +904,10 @@ export namespace vo {
 	    symbol: string;
 	    course: CourseInfoVo[][];
 	    HeaderUrl: string;
+	    Level: string;
+	    RivalID: number;
+	    GhostRivalID: number;
+	    GhostRivalTagID: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new DiffTableHeaderVo(source);
@@ -921,6 +925,10 @@ export namespace vo {
 	        this.symbol = source["symbol"];
 	        this.course = this.convertValues(source["course"], CourseInfoVo);
 	        this.HeaderUrl = source["HeaderUrl"];
+	        this.Level = source["Level"];
+	        this.RivalID = source["RivalID"];
+	        this.GhostRivalID = source["GhostRivalID"];
+	        this.GhostRivalTagID = source["GhostRivalTagID"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -964,6 +972,7 @@ export namespace vo {
 	    Page: number;
 	    PageSize: number;
 	    OnlyCourseLogs: boolean;
+	    MaximumTimestamp: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new RivalScoreLogVo(source);
@@ -990,6 +999,7 @@ export namespace vo {
 	        this.Page = source["Page"];
 	        this.PageSize = source["PageSize"];
 	        this.OnlyCourseLogs = source["OnlyCourseLogs"];
+	        this.MaximumTimestamp = source["MaximumTimestamp"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

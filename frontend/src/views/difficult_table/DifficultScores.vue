@@ -215,10 +215,15 @@ const songDataColumns: DataTableColumns<dto.DiffTableDataDto> = [
   }
 ];
 
-// TODO: pass ghost rival's ID & tag here
 function loadSongTableData(headerID: number, level: string, rivalID: number) {
   levelTableLoading.value = true;
-  QueryDiffTableDataWithRival(headerID, level, rivalID)
+  QueryDiffTableDataWithRival({
+    ID: headerID,
+    Level: level,
+    RivalID: rivalID,
+    GhostRivalID: currentRivalID.value ?? 0,
+    GhostRivalTagID: currentRivalTagID.value ?? 0,
+  } as any)
     .then(result => {
       if (result.Code != 200) {
         return Promise.reject(result.Msg);

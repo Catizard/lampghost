@@ -24,7 +24,8 @@ type RivalScoreLogVo struct {
 	Page     int
 	PageSize int
 	// Extra filter field
-	OnlyCourseLogs bool
+	OnlyCourseLogs   bool
+	MaximumTimestamp int64
 }
 
 func (rivalScoreLog *RivalScoreLogVo) Entity() *entity.RivalScoreLog {

@@ -130,3 +130,11 @@ func findRivalTagList(tx *gorm.DB, filter *vo.RivalTagVo) ([]*entity.RivalTag, i
 	}
 	return out, len(out), nil
 }
+
+func findRivalTagByID(tx *gorm.DB, ID uint) (*entity.RivalTag, error) {
+	tag := entity.RivalTag{}
+	if err := tx.First(&tag, ID).Error; err != nil {
+		return nil, err
+	}
+	return &tag, nil
+}

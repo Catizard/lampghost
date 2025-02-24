@@ -196,6 +196,17 @@ const songDataColumns: DataTableColumns<dto.DiffTableDataDto> = [
     }
   },
   {
+    title: "Ghost", key: "GhostLamp", minWidth: "100px", resizable: true,
+    render(row: dto.DiffTableDataDto) {
+      return h(
+        ClearTag,
+        {
+          clear: row.GhostLamp,
+        },
+      )
+    }
+  },
+  {
     title: "Action",
     key: "actions",
     resizable: true,

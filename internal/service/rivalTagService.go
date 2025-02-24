@@ -64,8 +64,13 @@ a corrupted songdata cache. So we have to take a step back to generate the cache
 */
 func (s *RivalTagService) syncRivalTagFromRawData(tx *gorm.DB, rivalID uint, rawScoreLog []*entity.ScoreLog, rawSongData []*entity.SongData) error {
 	courseInfoDtos, _, err := findCourseInfoList(tx, nil)
+	// NOTE: we have to build the cache by using rawSongData
 	if err != nil {
 		return err
+	}
+	correctCache := generateSongHashCacheFromRawData(rawSongData)
+	for _, courseInfoDto := range courseInfoDtos {
+		courseInfoDto.RepairHash(correctCache)
 	}
 	interestHashSet := make(map[string]interface{})
 	// NOTE: We cannot use sha256s directly, the hash from logs doesn't split hashes

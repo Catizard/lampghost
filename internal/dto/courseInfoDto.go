@@ -52,6 +52,25 @@ func NewCourseInfoDto(courseInfo *entity.CourseInfo, cache *entity.SongHashCache
 	return ret
 }
 
+func (courseInfo *CourseInfoDto) RepairHash(cache *entity.SongHashCache) {
+	courseInfo.Sha256 = make([]string, 0)
+	build := true
+	for _, md5 := range courseInfo.Md5 {
+		sha256, ok := cache.GetSHA256(md5)
+		if !ok {
+			build = false
+			break
+		}
+		courseInfo.Sha256 = append(courseInfo.Sha256, sha256)
+	}
+	if !build {
+		courseInfo.Sha256 = nil
+	} else {
+		courseInfo.Sha256s = strings.Join(courseInfo.Sha256, ",")
+		courseInfo.NoSepJoinedSha256s = strings.Join(courseInfo.Sha256, "")
+	}
+}
+
 func (courseInfo *CourseInfoDto) GetJoinedSha256(sep string) string {
 	return strings.Join(courseInfo.Sha256, sep)
 }

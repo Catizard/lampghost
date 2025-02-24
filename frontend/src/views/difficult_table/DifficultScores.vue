@@ -8,16 +8,22 @@
     <n-flex justify="flex-start">
       <n-select :loading="levelTableLoading" v-model:value="currentDiffTableID" :options="difftableOptions"
         style="width: 200px;" />
-      <n-select style="width: 200px;" placeholder="Target Rival"></n-select>
+      <n-select :loading="loadingRivalData" v-model:value="currentRivalID" :options="rivalOptions" style="width: 200px;"
+        placeholder="Ghost Rival" />
+      <n-select :loading="loadingRivalData" v-model:value="currentRivalTagID" :options="rivalTagOptions"
+        style="width: 200px;" placeholder="Rival Tag" />
     </n-flex>
     <n-data-table :columns="columns" :data="data" :pagination="pagination" :loading="levelTableLoading"
-      :row-key="(row: dto.DiffTableHeaderDto) => row.Level" @update-expanded-row-keys="handleUpdateLevelTableExpandedRowKeys"/>
+      :row-key="(row: dto.DiffTableHeaderDto) => row.Level"
+      @update-expanded-row-keys="handleUpdateLevelTableExpandedRowKeys" />
   </perfect-scrollbar>
 </template>
 
 <script setup lang="ts">
 import ClearTag from '@/components/ClearTag.vue';
 import { FindDiffTableHeaderList, FindDiffTableHeaderTree, QueryDiffTableDataWithRival } from '@wailsjs/go/controller/DiffTableController';
+import { FindRivalInfoList } from '@wailsjs/go/controller/RivalInfoController';
+import { FindRivalTagList } from '@wailsjs/go/controller/RivalTagController';
 import { dto, vo } from '@wailsjs/go/models';
 import { DataTableColumns, NButton, NDataTable, SelectOption, useNotification } from 'naive-ui';
 import { h, Ref, ref, watch } from 'vue';
@@ -107,6 +113,63 @@ function loadLevelTableData(difftableID: string | number) {
     });
 }
 
+const loadingRivalData = ref(false);
+const currentRivalID: Ref<number | null> = ref(null);
+const currentRivalTagID: Ref<number | null> = ref(null);
+const rivalOptions: Ref<Array<SelectOption>> = ref([]);
+const rivalTagOptions: Ref<Array<SelectOption>> = ref([]);
+function loadRivalOptions() {
+  loadingRivalData.value = true;
+  FindRivalInfoList()
+    .then(result => {
+      if (result.Code != 200) {
+        return Promise.reject(result.Msg);
+      }
+      if (result.Rows.length == 0) {
+        return Promise.reject("一个rival都没有, 发生什么事了?");
+      }
+      rivalOptions.value = result.Rows.map((row: dto.RivalInfoDto) => {
+        return {
+          label: row.Name,
+          value: row.ID,
+        } as SelectOption
+      });
+    }).catch(err => {
+      notification.error({
+        content: err,
+        duration: 3000,
+        keepAliveOnHover: true,
+      })
+    }).finally(() => {
+      loadingRivalData.value = false;
+    });
+}
+function loadRivalTagOptions(rivalID: number) {
+  // TODO: same logic, and should be handled together
+  loadingRivalData.value = true;
+  FindRivalTagList({ RivalId: rivalID } as any)
+    .then(result => {
+      if (result.Code != 200) {
+        return Promise.reject(result.Msg);
+      }
+      rivalTagOptions.value = result.Rows.map((row: dto.RivalTagDto) => {
+        return {
+          label: row.TagName,
+          value: row.ID,
+        } as SelectOption
+      });
+    }).catch(err => {
+      notification.error({
+        content: err,
+        duration: 3000,
+        keepAliveOnHover: true,
+      })
+    }).finally(() => {
+      loadingRivalData.value = false;
+    });
+}
+loadRivalOptions();
+
 function handleUpdateLevelTableExpandedRowKeys(keys: Array<string>) {
   // TODO: do we need to handle multiple loading state?
   keys.forEach((level) => {
@@ -152,6 +215,7 @@ const songDataColumns: DataTableColumns<dto.DiffTableDataDto> = [
   }
 ];
 
+// TODO: pass ghost rival's ID & tag here
 function loadSongTableData(headerID: number, level: string, rivalID: number) {
   levelTableLoading.value = true;
   QueryDiffTableDataWithRival(headerID, level, rivalID)
@@ -179,4 +243,11 @@ function handleAddToFolder(songDataID: number) {
 watch(currentDiffTableID, (newID: string | number) => {
   loadLevelTableData(newID);
 });
+
+// Watch 2: Whenever changing ghost rival, reload its corresponding tags
+watch(currentRivalID, (newID: number) => {
+  loadRivalTagOptions(newID);
+});
+
+// TODO: Watch3: Whenever changing current rival ID or tag, reload the song table
 </script>

@@ -2,19 +2,20 @@
   <perfect-scrollbar>
     <n-space justify="space-between">
       <n-h1 prefix="bar" style="text-align: start">
-        <n-text type="primary"> 是的，这是难度表信息!! </n-text>
+        <n-text type="primary">{{ t('title') }}</n-text>
       </n-h1>
-      <n-button @click="showAddModal = true"> 新增一个难度表 </n-button>
+      <n-button type="primary" @click="showAddModal = true">{{ t('button.add') }}</n-button>
     </n-space>
     <n-data-table :columns="columns" :data="data" :pagination="pagination" :bordered="false"
       :row-key="(row: dto.DiffTableHeaderDto) => row.ID" />
   </perfect-scrollbar>
 
-  <n-modal v-model:show="showAddModal" preset="dialog" title="新增难度表信息" positive-text="新增" negative-text="取消"
+  <n-modal v-model:show="showAddModal" preset="dialog" :title="t('modal.title')"
+    :positive-text="t('modal.positiveText')" :negative-text="t('modal.negativeText')"
     @positive-click="handlePositiveClick" @negative-click="handleNegativeClick" :mask-closable="false">
     <n-form ref="formRef" :model="formData" :rules="rules">
-      <n-form-item label="地址" path="url">
-        <n-input v-model:value="formData.url" placeholder="输入地址" />
+      <n-form-item :label="t('modal.labelAddress')" path="url">
+        <n-input v-model:value="formData.url" :placeholder="t('modal.placeHolder')" />
       </n-form-item>
     </n-form>
   </n-modal>
@@ -31,7 +32,10 @@ import {
   FindDiffTableHeaderTree
 } from "@wailsjs/go/controller/DiffTableController";
 import { dto, entity } from "@wailsjs/go/models";
+import { useI18n } from "vue-i18n";
 
+const i18n = useI18n();
+const { t } = i18n;
 const showAddModal = ref(false);
 
 const formRef = ref<FormInst | null>(null);
@@ -41,7 +45,7 @@ const formData = ref({
 const rules = {
   url: {
     required: true,
-    message: "请输入地址",
+    message: t('rules.missingAddress'),
     trigger: ["input", "blur"],
   },
 };
@@ -56,10 +60,10 @@ function createColumns({
   deleteHeader: (row: dto.DiffTableHeaderDto) => void;
 }): DataTableColumns<dto.DiffTableHeaderDto> {
   return [
-    { title: "Name", key: "Name", },
-    { title: "url", key: "HeaderUrl", },
+    { title: t('column.name'), key: "Name", },
+    { title: t('column.url'), key: "HeaderUrl", },
     {
-      title: "Action",
+      title: t('actions'),
       key: "actions",
       render(row) {
         return h(
@@ -70,7 +74,7 @@ function createColumns({
             size: "small",
             onClick: () => deleteHeader(row),
           },
-          { default: () => "删除" },
+          { default: () => t('button.delete') },
         );
       },
     },
@@ -82,9 +86,9 @@ const pagination = false as const;
 const columns = createColumns({
   deleteHeader(row: any) {
     dialog.warning({
-      title: "确定要删除么?",
-      positiveText: "确定",
-      negativeText: "取消",
+      title: t('deleteDialog.title'),
+      positiveText: t('deleteDialog.postiveText'),
+      negativeText: t('deleteDialog.negativeText'),
       onPositiveClick: () => {
         delDiffTableHeader(row.ID)
       }
@@ -98,11 +102,10 @@ function addDiffTableHeader(url: string) {
       if (result.Code != 200) {
         return Promise.reject(result.Msg);
       }
-      notifySuccess("新增难度表似乎成功了，后台返回结果: " + result.Msg);
       loadDiffTableData();
     })
     .catch((err) => {
-      notifyError("新增难度表似乎失败了，后台返回错误: " + err)
+      notifyError(t('message.addTableFailedPrefix') + err)
       loadDiffTableData();
     });
 }
@@ -113,7 +116,7 @@ function delDiffTableHeader(id: number) {
       if (result.Code != 200) {
         return Promise.reject(result.Msg)
       }
-      notifySuccess("删除成功")
+      notifySuccess(t('message.deleteSuccess'))
       loadDiffTableData();
     }).catch(err => {
       notifyError(err)
@@ -145,7 +148,7 @@ function loadDiffTableData() {
       data.value = [...result.Rows]
     }).catch((err) => {
       notification.error({
-        content: "读取难度表信息出错:" + err,
+        content: t('message.loadTableDataFailedPrefix') + err,
         duration: 5000,
         keepAliveOnHover: true
       })
@@ -168,3 +171,72 @@ function notifyError(msg: string) {
   })
 }
 </script>
+
+<i18n>
+{
+  "en": {
+    "title": "Table Management",
+    "button": {
+      "add": "Add Table",
+      "delete": "Delete"
+    },
+    "modal": {
+      "title": "Add a new table",
+      "positiveText": "add",
+      "negativeText": "cancel",
+      "labelAddress": "Address",
+      "placeholderAddress": "Input address",
+    },
+    "rules": {
+      "missingAddress": "Please input address"
+    },
+    "column": {
+      "name": "Name",
+      "url": "URL",
+      "actions": "Actions"
+    },
+    "deleteDialog": {
+      "title": "Confirm to delete?",
+      "positiveText": "Yes",
+      "negativeText": "No",
+    },
+    "message": {
+      "addTableFailedPrefix": "Failed to add table, error message: ",
+      "deleteSuccess": "Deleted successfully",
+      "loadTableDataFailedPrefix": "Failed to load table, error message: ",
+    }
+  },
+  "zh-CN": {
+    "title": "难度表管理",
+    "button": {
+      "add": "新增",
+      "delete": "删除"
+    },
+    "modal": {
+      "title": "新增难度表",
+      "positiveText": "新增",
+      "negativeText": "取消",
+      "labelAddress": "地址",
+      "placeholderAddress": "请输入地址",
+    },
+    "rules": {
+      "missingAddress": "请输入地址"
+    },
+    "column": {
+      "name": "名称",
+      "url": "地址",
+      "actions": "操作"
+    },
+    "deleteDialog": {
+      "title": "确定要删除吗？",
+      "positiveText": "是",
+      "negativeText": "否",
+    },
+    "message": {
+      "addTableFailedPrefix": "新增难度表失败，错误信息: ",
+      "deleteSuccess": "删除成功",
+      "loadTableDataFailedPrefix": "读取难度表信息失败, 错误信息: ",
+    }
+  },
+}
+</i18n>

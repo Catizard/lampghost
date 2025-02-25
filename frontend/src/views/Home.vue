@@ -1,52 +1,49 @@
 <template>
-  <perfect-scrollbar>
-    <n-h1 prefix="bar" style="text-align: start;">
-      <n-text type="primary">
-        也许是玩家信息
-      </n-text>
-    </n-h1>
-    <n-grid :cols="12">
-      <n-gi :span="4">
-        <n-flex>
-          你是?: {{ playerData.playerName }}
-          <n-divider />
-          玩了多少次: {{ playerData.playCount }}
-          <n-divider />
-          最后同步时间 : {{ playerData.lastUpdate }}
-          <n-divider />
-          <n-button @click="handleSyncClick" :loading="syncLoading">
-            同步最新存档数据,大概
-          </n-button>
-        </n-flex>
-      </n-gi>
-      <n-gi :span="8">
-        <n-grid :cols="12">
-          <n-gi :span="4">
-            <n-dropdown trigger="hover" :options="playCountChartYearOptions" @select="handleSelect">
-              <n-button>选择年份</n-button>
-            </n-dropdown>
-          </n-gi>
-        </n-grid>
-        <vue-apex-charts height="100%" type="line" :options="playCountChartOptions"
-          :series="playCountChartOptions.series" />
-      </n-gi>
-    </n-grid>
-    <n-divider />
-    <n-h1 prefix="bar" style="text-align: start;">
-      <n-text type="primary">
-        报告,我是点灯信息
-      </n-text>
-    </n-h1>
-    <n-grid :cols="12" min-height="600px">
-      <n-gi :span="4">
-        <n-dropdown trigger="hover" :options="difftableStatusOptions" @select="handleChangeDifftableStatusOption">
-          <n-button :loading="difftableChangingLoading">{{ currentChoosingDifftableName }}</n-button>
-        </n-dropdown>
-      </n-gi>
-    </n-grid>
-    <vue-apex-charts height="450px" type="bar" :options="lampCountChartOptions"
-      :series="lampCountChartOptions.series" />
-  </perfect-scrollbar>
+  <n-h1 prefix="bar" style="text-align: start;">
+    <n-text type="primary">
+      也许是玩家信息
+    </n-text>
+  </n-h1>
+  <n-grid :cols="12">
+    <n-gi :span="4">
+      <n-flex>
+        你是?: {{ playerData.playerName }}
+        <n-divider />
+        玩了多少次: {{ playerData.playCount }}
+        <n-divider />
+        最后同步时间 : {{ playerData.lastUpdate }}
+        <n-divider />
+        <n-button @click="handleSyncClick" :loading="syncLoading">
+          同步最新存档数据,大概
+        </n-button>
+      </n-flex>
+    </n-gi>
+    <n-gi :span="8">
+      <n-grid :cols="12">
+        <n-gi :span="4">
+          <n-dropdown trigger="hover" :options="playCountChartYearOptions" @select="handleSelect">
+            <n-button>选择年份</n-button>
+          </n-dropdown>
+        </n-gi>
+      </n-grid>
+      <vue-apex-charts height="100%" type="line" :options="playCountChartOptions"
+        :series="playCountChartOptions.series" />
+    </n-gi>
+  </n-grid>
+  <n-divider />
+  <n-h1 prefix="bar" style="text-align: start;">
+    <n-text type="primary">
+      报告,我是点灯信息
+    </n-text>
+  </n-h1>
+  <n-grid :cols="12" min-height="600px">
+    <n-gi :span="4">
+      <n-dropdown trigger="hover" :options="difftableStatusOptions" @select="handleChangeDifftableStatusOption">
+        <n-button :loading="difftableChangingLoading">{{ currentChoosingDifftableName }}</n-button>
+      </n-dropdown>
+    </n-gi>
+  </n-grid>
+  <vue-apex-charts height="450px" type="bar" :options="lampCountChartOptions" :series="lampCountChartOptions.series" />
 </template>
 
 <script setup>

@@ -2,7 +2,7 @@
   <perfect-scrollbar>
     <n-flex justify="space-between">
       <n-h1 prefix="bar" style="text-align: start;">
-        <n-text type="primary">玩家tag管理</n-text>
+        <n-text type="primary">{{ t('title') }}</n-text>
       </n-h1>
     </n-flex>
     <n-flex justify="flex-start">
@@ -20,7 +20,10 @@ import { dto } from '@wailsjs/go/models';
 import { DataTableColumns, SelectOption, useNotification } from 'naive-ui';
 import { Ref, ref, watch } from 'vue';
 import * as dayjs from 'dayjs';
+import { useI18n } from 'vue-i18n';
 
+const i18n = useI18n();
+const { t } = i18n;
 const notification = useNotification();
 
 const tableLoading = ref(false);
@@ -34,9 +37,8 @@ function loadRivalOptions() {
         return Promise.reject(result.Msg);
       }
       if (result.Rows.length == 0) {
-        return Promise.reject("一个rival都没有, 发生什么事了?");
+        return Promise.reject(t('message.noRivalError'));
       }
-      console.log(result.Rows)
       rivalOptions.value = result.Rows.map((row: dto.RivalInfoDto) => {
         return {
           label: row.Name,
@@ -57,10 +59,10 @@ function loadRivalOptions() {
 loadRivalOptions();
 
 const columns: DataTableColumns<dto.RivalTagDto> = [
-  { title: "Tag Name", key: "TagName", },
-  { title: "Generated", key: "Generated", },
+  { title: t('column.tagName'), key: "TagName", },
+  { title: t('column.generated'), key: "Generated", },
   {
-    title: "Tag Time",
+    title: t('column.tagTime'),
     key: "TagTime",
     render: (row: dto.RivalTagDto) => dayjs(row.TagTime).format('YYYY-MM-DD HH:mm:ss')
   }
@@ -92,3 +94,30 @@ watch(currentRivalID, (newID: number) => {
 })
 
 </script>
+
+<i18n>
+{
+  "en": {
+    "title": "Rival Tags",
+    "column": {
+      "tagName": "Tag Name",
+      "generated": "Generated",
+      "tagTime": "Tag Time",
+    },
+    "message": {
+      "noRivalError": "FATAL ERROR: no rival data found",
+    }
+  },
+  "zh-CN": {
+    "title": "玩家标签",
+    "column": {
+      "tagName": "标签名称",
+      "generated": "自动生成",
+      "tagTime": "标签时间",
+    },
+    "message": {
+      "noRivalError": "未知错误: 找不到任何玩家信息?",
+    }
+  },
+}
+</i18n>

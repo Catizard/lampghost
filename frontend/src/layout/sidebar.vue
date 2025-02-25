@@ -138,7 +138,7 @@ const menuOptions: MenuOption[] = [
       "rivals": {
         "self": "好友列表",
         "management": "管理",
-        "tags": "标记",
+        "tags": "标签",
       },
       "difftable": {
         "self": "难度表",
@@ -149,6 +149,7 @@ const menuOptions: MenuOption[] = [
       "recent": "最近游玩",
       "courses": "段位列表",
       "goals": "目标列表",
+			"settings": "设置",
     },
   },
 }

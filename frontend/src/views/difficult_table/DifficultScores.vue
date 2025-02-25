@@ -271,8 +271,7 @@ watch(currentRivalID, (newID: number) => {
 // TODO: Watch3: Whenever changing current rival ID or tag, reload the song table
 </script>
 
-<i18n>
-{
+<i18n lang="json">{
   "en": {
     "title": "Table Scores",
     "column": {
@@ -317,5 +316,4 @@ watch(currentRivalID, (newID: number) => {
     "placeHolderRival": "选择对比玩家",
     "placeHolderRivalTag": "选择对比玩家的标签",
   },
-}
-</i18n>
+}</i18n>

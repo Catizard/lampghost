@@ -172,8 +172,7 @@ function notifyError(msg: string) {
 }
 </script>
 
-<i18n>
-{
+<i18n lang="json">{
   "en": {
     "title": "Table Management",
     "button": {
@@ -238,5 +237,4 @@ function notifyError(msg: string) {
       "loadTableDataFailedPrefix": "读取难度表信息失败, 错误信息: ",
     }
   },
-}
-</i18n>
+}</i18n>

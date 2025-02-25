@@ -95,8 +95,7 @@ watch(currentRivalID, (newID: number) => {
 
 </script>
 
-<i18n>
-{
+<i18n lang="json">{
   "en": {
     "title": "Rival Tags",
     "column": {
@@ -119,5 +118,4 @@ watch(currentRivalID, (newID: number) => {
       "noRivalError": "未知错误: 找不到任何玩家信息?",
     }
   },
-}
-</i18n>
+}</i18n>

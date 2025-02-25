@@ -106,8 +106,7 @@ function handleSyncClick(id) {
 loadData();
 </script>
 
-<i18n>
-{
+<i18n lang="json">{
 	"en": {
 		"title": "Rivals",
 		"column": {
@@ -142,5 +141,4 @@ loadData();
 			"reloadSuccess": "同步成功",
 		}
 	},
-}
-</i18n>
+}</i18n>

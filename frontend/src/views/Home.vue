@@ -312,8 +312,7 @@ function handleSelect() {
 initUser();
 </script>
 
-<i18n>
-{
+<i18n lang="json">{
   "en": {
     "infoTitle": "Player Info",
     "playerInfo": {
@@ -356,8 +355,7 @@ initUser();
       "unfinishedFeature": "不好意思，这个功能还没实现"
     }
   },
-}
-</i18n>
+}</i18n>
 
 <style scoped>
 .n-button {

@@ -8,6 +8,7 @@ export namespace config {
 	    InternalServerPort: number;
 	    FolderSymbol: string;
 	    IgnoreVariantCourse: number;
+	    Locale: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new ApplicationConfig(source);
@@ -22,6 +23,7 @@ export namespace config {
 	        this.InternalServerPort = source["InternalServerPort"];
 	        this.FolderSymbol = source["FolderSymbol"];
 	        this.IgnoreVariantCourse = source["IgnoreVariantCourse"];
+	        this.Locale = source["Locale"];
 	    }
 	}
 

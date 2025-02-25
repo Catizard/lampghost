@@ -31,6 +31,7 @@ func init() {
 	viper.SetDefault("InternalServerPort", 7391)
 	viper.SetDefault("FolderSymbol", "")
 	viper.SetDefault("IgnoreVariantCourse", 0)
+	viper.SetDefault("Locale", "en")
 	viper.SafeWriteConfig()
 	// Create the directory if it's not exist
 	_, err = os.Stat(WorkingDirectory)
@@ -53,6 +54,7 @@ type ApplicationConfig struct {
 	InternalServerPort  int32
 	FolderSymbol        string
 	IgnoreVariantCourse int32
+	Locale              string
 }
 
 func ReadConfig() (*ApplicationConfig, error) {
@@ -67,6 +69,7 @@ func ReadConfig() (*ApplicationConfig, error) {
 		InternalServerPort:  viper.GetInt32("InternalServerPort"),
 		FolderSymbol:        viper.GetString("FolderSymbol"),
 		IgnoreVariantCourse: viper.GetInt32("IgnoreVariantCourse"),
+		Locale:              viper.GetString("Locale"),
 	}, nil
 }
 
@@ -78,6 +81,7 @@ func (c *ApplicationConfig) WriteConfig() error {
 	viper.Set("InternalServerPort", c.InternalServerPort)
 	viper.Set("FolderSymbol", c.FolderSymbol)
 	viper.Set("IgnoreVariantCourse", c.IgnoreVariantCourse)
+	viper.Set("Locale", c.Locale)
 	if err := viper.WriteConfig(); err != nil {
 		return err
 	}

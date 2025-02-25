@@ -13,6 +13,11 @@
       <n-h2>
         通用设置
         <n-p>
+          <n-form-item label="语言设置">
+            <n-select v-model:value="model.Locale" :options="localeOptions" style="width: 150px;" />
+          </n-form-item>
+        </n-p>
+        <n-p>
           <n-form-item>
             <template #label>
               <n-tooltip trigger="hover">
@@ -108,6 +113,16 @@ import { ReadConfig, WriteConfig } from '@wailsjs/go/controller/ConfigController
 import { config } from '../../../wailsjs/go/models';
 
 const notification = useNotification();
+const localeOptions: Array<SelectOption> = [
+  {
+    label: "English",
+    value: "en",
+  },
+  {
+    label: "中文",
+    value: "zh-CN"
+  }
+]
 const formRef = ref<FormInst | null>(null);
 const model = ref<config.ApplicationConfig>({
   InternalServerPort: null,
@@ -116,7 +131,8 @@ const model = ref<config.ApplicationConfig>({
   SongdataFilePath: null,
   ScoreFilePath: null,
   FolderSymbol: null,
-  IgnoreVariantCourse: null
+  IgnoreVariantCourse: null,
+  Locale: null,
 });
 const loading = ref(false);
 const yesnoOptions: Array<SelectOption> = [

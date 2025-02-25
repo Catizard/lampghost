@@ -1,20 +1,20 @@
 <template>
   <n-h1 prefix="bar" style="text-align: start;">
     <n-text type="primary">
-      也许是玩家信息
+      {{ t('infoTitle') }}
     </n-text>
   </n-h1>
   <n-grid :cols="12">
     <n-gi :span="4">
       <n-flex>
-        你是?: {{ playerData.playerName }}
+        {{ t('playerInfo.name') }}: {{ playerData.playerName }}
         <n-divider />
-        玩了多少次: {{ playerData.playCount }}
+        {{ t('playerInfo.count') }}: {{ playerData.playCount }}
         <n-divider />
-        最后同步时间 : {{ playerData.lastUpdate }}
+        {{ t('playerInfo.lastSyncTime') }}: {{ playerData.lastUpdate }}
         <n-divider />
         <n-button @click="handleSyncClick" :loading="syncLoading">
-          同步最新存档数据,大概
+          {{ t('button.sync') }}
         </n-button>
       </n-flex>
     </n-gi>
@@ -22,7 +22,7 @@
       <n-grid :cols="12">
         <n-gi :span="4">
           <n-dropdown trigger="hover" :options="playCountChartYearOptions" @select="handleSelect">
-            <n-button>选择年份</n-button>
+            <n-button>{{ t('button.chooseYear') }}</n-button>
           </n-dropdown>
         </n-gi>
       </n-grid>
@@ -33,7 +33,7 @@
   <n-divider />
   <n-h1 prefix="bar" style="text-align: start;">
     <n-text type="primary">
-      报告,我是点灯信息
+      {{ t('lampStatusTitle') }}
     </n-text>
   </n-h1>
   <n-grid :cols="12" min-height="600px">
@@ -59,6 +59,10 @@ import { FindDiffTableHeaderList } from '../../wailsjs/go/controller/DiffTableCo
 import { useNotification } from 'naive-ui';
 import dayjs from 'dayjs';
 import router from '../router';
+import { useI18n } from 'vue-i18n';
+
+const i18n = useI18n();
+const { t } = i18n;
 
 const LAMPS = [1, 4, 5, 11, 0];
 const STR_LAMPS = ["FAILED", "Easy", "Normal", "Hard+", "NO_PLAY"];
@@ -80,7 +84,7 @@ const playCountChartOptions = ref({
   },
   series: [
     {
-      name: "游玩次数",
+      name: t('playerInfo.count'),
       data: [],
     }
   ],
@@ -121,9 +125,6 @@ const lampCountChartOptions = reactive({
       columnHeight: '100%',
     },
   },
-  title: {
-    text: '我觉得我是当前难度表的进度'
-  },
   xaxis: {
     categories: [],
   },
@@ -141,8 +142,8 @@ const lampCountChartOptions = reactive({
 });
 
 const playerData = reactive({
-  playerName: "Catizard",
-  playCount: 114514,
+  playerName: "U",
+  playCount: 0,
   lastUpdate: "",
 });
 
@@ -154,7 +155,7 @@ function initUser() {
   QueryMainUser().then(result => {
     if (result.Code != 200) {
       notification.error({
-        content: "没有主用户，请先录入你自己的存档信息",
+        content: t('message.noMainUserError'),
         duration: 3000,
       });
       router.push("/initialize")
@@ -183,7 +184,7 @@ function initUser() {
     }).then(result => {
       if (result == null) {
         // TODO: 正确地显示无数据的情况
-        return Promise.reject("目前无法处理一个难度表都没有的情况，请至少先加入一个数据")
+        return Promise.reject(t('message.noTableError'))
       }
       QueryUserInfoWithLevelLayeredDiffTableLampStatus(mainUser.ID, result.ID).then(result => {
         if (result.Code != 200) {
@@ -199,12 +200,10 @@ function initUser() {
           return Promise.reject(result.Msg)
         }
         const { Rows } = result;
-        console.log(Rows);
         playCountChartOptions.value.series[0].data = [...Rows];
       }).catch(err => {
-        console.log('error: ', err)
         notification.error({
-          content: "获取用户数据失败: " + err,
+          content: t('message.loadUserDataErrorPrefix') + err,
           duration: 3000,
           keepAliveOnHover: true
         })
@@ -290,12 +289,12 @@ function handleSyncClick() {
     }
     syncLoading.value = false;
     notification.success({
-      content: "同步成功",
+      content: t('message.reloadSuccess'),
       duration: 3000,
     });
   }).catch(err => {
     notification.error({
-      content: "同步数据失败, 错误结果: " + err,
+      content: t('message.reloadFailedPrefix') + err,
       duration: 3000,
       keepAliveOnHover: true,
     });
@@ -305,13 +304,60 @@ function handleSyncClick() {
 
 function handleSelect() {
   notification.error({
-    content: "噢，不好意思，这个功能还没实现",
+    content: t('message.unfinishedFeature'),
     duration: 3000,
   });
 }
 
 initUser();
 </script>
+
+<i18n>
+{
+  "en": {
+    "infoTitle": "Player Info",
+    "playerInfo": {
+      "name": "Player Name",
+      "count": "Player Count",
+      "lastSyncTime": "Last Sync Time",
+    },
+    "button": {
+      "sync": "Reload Save File",
+      "chooseYear": "Choose Year",
+    },
+    "lampStatusTitle": "Lamp Status",
+    "message": {
+      "noMainUserError": "Found no main user, please first load your save file in",
+      "noTableError": "Cannot handle no difficult table data currenlty, please add at least one table first",
+      "loadUserDataErrorPrefix": "Cannot load user data: ",
+      "reloadSuccess": "Successfully reloaded",
+      "reloadFailedPrefix": "Failed to load save file, error message: ",
+      "unfinishedFeature": "Sorry, haven't implemented yet"
+    }
+  },
+  "zh-CN": {
+    "infoTitle": "玩家信息",
+    "playerInfo": {
+      "name": "玩家名称",
+      "count": "游玩次数",
+      "lastSyncTime": "最后同步时间",
+    },
+    "button": {
+      "sync": "同步最新存档",
+      "chooseYear": "选择年份",
+    },
+    "lampStatusTitle": "点灯情况",
+    "message": {
+      "noMainUserError": "找不到主用户信息，请先导入你自己的存档",
+      "noTableError": "目前无法处理一个难度表都没有的情况，请至少先添加一个难度表",
+      "loadUserDataErrorPrefix": "获取用户信息失败: ",
+      "reloadSuccess": "同步成功",
+      "reloadFailedPrefix": "同步失败，返回结果: ",
+      "unfinishedFeature": "不好意思，这个功能还没实现"
+    }
+  },
+}
+</i18n>
 
 <style scoped>
 .n-button {

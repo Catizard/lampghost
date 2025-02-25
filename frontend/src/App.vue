@@ -2,6 +2,7 @@
 import { ReadConfig } from '@wailsjs/go/controller/ConfigController';
 import { Provider, Viewer } from './components';
 import { useI18n } from 'vue-i18n';
+import { ref } from 'vue';
 
 const i18n = useI18n();
 
@@ -11,8 +12,7 @@ ReadConfig()
       // Should we report this?
       return;
     }
-    i18n.locale = result.Data.Locale
-    console.log('i18n.locale = ', i18n.locale);
+    i18n.locale = ref(result.Data.Locale);
   })
 </script>
 

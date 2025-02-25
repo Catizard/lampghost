@@ -13,7 +13,7 @@
       <n-h2>
         通用设置
         <n-p>
-          <n-form-item label="语言设置">
+          <n-form-item label="语言设置(重启后生效)">
             <n-select v-model:value="model.Locale" :options="localeOptions" style="width: 150px;" />
           </n-form-item>
         </n-p>
@@ -111,7 +111,9 @@ import {
 } from '@vicons/ionicons5';
 import { ReadConfig, WriteConfig } from '@wailsjs/go/controller/ConfigController';
 import { config } from '../../../wailsjs/go/models';
+import { useI18n } from 'vue-i18n';
 
+const i18n = useI18n();
 const notification = useNotification();
 const localeOptions: Array<SelectOption> = [
   {
@@ -157,7 +159,7 @@ function handleSaveSettings() {
         content: "保存成功",
         duration: 3000,
         keepAliveOnHover: false
-      })
+      });
     }).catch(err => {
       notification.error({
         content: err,

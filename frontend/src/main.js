@@ -21,6 +21,7 @@ const i18n = createI18n({
 	locale: "en",
 	fallbackLocale: "en",
 });
+
 app.use(i18n);
 
 app.mount('#app')

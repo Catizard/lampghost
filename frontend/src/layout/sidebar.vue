@@ -1,5 +1,5 @@
 <template>
-	<n-layout-sider bordered show-trigger collapse-mode="width" :collapsed-width="64" :width="240"
+	<n-layout-sider bordered show-trigger collapse-mode="width" :collapsed-width="64" :width="190"
 		:native-scrollbar="false" :inverted="inverted">
 		<n-menu :inverted="inverted" :collapsed-width="64" :collapsed-icon-size="22" :options="menuOptions"
 			defaultValue="home" />
@@ -125,7 +125,7 @@ const menuOptions: MenuOption[] = [
 	height: 32px;
 }
 
-:deep(.n-menu > .n-menu-item:last-child) { 
+:deep(.n-menu > .n-menu-item:last-child) {
 	position: absolute;
 	bottom: 10px;
 	width: 100%;

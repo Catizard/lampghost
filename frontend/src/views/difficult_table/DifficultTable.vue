@@ -63,7 +63,7 @@ function createColumns({
     { title: t('column.name'), key: "Name", },
     { title: t('column.url'), key: "HeaderUrl", },
     {
-      title: t('actions'),
+      title: t('column.actions'),
       key: "actions",
       render(row) {
         return h(
@@ -184,7 +184,7 @@ function notifyError(msg: string) {
       "positiveText": "add",
       "negativeText": "cancel",
       "labelAddress": "Address",
-      "placeholderAddress": "Input address",
+      "placeholderAddress": "Input address"
     },
     "rules": {
       "missingAddress": "Please input address"
@@ -197,12 +197,12 @@ function notifyError(msg: string) {
     "deleteDialog": {
       "title": "Confirm to delete?",
       "positiveText": "Yes",
-      "negativeText": "No",
+      "negativeText": "No"
     },
     "message": {
       "addTableFailedPrefix": "Failed to add table, error message: ",
       "deleteSuccess": "Deleted successfully",
-      "loadTableDataFailedPrefix": "Failed to load table, error message: ",
+      "loadTableDataFailedPrefix": "Failed to load table, error message: "
     }
   },
   "zh-CN": {
@@ -216,7 +216,7 @@ function notifyError(msg: string) {
       "positiveText": "新增",
       "negativeText": "取消",
       "labelAddress": "地址",
-      "placeholderAddress": "请输入地址",
+      "placeholderAddress": "请输入地址"
     },
     "rules": {
       "missingAddress": "请输入地址"
@@ -229,12 +229,12 @@ function notifyError(msg: string) {
     "deleteDialog": {
       "title": "确定要删除吗？",
       "positiveText": "是",
-      "negativeText": "否",
+      "negativeText": "否"
     },
     "message": {
       "addTableFailedPrefix": "新增难度表失败，错误信息: ",
       "deleteSuccess": "删除成功",
-      "loadTableDataFailedPrefix": "读取难度表信息失败, 错误信息: ",
+      "loadTableDataFailedPrefix": "读取难度表信息失败, 错误信息: "
     }
-  },
+  }
 }</i18n>

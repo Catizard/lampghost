@@ -2,31 +2,24 @@
 	<perfect-scrollbar>
 		<n-flex justify="space-between">
 			<n-h1 prefix="bar" style="text-align: left">
-				<n-text type="primary">收藏夹管理</n-text>
+				<n-text type="primary">{{ t('title') }}</n-text>
 			</n-h1>
 			<n-flex justify="end">
-				<n-button type="primary" @click="showAddModal = true">新增收藏夹</n-button>
-				<n-button type="primary" @click="showJsonModal = true">生成JSON</n-button>
-				<n-button type="error" @click="handleClickSync">同步数据</n-button>
+				<n-button type="primary" @click="showAddModal = true">{{ t('button.addFolder') }}</n-button>
 			</n-flex>
 		</n-flex>
-		<n-data-table :columns="columns" :data="data" :pagination="pagination" :bordered="false" />
+		<n-data-table :columns="columns" :data="data" :pagination="pagination" :bordered="false"
+			:row-key="(row: dto.FolderDto) => row.ID" />
 	</perfect-scrollbar>
 
-	<n-modal v-model:show="showAddModal" preset="dialog" title="新增收藏夹" positive-text="新增" negative-text="取消"
+	<n-modal v-model:show="showAddModal" preset="dialog" :title="t('modal.title')"
+		:positive-text="t('modal.positiveText')" :negative-text="t('modal.negativeText')"
 		@positive-click="handlePositiveClick" @negative-click="handleNegativeClick" :mask-closable="false">
 		<n-form ref="formRef" :model="formData" :rules="rules">
-			<n-form-item label="名称" path="name">
-				<n-input v-model:value="formData.name" placeholder="输入名称" />
+			<n-form-item :label="t('form.labelName')" path="name">
+				<n-input v-model:value="formData.name" :placeholder="t('form.placeholderName')" />
 			</n-form-item>
 		</n-form>
-	</n-modal>
-
-	<n-modal v-model:show="showJsonModal">
-		<n-card style="width: 80%" :boarded="false" size="huge" role="dialog" aria-modal="true" closable
-			@close="() => { showJsonModal = false; }" :loading="jsonGenerateLoading">
-			<pre>{{ folderJsonCode }}</pre>
-		</n-card>
 	</n-modal>
 </template>
 
@@ -49,21 +42,22 @@ import {
 	QueryFolderDefinition,
 	SyncSongData,
 } from "@wailsjs/go/controller/FolderController";
+import { useI18n } from "vue-i18n";
 
+const i18n = useI18n();
+const { t } = i18n;
 const notification = useNotification();
 const dialog = useDialog();
 
 const showAddModal = ref(false);
-const showJsonModal = ref(false);
-const jsonGenerateLoading = ref(false);
 const pagination = false as const;
 let data: Ref<Array<any>> = ref([]);
 const columns = createColumns({
 	deleteFolder(row: any) {
 		dialog.warning({
-			title: "确定要删除么?",
-			positiveText: "确定",
-			negativeText: "取消",
+			title: t('message.confirmToDelete'),
+			positiveText: t('dialog.positiveText'),
+			negativeText: t('dialog.negativeText'),
 			onPositiveClick: () => {
 				deleteFolder(row.ID);
 			},
@@ -73,16 +67,15 @@ const columns = createColumns({
 const folderContentColumns = createContentColumns({
 	deleteFolderContent(row: any) {
 		dialog.warning({
-			title: "确定要删除么?",
-			positiveText: "确定",
-			negativeText: "取消",
+			title: t('message.confirmToDelete'),
+			positiveText: t('dialog.positiveText'),
+			negativeText: t('dialog.negativeText'),
 			onPositiveClick: () => {
 				deleteFolderContent(row.ID);
 			},
 		});
 	},
 });
-const folderJsonCode = ref("");
 
 const formRef = ref<FormInst | null>(null);
 const formData = ref({
@@ -91,7 +84,7 @@ const formData = ref({
 const rules = {
 	name: {
 		required: true,
-		message: "请输入名称",
+		message: t('message.missingName'),
 		trigger: ["input", "blur"],
 	},
 };
@@ -115,9 +108,9 @@ function createColumns({
 				});
 			},
 		},
-		{ title: "Folder Name", key: "FolderName" },
+		{ title: t('column.name'), key: "FolderName" },
 		{
-			title: "Action",
+			title: t('column.actions'),
 			key: "actions",
 			render(row) {
 				return h(
@@ -128,7 +121,7 @@ function createColumns({
 						size: "small",
 						onClick: () => deleteFolder(row),
 					},
-					{ default: () => "删除" },
+					{ default: () => t('button.delete') },
 				);
 			},
 		},
@@ -141,9 +134,9 @@ function createContentColumns({
 	deleteFolderContent: (row: dto.FolderContentDto) => void;
 }): DataTableColumns<dto.FolderContentDto> {
 	return [
-		{ title: "Name", key: "Title" },
+		{ title: t('contentColumn.name'), key: "Title" },
 		{
-			title: "Action",
+			title: t('contentColumn.actions'),
 			key: "actions",
 			render(row) {
 				return h(
@@ -154,7 +147,7 @@ function createContentColumns({
 						size: "small",
 						onClick: () => deleteFolderContent(row),
 					},
-					{ default: () => "删除" },
+					{ default: () => t('button.delete') },
 				);
 			},
 		},
@@ -167,11 +160,10 @@ function addFolder(name: string) {
 			if (result.Code != 200) {
 				return Promise.reject(result.Msg);
 			}
-			notifySuccess("新增收藏夹成功: " + result.Msg);
 			loadFolderData();
 		})
 		.catch((err) => {
-			notifyError("新增收藏家失败: " + err);
+			notifyError(t('message.addFolderFailedPrefix') + err);
 			loadFolderData();
 		});
 }
@@ -182,7 +174,7 @@ function deleteFolder(id: number) {
 			if (result.Code != 200) {
 				return Promise.reject(result.Msg);
 			}
-			notifySuccess("删除成功");
+			notifySuccess(t('message.deleteSuccess'));
 			loadFolderData();
 		})
 		.catch((err) => {
@@ -197,7 +189,7 @@ function deleteFolderContent(id: number) {
 			if (result.Code != 200) {
 				return Promise.reject(result.Msg);
 			}
-			notifySuccess("删除成功");
+			notifySuccess(t('message.deleteSuccess'));
 			loadFolderData();
 		})
 		.catch((err) => {
@@ -212,15 +204,10 @@ function loadFolderData() {
 			if (result.Code != 200) {
 				return Promise.reject(result.Msg);
 			}
-			data.value = [...result.Rows].map((row) => {
-				return {
-					key: row.ID,
-					...row,
-				};
-			});
+			data.value = [...result.Rows];
 		})
 		.catch((err) => {
-			notifyError("读取收藏夹数据出错:" + err);
+			notifyError(t('message.loadFolderDataFailedPrefix') + err);
 		});
 }
 
@@ -239,21 +226,6 @@ function handleNegativeClick() {
 	formData.value.name = "";
 }
 
-function generateJson() {
-	jsonGenerateLoading.value = true;
-	QueryFolderDefinition()
-		.then(result => {
-			if (result.Code != 200) {
-				return Promise.reject(result.Msg);
-			}
-			jsonGenerateLoading.value = false;
-			folderJsonCode.value = JSON.stringify(result.Rows, null, "\t");
-		}).catch(err => {
-			notifyError("生成json失败: " + err)
-			jsonGenerateLoading.value = false;
-		})
-}
-
 function notifySuccess(msg: string) {
 	notification.success({
 		content: msg,
@@ -269,32 +241,77 @@ function notifyError(msg: string) {
 		keepAliveOnHover: true,
 	});
 }
-
-function handleClickSync() {
-	dialog.warning({
-		title: "警告",
-		content: "该操作会直接修改你在本地的songdata.db文件, 移除已有的所有配置(包括你在游戏中自行设置的favorite和invisible)并重新应用当前的收藏夹配置。该操作不可逆, 请在操作前对你的数据进行备份!",
-		positiveText: "确定",
-		negativeText: "取消",
-		onPositiveClick: () => {
-			SyncSongData().then(result => {
-				if (result.Code != 200) {
-					return Promise.reject(result.Msg)
-				}
-				notifySuccess("更新成功, 后台返回:" + result.Msg)
-			}).catch(err => {
-				notifyError("更新失败, 后台返回:" + err)
-			})
-		},
-		onNegativeClick: () => {
-			// do nothing
-		}
-	})
-}
-
-watch(showJsonModal, (newValue, oldValue) => {
-	if (newValue == true) {
-		generateJson();
-	}
-});
 </script>
+
+<i18n lang="json">{
+	"en": {
+		"title": "Folder Management",
+		"button": {
+			"addFolder": "Add Folder",
+			"delete": "Delete"
+		},
+		"modal": {
+			"title": "New folder",
+			"positiveText": "Submit",
+			"negativeText": "Cancel"
+		},
+		"form": {
+			"labelName": "Name",
+			"placeholderName": "Input name"
+		},
+		"column": {
+			"name": "Folder Name",
+			"actions": "Actions"
+		},
+		"contentColumn": {
+			"name": "Title",
+			"actions": "Actions"
+		},
+		"message": {
+			"addFolderFailedPrefix": "Failed to add folder, error message: ",
+			"deleteSuccess": "Delete successfully",
+			"confirmToDelete": "Do you really want to delete this content?",
+			"missingName": "Please input name",
+			"loadFolderDataFailedPrefix": "Failed to load folder data, error message: "
+		},
+		"dialog": {
+			"positiveText": "Yes",
+			"negativeText": "Cancel"
+		}
+	},
+	"zh-CN": {
+		"title": "收藏夹管理",
+		"button": {
+			"addFolder": "新增收藏夹",
+			"delete": "删除"
+		},
+		"modal": {
+			"title": "新增收藏夹",
+			"positiveText": "提交",
+			"negativeText": "取消"
+		},
+		"form": {
+			"labelName": "名称",
+			"placeholderName": "请输入名称"
+		},
+		"column": {
+			"name": "收藏夹名称",
+			"actions": "操作"
+		},
+		"contentColumn": {
+			"name": "谱名",
+			"actions": "操作"
+		},
+		"message": {
+			"addFolderFailedPrefix": "新增收藏夹失败，错误信息: ",
+			"deleteSuccess": "删除成功",
+			"confirmToDelete": "确定删除吗？",
+			"missingName": "请输入名称",
+			"loadFolderDataFailedPrefix": "读取收藏夹信息失败，错误信息: "
+		},
+		"dialog": {
+			"positiveText": "确定",
+			"negativeText": "取消"
+		}
+	}
+}</i18n>

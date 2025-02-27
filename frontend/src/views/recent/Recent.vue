@@ -2,13 +2,12 @@
   <perfect-scrollbar>
     <n-flex justify="space-between">
       <n-h1 prefix="bar" style="text-align: start;">
-        <n-text type="primary">Recent Records</n-text>
+        <n-text type="primary">{{ t('title') }}</n-text>
       </n-h1>
       <n-flex justify="end">
-        <n-button>choose clear type</n-button>
-        <n-button>minimum clear type</n-button>
+        <n-button>{{ t('button.chooseClearType') }}</n-button>
+        <n-button>{{ t('button.minimumClearType') }}</n-button>
       </n-flex>
-
       <n-data-table remote :columns="columns" :data="data" :pagination="pagination" :bordered="false" :loading="loading"
         :row-key="row => row.ID" />
     </n-flex>
@@ -25,27 +24,29 @@ import { h, onMounted, reactive, Ref, ref } from 'vue';
 import SelectFolder from '../folder/SelectFolder.vue';
 import { BindRivalSongDataToFolder } from '@wailsjs/go/controller/RivalSongDataController';
 import { dto } from '@wailsjs/go/models';
+import { useI18n } from 'vue-i18n';
 
+const i18n = useI18n();
+const { t } = i18n;
 const notification = useNotification();
 const loading = ref<boolean>(false);
 const showFolderSelection = ref<boolean>(false);
 const candidateSongDataID = ref<number>(null);
 
 function handleSubmit(selected: [any]) {
-  console.log('ID=', candidateSongDataID.value)
   BindRivalSongDataToFolder(candidateSongDataID.value, selected)
     .then(result => {
       if (result.Code != 200) {
         return Promise.reject(result.Msg);
       }
       notification.success({
-        content: "添加成功",
+        content: t('message.bindSuccess'),
         duration: 5000,
         keepAliveOnHover: true
       });
     }).catch((err) => {
       notification.error({
-        content: "添加至收藏夹失败:" + err,
+        content: t('message.bindFailedPrefix') + err,
         duration: 5000,
         keepAliveOnHover: true
       });
@@ -59,10 +60,10 @@ function handleAddToFolder(ID: number) {
 
 function createColumns(): DataTableColumns<dto.RivalScoreLogDto> {
   return [
-    { title: "Song Name", key: "Title", resizable: true },
-    { title: "Tag", key: "Tag", minWidth: "100px", resizable: true },
+    { title: t('column.name'), key: "Title", resizable: true },
+    { title: t('column.tag'), key: "Tag", minWidth: "100px", resizable: true },
     {
-      title: "Clear", key: "Clear", minWidth: "100px", resizable: true,
+      title: t('column.clear'), key: "Clear", minWidth: "100px", resizable: true,
       render(row) {
         return h(
           ClearTag,
@@ -73,9 +74,9 @@ function createColumns(): DataTableColumns<dto.RivalScoreLogDto> {
         )
       }
     },
-    { title: "Time", key: "RecordTime", minWidth: "100px", resizable: true },
+    { title: t('time'), key: "RecordTime", minWidth: "100px", resizable: true },
     {
-      title: "Action",
+      title: t('actions'),
       key: "actions",
       resizable: true,
       minWidth: "150px",
@@ -88,7 +89,7 @@ function createColumns(): DataTableColumns<dto.RivalScoreLogDto> {
             size: "small",
             onClick: () => handleAddToFolder(row.RivalSongDataID),
           },
-          { default: () => "Add to Folder" }
+          { default: () => t('addToFolder') }
         )
       }
     }
@@ -115,7 +116,7 @@ function loadData() {
     })
     .catch(err => {
       notification.error({
-        content: "读取最近游玩记录出错:" + err,
+        content: t('message.loadRecentRecordFailedPrefix') + err,
         duration: 3000,
         keepAliveOnHover: true
       });
@@ -147,3 +148,46 @@ onMounted(() => {
   loadData();
 })
 </script>
+
+<i18n lang="json">{
+  "en": {
+    "title": "Recent Record",
+    "button": {
+      "chooseClearType": "Choose Clear Type",
+      "minimumClearType": "Minimum Clear Type",
+      "addToFolder": "Add to Folder"
+    },
+    "column": {
+      "name": "Song Name",
+      "tag": "Tag",
+      "clear": "Clear",
+      "time": "Record Time",
+      "actions": "Actions"
+    },
+    "message": {
+      "loadRecentRecordFailedPrefix": "Load recent records failed, error message: ",
+      "bindSuccess": "Bind successfully",
+      "bindFailedPrefix": "Failed to bind song to folder, error message: "
+    }
+  },
+  "zh-CN": {
+    "title": "最近游玩记录",
+    "button": {
+      "chooseClearType": "筛选点灯记录",
+      "minimumClearType": "筛选最小灯记录",
+      "addToFolder": "添加至收藏夹"
+    },
+    "column": {
+      "name": "谱名",
+      "tag": "标签",
+      "clear": "点灯",
+      "time": "记录时间",
+      "actions": "操作"
+    },
+    "message": {
+      "loadRecentRecordFailedPrefix": "Load recent records failed, error message: ",
+      "bindSucess": "绑定成功",
+      "bindFailedPrefix": "绑定失败, 错误信息: "
+    }
+  }
+}</i18n>

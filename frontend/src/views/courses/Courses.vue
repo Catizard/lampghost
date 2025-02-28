@@ -1,7 +1,7 @@
 <template>
   <perfect-scrollbar>
     <n-h1 prefix="bar" style="text-align: left;">
-      <n-text type="primary">courses</n-text>
+      <n-text type="primary">{{ t('title') }}</n-text>
     </n-h1>
     <n-data-table :columns="columns" :data="data" :pagination="pagination" :bordered="false" />
   </perfect-scrollbar>
@@ -14,7 +14,10 @@ import { ref, h } from 'vue';
 import { FindCourseInfoListWithRival } from '@wailsjs/go/controller/CourseInfoController';
 import ClearTag from "@/components/ClearTag.vue"
 import * as dayjs from 'dayjs'
+import { useI18n } from 'vue-i18n';
 
+const i18n = useI18n();
+const { t } = i18n;
 const notification = useNotification();
 
 const columns = createColumns();
@@ -23,10 +26,10 @@ let data = ref<Array<dto.CourseInfoDto>>([]);
 
 function createColumns(): DataTableColumns<dto.CourseInfoDto> {
   return [
-    { title: "Name", key: "Name", },
-    { title: "Constraints", key: "Constraints" },
+    { title: t('column.name'), key: "Name", },
+    { title: t('column.constraints'), key: "Constraints" },
     {
-      title: "Clear",
+      title: t('column.clear'),
       key: "Clear",
       render(row) {
         return h(
@@ -38,7 +41,7 @@ function createColumns(): DataTableColumns<dto.CourseInfoDto> {
       }
     },
     {
-      title: "First Clear",
+      title: t('column.firstClearTime'),
       key: "FirstClearTime",
       render(row: dto.CourseInfoDto) {
         if (row.Clear > 1) {
@@ -70,3 +73,24 @@ function loadData() {
 
 loadData();
 </script>
+
+<i18n lang="json">{
+  "en": {
+    "title": "Courses",
+    "column": {
+      "name": "Name",
+      "constraints": "Constraints",
+      "clear": "Clear",
+      "firstClearTime": "First Clear"
+    }
+  },
+  "zh-CN": {
+    "title": "段位",
+    "column": {
+      "name": "名称",
+      "constraints": "限制",
+      "clear": "点灯",
+      "firstClearTime": "首次过段"
+    }
+  }
+}</i18n>

@@ -280,19 +280,19 @@ watch(currentRivalID, (newID: number) => {
       "count": "Play Count",
       "clear": "Clear",
       "ghost": "Ghost",
-      "actions": "Actions",
+      "actions": "Actions"
     },
     "message": {
       "noTableError": "Cannot handle no difficult table data currenlty, please add at least one table first",
       "tableNotFoundError": "FATAL ERROR: cannot load table data?",
       "duplicateTableError": "FATAL ERROR: table data is duplicated?",
-      "noRivalError": "FATAL ERROR: cannot find at least one rival?",
+      "noRivalError": "FATAL ERROR: cannot find at least one rival?"
     },
     "button": {
-      "addToFolder": "Add to Folder",
+      "addToFolder": "Add to Folder"
     },
     "placeHolderRival": "Choose Rival",
-    "placeHolderRivalTag": "Choose Rival Tag",
+    "placeHolderRivalTag": "Choose Rival Tag"
   },
   "zh-CN": {
     "title": "难度表得分",
@@ -302,18 +302,18 @@ watch(currentRivalID, (newID: number) => {
       "count": "游玩次数",
       "clear": "点灯",
       "ghost": "影子灯",
-      "actions": "操作",
+      "actions": "操作"
     },
     "message": {
       "noTableError": "目前无法处理一个难度表都没有的情况，请至少先添加一个难度表",
       "tableNotFoundError": "未知错误: 无法读取难度表数据?",
       "duplicateTableError": "未知错误: 难度表重复?",
-      "noRivalError": "未知错误: 无玩家信息?",
+      "noRivalError": "未知错误: 无玩家信息?"
     },
     "button": {
-      "addToFolder": "添加至收藏夹",
+      "addToFolder": "添加至收藏夹"
     },
     "placeHolderRival": "选择对比玩家",
-    "placeHolderRivalTag": "选择对比玩家的标签",
-  },
+    "placeHolderRivalTag": "选择对比玩家的标签"
+  }
 }</i18n>

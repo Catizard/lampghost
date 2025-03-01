@@ -1,13 +1,17 @@
 package entity
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type RivalTag struct {
 	gorm.Model
-	RivalId   uint
-	TagName   string
-	Generated bool
-	Timestamp int64
+	RivalId    uint
+	TagName    string
+	Generated  bool
+	RecordTime time.Time
 }
 
 func (RivalTag) TableName() string {

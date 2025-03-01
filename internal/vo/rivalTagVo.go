@@ -1,6 +1,8 @@
 package vo
 
 import (
+	"time"
+
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"gorm.io/gorm"
 )
@@ -8,10 +10,10 @@ import (
 type RivalTagVo struct {
 	gorm.Model
 
-	RivalId   uint
-	TagName   string
-	Generated bool
-	Timestamp int64
+	RivalId    uint
+	TagName    string
+	Generated  bool
+	RecordTime time.Time
 }
 
 func NewRivalTagVo(rivalTag *entity.RivalTag) *RivalTagVo {
@@ -22,10 +24,10 @@ func NewRivalTagVo(rivalTag *entity.RivalTag) *RivalTagVo {
 			UpdatedAt: rivalTag.UpdatedAt,
 			DeletedAt: rivalTag.DeletedAt,
 		},
-		RivalId:   rivalTag.RivalId,
-		TagName:   rivalTag.TagName,
-		Generated: rivalTag.Generated,
-		Timestamp: rivalTag.Timestamp,
+		RivalId:    rivalTag.RivalId,
+		TagName:    rivalTag.TagName,
+		Generated:  rivalTag.Generated,
+		RecordTime: rivalTag.RecordTime,
 	}
 }
 
@@ -37,9 +39,9 @@ func (rivalTag *RivalTagVo) Entity() *entity.RivalTag {
 			UpdatedAt: rivalTag.UpdatedAt,
 			DeletedAt: rivalTag.DeletedAt,
 		},
-		RivalId:   rivalTag.RivalId,
-		TagName:   rivalTag.TagName,
-		Generated: rivalTag.Generated,
-		Timestamp: rivalTag.Timestamp,
+		RivalId:    rivalTag.RivalId,
+		TagName:    rivalTag.TagName,
+		Generated:  rivalTag.Generated,
+		RecordTime: rivalTag.RecordTime,
 	}
 }

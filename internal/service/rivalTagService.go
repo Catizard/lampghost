@@ -3,6 +3,7 @@ package service
 import (
 	"sort"
 	"strconv"
+	"time"
 
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
@@ -107,10 +108,10 @@ func (s *RivalTagService) syncRivalTagFromRawData(tx *gorm.DB, rivalID uint, raw
 				continue
 			}
 			fct := entity.RivalTag{
-				RivalId:   rivalID,
-				TagName:   courseInfoDto.Name + " First Clear",
-				Generated: true,
-				Timestamp: scoreLog.TimeStamp,
+				RivalId:    rivalID,
+				TagName:    courseInfoDto.Name + " First Clear",
+				Generated:  true,
+				RecordTime: time.Unix(scoreLog.TimeStamp, 0).Local(),
 			}
 			tags = append(tags, fct)
 			break

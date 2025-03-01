@@ -10,11 +10,10 @@ import (
 type RivalTagDto struct {
 	gorm.Model
 
-	RivalId   uint
-	TagName   string
-	Generated bool
-	Timestamp int64
-	TagTime   time.Time
+	RivalId    uint
+	TagName    string
+	Generated  bool
+	RecordTime time.Time
 }
 
 func NewRivalTagDto(rivalTag *entity.RivalTag) *RivalTagDto {
@@ -25,11 +24,10 @@ func NewRivalTagDto(rivalTag *entity.RivalTag) *RivalTagDto {
 			UpdatedAt: rivalTag.UpdatedAt,
 			DeletedAt: rivalTag.DeletedAt,
 		},
-		RivalId:   rivalTag.RivalId,
-		TagName:   rivalTag.TagName,
-		Generated: rivalTag.Generated,
-		Timestamp: rivalTag.Timestamp,
-		TagTime:   time.Unix(rivalTag.Timestamp, 0),
+		RivalId:    rivalTag.RivalId,
+		TagName:    rivalTag.TagName,
+		Generated:  rivalTag.Generated,
+		RecordTime: rivalTag.RecordTime,
 	}
 }
 
@@ -41,9 +39,9 @@ func (rivalTag *RivalTagDto) Entity() *entity.RivalTag {
 			UpdatedAt: rivalTag.UpdatedAt,
 			DeletedAt: rivalTag.DeletedAt,
 		},
-		RivalId:   rivalTag.RivalId,
-		TagName:   rivalTag.TagName,
-		Generated: rivalTag.Generated,
-		Timestamp: rivalTag.Timestamp,
+		RivalId:    rivalTag.RivalId,
+		TagName:    rivalTag.TagName,
+		Generated:  rivalTag.Generated,
+		RecordTime: rivalTag.RecordTime,
 	}
 }

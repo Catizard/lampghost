@@ -471,9 +471,8 @@ export namespace dto {
 	    RivalId: number;
 	    TagName: string;
 	    Generated: boolean;
-	    Timestamp: number;
 	    // Go type: time
-	    TagTime: any;
+	    RecordTime: any;
 	
 	    static createFrom(source: any = {}) {
 	        return new RivalTagDto(source);
@@ -488,8 +487,7 @@ export namespace dto {
 	        this.RivalId = source["RivalId"];
 	        this.TagName = source["TagName"];
 	        this.Generated = source["Generated"];
-	        this.Timestamp = source["Timestamp"];
-	        this.TagTime = this.convertValues(source["TagTime"], null);
+	        this.RecordTime = this.convertValues(source["RecordTime"], null);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -730,7 +728,8 @@ export namespace entity {
 	    RivalId: number;
 	    TagName: string;
 	    Generated: boolean;
-	    Timestamp: number;
+	    // Go type: time
+	    RecordTime: any;
 	
 	    static createFrom(source: any = {}) {
 	        return new RivalTag(source);
@@ -745,7 +744,7 @@ export namespace entity {
 	        this.RivalId = source["RivalId"];
 	        this.TagName = source["TagName"];
 	        this.Generated = source["Generated"];
-	        this.Timestamp = source["Timestamp"];
+	        this.RecordTime = this.convertValues(source["RecordTime"], null);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1030,7 +1029,10 @@ export namespace vo {
 	    RecordTime: any;
 	    Pagination?: entity.Page;
 	    OnlyCourseLogs: boolean;
-	    MaximumTimestamp: number;
+	    // Go type: time
+	    StartRecordTime: any;
+	    // Go type: time
+	    EndRecordTime: any;
 	
 	    static createFrom(source: any = {}) {
 	        return new RivalScoreLogVo(source);
@@ -1056,7 +1058,8 @@ export namespace vo {
 	        this.RecordTime = this.convertValues(source["RecordTime"], null);
 	        this.Pagination = this.convertValues(source["Pagination"], entity.Page);
 	        this.OnlyCourseLogs = source["OnlyCourseLogs"];
-	        this.MaximumTimestamp = source["MaximumTimestamp"];
+	        this.StartRecordTime = this.convertValues(source["StartRecordTime"], null);
+	        this.EndRecordTime = this.convertValues(source["EndRecordTime"], null);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1088,7 +1091,8 @@ export namespace vo {
 	    RivalId: number;
 	    TagName: string;
 	    Generated: boolean;
-	    Timestamp: number;
+	    // Go type: time
+	    RecordTime: any;
 	
 	    static createFrom(source: any = {}) {
 	        return new RivalTagVo(source);
@@ -1103,7 +1107,7 @@ export namespace vo {
 	        this.RivalId = source["RivalId"];
 	        this.TagName = source["TagName"];
 	        this.Generated = source["Generated"];
-	        this.Timestamp = source["Timestamp"];
+	        this.RecordTime = this.convertValues(source["RecordTime"], null);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

@@ -25,8 +25,10 @@ type RivalScoreLogVo struct {
 	// Pagination
 	Pagination *entity.Page
 	// Extra filter field
-	OnlyCourseLogs   bool
-	MaximumTimestamp int64
+	OnlyCourseLogs bool
+	// StartRecordTime <= RecordTime <= EndRecordTime
+	StartRecordTime time.Time
+	EndRecordTime   time.Time
 }
 
 func (rivalScoreLog *RivalScoreLogVo) Entity() *entity.RivalScoreLog {

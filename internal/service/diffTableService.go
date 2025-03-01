@@ -351,7 +351,7 @@ func (s *DiffTableService) QueryDiffTableDataWithRival(filter vo.DiffTableHeader
 			if err != nil {
 				return nil, 0, err
 			}
-			queryGhostScoreLogParam.MaximumTimestamp = tag.Timestamp
+			queryGhostScoreLogParam.EndRecordTime = tag.RecordTime
 		}
 		ghostScoreLogsMap, err := findRivalScoreLogSha256Map(s.db, queryGhostScoreLogParam)
 		if err != nil {

@@ -314,11 +314,11 @@ export namespace dto {
 	    OldCombo: number;
 	    Minbp: number;
 	    OldMinbp: number;
-	    Timestamp: number;
+	    // Go type: time
+	    RecordTime: any;
 	    Md5: string;
 	    RivalSongDataID: number;
 	    Title: string;
-	    RecordTime: string;
 	    Page: number;
 	    PageSize: number;
 	    PageCount: number;
@@ -344,11 +344,10 @@ export namespace dto {
 	        this.OldCombo = source["OldCombo"];
 	        this.Minbp = source["Minbp"];
 	        this.OldMinbp = source["OldMinbp"];
-	        this.Timestamp = source["Timestamp"];
+	        this.RecordTime = this.convertValues(source["RecordTime"], null);
 	        this.Md5 = source["Md5"];
 	        this.RivalSongDataID = source["RivalSongDataID"];
 	        this.Title = source["Title"];
-	        this.RecordTime = source["RecordTime"];
 	        this.Page = source["Page"];
 	        this.PageSize = source["PageSize"];
 	        this.PageCount = source["PageCount"];
@@ -1027,7 +1026,8 @@ export namespace vo {
 	    OldCombo: number;
 	    Minbp: number;
 	    OldMinbp: number;
-	    Timestamp: number;
+	    // Go type: time
+	    RecordTime: any;
 	    Pagination?: entity.Page;
 	    OnlyCourseLogs: boolean;
 	    MaximumTimestamp: number;
@@ -1053,7 +1053,7 @@ export namespace vo {
 	        this.OldCombo = source["OldCombo"];
 	        this.Minbp = source["Minbp"];
 	        this.OldMinbp = source["OldMinbp"];
-	        this.Timestamp = source["Timestamp"];
+	        this.RecordTime = this.convertValues(source["RecordTime"], null);
 	        this.Pagination = this.convertValues(source["Pagination"], entity.Page);
 	        this.OnlyCourseLogs = source["OnlyCourseLogs"];
 	        this.MaximumTimestamp = source["MaximumTimestamp"];

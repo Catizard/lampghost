@@ -25,6 +25,7 @@ import SelectFolder from '../folder/SelectFolder.vue';
 import { BindRivalSongDataToFolder } from '@wailsjs/go/controller/RivalSongDataController';
 import { dto, vo } from '@wailsjs/go/models';
 import { useI18n } from 'vue-i18n';
+import * as dayjs from 'dayjs';
 
 const i18n = useI18n();
 const { t } = i18n;
@@ -74,9 +75,14 @@ function createColumns(): DataTableColumns<dto.RivalScoreLogDto> {
         )
       }
     },
-    { title: t('time'), key: "RecordTime", minWidth: "100px", resizable: true },
     {
-      title: t('actions'),
+      title: t('column.time'), key: "RecordTime", minWidth: "100px", resizable: true,
+      render(row: dto.RivalScoreLogDto) {
+        return dayjs(row.RecordTime).format('YYYY-MM-DD HH:mm:ss');
+      }
+    },
+    {
+      title: t('column.actions'),
       key: "actions",
       resizable: true,
       minWidth: "150px",
@@ -89,7 +95,7 @@ function createColumns(): DataTableColumns<dto.RivalScoreLogDto> {
             size: "small",
             onClick: () => handleAddToFolder(row.RivalSongDataID),
           },
-          { default: () => t('addToFolder') }
+          { default: () => t('button.addToFolder') }
         )
       }
     }

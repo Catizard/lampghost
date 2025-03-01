@@ -2,7 +2,6 @@ package service
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/Catizard/lampghost_wails/internal/config"
 	"github.com/Catizard/lampghost_wails/internal/dto"
@@ -134,8 +133,7 @@ func (s *RivalInfoService) QueryUserPlayCountInYear(ID uint, yearNum int) ([]int
 		ret[i] = 0
 	}
 	for _, playLog := range playData {
-		date := time.Unix(playLog.Timestamp, 0)
-		ret[date.Month()-1]++
+		ret[playLog.RecordTime.Month()-1]++
 	}
 	return ret, nil
 }

@@ -45,12 +45,11 @@ func (s *RivalScoreLogService) QueryRivalScoreLogPageList(filter *vo.RivalScoreL
 func findRivalScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.RivalScoreLogDto, int, error) {
 	fields := `
 		rival_score_log.*,
-		datetime(rival_score_log.date, 'unixepoch') as record_time,
 		sd.title as title,
 		sd.md5 as md5,
 		sd.ID as rival_song_data_id
 	`
-	partial := tx.Model(&entity.RivalScoreLog{}).Order("rival_score_log.date desc").Select(fields)
+	partial := tx.Model(&entity.RivalScoreLog{}).Order("rival_score_log.record_time desc").Select(fields)
 	if filter != nil {
 		partial = partial.Where(filter.Entity())
 		// Extra filters
@@ -58,7 +57,7 @@ func findRivalScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.Riva
 			partial = partial.Where("length(rival_score_log.sha256) > 64")
 		}
 		if filter.MaximumTimestamp > 0 {
-			partial = partial.Where("rival_score_log.`date` <= ?", filter.MaximumTimestamp)
+			partial = partial.Where("rival_score_log.record_time <= ?", filter.MaximumTimestamp)
 		}
 	}
 	var out []*dto.RivalScoreLogDto

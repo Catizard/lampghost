@@ -27,7 +27,7 @@ const data = ref<dto.FolderDto[]>([]);
 const checkedRowKeysRef = ref<DataTableRowKey[]>([]);
 const columns: DataTableColumns<dto.FolderDto> = [
 	{ type: "selection" },
-	{ title: t('column.folderName'), key: "FolderName" }
+	{ title: t('column.name'), key: "FolderName" }
 ] as const;
 
 function reload() {

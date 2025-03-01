@@ -15,7 +15,7 @@
     @positive-click="handlePositiveClick" @negative-click="handleNegativeClick" :mask-closable="false">
     <n-form ref="formRef" :model="formData" :rules="rules">
       <n-form-item :label="t('modal.labelAddress')" path="url">
-        <n-input v-model:value="formData.url" :placeholder="t('modal.placeHolder')" />
+        <n-input v-model:value="formData.url" :placeholder="t('modal.placeholderAddress')" />
       </n-form-item>
     </n-form>
   </n-modal>

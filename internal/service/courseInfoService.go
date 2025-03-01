@@ -4,7 +4,6 @@ import (
 	"slices"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/Catizard/lampghost_wails/internal/config"
 	"github.com/Catizard/lampghost_wails/internal/dto"
@@ -121,11 +120,10 @@ func mergeRivalScoreLogToCourses(courses []*dto.CourseInfoDto, logs []*dto.Rival
 			}
 			course.Clear = max(course.Clear, scoreLog.Clear)
 			if scoreLog.Clear > entity.Failed {
-				logTime := time.Unix(scoreLog.Timestamp, 0)
 				if course.FirstClearTimestamp.IsZero() {
-					course.FirstClearTimestamp = logTime
-				} else if course.FirstClearTimestamp.After(logTime) {
-					course.FirstClearTimestamp = logTime
+					course.FirstClearTimestamp = scoreLog.RecordTime
+				} else if course.FirstClearTimestamp.After(scoreLog.RecordTime) {
+					course.FirstClearTimestamp = scoreLog.RecordTime
 				}
 			}
 		}

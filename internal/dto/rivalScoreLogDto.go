@@ -9,24 +9,22 @@ import (
 
 type RivalScoreLogDto struct {
 	gorm.Model
-	RivalId   uint
-	Sha256    string
-	Mode      string
-	Clear     int32
-	OldClear  int32
-	Score     int32
-	OldScore  int32
-	Combo     int32
-	OldCombo  int32
-	Minbp     int32
-	OldMinbp  int32
-	Timestamp int64 `gorm:"column:date"`
+	RivalId    uint
+	Sha256     string
+	Mode       string
+	Clear      int32
+	OldClear   int32
+	Score      int32
+	OldScore   int32
+	Combo      int32
+	OldCombo   int32
+	Minbp      int32
+	OldMinbp   int32
+	RecordTime time.Time
 
 	Md5             string
 	RivalSongDataID uint
 	Title           string
-	// yyyy-mm-dd hh:mm:ss
-	RecordTime string
 	// Pagination
 	Page      int
 	PageSize  int
@@ -51,8 +49,7 @@ func NewRivalScoreLogDto(rivalScoreLog *entity.RivalScoreLog) *RivalScoreLogDto 
 		OldCombo:   rivalScoreLog.OldCombo,
 		Minbp:      rivalScoreLog.Minbp,
 		OldMinbp:   rivalScoreLog.OldMinbp,
-		Timestamp:  rivalScoreLog.Timestamp,
-		RecordTime: time.Unix(rivalScoreLog.Timestamp, 0).Format("2006-01-02 15:04:05"),
+		RecordTime: rivalScoreLog.RecordTime,
 	}
 }
 
@@ -64,16 +61,16 @@ func (rivalScoreLog *RivalScoreLogDto) Entity() *entity.RivalScoreLog {
 			UpdatedAt: rivalScoreLog.UpdatedAt,
 			DeletedAt: rivalScoreLog.DeletedAt,
 		},
-		Sha256:    rivalScoreLog.Sha256,
-		Mode:      rivalScoreLog.Mode,
-		Clear:     rivalScoreLog.Clear,
-		OldClear:  rivalScoreLog.Clear,
-		Score:     rivalScoreLog.Score,
-		OldScore:  rivalScoreLog.OldScore,
-		Combo:     rivalScoreLog.Combo,
-		OldCombo:  rivalScoreLog.OldCombo,
-		Minbp:     rivalScoreLog.Minbp,
-		OldMinbp:  rivalScoreLog.OldMinbp,
-		Timestamp: rivalScoreLog.Timestamp,
+		Sha256:     rivalScoreLog.Sha256,
+		Mode:       rivalScoreLog.Mode,
+		Clear:      rivalScoreLog.Clear,
+		OldClear:   rivalScoreLog.Clear,
+		Score:      rivalScoreLog.Score,
+		OldScore:   rivalScoreLog.OldScore,
+		Combo:      rivalScoreLog.Combo,
+		OldCombo:   rivalScoreLog.OldCombo,
+		Minbp:      rivalScoreLog.Minbp,
+		OldMinbp:   rivalScoreLog.OldMinbp,
+		RecordTime: rivalScoreLog.RecordTime,
 	}
 }

@@ -5,6 +5,8 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+
 const props = defineProps<{
   clear: number
 }>();
@@ -83,6 +85,6 @@ function getDef(clearType: number): ClearTypeDef {
   return table[clearType];
 }
 
-const def = getDef(props.clear);
+const def = computed(() => getDef(props.clear));
 
 </script>

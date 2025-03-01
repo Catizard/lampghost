@@ -21,8 +21,7 @@ type RivalScoreLogVo struct {
 	Timestamp int64
 
 	// Pagination
-	Page     int
-	PageSize int
+	Pagination *entity.Page
 	// Extra filter field
 	OnlyCourseLogs   bool
 	MaximumTimestamp int64

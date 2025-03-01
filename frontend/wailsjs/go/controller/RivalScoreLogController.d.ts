@@ -6,4 +6,4 @@ import {result} from '../models';
 
 export function GENERATE_RIVAL_SCORE_LOG():Promise<dto.RivalScoreLogDto>;
 
-export function QueryRivalScoreLogPageList(arg1:vo.RivalScoreLogVo):Promise<result.RtnDataList>;
+export function QueryRivalScoreLogPageList(arg1:vo.RivalScoreLogVo):Promise<result.RtnPage>;

@@ -39,11 +39,6 @@ func (s *RivalScoreLogService) QueryRivalScoreLogPageList(filter *vo.RivalScoreL
 	if err := tx.Commit().Error; err != nil {
 		return nil, 0, err
 	}
-	for i := range scoreLogs {
-		scoreLogs[i].Page = filter.Page
-		scoreLogs[i].PageSize = filter.PageSize
-		scoreLogs[i].PageCount = int((count + int64(filter.PageSize) - 1) / int64(filter.PageSize))
-	}
 	return scoreLogs, n, nil
 }
 
@@ -55,7 +50,7 @@ func findRivalScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.Riva
 		sd.md5 as md5,
 		sd.ID as rival_song_data_id
 	`
-	partial := tx.Model(&entity.RivalScoreLog{}).Select(fields)
+	partial := tx.Model(&entity.RivalScoreLog{}).Order("rival_score_log.date desc").Select(fields)
 	if filter != nil {
 		partial = partial.Where(filter.Entity())
 		// Extra filters
@@ -67,7 +62,9 @@ func findRivalScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.Riva
 		}
 	}
 	var out []*dto.RivalScoreLogDto
-	if err := partial.Joins("left join rival_song_data sd on rival_score_log.sha256 = sd.sha256").Find(&out).Error; err != nil {
+	if err := partial.Joins("left join rival_song_data sd on rival_score_log.sha256 = sd.sha256").Scopes(
+		pagination(filter.Pagination),
+	).Find(&out).Error; err != nil {
 		return nil, 0, err
 	}
 	return out, len(out), nil
@@ -80,33 +77,19 @@ func pageRivalScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.Riva
 		return nil, 0, fmt.Errorf("Cannot call page query without pagination parameter")
 	}
 
-	filter.Page = normalizePage(filter.Page)
-	filter.PageSize = normalizePageSize(filter.PageSize)
-
 	var count int64
 	if err := tx.Model(&entity.RivalScoreLog{}).Count(&count).Error; err != nil {
 		return nil, 0, err
 	}
 
-	var out []*dto.RivalScoreLogDto
-	fields := `
-		rival_score_log.*,
-		datetime(rival_score_log.date, 'unixepoch') as record_time,
-		sd.title as title,
-		sd.md5 as md5,
-		sd.ID as rival_song_data_id
-	`
-	if err := tx.Table("rival_score_log").Select(fields).Order("rival_score_log.date desc").Where(filter.Entity()).Scopes(
-		pagination(filter.Page, filter.PageSize),
-	).Joins("left join rival_song_data sd on rival_score_log.sha256 = sd.sha256").Scan(&out).Error; err != nil {
+	rows, n, err := findRivalScoreLogList(tx, filter)
+	if err != nil {
 		return nil, 0, err
 	}
-	for i := range out {
-		out[i].Page = filter.Page
-		out[i].PageSize = filter.PageSize
-		out[i].PageCount = int((count + int64(filter.PageSize) - 1) / int64(filter.PageSize))
-	}
-	return out, len(out), nil
+
+	filter.Pagination.PageCount = int((count + int64(filter.Pagination.PageSize) - 1) / int64(filter.Pagination.PageSize))
+
+	return rows, n, nil
 }
 
 // Extend function to findRivalScoreLogList

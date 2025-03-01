@@ -23,7 +23,7 @@ import { DataTableColumns, NButton, useNotification } from 'naive-ui';
 import { h, onMounted, reactive, Ref, ref } from 'vue';
 import SelectFolder from '../folder/SelectFolder.vue';
 import { BindRivalSongDataToFolder } from '@wailsjs/go/controller/RivalSongDataController';
-import { dto } from '@wailsjs/go/models';
+import { dto, vo } from '@wailsjs/go/models';
 import { useI18n } from 'vue-i18n';
 
 const i18n = useI18n();
@@ -98,21 +98,16 @@ function createColumns(): DataTableColumns<dto.RivalScoreLogDto> {
 
 function loadData() {
   loading.value = true;
-  let arg: any = {
-    Page: pagination.page,
-    PageSize: pagination.pageSize,
-  };
+  let arg: vo.RivalScoreLogVo = {
+    Pagination: pagination,
+  } as any;
   QueryRivalScoreLogPageList(arg)
     .then(result => {
       if (result.Code != 200) {
         return Promise.reject(result.Msg);
       }
       data.value = [...result.Rows];
-      if (result.Rows.length > 0) {
-        pagination.pageCount = result.Rows[0].PageCount;
-      } else {
-        pagination.pageCount = 0;
-      }
+      pagination.pageCount = result.Pagination.pageCount;
     })
     .catch(err => {
       notification.error({

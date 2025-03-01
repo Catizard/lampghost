@@ -68,7 +68,7 @@
               </n-tooltip>
               score.db文件路径
             </template>
-            <n-input clearable v-model:value="model.ScoreFilePath" placeholder="请输入score.db文件路径" style="width: 50%;"
+            <n-input disabled clearable v-model:value="model.ScoreFilePath" placeholder="请输入score.db文件路径" style="width: 50%;"
               :loading="loading" />
           </n-form-item>
         </n-p>

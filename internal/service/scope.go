@@ -1,6 +1,9 @@
 package service
 
-import "gorm.io/gorm"
+import (
+	"github.com/Catizard/lampghost_wails/internal/entity"
+	"gorm.io/gorm"
+)
 
 // This file defines the scopes shared between services file
 
@@ -43,12 +46,19 @@ func scopeInHeaderIDs(headerIDs []uint) func(db *gorm.DB) *gorm.DB {
 // 1) if page <= 0, set it to 1
 // 2) if pageSize >= 100, set it to 100
 // 3) if pageSize <= 0, set if to 10
-func pagination(page int, pageSize int) func(db *gorm.DB) *gorm.DB {
+//
+// Warning:
+// 1) This function would modify `pagination` to `return` the page param back
+// 2) If pagination is nil, do nothing
+func pagination(pagination *entity.Page) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
-		page = normalizePage(page)
-		pageSize = normalizePageSize(pageSize)
-		offset := (page - 1) * pageSize
-		return db.Offset(offset).Limit(pageSize)
+		if pagination == nil {
+			return db
+		}
+		pagination.Page = normalizePage(pagination.Page)
+		pagination.PageSize = normalizePageSize(pagination.PageSize)
+		offset := (pagination.Page - 1) * pagination.PageSize
+		return db.Offset(offset).Limit(pagination.PageSize)
 	}
 }
 

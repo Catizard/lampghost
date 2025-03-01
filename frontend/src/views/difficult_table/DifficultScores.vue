@@ -74,6 +74,8 @@ const columns: DataTableColumns<dto.DiffTableHeaderDto> = [
         {
           headerId: row.ID,
           level: row.Level,
+          ghostRivalId: currentRivalID.value,
+          ghostRivalTagId: currentRivalTagID.value 
         }
       )
     }

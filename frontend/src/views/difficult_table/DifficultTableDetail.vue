@@ -25,6 +25,8 @@ const loading = ref<boolean>(false);
 const props = defineProps<{
 	headerId?: number
 	level?: string
+	ghostRivalId?: number
+	ghostRivalTagId?: number
 }>()
 
 const columns: DataTableColumns<dto.DiffTableDataDto> = [
@@ -73,7 +75,7 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
 	}
 ];
 
-let data: Ref<Array<any>> = ref([]);
+let data: Ref<Array<dto.DiffTableDataDto>> = ref([]);
 function loadData() {
 	loading.value = true;
 	// TODO: remove magic 1
@@ -81,8 +83,8 @@ function loadData() {
 		ID: props.headerId,
 		Level: props.level,
 		RivalID: 1,
-		GhostRivalID: /*currentRivalID.value ?? */0,
-		GhostRivalTagID: /*currentRivalTagID.value ?? */0,
+		GhostRivalID: props.ghostRivalId ?? 0,
+		GhostRivalTagID: props.ghostRivalTagId ?? 0,
 		Pagination: pagination,
 	} as any)
 		.then(result => {

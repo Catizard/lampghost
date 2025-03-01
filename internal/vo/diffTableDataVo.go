@@ -19,6 +19,7 @@ type DiffTableDataVo struct {
 	UrlDiff  string `json:"url_diff"`
 	Sha256   string
 
+	Pagination *entity.Page
 	// Extra filter fields
 	IDs       []uint
 	HeaderIDs []uint

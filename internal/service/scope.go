@@ -78,3 +78,10 @@ func normalizePageSize(pageSize int) int {
 	}
 	return pageSize
 }
+
+// helper method for calculating `PageCount` field
+func calcPageCount(count int64, pageSize int) int {
+	// HACK: prevent us from a un-normalized pageSize
+	pageSize = normalizePage(pageSize)
+	return int((count + int64(pageSize) - 1) / int64(pageSize))
+}

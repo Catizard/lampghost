@@ -965,6 +965,7 @@ export namespace vo {
 	    RivalID: number;
 	    GhostRivalID: number;
 	    GhostRivalTagID: number;
+	    Pagination?: entity.Page;
 	
 	    static createFrom(source: any = {}) {
 	        return new DiffTableHeaderVo(source);
@@ -986,6 +987,7 @@ export namespace vo {
 	        this.RivalID = source["RivalID"];
 	        this.GhostRivalID = source["GhostRivalID"];
 	        this.GhostRivalTagID = source["GhostRivalTagID"];
+	        this.Pagination = this.convertValues(source["Pagination"], entity.Page);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

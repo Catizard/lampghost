@@ -18,6 +18,7 @@ type DiffTableHeaderVo struct {
 	RivalID         uint
 	GhostRivalID    uint
 	GhostRivalTagID uint
+	Pagination      *entity.Page
 }
 
 func (header *DiffTableHeaderVo) Entity() *entity.DiffTableHeader {

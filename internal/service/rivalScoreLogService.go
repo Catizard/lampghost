@@ -1,8 +1,6 @@
 package service
 
 import (
-	"fmt"
-
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/vo"
@@ -31,7 +29,7 @@ func (s *RivalScoreLogService) QueryRivalScoreLogPageList(filter *vo.RivalScoreL
 		tx.Rollback()
 		return nil, 0, err
 	}
-	scoreLogs, n, err := pageRivalScoreLogList(tx, filter)
+	scoreLogs, n, err := findRivalScoreLogList(tx, filter)
 	if err != nil {
 		tx.Rollback()
 		return nil, 0, err
@@ -64,34 +62,20 @@ func findRivalScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.Riva
 		}
 	}
 	var out []*dto.RivalScoreLogDto
-	if err := partial.Joins("left join rival_song_data sd on rival_score_log.sha256 = sd.sha256").Scopes(
+	if err := partial.Debug().Joins("left join rival_song_data sd on rival_score_log.sha256 = sd.sha256").Scopes(
 		pagination(filter.Pagination),
 	).Find(&out).Error; err != nil {
 		return nil, 0, err
 	}
+	// pagination
+	if filter != nil && filter.Pagination != nil {
+		count, err := selectRivalScoreLogCount(tx, filter)
+		if err != nil {
+			return nil, 0, err
+		}
+		filter.Pagination.PageCount = calcPageCount(count, filter.Pagination.PageSize)
+	}
 	return out, len(out), nil
-}
-
-// Extend function to findRivalScoreLogList with page query parameter
-// TODO: how to merge findRivalScoreLogList and pageRivalScoreLogList?
-func pageRivalScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.RivalScoreLogDto, int, error) {
-	if filter == nil {
-		return nil, 0, fmt.Errorf("Cannot call page query without pagination parameter")
-	}
-
-	var count int64
-	if err := tx.Model(&entity.RivalScoreLog{}).Count(&count).Error; err != nil {
-		return nil, 0, err
-	}
-
-	rows, n, err := findRivalScoreLogList(tx, filter)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	filter.Pagination.PageCount = int((count + int64(filter.Pagination.PageSize) - 1) / int64(filter.Pagination.PageSize))
-
-	return rows, n, nil
 }
 
 // Extend function to findRivalScoreLogList
@@ -110,4 +94,19 @@ func findRivalScoreLogSha256Map(tx *gorm.DB, filter *vo.RivalScoreLogVo) (map[st
 		sha256ScoreLogsMap[scoreLog.Sha256] = append(sha256ScoreLogsMap[scoreLog.Sha256], scoreLog)
 	}
 	return sha256ScoreLogsMap, nil
+}
+
+func selectRivalScoreLogCount(tx *gorm.DB, filter *vo.RivalScoreLogVo) (int64, error) {
+	if filter == nil {
+		var count int64
+		if err := tx.Debug().Model(&entity.RivalScoreLog{}).Count(&count).Error; err != nil {
+			return 0, err
+		}
+		return count, nil
+	}
+	var count int64
+	if err := tx.Model(&entity.RivalScoreLog{}).Debug().Where(filter.Entity()).Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return count, nil
 }

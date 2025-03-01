@@ -14,8 +14,7 @@
         style="width: 200px;" :placeholder="t('placeHolderRivalTag')" />
     </n-flex>
     <n-data-table :columns="columns" :data="data" :pagination="pagination" :loading="levelTableLoading"
-      :row-key="(row: dto.DiffTableHeaderDto) => row.Level"
-      @update-expanded-row-keys="handleUpdateLevelTableExpandedRowKeys" />
+      :row-key="(row: dto.DiffTableHeaderDto) => row.Level" />
   </perfect-scrollbar>
 </template>
 
@@ -26,8 +25,9 @@ import { FindRivalInfoList } from '@wailsjs/go/controller/RivalInfoController';
 import { FindRivalTagList } from '@wailsjs/go/controller/RivalTagController';
 import { dto, vo } from '@wailsjs/go/models';
 import { DataTableColumns, NButton, NDataTable, SelectOption, useNotification } from 'naive-ui';
-import { h, Ref, ref, watch } from 'vue';
+import { h, nextTick, Ref, ref, useTemplateRef, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import DifficultTableDetail from './DifficultTableDetail.vue';
 
 const i18n = useI18n();
 const { t } = i18n;
@@ -70,13 +70,10 @@ const columns: DataTableColumns<dto.DiffTableHeaderDto> = [
     type: "expand",
     renderExpand: (row: dto.DiffTableHeaderDto) => {
       return h(
-        NDataTable,
+        DifficultTableDetail,
         {
-          columns: songDataColumns,
-          data: levelData[row.Level],
-          pagination: false,
-          bordered: false,
-          rowKey: (row: dto.DiffTableDataDto) => row.ID,
+          headerId: row.ID,
+          level: row.Level,
         }
       )
     }
@@ -172,91 +169,6 @@ function loadRivalTagOptions(rivalID: number) {
     });
 }
 loadRivalOptions();
-
-function handleUpdateLevelTableExpandedRowKeys(keys: Array<string>) {
-  // TODO: do we need to handle multiple loading state?
-  keys.forEach((level) => {
-    if (!levelData.has(level)) {
-      // TODO: remove magic 1
-      loadSongTableData(currentDiffTableID.value, level, 1)
-    }
-  });
-}
-
-const songDataColumns: DataTableColumns<dto.DiffTableDataDto> = [
-  { title: t('column.songName'), key: "Title", ellipsis: true, resizable: true },
-  { title: t('column.artist'), key: "Artist", resizable: true },
-  { title: t('column.count'), key: "PlayCount", minWidth: "100px", resizable: true },
-  {
-    title: t('column.clear'), key: "Lamp", minWidth: "100px", resizable: true,
-    render(row) {
-      return h(
-        ClearTag,
-        {
-          clear: row.Lamp
-        },
-      )
-    }
-  },
-  {
-    title: t('column.ghost'), key: "GhostLamp", minWidth: "100px", resizable: true,
-    render(row: dto.DiffTableDataDto) {
-      return h(
-        ClearTag,
-        {
-          clear: row.GhostLamp,
-        },
-      )
-    }
-  },
-  {
-    title: t('column.actions'),
-    key: "actions",
-    resizable: true,
-    minWidth: "150px",
-    render(row) {
-      return h(
-        NButton,
-        {
-          strong: true,
-          tertiary: true,
-          size: "small",
-          onClick: () => handleAddToFolder(row.ID),
-        },
-        { default: () => t('button.addToFolder') }
-      )
-    }
-  }
-];
-
-function loadSongTableData(headerID: number, level: string, rivalID: number) {
-  levelTableLoading.value = true;
-  QueryDiffTableDataWithRival({
-    ID: headerID,
-    Level: level,
-    RivalID: rivalID,
-    GhostRivalID: currentRivalID.value ?? 0,
-    GhostRivalTagID: currentRivalTagID.value ?? 0,
-  } as any)
-    .then(result => {
-      if (result.Code != 200) {
-        return Promise.reject(result.Msg);
-      }
-      levelData[level] = [...result.Rows];
-    }).catch(err => {
-      notification.error({
-        content: err,
-        duration: 3000,
-        keepAliveOnHover: true,
-      });
-    }).finally(() => {
-      levelTableLoading.value = false;
-    });
-}
-
-// TODO: implement me!
-function handleAddToFolder(songDataID: number) {
-}
 
 // Watch 1: Whenever changing current difftable, reload the level table
 watch(currentDiffTableID, (newID: string | number) => {

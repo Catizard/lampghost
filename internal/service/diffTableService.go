@@ -318,7 +318,7 @@ func (s *DiffTableService) QueryLevelLayeredDiffTableInfoById(ID uint) (*dto.Dif
 // Requirements:
 //
 //	Level & ID & RivalID should not be empty
-func (s *DiffTableService) QueryDiffTableDataWithRival(filter vo.DiffTableHeaderVo) ([]*dto.DiffTableDataDto, int, error) {
+func (s *DiffTableService) QueryDiffTableDataWithRival(filter *vo.DiffTableHeaderVo) ([]*dto.DiffTableDataDto, int, error) {
 	if filter.Level == "" {
 		return nil, 0, fmt.Errorf("Level should not be empty")
 	}
@@ -328,7 +328,11 @@ func (s *DiffTableService) QueryDiffTableDataWithRival(filter vo.DiffTableHeader
 	if filter.RivalID <= 0 {
 		return nil, 0, fmt.Errorf("RivalID should > 0")
 	}
-	rawContents, _, err := findDiffTableDataList(s.db, &vo.DiffTableDataVo{HeaderID: filter.ID, Level: filter.Level})
+	rawContents, _, err := findDiffTableDataList(s.db, &vo.DiffTableDataVo{
+		HeaderID:   filter.ID,
+		Level:      filter.Level,
+		Pagination: filter.Pagination,
+	})
 	if err != nil {
 		return nil, 0, err
 	}

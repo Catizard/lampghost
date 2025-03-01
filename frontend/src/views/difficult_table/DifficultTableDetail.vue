@@ -1,17 +1,24 @@
 <template>
-	<n-data-table :columns="columns" :data="data" :pagination="pagination" :bordered="false" max-height="400px"
-		:loading="loading" />
+	<n-data-table remote :columns="columns" :data="data" :pagination="pagination" :bordered="false" min-height="500px"
+		:loading="loading" :row-key="(row: dto.DiffTableDataDto) => row.ID" />
 	<select-folder v-model:show="showFolderSelection" @submit="handleSubmit" />
 </template>
 
 <script setup lang="ts">
 import { DataTableColumns, NButton, useNotification } from 'naive-ui';
 import { dto } from '@wailsjs/go/models';
-import { h, ref, Ref, watch } from 'vue';
+import { h, reactive, ref, Ref, watch } from 'vue';
 import { BindDiffTableDataToFolder, QueryDiffTableDataWithRival } from '@wailsjs/go/controller/DiffTableController';
 import SelectFolder from '@/views/folder/SelectFolder.vue';
 import ClearTag from '@/components/ClearTag.vue';
+import { useI18n } from 'vue-i18n';
 
+defineExpose({
+	loadData,
+});
+
+const i18n = useI18n();
+const { t } = i18n;
 const notification = useNotification();
 const loading = ref<boolean>(false);
 
@@ -20,71 +27,101 @@ const props = defineProps<{
 	level?: string
 }>()
 
-function createColumns(): DataTableColumns<dto.DiffTableDataDto> {
-	return [
-		{ title: "Song Name", key: "Title", resizable: true },
-		{ title: "Artist", key: "Artist", resizable: true },
-		{ title: "Play Count", key: "PlayCount", minWidth: "100px", resizable: true },
-		{
-			title: "Clear", key: "Lamp", minWidth: "100px", resizable: true,
-			render(row) {
-				return h(
-					ClearTag,
-					{
-						clear: row.Lamp
-					},
-				)
-			}
-		},
-		{
-			title: "Action",
-			key: "actions",
-			resizable: true,
-			minWidth: "150px",
-			render(row) {
-				return h(
-					NButton,
-					{
-						strong: true,
-						tertiary: true,
-						size: "small",
-						onClick: () => handleAddToFolder(row.ID),
-					},
-					{ default: () => "添加至收藏夹" }
-				)
-			}
+const columns: DataTableColumns<dto.DiffTableDataDto> = [
+	{ title: t('column.songName'), key: "Title", ellipsis: true, resizable: true },
+	{ title: t('column.artist'), key: "Artist", resizable: true },
+	{ title: t('column.count'), key: "PlayCount", minWidth: "100px", resizable: true },
+	{
+		title: t('column.clear'), key: "Lamp", minWidth: "100px", resizable: true,
+		render(row) {
+			return h(
+				ClearTag,
+				{
+					clear: row.Lamp
+				},
+			)
 		}
-	];
-}
-const columns = createColumns();
+	},
+	{
+		title: t('column.ghost'), key: "GhostLamp", minWidth: "100px", resizable: true,
+		render(row: dto.DiffTableDataDto) {
+			return h(
+				ClearTag,
+				{
+					clear: row.GhostLamp,
+				},
+			)
+		}
+	},
+	{
+		title: t('column.actions'),
+		key: "actions",
+		resizable: true,
+		minWidth: "150px",
+		render(row) {
+			return h(
+				NButton,
+				{
+					strong: true,
+					tertiary: true,
+					size: "small",
+					onClick: () => handleAddToFolder(row.ID),
+				},
+				{ default: () => t('button.addToFolder') }
+			)
+		}
+	}
+];
 
 let data: Ref<Array<any>> = ref([]);
-function loadData(headerId: number, level: string) {
+function loadData() {
 	loading.value = true;
 	// TODO: remove magic 1
-	QueryDiffTableDataWithRival(headerId, level, 1)
+	QueryDiffTableDataWithRival({
+		ID: props.headerId,
+		Level: props.level,
+		RivalID: 1,
+		GhostRivalID: /*currentRivalID.value ?? */0,
+		GhostRivalTagID: /*currentRivalTagID.value ?? */0,
+		Pagination: pagination,
+	} as any)
 		.then(result => {
 			if (result.Code != 200) {
-				return Promise.reject(result.Msg)
+				return Promise.reject(result.Msg);
 			}
-			data.value = [...result.Rows].map(row => {
-				return {
-					key: row.ID,
-					...row
-				}
-			})
+			data.value = [...result.Rows];
+			pagination.pageCount = result.Pagination.pageCount;
 		}).catch(err => {
-			notifyError("读取数据失败:" + err);
+			notification.error({
+				content: err,
+				duration: 3000,
+				keepAliveOnHover: true,
+			});
 		}).finally(() => {
 			loading.value = false;
-		})
+		});
 }
 
-const pagination = false as const;
+const pagination = reactive({
+	page: 1,
+	pageSize: 10,
+	pageCount: 0,
+	showSizePicker: true,
+	pageSizes: [10, 20, 50],
+	onChange: (page: number) => {
+		pagination.page = page;
+		loadData();
+	},
+	onUpdatePageSize: (pageSize: number) => {
+		pagination.pageSize = pageSize;
+		pagination.page = 1;
+		loadData();
+	}
+});
 
-watch(props, (newProps) => {
-	loadData(newProps.headerId, newProps.level)
-}, { immediate: true })
+watch(props, () => {
+	loadData()
+});
 
 const candidateSongDataID = ref<number>(null);
 const showFolderSelection = ref<boolean>(false);
@@ -121,4 +158,34 @@ function notifyError(msg: string) {
 	})
 }
 
+loadData();
 </script>
+
+<i18n lang="json">{
+	"en": {
+		"column": {
+			"songName": "Song Name",
+			"artist": "Artist",
+			"count": "Play Count",
+			"clear": "Clear",
+			"ghost": "Ghost",
+			"actions": "Actions"
+		},
+		"button": {
+			"addToFolder": "Add to Folder"
+		}
+	},
+	"zh-CN": {
+		"column": {
+			"songName": "谱名",
+			"artist": "作者",
+			"count": "游玩次数",
+			"clear": "点灯",
+			"ghost": "影子灯",
+			"actions": "操作"
+		},
+		"button": {
+			"addToFolder": "添加至收藏夹"
+		}
+	}
+}</i18n>

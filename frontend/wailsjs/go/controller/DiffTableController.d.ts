@@ -23,7 +23,7 @@ export function GENERATOR_TABLE_HEADER():Promise<entity.DiffTableHeader>;
 
 export function GENERATOR_TABLE_HEADER_DTO():Promise<dto.DiffTableHeaderDto>;
 
-export function QueryDiffTableDataWithRival(arg1:vo.DiffTableHeaderVo):Promise<result.RtnDataList>;
+export function QueryDiffTableDataWithRival(arg1:vo.DiffTableHeaderVo):Promise<result.RtnPage>;
 
 export function QueryDiffTableInfoById(arg1:number):Promise<result.RtnData>;
 

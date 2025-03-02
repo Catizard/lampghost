@@ -29,5 +29,15 @@ func (ctl *RivalTagController) FindRivalTagList(filter *vo.RivalTagVo) result.Rt
 	return result.NewRtnDataList(rows)
 }
 
+func (ctl *RivalTagController) QueryRivalTagPageList(filter *vo.RivalTagVo) result.RtnPage {
+	log.Info("[Controller] Calling RivalTagController.QueryRivalTagPageList")
+	rows, _, err := ctl.rivalTagService.FindRivalTagList(filter)
+	if err != nil {
+		log.Errorf("[RivalTagController] returning err: %v", err)
+		return result.NewErrorPage(err)
+	}
+	return result.NewRtnPage(*filter.Pagination, rows)
+}
+
 func (*RivalTagController) GENERATE_RIVAL_TAG() *entity.RivalTag     { return nil }
 func (*RivalTagController) GENERATE_RIVAL_TAG_DTO() *dto.RivalTagDto { return nil }

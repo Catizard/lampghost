@@ -14,6 +14,7 @@ type RivalTagVo struct {
 	TagName    string
 	Generated  bool
 	RecordTime time.Time
+	Pagination *entity.Page
 }
 
 func NewRivalTagVo(rivalTag *entity.RivalTag) *RivalTagVo {

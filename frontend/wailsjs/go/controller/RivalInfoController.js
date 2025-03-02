@@ -30,6 +30,10 @@ export function QueryMainUser() {
   return window['go']['controller']['RivalInfoController']['QueryMainUser']();
 }
 
+export function QueryRivalInfoPageList(arg1) {
+  return window['go']['controller']['RivalInfoController']['QueryRivalInfoPageList'](arg1);
+}
+
 export function QueryUserInfoByID(arg1) {
   return window['go']['controller']['RivalInfoController']['QueryUserInfoByID'](arg1);
 }

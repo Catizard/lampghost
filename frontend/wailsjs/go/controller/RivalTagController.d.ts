@@ -10,3 +10,5 @@ export function FindRivalTagList(arg1:vo.RivalTagVo):Promise<result.RtnDataList>
 export function GENERATE_RIVAL_TAG():Promise<entity.RivalTag>;
 
 export function GENERATE_RIVAL_TAG_DTO():Promise<dto.RivalTagDto>;
+
+export function QueryRivalTagPageList(arg1:vo.RivalTagVo):Promise<result.RtnPage>;

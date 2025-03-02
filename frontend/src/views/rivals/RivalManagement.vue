@@ -31,28 +31,43 @@
 </template>
 
 <script lang="ts" setup>
-import { AddRivalInfo, FindRivalInfoList, SyncRivalScoreLog } from '@wailsjs/go/controller/RivalInfoController';
-import { dto, entity, vo } from '@wailsjs/go/models';
+import { AddRivalInfo, QueryRivalInfoPageList, SyncRivalScoreLog } from '@wailsjs/go/controller/RivalInfoController';
+import { dto, entity } from '@wailsjs/go/models';
 import * as dayjs from 'dayjs';
 import { DataTableColumns, FormInst, NButton, useNotification } from 'naive-ui';
-import { h, ref } from 'vue';
+import { h, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const i18n = useI18n();
 const { t } = i18n;
 const notification = useNotification();
 
-const pagination = false as const;
+const pagination = reactive({
+	page: 1,
+	pageSize: 10,
+	pageCount: 0,
+	showSizePicker: true,
+	pageSizes: [10, 20, 50],
+	onChange: (page: number) => {
+		pagination.page = page;
+		loadData();
+	},
+	onUpdatePageSize: (pageSize: number) => {
+		pagination.pageSize = pageSize;
+		pagination.page = 1;
+		loadData();
+	}
+});
 const columns = createColumns();
 const data = ref<Array<dto.RivalInfoDto>>([]);
 const loading = ref<boolean>(false);
 
 function createColumns(): DataTableColumns<dto.RivalInfoDto> {
 	return [
-		{ title: t('column.name'), key: "Name" },
-		{ title: t('column.count'), key: "PlayCount" },
-		{ title: t('column.scoreLogFilePath'), key: "ScoreLogPath", ellipsis: true, maxWidth: "150px" },
-		{ title: t('column.songdataFilePath'), key: "SongDataPath", ellipsis: true, maxWidth: "150px" },
+		{ title: t('column.name'), key: "Name", width: "100px", ellipsis: { tooltip: true } },
+		{ title: t('column.count'), key: "PlayCount", width: "100px", ellipsis: { tooltip: true } },
+		{ title: t('column.scoreLogFilePath'), key: "ScoreLogPath", maxWidth: "150px", ellipsis: { tooltip: true }},
+		{ title: t('column.songdataFilePath'), key: "SongDataPath", maxWidth: "150px", ellipsis: { tooltip: true }},
 		{
 			title: t('column.lastSyncTime'),
 			key: "UpdateAt",
@@ -80,7 +95,9 @@ function createColumns(): DataTableColumns<dto.RivalInfoDto> {
 
 function loadData() {
 	loading.value = true;
-	FindRivalInfoList()
+	QueryRivalInfoPageList({
+		Pagination: pagination,
+	} as any)
 		.then(result => {
 			if (result.Code != 200) {
 				return Promise.reject(result.Msg)

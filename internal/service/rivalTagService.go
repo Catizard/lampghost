@@ -131,8 +131,20 @@ func findRivalTagList(tx *gorm.DB, filter *vo.RivalTagVo) ([]*entity.RivalTag, i
 		partial = partial.Where(filter.Entity())
 	}
 	var out []*entity.RivalTag
-	if err := partial.Find(&out).Error; err != nil {
+	if err := partial.Scopes(
+		pagination(filter.Pagination),
+	).Find(&out).Error; err != nil {
 		return nil, 0, err
+	}
+
+	if filter != nil && filter.Pagination != nil {
+		if filter.Pagination != nil {
+			count, err := selectRivalTagCount(tx, filter)
+			if err != nil {
+				return nil, 0, err
+			}
+			filter.Pagination.PageCount = calcPageCount(count, filter.Pagination.PageSize)
+		}
 	}
 	return out, len(out), nil
 }
@@ -143,4 +155,16 @@ func findRivalTagByID(tx *gorm.DB, ID uint) (*entity.RivalTag, error) {
 		return nil, err
 	}
 	return &tag, nil
+}
+
+func selectRivalTagCount(tx *gorm.DB, filter *vo.RivalTagVo) (int64, error) {
+	querying := tx.Model(&entity.RivalTag{})
+	if filter != nil {
+		querying = querying.Where(filter.Entity())
+	}
+	var count int64
+	if err := querying.Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return count, nil
 }

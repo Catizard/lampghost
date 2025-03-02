@@ -13,3 +13,7 @@ export function GENERATE_RIVAL_TAG() {
 export function GENERATE_RIVAL_TAG_DTO() {
   return window['go']['controller']['RivalTagController']['GENERATE_RIVAL_TAG_DTO']();
 }
+
+export function QueryRivalTagPageList(arg1) {
+  return window['go']['controller']['RivalTagController']['QueryRivalTagPageList'](arg1);
+}

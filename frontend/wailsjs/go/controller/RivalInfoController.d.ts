@@ -3,6 +3,7 @@
 import {entity} from '../models';
 import {result} from '../models';
 import {dto} from '../models';
+import {vo} from '../models';
 
 export function AddRivalInfo(arg1:entity.RivalInfo):Promise<result.RtnMessage>;
 
@@ -17,6 +18,8 @@ export function GENERATOR_RIVAL_INFO_DTO():Promise<dto.RivalInfoDto>;
 export function InitializeMainUser(arg1:entity.RivalInfo):Promise<result.RtnMessage>;
 
 export function QueryMainUser():Promise<result.RtnData>;
+
+export function QueryRivalInfoPageList(arg1:vo.RivalInfoVo):Promise<result.RtnPage>;
 
 export function QueryUserInfoByID(arg1:number):Promise<result.RtnData>;
 

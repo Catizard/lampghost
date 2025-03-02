@@ -5,6 +5,7 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/result"
 	"github.com/Catizard/lampghost_wails/internal/service"
+	"github.com/Catizard/lampghost_wails/internal/vo"
 	"github.com/charmbracelet/log"
 )
 
@@ -92,6 +93,16 @@ func (ctl *RivalInfoController) FindRivalInfoList() result.RtnDataList {
 		return result.NewErrorDataList(err)
 	}
 	return result.NewRtnDataList(rows)
+}
+
+func (ctl *RivalInfoController) QueryRivalInfoPageList(filter *vo.RivalInfoVo) result.RtnPage {
+	log.Info("[Controller] calling RivalInfoController.QueryRivalInfoPageList")
+	rows, _, err := ctl.rivalInfoService.FindRivalInfoList()
+	if err != nil {
+		log.Errorf("[RivalInfoController] returning error: %v", err)
+		return result.NewErrorPage(err)
+	}
+	return result.NewRtnPage(*filter.Pagination, rows)
 }
 
 func (ctl *RivalInfoController) DelRivalInfo(ID uint) result.RtnMessage {

@@ -30,11 +30,11 @@ const props = defineProps<{
 }>()
 
 const columns: DataTableColumns<dto.DiffTableDataDto> = [
-	{ title: t('column.songName'), key: "Title", ellipsis: true, resizable: true },
-	{ title: t('column.artist'), key: "Artist", resizable: true },
-	{ title: t('column.count'), key: "PlayCount", minWidth: "100px", resizable: true },
+	{ title: t('column.songName'), key: "Title", width: "300px", ellipsis: { tooltip: true}, resizable: true },
+	{ title: t('column.artist'), key: "Artist", ellipsis: { tooltip: true}, },
+	{ title: t('column.count'), key: "PlayCount", width: "100px", },
 	{
-		title: t('column.clear'), key: "Lamp", minWidth: "100px", resizable: true,
+		title: t('column.clear'), key: "Lamp", width: "100px", resizable: true,
 		render(row) {
 			return h(
 				ClearTag,
@@ -45,7 +45,7 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
 		}
 	},
 	{
-		title: t('column.ghost'), key: "GhostLamp", minWidth: "100px", resizable: true,
+		title: t('column.ghost'), key: "GhostLamp", width: "100px", resizable: true,
 		render(row: dto.DiffTableDataDto) {
 			return h(
 				ClearTag,

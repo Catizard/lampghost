@@ -12,6 +12,8 @@ type RivalInfoVo struct {
 	SongDataPath *string
 	PlayCount    int
 	MainUser     bool
+
+	Pagination *entity.Page
 }
 
 func (rivalInfo *RivalInfoVo) Entity() *entity.RivalInfo {

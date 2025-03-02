@@ -8,17 +8,17 @@
     <n-flex justify="flex-start">
       <n-select :loading="tableLoading" v-model:value="currentRivalID" :options="rivalOptions" style="width: 200px;" />
     </n-flex>
-    <n-data-table :columns="columns" :data="data" :pagination="pagination" :loading="tableLoading"
+    <n-data-table remote :columns="columns" :data="data" :pagination="pagination" :loading="tableLoading"
       :row-key="(row: dto.RivalTagDto) => row.ID" />
   </perfect-scrollbar>
 </template>
 
 <script setup lang="ts">
 import { FindRivalInfoList } from '@wailsjs/go/controller/RivalInfoController';
-import { FindRivalTagList } from '@wailsjs/go/controller/RivalTagController';
-import { dto } from '@wailsjs/go/models';
+import { FindRivalTagList, QueryRivalTagPageList } from '@wailsjs/go/controller/RivalTagController';
+import { dto, vo } from '@wailsjs/go/models';
 import { DataTableColumns, SelectOption, useNotification } from 'naive-ui';
-import { Ref, ref, watch } from 'vue';
+import { reactive, Ref, ref, watch } from 'vue';
 import * as dayjs from 'dayjs';
 import { useI18n } from 'vue-i18n';
 
@@ -63,20 +63,39 @@ const columns: DataTableColumns<dto.RivalTagDto> = [
   { title: t('column.generated'), key: "Generated", },
   {
     title: t('column.tagTime'),
-    key: "TagTime",
-    render: (row: dto.RivalTagDto) => dayjs(row.TagTime).format('YYYY-MM-DD HH:mm:ss')
+    key: "RecordTime",
+    render: (row: dto.RivalTagDto) => dayjs(row.RecordTime).format('YYYY-MM-DD HH:mm:ss')
   }
 ];
 const data: Ref<Array<dto.RivalTagDto>> = ref([]);
-const pagination = false as const;
-function loadData(rivalID: number) {
+const pagination = reactive({
+  page: 1,
+  pageSize: 10,
+  pageCount: 0,
+  showSizePicker: true,
+  pageSizes: [10, 20, 50],
+  onChange: (page: number) => {
+    pagination.page = page;
+    loadData();
+  },
+  onUpdatePageSize: (pageSize: number) => {
+    pagination.pageSize = pageSize;
+    pagination.page = 1;
+    loadData();
+  }
+});
+function loadData() {
   tableLoading.value = true;
-  FindRivalTagList({ RivalId: rivalID } as any)
+  QueryRivalTagPageList({
+    RivalId: currentRivalID.value,
+    Pagination: pagination,
+  } as any)
     .then(result => {
       if (result.Code != 200) {
         return Promise.reject(result.Msg);
       }
       data.value = [...result.Rows];
+      pagination.pageCount = result.Pagination.pageCount;
     }).catch(err => {
       notification.error({
         content: err,
@@ -89,8 +108,8 @@ function loadData(rivalID: number) {
 }
 
 // Watch: Whenever changing current rival, reload the tag table
-watch(currentRivalID, (newID: number) => {
-  loadData(newID);
+watch(currentRivalID, () => {
+  loadData();
 })
 
 </script>
@@ -101,10 +120,10 @@ watch(currentRivalID, (newID: number) => {
     "column": {
       "tagName": "Tag Name",
       "generated": "Generated",
-      "tagTime": "Tag Time",
+      "tagTime": "Tag Time"
     },
     "message": {
-      "noRivalError": "FATAL ERROR: no rival data found",
+      "noRivalError": "FATAL ERROR: no rival data found"
     }
   },
   "zh-CN": {
@@ -112,10 +131,10 @@ watch(currentRivalID, (newID: number) => {
     "column": {
       "tagName": "标签名称",
       "generated": "自动生成",
-      "tagTime": "标签时间",
+      "tagTime": "标签时间"
     },
     "message": {
-      "noRivalError": "未知错误: 找不到任何玩家信息?",
+      "noRivalError": "未知错误: 找不到任何玩家信息?"
     }
-  },
+  }
 }</i18n>

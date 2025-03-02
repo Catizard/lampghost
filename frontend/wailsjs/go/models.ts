@@ -1152,6 +1152,7 @@ export namespace vo {
 	    // Go type: time
 	    RecordTime: any;
 	    Pagination?: entity.Page;
+	    RecordTimestamp?: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new RivalTagVo(source);
@@ -1169,6 +1170,7 @@ export namespace vo {
 	        this.Enabled = source["Enabled"];
 	        this.RecordTime = this.convertValues(source["RecordTime"], null);
 	        this.Pagination = this.convertValues(source["Pagination"], entity.Page);
+	        this.RecordTimestamp = source["RecordTimestamp"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

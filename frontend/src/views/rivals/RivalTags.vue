@@ -1,23 +1,36 @@
 <template>
   <perfect-scrollbar>
-    <n-flex justify="space-between">
+    <n-flex justify="space-start">
       <n-h1 prefix="bar" style="text-align: start;">
         <n-text type="primary">{{ t('title') }}</n-text>
       </n-h1>
     </n-flex>
     <n-flex justify="flex-start">
       <n-select :loading="tableLoading" v-model:value="currentRivalID" :options="rivalOptions" style="width: 200px;" />
+      <n-button style="margin-left: auto;" type="primary" @click="showAddModal = true">{{ t('button.add') }}</n-button>
     </n-flex>
     <n-data-table remote :columns="columns" :data="data" :pagination="pagination" :loading="tableLoading"
       :row-key="(row: dto.RivalTagDto) => row.ID" />
   </perfect-scrollbar>
+  <n-modal v-model:show="showAddModal" preset="dialog" :title="t('modal.title')"
+    :positive-text="t('modal.positiveText')" :negative-text="t('modal.negativeText')"
+    @positive-click="handlePositiveClick" @negative-click="handleNegativeClick" :mask-closable="false">
+    <n-form ref="formRef" :model="formData" :rules="rules">
+      <n-form-item :label="t('modal.labelTagName')" path="TagName">
+        <n-input v-model:value="formData.TagName" :placeholder="t('modal.placeholderTagName')" />
+      </n-form-item>
+      <n-form-item :label="t('modal.labelRecordTime')" path="RecordTimestamp">
+        <n-date-picker clearable v-model:value="formData.RecordTimestamp" type="datetime" />
+      </n-form-item>
+    </n-form>
+  </n-modal>
 </template>
 
 <script setup lang="ts">
 import { FindRivalInfoList } from '@wailsjs/go/controller/RivalInfoController';
-import { QueryRivalTagPageList } from '@wailsjs/go/controller/RivalTagController';
+import { AddRivalTag, QueryRivalTagPageList } from '@wailsjs/go/controller/RivalTagController';
 import { dto } from '@wailsjs/go/models';
-import { DataTableColumns, SelectOption, useNotification } from 'naive-ui';
+import { DataTableColumns, FormInst, FormRules, SelectOption, useNotification } from 'naive-ui';
 import { h, reactive, Ref, ref, watch } from 'vue';
 import * as dayjs from 'dayjs';
 import { useI18n } from 'vue-i18n';
@@ -61,14 +74,15 @@ loadRivalOptions();
 
 const columns: DataTableColumns<dto.RivalTagDto> = [
   { title: t('column.tagName'), key: "TagName", width: "400px" },
-  { title: t('column.generated'), key: "Generated",
+  {
+    title: t('column.generated'), key: "Generated",
     render: (row: dto.RivalTagDto) => {
       return h(
         YesNotTag,
         { state: row.Generated }
       );
     }
-   },
+  },
   {
     title: t('column.tagTime'),
     key: "RecordTime",
@@ -115,11 +129,50 @@ function loadData() {
     });
 }
 
+const showAddModal = ref(false);
+const formRef = ref<FormInst | null>(null);
+const formData = ref({
+  TagName: null,
+  RecordTimestamp: null
+});
+const rules: FormRules = {
+  RecordTimestamp: {
+    type: 'number',
+    required: true,
+    message: t('rules.missingRecordTime'),
+    trigger: ["input", "blur"]
+  }
+}
+function handlePositiveClick(): boolean {
+  formRef.value
+    ?.validate()
+    .then(() => {
+      AddRivalTag(formData.value as any)
+        .then(result => {
+          if (result.Code != 200) {
+            return Promise.reject(result.Msg);
+          }
+          showAddModal.value = false;
+        }).catch(err => {
+          notification.error({
+            content: err,
+            duration: 3000,
+            keepAliveOnHover: true
+          });
+        });
+    })
+    .catch((err) => { });
+  return false;
+}
+function handleNegativeClick() {
+  formData.value.TagName = null;
+  formData.value.RecordTimestamp = null;
+}
+
 // Watch: Whenever changing current rival, reload the tag table
 watch(currentRivalID, () => {
   loadData();
 })
-
 </script>
 
 <i18n lang="json">{
@@ -132,6 +185,21 @@ watch(currentRivalID, () => {
     },
     "message": {
       "noRivalError": "FATAL ERROR: no rival data found"
+    },
+    "modal": {
+      "title": "Add Custom Tag",
+      "positiveText": "Submit",
+      "negativeText": "Cancel",
+      "labelTagName": "Tag Name",
+      "labelRecordTime": "Tag Time",
+      "placeholderTagName": "Please input tag name",
+      "placeholderRecordTime": "Please input tag time",
+    },
+    "button": {
+      "add": "Add Custom Tag"
+    },
+    "rules": {
+      "missingRecordTime": "Tag time cannot be empty"
     }
   },
   "zh-CN": {
@@ -143,6 +211,21 @@ watch(currentRivalID, () => {
     },
     "message": {
       "noRivalError": "未知错误: 找不到任何玩家信息?"
+    },
+    "modal": {
+      "title": "添加自定义标签",
+      "positiveText": "提交",
+      "negativeText": "取消",
+      "labelTagName": "名称",
+      "labelRecordTime": "标签时间",
+      "placeholderTagName": "请输入标签名称",
+      "placeholderRecordTime": "请输入标签时间",
+    },
+    "button": {
+      "add": "添加自定义标签"
+    },
+    "rules": {
+      "missingRecordTime": "标签时间不可为空"
     }
   }
 }</i18n>

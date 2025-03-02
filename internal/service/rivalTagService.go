@@ -47,7 +47,7 @@ func (s *RivalTagService) AddRivalTag(rivalTag *vo.RivalTagVo) error {
 		rivalTag.TagName = rivalTag.RecordTime.Format("2006-01-02 15:04:05")
 	}
 	rivalTag.Generated = false
-	return s.db.Create(rivalTag).Error
+	return s.db.Create(rivalTag.Entity()).Error
 }
 
 func (s *RivalTagService) SyncRivalTagFromRawData(rivalID uint, rawScoreLog []*entity.ScoreLog, rawSongData []*entity.SongData) error {

@@ -16,6 +16,8 @@ type RivalTagVo struct {
 	Enabled    bool
 	RecordTime time.Time
 	Pagination *entity.Page
+
+	RecordTimestamp *int64 // overwrites to RecordTime
 }
 
 func NewRivalTagVo(rivalTag *entity.RivalTag) *RivalTagVo {

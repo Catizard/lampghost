@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"time"
+
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/result"
@@ -41,6 +43,9 @@ func (ctl *RivalTagController) QueryRivalTagPageList(filter *vo.RivalTagVo) resu
 
 func (ctl *RivalTagController) AddRivalTag(rivalTag *vo.RivalTagVo) result.RtnMessage {
 	log.Info("[Controller] Calling RivalTagController.AddRivalTag")
+	if rivalTag.RecordTimestamp != nil {
+		rivalTag.RecordTime = time.Unix((*rivalTag.RecordTimestamp)/1000, 0)
+	}
 	err := ctl.rivalTagService.AddRivalTag(rivalTag)
 	if err != nil {
 		log.Errorf("[RivalTagController] returning err: %v", err)

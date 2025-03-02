@@ -44,7 +44,7 @@ func (s *RivalTagService) SyncRivalTagFromRawData(rivalID uint, rawScoreLog []*e
 			tx.Rollback()
 		}
 	}()
-	if err := s.syncRivalTagFromRawData(tx, rivalID, rawScoreLog, rawSongData); err != nil {
+	if err := syncRivalTagFromRawData(tx, rivalID, rawScoreLog, rawSongData); err != nil {
 		return err
 	}
 	return tx.Commit().Error
@@ -63,7 +63,7 @@ cache is here to build the relationship. However this also means we cannot call 
 before having the songdata.db loaded properly(which isn't in initialize phase) or have
 a corrupted songdata cache. So we have to take a step back to generate the cache in time.
 */
-func (s *RivalTagService) syncRivalTagFromRawData(tx *gorm.DB, rivalID uint, rawScoreLog []*entity.ScoreLog, rawSongData []*entity.SongData) error {
+func syncRivalTagFromRawData(tx *gorm.DB, rivalID uint, rawScoreLog []*entity.ScoreLog, rawSongData []*entity.SongData) error {
 	courseInfoDtos, _, err := findCourseInfoList(tx, nil)
 	// NOTE: we have to build the cache by using rawSongData
 	if err != nil {

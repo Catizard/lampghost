@@ -6,6 +6,7 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/config"
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
+	"github.com/Catizard/lampghost_wails/internal/vo"
 	"github.com/charmbracelet/log"
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
@@ -32,11 +33,11 @@ func (s *RivalInfoService) InitializeMainUser(rivalInfo *entity.RivalInfo) error
 	if rivalInfo.ScoreLogPath == nil || *rivalInfo.ScoreLogPath == "" {
 		return fmt.Errorf("scorelog.db path cannot be empty")
 	}
-	var cnt int64
-	if err := s.db.Model(&entity.RivalInfo{}).Where("main_user = 1").Count(&cnt).Error; err != nil {
+	mainUserCount, err := selectRivalInfoCount(s.db, &vo.RivalInfoVo{MainUser: true})
+	if err != nil {
 		return err
 	}
-	if cnt > 0 {
+	if mainUserCount > 0 {
 		return fmt.Errorf("cannot have two main user, what are you doing?")
 	}
 	// Initialize the config
@@ -49,21 +50,21 @@ func (s *RivalInfoService) InitializeMainUser(rivalInfo *entity.RivalInfo) error
 	config.ScorelogFilePath = *rivalInfo.ScoreLogPath
 	config.WriteConfig()
 	rivalInfo.MainUser = true
-	tx := s.db.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
-	if err := tx.Create(rivalInfo).Error; err != nil {
-		tx.Rollback()
-		return err
+	return s.db.Transaction(func(tx *gorm.DB) error {
+		return addRivalInfo(tx, rivalInfo)
+	})
+}
+
+func (s *RivalInfoService) AddRivalInfo(rivalInfo *entity.RivalInfo) error {
+	if rivalInfo == nil {
+		return fmt.Errorf("AddRivalInfo: rivalInfo cannot be nil")
 	}
-	if err := s.syncRivalScoreLog(tx, rivalInfo); err != nil {
-		tx.Rollback()
-		return err
+	if rivalInfo.ScoreLogPath == nil || *rivalInfo.ScoreLogPath == "" {
+		return fmt.Errorf("scorelog.db path cannot be empty")
 	}
-	return tx.Commit().Error
+	return s.db.Transaction(func(tx *gorm.DB) error {
+		return addRivalInfo(tx, rivalInfo)
+	})
 }
 
 func (s *RivalInfoService) FindRivalInfoList() ([]*entity.RivalInfo, int, error) {
@@ -100,7 +101,7 @@ func (s *RivalInfoService) SyncRivalScoreLog(rivalInfo *entity.RivalInfo) error 
 			tx.Rollback()
 		}
 	}()
-	if err := s.syncRivalScoreLog(tx, rivalInfo); err != nil {
+	if err := syncRivalScoreLog(tx, rivalInfo); err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -197,8 +198,30 @@ func (s *RivalInfoService) QueryMainUser() (*entity.RivalInfo, error) {
 	return &out, nil
 }
 
+func addRivalInfo(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
+	if err := tx.Create(rivalInfo).Error; err != nil {
+		return err
+	}
+	if err := syncRivalScoreLog(tx, rivalInfo); err != nil {
+		return err
+	}
+	return nil
+}
+
+func selectRivalInfoCount(tx *gorm.DB, filter *vo.RivalInfoVo) (int64, error) {
+	querying := tx.Model(&entity.RivalInfo{})
+	if filter != nil {
+		querying = querying.Where(filter.Entity())
+	}
+	var count int64
+	if err := querying.Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
 // TODO: 移除掉该接口同步SongData数据的能力
-func (s *RivalInfoService) syncRivalScoreLog(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
+func syncRivalScoreLog(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
 	// (1) load and sync scorelog.db
 	if rivalInfo.ScoreLogPath == nil {
 		return fmt.Errorf("assert: rival's scorelog path cannot be empty")
@@ -219,7 +242,7 @@ func (s *RivalInfoService) syncRivalScoreLog(tx *gorm.DB, rivalInfo *entity.Riva
 		return err
 	}
 	// (3) generate rival tags
-	if err := s.rivalTagService.syncRivalTagFromRawData(tx, rivalInfo.ID, rawScoreLog, rawSongData); err != nil {
+	if err := syncRivalTagFromRawData(tx, rivalInfo.ID, rawScoreLog, rawSongData); err != nil {
 		return err
 	}
 	// (4) update rival itself

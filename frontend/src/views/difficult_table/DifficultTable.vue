@@ -23,15 +23,15 @@
 
 <script lang="ts" setup>
 import type { DataTableColumns, FormInst } from "naive-ui";
-import { NButton, NDataTable, useDialog, useMessage } from "naive-ui";
+import { NButton, NDataTable, useDialog } from "naive-ui";
 import { useNotification } from "naive-ui";
-import { computed, defineComponent, h, Ref, ref } from "vue";
+import { h, Ref, ref } from "vue";
 import {
   AddDiffTableHeader,
   DelDiffTableHeader,
   FindDiffTableHeaderTree
 } from "@wailsjs/go/controller/DiffTableController";
-import { dto, entity } from "@wailsjs/go/models";
+import { dto } from "@wailsjs/go/models";
 import { useI18n } from "vue-i18n";
 
 const i18n = useI18n();

@@ -28,6 +28,18 @@ func (ctl *RivalInfoController) InitializeMainUser(rivalInfo *entity.RivalInfo) 
 	return result.SUCCESS
 }
 
+// TODO: Seperate songdata.db file feature doesn't implement yet, this function would
+// not save the songdata.db file path parameter
+func (ctl *RivalInfoController) AddRivalInfo(rivalInfo *entity.RivalInfo) result.RtnMessage {
+	log.Info("[Controller] calling RivalInfoController.AddRivalInfo")
+	err := ctl.rivalInfoService.AddRivalInfo(rivalInfo)
+	if err != nil {
+		log.Errorf("[RivalController] returning err: %v", err)
+		return result.NewErrorMessage(err)
+	}
+	return result.SUCCESS
+}
+
 func (ctl *RivalInfoController) QueryMainUser() result.RtnData {
 	log.Info("[Controller] calling RivalInfoController.QueryMainUser")
 	rivalInfo, err := ctl.rivalInfoService.QueryMainUser()

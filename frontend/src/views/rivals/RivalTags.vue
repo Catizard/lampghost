@@ -18,9 +18,10 @@ import { FindRivalInfoList } from '@wailsjs/go/controller/RivalInfoController';
 import { FindRivalTagList, QueryRivalTagPageList } from '@wailsjs/go/controller/RivalTagController';
 import { dto, vo } from '@wailsjs/go/models';
 import { DataTableColumns, SelectOption, useNotification } from 'naive-ui';
-import { reactive, Ref, ref, watch } from 'vue';
+import { h, reactive, Ref, ref, watch } from 'vue';
 import * as dayjs from 'dayjs';
 import { useI18n } from 'vue-i18n';
+import YesNotTag from '@/components/YesNotTag.vue';
 
 const i18n = useI18n();
 const { t } = i18n;
@@ -59,8 +60,15 @@ function loadRivalOptions() {
 loadRivalOptions();
 
 const columns: DataTableColumns<dto.RivalTagDto> = [
-  { title: t('column.tagName'), key: "TagName", },
-  { title: t('column.generated'), key: "Generated", },
+  { title: t('column.tagName'), key: "TagName", width: "400px" },
+  { title: t('column.generated'), key: "Generated",
+    render: (row: dto.RivalTagDto) => {
+      return h(
+        YesNotTag,
+        { state: row.Generated }
+      );
+    }
+   },
   {
     title: t('column.tagTime'),
     key: "RecordTime",

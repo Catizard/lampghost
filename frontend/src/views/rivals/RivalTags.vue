@@ -15,8 +15,8 @@
 
 <script setup lang="ts">
 import { FindRivalInfoList } from '@wailsjs/go/controller/RivalInfoController';
-import { FindRivalTagList, QueryRivalTagPageList } from '@wailsjs/go/controller/RivalTagController';
-import { dto, vo } from '@wailsjs/go/models';
+import { QueryRivalTagPageList } from '@wailsjs/go/controller/RivalTagController';
+import { dto } from '@wailsjs/go/models';
 import { DataTableColumns, SelectOption, useNotification } from 'naive-ui';
 import { h, reactive, Ref, ref, watch } from 'vue';
 import * as dayjs from 'dayjs';

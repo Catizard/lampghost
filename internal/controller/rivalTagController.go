@@ -39,5 +39,35 @@ func (ctl *RivalTagController) QueryRivalTagPageList(filter *vo.RivalTagVo) resu
 	return result.NewRtnPage(*filter.Pagination, rows)
 }
 
+func (ctl *RivalTagController) AddRivalTag(rivalTag *vo.RivalTagVo) result.RtnMessage {
+	log.Info("[Controller] Calling RivalTagController.AddRivalTag")
+	err := ctl.rivalTagService.AddRivalTag(rivalTag)
+	if err != nil {
+		log.Errorf("[RivalTagController] returning err: %v", err)
+		return result.NewErrorMessage(err)
+	}
+	return result.SUCCESS
+}
+
+func (ctl *RivalTagController) DeleteRivalTagByID(rivalTagID uint) result.RtnMessage {
+	log.Info("[Controller] Calling RivalTagController.DeleteRivalTag")
+	err := ctl.rivalTagService.DeleteRivalTagByID(rivalTagID)
+	if err != nil {
+		log.Errorf("[RivalTagController] returning err: %v", err)
+		return result.NewErrorMessage(err)
+	}
+	return result.SUCCESS
+}
+
+func (ctl *RivalTagController) RevertRivalTagEnabledState(rivalTagID uint) result.RtnMessage {
+	log.Info("[Controller] Calling RivalTagController.RevertRivalTagEnabledState")
+	err := ctl.rivalTagService.RevertRivalTagEnabledState(rivalTagID)
+	if err != nil {
+		log.Errorf("[RivalTagController] returning err: %v", err)
+		return result.NewErrorMessage(err)
+	}
+	return result.SUCCESS
+}
+
 func (*RivalTagController) GENERATE_RIVAL_TAG() *entity.RivalTag     { return nil }
 func (*RivalTagController) GENERATE_RIVAL_TAG_DTO() *dto.RivalTagDto { return nil }

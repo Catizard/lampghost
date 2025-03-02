@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"sort"
 	"strconv"
 	"time"
@@ -37,6 +38,18 @@ func (s *RivalTagService) FindRivalTagList(filter *vo.RivalTagVo) ([]*dto.RivalT
 	return ret, n, nil
 }
 
+func (s *RivalTagService) AddRivalTag(rivalTag *vo.RivalTagVo) error {
+	if rivalTag == nil {
+		return fmt.Errorf("AddRivalTag: rivalTag cannot be nil")
+	}
+	// if you don't provide the tag name, it would be supplyed with tag time
+	if rivalTag.TagName == "" {
+		rivalTag.TagName = rivalTag.RecordTime.Format("2006-01-02 15:04:05")
+	}
+	rivalTag.Generated = false
+	return s.db.Create(rivalTag).Error
+}
+
 func (s *RivalTagService) SyncRivalTagFromRawData(rivalID uint, rawScoreLog []*entity.ScoreLog, rawSongData []*entity.SongData) error {
 	tx := s.db.Begin()
 	defer func() {
@@ -48,6 +61,23 @@ func (s *RivalTagService) SyncRivalTagFromRawData(rivalID uint, rawScoreLog []*e
 		return err
 	}
 	return tx.Commit().Error
+}
+
+func (s *RivalTagService) DeleteRivalTagByID(rivalTagID uint) error {
+	return s.db.Transaction(func(tx *gorm.DB) error {
+		rivalTag, err := findRivalTagByID(s.db, rivalTagID)
+		if err != nil {
+			return err
+		}
+		if rivalTag.Generated {
+			return fmt.Errorf("DeleteRivalTagByID: cannot delete generated tag")
+		}
+		return deleteRivalTagByID(tx, rivalTagID)
+	})
+}
+
+func (s *RivalTagService) RevertRivalTagEnabledState(rivalTagID uint) error {
+	return s.db.Model(&entity.RivalTag{}).Where("ID = ?", rivalTagID).UpdateColumn("enabled", gorm.Expr("1 - enabled")).Error
 }
 
 /*
@@ -167,4 +197,8 @@ func selectRivalTagCount(tx *gorm.DB, filter *vo.RivalTagVo) (int64, error) {
 		return 0, err
 	}
 	return count, nil
+}
+
+func deleteRivalTagByID(tx *gorm.DB, rivalTagID uint) error {
+	return tx.Unscoped().Where("ID = ?", rivalTagID).Delete(&entity.RivalTag{}).Error
 }

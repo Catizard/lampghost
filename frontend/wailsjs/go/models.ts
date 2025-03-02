@@ -471,6 +471,7 @@ export namespace dto {
 	    RivalId: number;
 	    TagName: string;
 	    Generated: boolean;
+	    Enabled: boolean;
 	    // Go type: time
 	    RecordTime: any;
 	
@@ -487,6 +488,7 @@ export namespace dto {
 	        this.RivalId = source["RivalId"];
 	        this.TagName = source["TagName"];
 	        this.Generated = source["Generated"];
+	        this.Enabled = source["Enabled"];
 	        this.RecordTime = this.convertValues(source["RecordTime"], null);
 	    }
 	
@@ -728,6 +730,7 @@ export namespace entity {
 	    RivalId: number;
 	    TagName: string;
 	    Generated: boolean;
+	    Enabled: boolean;
 	    // Go type: time
 	    RecordTime: any;
 	
@@ -744,6 +747,7 @@ export namespace entity {
 	        this.RivalId = source["RivalId"];
 	        this.TagName = source["TagName"];
 	        this.Generated = source["Generated"];
+	        this.Enabled = source["Enabled"];
 	        this.RecordTime = this.convertValues(source["RecordTime"], null);
 	    }
 	
@@ -1144,6 +1148,7 @@ export namespace vo {
 	    RivalId: number;
 	    TagName: string;
 	    Generated: boolean;
+	    Enabled: boolean;
 	    // Go type: time
 	    RecordTime: any;
 	    Pagination?: entity.Page;
@@ -1161,6 +1166,7 @@ export namespace vo {
 	        this.RivalId = source["RivalId"];
 	        this.TagName = source["TagName"];
 	        this.Generated = source["Generated"];
+	        this.Enabled = source["Enabled"];
 	        this.RecordTime = this.convertValues(source["RecordTime"], null);
 	        this.Pagination = this.convertValues(source["Pagination"], entity.Page);
 	    }

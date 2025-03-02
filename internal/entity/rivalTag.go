@@ -11,6 +11,7 @@ type RivalTag struct {
 	RivalId    uint
 	TagName    string
 	Generated  bool
+	Enabled    bool `gorm:"default:1"`
 	RecordTime time.Time
 }
 

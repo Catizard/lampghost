@@ -13,6 +13,7 @@ type RivalTagDto struct {
 	RivalId    uint
 	TagName    string
 	Generated  bool
+	Enabled    bool
 	RecordTime time.Time
 }
 
@@ -27,6 +28,7 @@ func NewRivalTagDto(rivalTag *entity.RivalTag) *RivalTagDto {
 		RivalId:    rivalTag.RivalId,
 		TagName:    rivalTag.TagName,
 		Generated:  rivalTag.Generated,
+		Enabled:    rivalTag.Enabled,
 		RecordTime: rivalTag.RecordTime,
 	}
 }
@@ -42,6 +44,7 @@ func (rivalTag *RivalTagDto) Entity() *entity.RivalTag {
 		RivalId:    rivalTag.RivalId,
 		TagName:    rivalTag.TagName,
 		Generated:  rivalTag.Generated,
+		Enabled:    rivalTag.Enabled,
 		RecordTime: rivalTag.RecordTime,
 	}
 }

@@ -13,6 +13,7 @@ type RivalTagVo struct {
 	RivalId    uint
 	TagName    string
 	Generated  bool
+	Enabled    bool
 	RecordTime time.Time
 	Pagination *entity.Page
 }
@@ -28,6 +29,7 @@ func NewRivalTagVo(rivalTag *entity.RivalTag) *RivalTagVo {
 		RivalId:    rivalTag.RivalId,
 		TagName:    rivalTag.TagName,
 		Generated:  rivalTag.Generated,
+		Enabled:    rivalTag.Enabled,
 		RecordTime: rivalTag.RecordTime,
 	}
 }
@@ -43,6 +45,7 @@ func (rivalTag *RivalTagVo) Entity() *entity.RivalTag {
 		RivalId:    rivalTag.RivalId,
 		TagName:    rivalTag.TagName,
 		Generated:  rivalTag.Generated,
+		Enabled:    rivalTag.Enabled,
 		RecordTime: rivalTag.RecordTime,
 	}
 }

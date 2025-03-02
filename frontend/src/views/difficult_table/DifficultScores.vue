@@ -11,7 +11,7 @@
       <n-select :loading="loadingRivalData" v-model:value="currentRivalID" :options="rivalOptions" style="width: 200px;"
         :placeholder="t('placeHolderRival')" />
       <n-select :loading="loadingRivalData" v-model:value="currentRivalTagID" :options="rivalTagOptions"
-        style="width: 200px;" :placeholder="t('placeHolderRivalTag')" />
+        style="width: 200px;" :placeholder="t('placeHolderRivalTag')" :render-option="renderRivalTagOption" />
     </n-flex>
     <n-data-table :columns="columns" :data="data" :pagination="pagination" :loading="levelTableLoading"
       :row-key="(row: dto.DiffTableHeaderDto) => row.Level" />
@@ -19,13 +19,12 @@
 </template>
 
 <script setup lang="ts">
-import ClearTag from '@/components/ClearTag.vue';
-import { FindDiffTableHeaderList, FindDiffTableHeaderTree, QueryDiffTableDataWithRival } from '@wailsjs/go/controller/DiffTableController';
+import { FindDiffTableHeaderList, FindDiffTableHeaderTree } from '@wailsjs/go/controller/DiffTableController';
 import { FindRivalInfoList } from '@wailsjs/go/controller/RivalInfoController';
 import { FindRivalTagList } from '@wailsjs/go/controller/RivalTagController';
-import { dto, vo } from '@wailsjs/go/models';
-import { DataTableColumns, NButton, NDataTable, SelectOption, useNotification } from 'naive-ui';
-import { h, nextTick, Ref, ref, useTemplateRef, watch } from 'vue';
+import { dto } from '@wailsjs/go/models';
+import { DataTableColumns, NDataTable, NTooltip, SelectOption, useNotification } from 'naive-ui';
+import { h, Ref, ref, VNode, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import DifficultTableDetail from './DifficultTableDetail.vue';
 
@@ -120,6 +119,12 @@ const currentRivalID: Ref<number | null> = ref(null);
 const currentRivalTagID: Ref<number | null> = ref(null);
 const rivalOptions: Ref<Array<SelectOption>> = ref([]);
 const rivalTagOptions: Ref<Array<SelectOption>> = ref([]);
+function renderRivalTagOption({node, option}: {node: VNode, option: SelectOption}) {
+  return h(NTooltip, null, {
+    trigger: () => node,
+    default: () => option.label
+  });
+}
 function loadRivalOptions() {
   loadingRivalData.value = true;
   FindRivalInfoList()

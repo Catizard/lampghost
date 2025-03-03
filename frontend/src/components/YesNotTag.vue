@@ -5,6 +5,8 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+
 const props = defineProps<{
   state: boolean
 }>();
@@ -36,6 +38,6 @@ function getDef(state: boolean): TagDef {
 }
 
 
-const def = getDef(props.state);
+const def = computed(() => getDef(props.state));
 
 </script>

@@ -5,7 +5,7 @@
         <n-text type="primary">{{ t('title') }}</n-text>
       </n-h1>
     </n-flex>
-    <n-flex justify="flex-start">
+    <n-flex justify="flex-start" style="margin-bottom: 15px;">
       <n-select :loading="tableLoading" v-model:value="currentRivalID" :options="rivalOptions" style="width: 200px;" />
       <n-button style="margin-left: auto;" type="primary" @click="showAddModal = true">{{ t('button.add') }}</n-button>
     </n-flex>
@@ -28,9 +28,9 @@
 
 <script setup lang="ts">
 import { FindRivalInfoList } from '@wailsjs/go/controller/RivalInfoController';
-import { AddRivalTag, QueryRivalTagPageList } from '@wailsjs/go/controller/RivalTagController';
+import { AddRivalTag, DeleteRivalTagByID, QueryRivalTagPageList, RevertRivalTagEnabledState } from '@wailsjs/go/controller/RivalTagController';
 import { dto } from '@wailsjs/go/models';
-import { DataTableColumns, FormInst, FormRules, SelectOption, useNotification } from 'naive-ui';
+import { DataTableColumns, FormInst, FormRules, NButton, SelectOption, useDialog, useNotification } from 'naive-ui';
 import { h, reactive, Ref, ref, watch } from 'vue';
 import * as dayjs from 'dayjs';
 import { useI18n } from 'vue-i18n';
@@ -38,6 +38,7 @@ import YesNotTag from '@/components/YesNotTag.vue';
 
 const i18n = useI18n();
 const { t } = i18n;
+const dialog = useDialog();
 const notification = useNotification();
 
 const tableLoading = ref(false);
@@ -73,7 +74,7 @@ function loadRivalOptions() {
 loadRivalOptions();
 
 const columns: DataTableColumns<dto.RivalTagDto> = [
-  { title: t('column.tagName'), key: "TagName", width: "400px" },
+  { title: t('column.tagName'), key: "TagName", width: "200px", ellipsis: { tooltip: true } },
   {
     title: t('column.generated'), key: "Generated",
     render: (row: dto.RivalTagDto) => {
@@ -84,9 +85,48 @@ const columns: DataTableColumns<dto.RivalTagDto> = [
     }
   },
   {
+    title: t('column.enabled'), key: "Enabled",
+    render: (row: dto.RivalTagDto) => {
+      return h(
+        YesNotTag,
+        { state: row.Enabled }
+      );
+    }
+  },
+  {
     title: t('column.tagTime'),
     key: "RecordTime",
     render: (row: dto.RivalTagDto) => dayjs(row.RecordTime).format('YYYY-MM-DD HH:mm:ss')
+  },
+  {
+    title: t('column.actions'), key: "Actions",
+    render: (row: dto.RivalTagDto) => {
+      const deleteTagButton = row.Generated == false ? h(
+        NButton,
+        {
+          strong: true,
+          tertiary: true,
+          size: 'small',
+          type: "error",
+          onClick: () => deleteTag(row),
+        },
+        { default: () => t('button.delete') }
+      ) : null;
+      const revertEnabledStateButton = h(
+        NButton,
+        {
+          strong: true,
+          tertiary: true,
+          size: "small",
+          onClick: () => revertTagEnabledState(row),
+        },
+        { default: () => row.Enabled ? t('button.disable') : t('button.enable') }
+      );
+      if (deleteTagButton != null) {
+        return [deleteTagButton, revertEnabledStateButton];
+      }
+      return revertEnabledStateButton;
+    }
   }
 ];
 const data: Ref<Array<dto.RivalTagDto>> = ref([]);
@@ -169,6 +209,45 @@ function handleNegativeClick() {
   formData.value.RecordTimestamp = null;
 }
 
+function deleteTag(tag: dto.RivalTagDto) {
+  dialog.warning({
+    title: t('deleteDialog.title'),
+    positiveText: t('deleteDialog.positiveText'),
+    negativeText: t('deleteDialog.negativeText'),
+    onPositiveClick: () => {
+      DeleteRivalTagByID(tag.ID)
+        .then(result => {
+          if (result.Code != 200) {
+            return Promise.reject(result.Msg);
+          }
+          loadData();
+        }).catch(err => {
+          notification.error({
+            content: err,
+            duration: 3000,
+            keepAliveOnHover: true,
+          });
+        });
+    }
+  })
+}
+
+function revertTagEnabledState(tag: dto.RivalTagDto) {
+  RevertRivalTagEnabledState(tag.ID)
+    .then(result => {
+      if (result.Code != 200) {
+        return Promise.reject(result.Msg);
+      }
+      loadData();
+    }).catch(err => {
+      notification.error({
+        content: err,
+        duration: 3000,
+        keepAliveOnHover: true
+      });
+    });
+}
+
 // Watch: Whenever changing current rival, reload the tag table
 watch(currentRivalID, () => {
   loadData();
@@ -180,8 +259,10 @@ watch(currentRivalID, () => {
     "title": "Rival Tags",
     "column": {
       "tagName": "Tag Name",
+      "enabled": "Enabled",
       "generated": "Generated",
-      "tagTime": "Tag Time"
+      "tagTime": "Tag Time",
+      "actions": "Actions"
     },
     "message": {
       "noRivalError": "FATAL ERROR: no rival data found"
@@ -193,21 +274,31 @@ watch(currentRivalID, () => {
       "labelTagName": "Tag Name",
       "labelRecordTime": "Tag Time",
       "placeholderTagName": "Please input tag name",
-      "placeholderRecordTime": "Please input tag time",
+      "placeholderRecordTime": "Please input tag time"
     },
     "button": {
-      "add": "Add Custom Tag"
+      "add": "Add Custom Tag",
+      "delete": "Delete",
+      "enable": "Enable",
+      "disable": "Disable"
     },
     "rules": {
       "missingRecordTime": "Tag time cannot be empty"
+    },
+    "deleteDialog": {
+      "title": "Confirm to delete?",
+      "positiveText": "Yes",
+      "negativeText": "No"
     }
   },
   "zh-CN": {
     "title": "玩家标签",
     "column": {
       "tagName": "标签名称",
+      "enabled": "是否启用",
       "generated": "自动生成",
-      "tagTime": "标签时间"
+      "tagTime": "标签时间",
+      "actions": "操作"
     },
     "message": {
       "noRivalError": "未知错误: 找不到任何玩家信息?"
@@ -219,13 +310,20 @@ watch(currentRivalID, () => {
       "labelTagName": "名称",
       "labelRecordTime": "标签时间",
       "placeholderTagName": "请输入标签名称",
-      "placeholderRecordTime": "请输入标签时间",
+      "placeholderRecordTime": "请输入标签时间"
     },
     "button": {
-      "add": "添加自定义标签"
+      "add": "添加自定义标签",
+      "enable": "启用",
+      "disable": "禁用"
     },
     "rules": {
       "missingRecordTime": "标签时间不可为空"
+    },
+    "deleteDialog": {
+      "title": "确定要删除吗?",
+      "positiveText": "是",
+      "negativeText": "否"
     }
   }
 }</i18n>

@@ -4,9 +4,9 @@
       <n-h1 prefix="bar" style="text-align: start">
         <n-text type="primary">{{ t('title') }}</n-text>
       </n-h1>
-      <n-button type="primary" @click="showAddModal = true">{{ t('button.add') }}</n-button>
+      <n-button :loading="loading" type="primary" @click="showAddModal = true">{{ t('button.add') }}</n-button>
     </n-space>
-    <n-data-table :columns="columns" :data="data" :pagination="pagination" :bordered="false"
+    <n-data-table :loading="loading" :columns="columns" :data="data" :pagination="pagination" :bordered="false"
       :row-key="(row: dto.DiffTableHeaderDto) => row.ID" />
   </perfect-scrollbar>
 
@@ -52,6 +52,7 @@ const rules = {
 
 const notification = useNotification();
 const dialog = useDialog();
+const loading = ref(false);
 loadDiffTableData();
 
 function createColumns({
@@ -97,20 +98,23 @@ const columns = createColumns({
 });
 
 function addDiffTableHeader(url: string) {
+  loading.value = true;
   AddDiffTableHeader(url)
     .then((result) => {
       if (result.Code != 200) {
         return Promise.reject(result.Msg);
       }
+      formData.value.url = "";
       loadDiffTableData();
     })
     .catch((err) => {
       notifyError(t('message.addTableFailedPrefix') + err)
       loadDiffTableData();
-    });
+    }).finally(() => loading.value = false);
 }
 
 function delDiffTableHeader(id: number) {
+  loading.value = true;
   DelDiffTableHeader(id)
     .then(result => {
       if (result.Code != 200) {
@@ -121,7 +125,7 @@ function delDiffTableHeader(id: number) {
     }).catch(err => {
       notifyError(err)
       loadDiffTableData();
-    })
+    }).finally(() => loading.value = false);
 }
 
 function handlePositiveClick(): boolean {
@@ -140,6 +144,7 @@ function handleNegativeClick() {
 }
 
 function loadDiffTableData() {
+  loading.value = true;
   FindDiffTableHeaderTree(null)
     .then(result => {
       if (result.Code != 200) {
@@ -152,7 +157,7 @@ function loadDiffTableData() {
         duration: 5000,
         keepAliveOnHover: true
       })
-    });
+    }).finally(() => loading.value = false);
 }
 
 function notifySuccess(msg: string) {

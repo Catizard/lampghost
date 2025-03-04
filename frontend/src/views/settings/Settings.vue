@@ -20,15 +20,13 @@
         <n-p>
           <n-form-item>
             <template #label>
-              <n-tooltip trigger="hover">
+              <n-tooltip trigger="hover" style="max-width: 400px; text-align: left; white-space: pre-line;">
                 <template #trigger>
                   <n-icon :component="HintIcon" />
                 </template>
-                <n-p>
-                  {{ t('generalSettings.tipIgnoreVariantCourse') }}
-                </n-p>
+                {{ t('generalSettings.tipIgnoreVariantCourse') }}
               </n-tooltip>
-              {{ t('generalSettings.labelIgnoreVariantCourse') }}
+              <span style="white-space: pre-line;">{{ t('generalSettings.labelIgnoreVariantCourse') }}</span>
             </template>
             <n-select v-model:value="model.IgnoreVariantCourse" :options="yesnoOptions" style="width: 150px;" />
           </n-form-item>
@@ -94,7 +92,7 @@
             </n-tooltip>
             {{ t('folderSettings.labelSymbol') }}
           </template>
-          <n-input v-model:value="model.FolderSymbol" :placeholder="t('folderSettings.placeholderSymbol')" :maxlength="5" style="width: 150px;"
+          <n-input v-model:value="model.FolderSymbol" :placeholder="t('folderSettings.placeholderSymbol')" :maxlength="5" style="width: 200px;"
             :loading="loading">
           </n-input>
         </n-form-item>

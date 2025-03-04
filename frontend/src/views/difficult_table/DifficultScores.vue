@@ -120,7 +120,9 @@ const currentRivalTagID: Ref<number | null> = ref(null);
 const rivalOptions: Ref<Array<SelectOption>> = ref([]);
 const rivalTagOptions: Ref<Array<SelectOption>> = ref([]);
 function renderRivalTagOption({node, option}: {node: VNode, option: SelectOption}) {
-  return h(NTooltip, null, {
+  return h(NTooltip, {
+    style: "max-width: 200px; font-color: white",
+  }, {
     trigger: () => node,
     default: () => option.label
   });

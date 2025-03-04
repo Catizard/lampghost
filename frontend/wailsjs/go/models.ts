@@ -1092,6 +1092,8 @@ export namespace vo {
 	    StartRecordTime: any;
 	    // Go type: time
 	    EndRecordTime: any;
+	    StartRecordTimestamp: number;
+	    EndRecordTimestamp: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new RivalScoreLogVo(source);
@@ -1119,6 +1121,8 @@ export namespace vo {
 	        this.OnlyCourseLogs = source["OnlyCourseLogs"];
 	        this.StartRecordTime = this.convertValues(source["StartRecordTime"], null);
 	        this.EndRecordTime = this.convertValues(source["EndRecordTime"], null);
+	        this.StartRecordTimestamp = source["StartRecordTimestamp"];
+	        this.EndRecordTimestamp = source["EndRecordTimestamp"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

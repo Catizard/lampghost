@@ -48,21 +48,9 @@ func findRivalScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.Riva
 		sd.ID as rival_song_data_id
 	`
 	partial := tx.Model(&entity.RivalScoreLog{}).Order("rival_score_log.record_time desc").Select(fields)
-	if filter != nil {
-		partial = partial.Where(filter.Entity())
-		// Extra filters
-		if filter.OnlyCourseLogs {
-			partial = partial.Where("length(rival_score_log.sha256) > 64")
-		}
-		if !filter.StartRecordTime.IsZero() {
-			partial = partial.Where("rival_score_log.record_time >= ?", filter.StartRecordTime)
-		}
-		if !filter.EndRecordTime.IsZero() {
-			partial = partial.Where("rival_score_log.record_time <= ?", filter.EndRecordTime)
-		}
-	}
 	var out []*dto.RivalScoreLogDto
-	if err := partial.Debug().Joins("left join rival_song_data sd on rival_score_log.sha256 = sd.sha256").Scopes(
+	if err := partial.Debug().Joins("left join (select * from rival_song_data group by sha256) as sd on rival_score_log.sha256 = sd.sha256").Scopes(
+		scopeRivalScoreLogFilter(filter),
 		pagination(filter.Pagination),
 	).Find(&out).Error; err != nil {
 		return nil, 0, err
@@ -105,8 +93,31 @@ func selectRivalScoreLogCount(tx *gorm.DB, filter *vo.RivalScoreLogVo) (int64, e
 		return count, nil
 	}
 	var count int64
-	if err := tx.Model(&entity.RivalScoreLog{}).Debug().Where(filter.Entity()).Count(&count).Error; err != nil {
+	if err := tx.Model(&entity.RivalScoreLog{}).Debug().Where(filter.Entity()).Scopes(
+		scopeRivalScoreLogFilter(filter),
+	).Count(&count).Error; err != nil {
 		return 0, err
 	}
 	return count, nil
+}
+
+// Specialized scope for vo.RivalScoreLogVo
+func scopeRivalScoreLogFilter(filter *vo.RivalScoreLogVo) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if filter == nil {
+			return db
+		}
+		moved := db.Where(filter.Entity())
+		// Extra filters
+		if filter.OnlyCourseLogs {
+			moved = moved.Where("length(rival_score_log.sha256) > 64")
+		}
+		if !filter.StartRecordTime.IsZero() {
+			moved = moved.Where("rival_score_log.record_time >= ?", filter.StartRecordTime)
+		}
+		if !filter.EndRecordTime.IsZero() {
+			moved = moved.Where("rival_score_log.record_time <= ?", filter.EndRecordTime)
+		}
+		return moved
+	}
 }

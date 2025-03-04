@@ -183,7 +183,6 @@ function initUser() {
       }
     }).then(result => {
       if (result == null) {
-        // TODO: 正确地显示无数据的情况
         return Promise.reject(t('message.noTableError'))
       }
       QueryUserInfoWithLevelLayeredDiffTableLampStatus(mainUser.ID, result.ID).then(result => {

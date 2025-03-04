@@ -115,6 +115,5 @@ func (ctl *RivalInfoController) DelRivalInfo(ID uint) result.RtnMessage {
 	return result.SUCCESS
 }
 
-// TODO: 目前wails不支持泛型代码生成，这个方法用于让wails知道需要生成entity下的数据
 func (ctl *RivalInfoController) GENERATOR_RIVAL_INFO() *entity.RivalInfo     { return nil }
 func (ctl *RivalInfoController) GENERATOR_RIVAL_INFO_DTO() *dto.RivalInfoDto { return nil }

@@ -27,8 +27,10 @@ type RivalScoreLogVo struct {
 	// Extra filter field
 	OnlyCourseLogs bool
 	// StartRecordTime <= RecordTime <= EndRecordTime
-	StartRecordTime time.Time
-	EndRecordTime   time.Time
+	StartRecordTime      time.Time
+	EndRecordTime        time.Time
+	StartRecordTimestamp int64 // overwrite StartRecordTime
+	EndRecordTimestamp   int64 // overwrite EndRecordTime
 }
 
 func (rivalScoreLog *RivalScoreLogVo) Entity() *entity.RivalScoreLog {
@@ -52,4 +54,9 @@ func (rivalScoreLog *RivalScoreLogVo) Entity() *entity.RivalScoreLog {
 		OldMinbp:   rivalScoreLog.OldMinbp,
 		RecordTime: rivalScoreLog.RecordTime,
 	}
+}
+
+func (rivalScoreLog *RivalScoreLogVo) ConvTimestamp() {
+	rivalScoreLog.StartRecordTime = time.Unix(rivalScoreLog.StartRecordTimestamp, 0).Local()
+	rivalScoreLog.EndRecordTime = time.Unix(rivalScoreLog.EndRecordTimestamp, 0).Local()
 }

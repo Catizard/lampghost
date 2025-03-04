@@ -26,12 +26,22 @@ func NewRivalInfoService(db *gorm.DB, diffTableService *DiffTableService, rivalT
 	}
 }
 
-func (s *RivalInfoService) InitializeMainUser(rivalInfo *entity.RivalInfo) error {
+func (s *RivalInfoService) InitializeMainUser(rivalInfo *vo.RivalInfoVo) error {
 	if rivalInfo.SongDataPath == nil || *rivalInfo.SongDataPath == "" {
 		return fmt.Errorf("songdata.db path cannot be empty")
 	}
 	if rivalInfo.ScoreLogPath == nil || *rivalInfo.ScoreLogPath == "" {
 		return fmt.Errorf("scorelog.db path cannot be empty")
+	}
+	if rivalInfo.Locale != nil && *rivalInfo.Locale != "" {
+		conf, err := config.ReadConfig()
+		if err != nil {
+			return err
+		}
+		conf.Locale = *rivalInfo.Locale
+		if err := conf.WriteConfig(); err != nil {
+			return err
+		}
 	}
 	mainUserCount, err := selectRivalInfoCount(s.db, &vo.RivalInfoVo{MainUser: true})
 	if err != nil {
@@ -51,7 +61,7 @@ func (s *RivalInfoService) InitializeMainUser(rivalInfo *entity.RivalInfo) error
 	config.WriteConfig()
 	rivalInfo.MainUser = true
 	return s.db.Transaction(func(tx *gorm.DB) error {
-		return addRivalInfo(tx, rivalInfo)
+		return addRivalInfo(tx, rivalInfo.Entity())
 	})
 }
 

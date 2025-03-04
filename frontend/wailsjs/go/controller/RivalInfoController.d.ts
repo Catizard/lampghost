@@ -15,7 +15,7 @@ export function GENERATOR_RIVAL_INFO():Promise<entity.RivalInfo>;
 
 export function GENERATOR_RIVAL_INFO_DTO():Promise<dto.RivalInfoDto>;
 
-export function InitializeMainUser(arg1:entity.RivalInfo):Promise<result.RtnMessage>;
+export function InitializeMainUser(arg1:vo.RivalInfoVo):Promise<result.RtnMessage>;
 
 export function QueryMainUser():Promise<result.RtnData>;
 

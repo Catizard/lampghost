@@ -1026,6 +1026,7 @@ export namespace vo {
 	    PlayCount: number;
 	    MainUser: boolean;
 	    Pagination?: entity.Page;
+	    Locale?: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new RivalInfoVo(source);
@@ -1043,6 +1044,7 @@ export namespace vo {
 	        this.PlayCount = source["PlayCount"];
 	        this.MainUser = source["MainUser"];
 	        this.Pagination = this.convertValues(source["Pagination"], entity.Page);
+	        this.Locale = source["Locale"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

@@ -19,7 +19,7 @@ func NewRivalInfoController(rivalInfoService *service.RivalInfoService) *RivalIn
 	}
 }
 
-func (ctl *RivalInfoController) InitializeMainUser(rivalInfo *entity.RivalInfo) result.RtnMessage {
+func (ctl *RivalInfoController) InitializeMainUser(rivalInfo *vo.RivalInfoVo) result.RtnMessage {
 	log.Info("[Controller] calling RivalInfoController.InitializeMainUser")
 	err := ctl.rivalInfoService.InitializeMainUser(rivalInfo)
 	if err != nil {

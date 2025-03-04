@@ -14,6 +14,7 @@ type RivalInfoVo struct {
 	MainUser     bool
 
 	Pagination *entity.Page
+	Locale     *string // only passed at initialized phase
 }
 
 func (rivalInfo *RivalInfoVo) Entity() *entity.RivalInfo {

@@ -318,11 +318,11 @@ initUser();
     "playerInfo": {
       "name": "Player Name",
       "count": "Player Count",
-      "lastSyncTime": "Last Sync Time",
+      "lastSyncTime": "Last Sync Time"
     },
     "button": {
       "sync": "Reload Save File",
-      "chooseYear": "Choose Year",
+      "chooseYear": "Choose Year"
     },
     "lampStatusTitle": "Lamp Status",
     "message": {
@@ -339,11 +339,11 @@ initUser();
     "playerInfo": {
       "name": "玩家名称",
       "count": "游玩次数",
-      "lastSyncTime": "最后同步时间",
+      "lastSyncTime": "最后同步时间"
     },
     "button": {
       "sync": "同步最新存档",
-      "chooseYear": "选择年份",
+      "chooseYear": "选择年份"
     },
     "lampStatusTitle": "点灯情况",
     "message": {
@@ -354,7 +354,7 @@ initUser();
       "reloadFailedPrefix": "同步失败，返回结果: ",
       "unfinishedFeature": "不好意思，这个功能还没实现"
     }
-  },
+  }
 }</i18n>
 
 <style scoped>

@@ -12,6 +12,7 @@ ReadConfig()
       // Should we report this?
       return;
     }
+    console.log(result);
     i18n.locale = ref(result.Data.Locale);
   })
 </script>

@@ -3,7 +3,7 @@
     <n-flex justify="space-between">
       <n-h1 prefix="bar" style="text-align: left;">
         <n-text type="primary">
-          {{ t('title') }} 
+          {{ t('title') }}
         </n-text>
       </n-h1>
       <n-button type="primary" @click="handleSaveSettings" :loading="loading">{{ t('button.save') }}</n-button>
@@ -35,9 +35,23 @@
       <n-h2>
         {{ t('saveSettings.title') }}
         <n-p>
+          <n-form-item path="forceFullyReload">
+            <template #label>
+              <n-tooltip trigger="hover">
+                <template #trigger>
+                  <n-icon :component="HintIcon" />
+                </template>
+                {{ t('saveSettings.tipForceFullyReload') }}
+              </n-tooltip>
+              {{ t('saveSettings.labelForceFullyReload') }}
+            </template>
+            <n-select v-model:value="model.ForceFullyReload" :options="yesnoOptions" style="width: 150px;" />
+          </n-form-item>
+        </n-p>
+        <n-p>
           <n-form-item :label="t('saveSettings.labelUserName')" path="userName">
-            <n-input show-count v-model:value="model.UserName" :placeholder="t('saveSettings.placeholderUserName')" style="width: 50%;"
-              :loading="loading" />
+            <n-input show-count v-model:value="model.UserName" :placeholder="t('saveSettings.placeholderUserName')"
+              style="width: 50%;" :loading="loading" />
           </n-form-item>
         </n-p>
         <n-p class="alert-p">
@@ -45,14 +59,14 @@
         </n-p>
         <n-p>
           <n-form-item :label="t('saveSettings.labelScorelogPath')" path="scorelogFilePath">
-            <n-input clearable v-model:value="model.ScorelogFilePath" :placeholder="t('saveSettings.placeholderScorelogPath')"
-              style="width: 50%;" :loading="loading" />
+            <n-input clearable v-model:value="model.ScorelogFilePath"
+              :placeholder="t('saveSettings.placeholderScorelogPath')" style="width: 50%;" :loading="loading" />
           </n-form-item>
         </n-p>
         <n-p>
           <n-form-item :label="t('saveSettings.labelSongdataPath')" path="songdataFilePath">
-            <n-input clearable v-model:value="model.SongdataFilePath" :placeholder="t('saveSettings.placeholderSongdataPath')"
-              style="width: 50%;" :loading="loading" />
+            <n-input clearable v-model:value="model.SongdataFilePath"
+              :placeholder="t('saveSettings.placeholderSongdataPath')" style="width: 50%;" :loading="loading" />
           </n-form-item>
         </n-p>
         <!-- <n-p>
@@ -73,14 +87,15 @@
       </n-h2>
       <n-h2>
         <n-text>
-          {{ t('folderSettings.title') }} 
+          {{ t('folderSettings.title') }}
         </n-text>
         <!-- <n-p class="alert-p">
           {{ t('folderSettings.labelInternalServerPort') }} 
         </n-p> -->
         <n-form-item :label="t('folderSettings.labelInternalServerPort')" path="internalServerPort">
-          <n-input-number :show-button="false" v-model:value="model.InternalServerPort" :placeholder="t('folderSettings.placeholderInternalServerPort')"
-            :maxlength="5" style="width: 150px;" :loading="loading" />
+          <n-input-number :show-button="false" v-model:value="model.InternalServerPort"
+            :placeholder="t('folderSettings.placeholderInternalServerPort')" :maxlength="5" style="width: 150px;"
+            :loading="loading" />
         </n-form-item>
         <n-form-item path="folderSymbol">
           <template #label>
@@ -92,8 +107,8 @@
             </n-tooltip>
             {{ t('folderSettings.labelSymbol') }}
           </template>
-          <n-input v-model:value="model.FolderSymbol" :placeholder="t('folderSettings.placeholderSymbol')" :maxlength="5" style="width: 200px;"
-            :loading="loading">
+          <n-input v-model:value="model.FolderSymbol" :placeholder="t('folderSettings.placeholderSymbol')"
+            :maxlength="5" style="width: 200px;" :loading="loading">
           </n-input>
         </n-form-item>
       </n-h2>
@@ -134,6 +149,7 @@ const model = ref<config.ApplicationConfig>({
   FolderSymbol: null,
   IgnoreVariantCourse: null,
   Locale: null,
+  ForceFullyReload: null,
 });
 const loading = ref(false);
 const yesnoOptions: Array<SelectOption> = [
@@ -202,8 +218,7 @@ loadSettings();
 }
 </style>
 
-<i18n lang="json">
-{
+<i18n lang="json">{
   "en": {
     "title": "Settings",
     "button": {
@@ -218,12 +233,14 @@ loadSettings();
     "saveSettings": {
       "title": "Save File Settings",
       "alert": "If you changed the file path, by pressing the save button your save file would be reloaded automatically, there's no need to reload again manually",
+      "tipForceFullyReload": "When checked, all save files would be reloaded by pressing sync button.While not, only part of the scorelog.db would be read, which could be faster\nWarning: when not checked, your songdata.db would not be updated by pressing sync button but need to press the full reload button",
+      "labelForceFullyReload": "Force Fully Reload",
       "labelUserName": "Your user name",
-			"labelSongdataPath": "songdata.db file path",
-			"labelScorelogPath": "scorelog.db file path",
-			"placeholderUserName": "Please input your name",
-			"placeholderSongdataPath": "Please input songdata.db file path",
-			"placeholderScorelogPath": "Please input scorelog.db file path"
+      "labelSongdataPath": "songdata.db file path",
+      "labelScorelogPath": "scorelog.db file path",
+      "placeholderUserName": "Please input your name",
+      "placeholderSongdataPath": "Please input songdata.db file path",
+      "placeholderScorelogPath": "Please input scorelog.db file path"
     },
     "folderSettings": {
       "title": "Custom Folder Settings",
@@ -256,12 +273,14 @@ loadSettings();
     "saveSettings": {
       "title": "存档设置",
       "alert": "如果你修改了这里的设置,保存时会自动重新加载存档信息, 不需要手动加载数据",
+      "tipForceFullyReload": "开启时每次同步存档都会读取完整的文件内容。关闭时同步速度会更快,因为只会读取一部分scorelog.db\n注意: 关闭该设置时同步按钮不会读取你的songdata.db文件, 如果文件发生了变化你需要在点击完整重新读取存档的按钮",
+      "labelForceFullyReload": "强制完整更新存档",
       "labelUserName": "用户名称",
-			"labelSongdataPath": "songdata.db文件路径",
-			"labelScorelogPath": "scorelog.db文件路径",
-			"placeholderUserName": "请输入用户名",
-			"placeholderSongdataPath": "请输入songdata.db文件路径",
-			"placeholderScorelogPath": "请输入scorelog.db文件路径"
+      "labelSongdataPath": "songdata.db文件路径",
+      "labelScorelogPath": "scorelog.db文件路径",
+      "placeholderUserName": "请输入用户名",
+      "placeholderSongdataPath": "请输入songdata.db文件路径",
+      "placeholderScorelogPath": "请输入scorelog.db文件路径"
     },
     "folderSettings": {
       "title": "收藏夹设置",
@@ -279,5 +298,4 @@ loadSettings();
       "saveSuccess": "保存成功"
     }
   }
-}
-</i18n>
+}</i18n>

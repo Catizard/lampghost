@@ -369,36 +369,23 @@ func (s *DiffTableService) QueryDiffTableDataWithRival(filter *vo.DiffTableHeade
 }
 
 func (s *DiffTableService) BindDiffTableDataToFolder(diffTableDataID uint, folderIDs []uint) error {
-	log.Debugf("[DiffTableService] Calling BindDiffTableToFolder with diffTableDataID=%v, folderIDs=%v", diffTableDataID, folderIDs)
-	tx := s.db.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
+	return s.db.Transaction(func(tx *gorm.DB) error {
+		songData, err := findDiffTableDataByID(tx, diffTableDataID)
+		if err != nil {
+			return err
 		}
-	}()
 
-	songData, err := findDiffTableDataByID(tx, diffTableDataID)
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
+		content := entity.FolderContent{
+			Sha256: songData.Sha256,
+			Md5:    songData.Md5,
+			Title:  songData.Title,
+		}
 
-	content := entity.FolderContent{
-		Sha256: songData.Sha256,
-		Md5:    songData.Md5,
-		Title:  songData.Title,
-	}
-
-	if err := bindSongToFolder(tx, content, folderIDs); err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	if err := tx.Commit().Error; err != nil {
-		tx.Rollback()
-		return err
-	}
-	return nil
+		if err := bindSongToFolder(tx, content, folderIDs); err != nil {
+			return err
+		}
+		return nil
+	})
 }
 
 // Query if there exists a header that satisfies the condition

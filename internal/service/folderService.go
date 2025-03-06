@@ -7,7 +7,6 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/vo"
-	"github.com/charmbracelet/log"
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 )
@@ -114,63 +113,58 @@ func (s *FolderService) DelFolderContent(contentID uint) error {
 }
 
 // Bind one song to multiple folders
+//
 // Requirements:
 // 1) `Sha256` & `Title` & `folderIDs` must be existed.
-// 2) `folderIDs` defines the final binding, for example, if the song "AIR" is currently binds to folder "1" & "2"
-// After calling BindSongToFolder("AIR", ["2", "3"]), "AIR" is now binds to "2" & "3"
-// 3) This function must keep old data. In previous example, the content which represents "AIR" and "2" won't be modified
+// 2) if len(folderIDs) == 0, nothing would be done
+//
+// This function implements `incremental update`, which means the `folderIDs` doesn't define the final
+// bindings for the `content` but only the updates
 func bindSongToFolder(tx *gorm.DB, content entity.FolderContent, folderIDs []uint) error {
-	rawFolders, rlen, err := findFolderList(tx, &vo.FolderVo{IDs: folderIDs})
+	if len(folderIDs) == 0 {
+		return nil
+	}
+	// Fetch previous bindings
+	previous, _, err := findFolderContentList(tx, &vo.FolderContentVo{
+		FolderIDs: folderIDs,
+		Sha256:    content.Sha256,
+	})
 	if err != nil {
 		return err
 	}
-	if rlen != len(folderIDs) {
-		return fmt.Errorf("bind song to folder failed: folder id array is cracked")
+	// If we already binds it, do nothing
+	newFolderIDs := make([]uint, 0)
+	for _, folderID := range folderIDs {
+		if !slices.ContainsFunc(previous, func(p *entity.FolderContent) bool {
+			return p.FolderID == folderID
+		}) {
+			newFolderIDs = append(newFolderIDs, folderID)
+		}
+	}
+	if len(newFolderIDs) == 0 {
+		return nil // Okay dokey
 	}
 
+	folders, _, err := findFolderList(tx, &vo.FolderVo{
+		IDs: newFolderIDs,
+	})
+	if err != nil {
+		return err
+	}
 	folderIDMapsToSelf := make(map[uint]*entity.Folder)
-	for _, folder := range rawFolders {
+	for _, folder := range folders {
 		folderIDMapsToSelf[folder.ID] = folder
 	}
 
-	// Fetch previous bindings
-	previous, _, err := findFolderContentList(tx, &vo.FolderContentVo{FolderIDs: folderIDs})
-	if err != nil {
-		return err
-	}
-
-	// Delete unused bindings
-	unused := make([]uint, 0)
-	for _, prev := range previous {
-		if slices.Contains(folderIDs, prev.ID) {
-			unused = append(unused, prev.ID)
-		}
-	}
-	if len(unused) > 0 {
-		if err := tx.Unscoped().Where("id in ?", unused).Delete(&entity.FolderContent{}).Error; err != nil {
-			return err
-		}
-	}
 	// Insert new bindings
 	candidate := make([]*entity.FolderContent, 0)
-	for _, folderID := range folderIDs {
-		if !slices.ContainsFunc(previous, func(prev *entity.FolderContent) bool {
-			log.Debugf("prev.ID=%v, folderID=%v, equals?=%v", prev.ID, folderID, prev.ID == folderID)
-			return prev.ID == folderID
-		}) {
-			newContent := content
-			newContent.FolderID = folderIDMapsToSelf[folderID].ID
-			newContent.FolderName = folderIDMapsToSelf[folderID].FolderName
-			candidate = append(candidate, &newContent)
-		}
+	for _, folderID := range newFolderIDs {
+		newContent := content
+		newContent.FolderID = folderID
+		newContent.FolderName = folderIDMapsToSelf[folderID].FolderName
+		candidate = append(candidate, &newContent)
 	}
-	if len(candidate) > 0 {
-		if err := tx.Create(&candidate).Error; err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return tx.Create(&candidate).Error
 }
 
 func (s *FolderService) FindFolderTree() ([]*dto.FolderDto, int, error) {

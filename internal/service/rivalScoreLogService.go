@@ -66,6 +66,13 @@ func findRivalScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.Riva
 	return out, len(out), nil
 }
 
+// Query the last played score log
+func findLastRivalScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) (*entity.RivalScoreLog, error) {
+	ret := entity.RivalScoreLog{}
+	err := tx.Model(&entity.RivalScoreLog{}).Scopes(scopeRivalScoreLogFilter(filter)).Order("record_time desc").Limit(1).Find(&ret).Error
+	return &ret, err
+}
+
 // Extend function to findRivalScoreLogList
 //
 // Returns sha256 grouped array

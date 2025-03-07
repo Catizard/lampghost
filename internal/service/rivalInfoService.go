@@ -12,6 +12,8 @@ import (
 	"gorm.io/gorm"
 )
 
+const DEFAULT_BATCH_SIZE = 100
+
 type RivalInfoService struct {
 	db               *gorm.DB
 	diffTableService *DiffTableService
@@ -96,6 +98,7 @@ func (s *RivalInfoService) FindRivalInfoByID(rivalID uint) (*entity.RivalInfo, e
 	return &out, nil
 }
 
+// Fully reload one rival's save files
 func (s *RivalInfoService) SyncRivalScoreLog(rivalInfo *entity.RivalInfo) error {
 	if rivalInfo == nil {
 		return fmt.Errorf("assert: SyncRivalScoreLog: rivalInfo == nil")
@@ -107,17 +110,33 @@ func (s *RivalInfoService) SyncRivalScoreLog(rivalInfo *entity.RivalInfo) error 
 	if rivalInfo.ScoreLogPath == nil || *rivalInfo.ScoreLogPath == "" {
 		return fmt.Errorf("cannot sync rival %s's score log: score log file path is empty", rivalInfo.Name)
 	}
-	tx := s.db.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
-	if err := syncRivalScoreLog(tx, rivalInfo); err != nil {
-		tx.Rollback()
-		return err
+	return s.db.Transaction(func(tx *gorm.DB) error {
+		return syncRivalScoreLog(tx, rivalInfo)
+	})
+}
+
+// Extension to syncRivalScoreLog, which only reloads part of the scorelog.db file
+// More specifically, only reloads the log that is recorded after rival's last log
+//
+// Requirements:
+// 1) rivalInfo's id > 0
+// 2) rivalInfo's scorelog path must not be empty
+//
+// Special Cases:
+// If no record belong to passed rival, fallback to fully reload
+func (s *RivalInfoService) IncrementalSyncRivalScoreLog(rivalInfo *entity.RivalInfo) error {
+	if rivalInfo == nil {
+		return fmt.Errorf("incrementalSyncRivalScoreLog: rivalInfo cannot be nil")
 	}
-	return tx.Commit().Error
+	if rivalInfo.ID == 0 {
+		return fmt.Errorf("incrementalSyncRivalScoreLog: rivalInfo.ID should > 0")
+	}
+	if rivalInfo.ScoreLogPath == nil || *rivalInfo.ScoreLogPath == "" {
+		return fmt.Errorf("incrementalSyncRivalScoreLog: rivalInfo.ScoreLogPath cannot be empty")
+	}
+	return s.db.Transaction(func(tx *gorm.DB) error {
+		return incrementalSyncRivalScoreLog(tx, rivalInfo)
+	})
 }
 
 func (s *RivalInfoService) DelRivalInfo(ID uint) error {
@@ -198,7 +217,14 @@ func (s *RivalInfoService) SyncRivalScoreLogByID(rivalID uint) error {
 	if rivalInfo, err := s.FindRivalInfoByID(rivalID); err != nil {
 		return err
 	} else {
-		return s.SyncRivalScoreLog(rivalInfo)
+		conf, err := config.ReadConfig()
+		if err != nil {
+			return err
+		}
+		if conf.ForceFullyReload != 0 {
+			return s.SyncRivalScoreLog(rivalInfo)
+		}
+		return s.IncrementalSyncRivalScoreLog(rivalInfo)
 	}
 }
 
@@ -232,13 +258,16 @@ func selectRivalInfoCount(tx *gorm.DB, filter *vo.RivalInfoVo) (int64, error) {
 	return count, nil
 }
 
-// TODO: 移除掉该接口同步SongData数据的能力
+// Fully reload one rival's saves files
+//
+// Warning: this method actually reload not only scorelog.db but all save files
+// may need a rename in the future
 func syncRivalScoreLog(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
 	// (1) load and sync scorelog.db
 	if rivalInfo.ScoreLogPath == nil {
 		return fmt.Errorf("assert: rival's scorelog path cannot be empty")
 	}
-	rawScoreLog, err := loadScoreLog(*rivalInfo.ScoreLogPath)
+	rawScoreLog, err := loadScoreLog(*rivalInfo.ScoreLogPath, nil)
 	if err != nil {
 		return err
 	}
@@ -263,7 +292,30 @@ func syncRivalScoreLog(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
 	}).Error
 }
 
-func loadScoreLog(scoreLogPath string) ([]*entity.ScoreLog, error) {
+func incrementalSyncRivalScoreLog(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
+
+	lastRivalScoreLog, err := findLastRivalScoreLogList(tx, &vo.RivalScoreLogVo{RivalId: rivalInfo.ID})
+	if err != nil {
+		return err
+	}
+	// Fallback to fully reload
+	if lastRivalScoreLog.ID == 0 {
+		return syncRivalScoreLog(tx, rivalInfo)
+	}
+	maximumRecordTimestamp := lastRivalScoreLog.RecordTime.Unix()
+	rawScoreLog, err := loadScoreLog(*rivalInfo.ScoreLogPath, &maximumRecordTimestamp)
+	if err != nil {
+		return err
+	}
+	if err := appendScoreLog(tx, rawScoreLog, rivalInfo.ID); err != nil {
+		return err
+	}
+	// TODO: regenerate tags here
+	// TODO: update rival's playcount here
+	return nil
+}
+
+func loadScoreLog(scoreLogPath string, maximumTimestamp *int64) ([]*entity.ScoreLog, error) {
 	if scoreLogPath == "" {
 		return nil, fmt.Errorf("assert: scorelog path cannot be empty")
 	}
@@ -298,6 +350,7 @@ func loadSongData(songDataPath string) ([]*entity.SongData, error) {
 	return rawSongData, nil
 }
 
+// Fully delete all content from rival_score_log and rebuild them by rawScoreLog
 func syncScoreLog(tx *gorm.DB, rawScoreLog []*entity.ScoreLog, rivalID uint) error {
 	rivalScoreLog := make([]entity.RivalScoreLog, len(rawScoreLog))
 	for i, rawLog := range rawScoreLog {
@@ -309,10 +362,21 @@ func syncScoreLog(tx *gorm.DB, rawScoreLog []*entity.ScoreLog, rivalID uint) err
 		return err
 	}
 
-	if err := tx.CreateInBatches(&rivalScoreLog, 100).Error; err != nil {
+	if err := tx.CreateInBatches(&rivalScoreLog, DEFAULT_BATCH_SIZE).Error; err != nil {
 		return err
 	}
 	return nil
+}
+
+// Similar to syncScoreLog but not delete any old content, only append new logs
+func appendScoreLog(tx *gorm.DB, rawScoreLog []*entity.ScoreLog, rivalID uint) error {
+	newRivalScorelogs := make([]*entity.RivalScoreLog, len(rawScoreLog))
+	for i, rawLog := range rawScoreLog {
+		rivalLog := entity.FromRawScoreLogToRivalScoreLog(rawLog)
+		rivalLog.RivalId = rivalID
+		newRivalScorelogs[i] = &rivalLog
+	}
+	return tx.Model(&entity.RivalScoreLog{}).CreateInBatches(newRivalScorelogs, DEFAULT_BATCH_SIZE).Error
 }
 
 func syncSongData(tx *gorm.DB, rawSongData []*entity.SongData, rivalID uint) error {
@@ -327,10 +391,7 @@ func syncSongData(tx *gorm.DB, rawSongData []*entity.SongData, rivalID uint) err
 		return err
 	}
 
-	if err := tx.CreateInBatches(&rivalSongData, 100).Error; err != nil {
-		return err
-	}
-	return nil
+	return tx.CreateInBatches(&rivalSongData, DEFAULT_BATCH_SIZE).Error
 }
 
 func queryMainUser(tx *gorm.DB) (*entity.RivalInfo, error) {

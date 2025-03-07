@@ -222,8 +222,10 @@ func (s *RivalInfoService) SyncRivalScoreLogByID(rivalID uint) error {
 			return err
 		}
 		if conf.ForceFullyReload != 0 {
+			log.Debug("[RivalInfoService] dispatched into fully reload")
 			return s.SyncRivalScoreLog(rivalInfo)
 		}
+		log.Debug("[RivalInfoService] dispatched into incremental reload")
 		return s.IncrementalSyncRivalScoreLog(rivalInfo)
 	}
 }
@@ -293,7 +295,6 @@ func syncRivalScoreLog(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
 }
 
 func incrementalSyncRivalScoreLog(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
-
 	lastRivalScoreLog, err := findLastRivalScoreLogList(tx, &vo.RivalScoreLogVo{RivalId: rivalInfo.ID})
 	if err != nil {
 		return err
@@ -310,7 +311,7 @@ func incrementalSyncRivalScoreLog(tx *gorm.DB, rivalInfo *entity.RivalInfo) erro
 	if err := appendScoreLog(tx, rawScoreLog, rivalInfo.ID); err != nil {
 		return err
 	}
-	// TODO: regenerate tags here
+	syncRivalTag(tx, rivalInfo.ID)
 	// TODO: update rival's playcount here
 	return nil
 }
@@ -325,7 +326,7 @@ func loadScoreLog(scoreLogPath string, maximumTimestamp *int64) ([]*entity.Score
 		return nil, err
 	}
 	scoreLogService := NewScoreLogService(scoreLogDB)
-	rawScoreLog, n, err := scoreLogService.FindScoreLogList()
+	rawScoreLog, n, err := scoreLogService.FindScoreLogList(maximumTimestamp)
 	if err != nil {
 		return nil, err
 	}

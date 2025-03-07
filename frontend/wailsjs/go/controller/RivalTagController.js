@@ -29,3 +29,7 @@ export function QueryRivalTagPageList(arg1) {
 export function RevertRivalTagEnabledState(arg1) {
   return window['go']['controller']['RivalTagController']['RevertRivalTagEnabledState'](arg1);
 }
+
+export function SyncRivalTag(arg1) {
+  return window['go']['controller']['RivalTagController']['SyncRivalTag'](arg1);
+}

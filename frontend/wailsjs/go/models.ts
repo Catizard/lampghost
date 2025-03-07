@@ -1096,6 +1096,7 @@ export namespace vo {
 	    EndRecordTime: any;
 	    StartRecordTimestamp: number;
 	    EndRecordTimestamp: number;
+	    MinimumClear?: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new RivalScoreLogVo(source);
@@ -1125,6 +1126,7 @@ export namespace vo {
 	        this.EndRecordTime = this.convertValues(source["EndRecordTime"], null);
 	        this.StartRecordTimestamp = source["StartRecordTimestamp"];
 	        this.EndRecordTimestamp = source["EndRecordTimestamp"];
+	        this.MinimumClear = source["MinimumClear"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

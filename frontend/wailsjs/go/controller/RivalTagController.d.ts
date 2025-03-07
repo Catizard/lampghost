@@ -18,3 +18,5 @@ export function GENERATE_RIVAL_TAG_DTO():Promise<dto.RivalTagDto>;
 export function QueryRivalTagPageList(arg1:vo.RivalTagVo):Promise<result.RtnPage>;
 
 export function RevertRivalTagEnabledState(arg1:number):Promise<result.RtnMessage>;
+
+export function SyncRivalTag(arg1:number):Promise<result.RtnMessage>;

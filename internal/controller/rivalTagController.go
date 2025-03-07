@@ -74,5 +74,15 @@ func (ctl *RivalTagController) RevertRivalTagEnabledState(rivalTagID uint) resul
 	return result.SUCCESS
 }
 
+func (ctl *RivalTagController) SyncRivalTag(rivalID uint) result.RtnMessage {
+	log.Info("[Controller] Calling RivalTagController.SyncRivalTag")
+	err := ctl.rivalTagService.SyncRivalTag(rivalID)
+	if err != nil {
+		log.Error("[RivalTagController] returning err: %v", err)
+		return result.NewErrorMessage(err)
+	}
+	return result.SUCCESS
+}
+
 func (*RivalTagController) GENERATE_RIVAL_TAG() *entity.RivalTag     { return nil }
 func (*RivalTagController) GENERATE_RIVAL_TAG_DTO() *dto.RivalTagDto { return nil }

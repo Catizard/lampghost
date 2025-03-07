@@ -50,17 +50,24 @@ func (s *RivalTagService) AddRivalTag(rivalTag *vo.RivalTagVo) error {
 	return s.db.Create(rivalTag.Entity()).Error
 }
 
+// Rebuild one rival's tags
+//
+// Implementaion Details:
+// All user customized tags would be kept
+func (s *RivalTagService) SyncRivalTag(rivalID uint) error {
+	return s.db.Transaction(func(tx *gorm.DB) error {
+		return syncRivalTag(tx, rivalID)
+	})
+}
+
+// Rebuild one rival's tags but use the raw contents from scorelog.db & songdata.db
+//
+// Implementaion Details:
+// All user customized tags would be kept
 func (s *RivalTagService) SyncRivalTagFromRawData(rivalID uint, rawScoreLog []*entity.ScoreLog, rawSongData []*entity.SongData) error {
-	tx := s.db.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
-	if err := syncRivalTagFromRawData(tx, rivalID, rawScoreLog, rawSongData); err != nil {
-		return err
-	}
-	return tx.Commit().Error
+	return s.db.Transaction(func(tx *gorm.DB) error {
+		return syncRivalTagFromRawData(tx, rivalID, rawScoreLog, rawSongData)
+	})
 }
 
 func (s *RivalTagService) DeleteRivalTagByID(rivalTagID uint) error {
@@ -80,12 +87,76 @@ func (s *RivalTagService) RevertRivalTagEnabledState(rivalTagID uint) error {
 	return s.db.Model(&entity.RivalTag{}).Where("ID = ?", rivalTagID).UpdateColumn("enabled", gorm.Expr("1 - enabled")).Error
 }
 
+// Rebuild one rival's tag list
+func syncRivalTag(tx *gorm.DB, rivalID uint) error {
+	courseInfoDtos, _, err := findCourseInfoList(tx, nil)
+	if err != nil {
+		return err
+	}
+	interestHashSet := make(map[string]interface{})
+	for _, course := range courseInfoDtos {
+		interestHashSet[course.GetJoinedSha256("")] = new(interface{})
+	}
+	var minimumClear int32 = entity.Normal
+	rawScorelogs, _, err := findRivalScoreLogList(tx, &vo.RivalScoreLogVo{
+		OnlyCourseLogs: true,
+		MinimumClear:   &minimumClear,
+	})
+	if err != nil {
+		return err
+	}
+	interestScoreLogs := make([]*dto.RivalScoreLogDto, 0)
+	for _, log := range rawScorelogs {
+		if _, ok := interestHashSet[log.Sha256]; ok {
+			interestScoreLogs = append(interestScoreLogs, log)
+		}
+	}
+	if len(interestScoreLogs) == 0 {
+		log.Warn("[RivalTagService] There's no course related play record, skip tag build")
+		return nil
+	}
+
+	sort.Slice(interestScoreLogs, func(i int, j int) bool {
+		return interestScoreLogs[i].RecordTime.Before(interestScoreLogs[j].RecordTime)
+	})
+
+	tags := make([]*entity.RivalTag, 0)
+	for _, courseInfo := range courseInfoDtos {
+		for _, log := range interestScoreLogs {
+			if log.Sha256 != courseInfo.GetJoinedSha256("") {
+				continue
+			}
+			scoreLogMode, err := strconv.Atoi(log.Mode)
+			if err != nil {
+				continue
+			}
+			if scoreLogMode/100 == courseInfo.GetConstraintMode()/100 {
+				continue
+			}
+			fct := &entity.RivalTag{
+				RivalId:    rivalID,
+				TagName:    courseInfo.Name + " First Clear",
+				Generated:  true,
+				RecordTime: log.RecordTime,
+			}
+			tags = append(tags, fct)
+			break
+		}
+	}
+
+	if err := tx.Unscoped().Where("rival_id = ? and generated = true", rivalID).Error; err != nil {
+		return err
+	}
+
+	return tx.Create(tags).Error
+}
+
 /*
 Sync one rival's tag list with specified raw scorelog.
 
 For now this function only generate the first clear course tag.
-The array of logs' sequence requires nothing, this function would handle it properly,
-so there's no need to sort the logs before calling this function.
+There is no special requirements for `rawScoreLog`, this function would handle it properly,
+and there's no need to sort the logs before calling this function.
 
 This function depends on SongDataService's song hash cache and it was due to a historical
 problem: scorelog only contains sha256 and difficult table data only contains md5. And the
@@ -148,7 +219,8 @@ func syncRivalTagFromRawData(tx *gorm.DB, rivalID uint, rawScoreLog []*entity.Sc
 		}
 	}
 
-	if err := tx.Unscoped().Where("rival_id = ?", rivalID).Delete(&entity.RivalTag{}).Error; err != nil {
+	// NOTE: We only delete generated tags
+	if err := tx.Unscoped().Where("rival_id = ? and generated = true", rivalID).Delete(&entity.RivalTag{}).Error; err != nil {
 		return err
 	}
 

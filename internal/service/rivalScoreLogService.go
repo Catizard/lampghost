@@ -129,6 +129,10 @@ func scopeRivalScoreLogFilter(filter *vo.RivalScoreLogVo) func(db *gorm.DB) *gor
 		if filter.MinimumClear != nil {
 			moved = moved.Where("rival_score_log.clear >= ?", filter.MinimumClear)
 		}
+		if filter.SpecifyYear != nil {
+			// TODO: why the fuck this doesn't work
+			moved = moved.Where("STRFTIME('%Y', `rival_score_log`.`record_time`) = ?", filter.SpecifyYear)
+		}
 		return moved
 	}
 }

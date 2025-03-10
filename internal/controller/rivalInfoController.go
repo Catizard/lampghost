@@ -59,7 +59,7 @@ func (ctl *RivalInfoController) QueryUserInfoByID(rivalID uint) result.RtnData {
 	return result.NewRtnData(data)
 }
 
-func (ctl *RivalInfoController) QueryUserPlayCountInYear(ID uint, yearNum int) result.RtnDataList {
+func (ctl *RivalInfoController) QueryUserPlayCountInYear(ID uint, yearNum string) result.RtnDataList {
 	log.Info("[Controller] calling RivalInfoController.QueryUserPlayCountInYear")
 	pc, err := ctl.rivalInfoService.QueryUserPlayCountInYear(ID, yearNum)
 	if err != nil {
@@ -103,6 +103,16 @@ func (ctl *RivalInfoController) QueryRivalInfoPageList(filter *vo.RivalInfoVo) r
 		return result.NewErrorPage(err)
 	}
 	return result.NewRtnPage(*filter.Pagination, rows)
+}
+
+func (ctl *RivalInfoController) QueryRivalPlayedYears(rivalID uint) result.RtnDataList {
+	log.Info("[Controller] calling RivalInfoController.QueryRivalPlayedYears")
+	rows, _, err := ctl.rivalInfoService.QueryRivalPlayedYears(rivalID)
+	if err != nil {
+		log.Errorf("[RivalInfoController] returning error: %v", err)
+		return result.NewErrorDataList(err)
+	}
+	return result.NewRtnDataList(rows)
 }
 
 func (ctl *RivalInfoController) DelRivalInfo(ID uint) result.RtnMessage {

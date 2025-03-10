@@ -34,6 +34,10 @@ export function QueryRivalInfoPageList(arg1) {
   return window['go']['controller']['RivalInfoController']['QueryRivalInfoPageList'](arg1);
 }
 
+export function QueryRivalPlayedYears(arg1) {
+  return window['go']['controller']['RivalInfoController']['QueryRivalPlayedYears'](arg1);
+}
+
 export function QueryUserInfoByID(arg1) {
   return window['go']['controller']['RivalInfoController']['QueryUserInfoByID'](arg1);
 }

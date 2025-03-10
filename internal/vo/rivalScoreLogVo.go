@@ -33,6 +33,8 @@ type RivalScoreLogVo struct {
 	EndRecordTimestamp   int64 // overwrite EndRecordTime
 	// Clear >= MinimumClear
 	MinimumClear *int32
+	// year(RecordTime) == specifyYear
+	SpecifyYear *string
 }
 
 func (rivalScoreLog *RivalScoreLogVo) Entity() *entity.RivalScoreLog {

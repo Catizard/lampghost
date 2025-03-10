@@ -155,16 +155,19 @@ func (s *RivalInfoService) DelRivalInfo(ID uint) error {
 	return nil
 }
 
-func (s *RivalInfoService) QueryUserPlayCountInYear(ID uint, yearNum int) ([]int, error) {
-	var playData []entity.RivalScoreLog
-	if err := s.db.Where(&entity.RivalScoreLog{RivalId: ID}).Find(&playData).Error; err != nil {
+func (s *RivalInfoService) QueryUserPlayCountInYear(ID uint, yearNum string) ([]int, error) {
+	logs, _, err := findRivalScoreLogList(s.db, &vo.RivalScoreLogVo{
+		RivalId:     ID,
+		SpecifyYear: &yearNum,
+	})
+	if err != nil {
 		return nil, err
 	}
 	ret := make([]int, 12)
 	for i := range ret {
 		ret[i] = 0
 	}
-	for _, playLog := range playData {
+	for _, playLog := range logs {
 		ret[playLog.RecordTime.Month()-1]++
 	}
 	return ret, nil
@@ -228,6 +231,14 @@ func (s *RivalInfoService) SyncRivalScoreLogByID(rivalID uint) error {
 		log.Debug("[RivalInfoService] dispatched into incremental reload")
 		return s.IncrementalSyncRivalScoreLog(rivalInfo)
 	}
+}
+
+func (s *RivalInfoService) QueryRivalPlayedYears(rivalID uint) ([]int, int, error) {
+	var years []int
+	if err := s.db.Model(&entity.RivalScoreLog{}).Select("distinct STRFTIME('%Y', record_time)").Find(&years).Error; err != nil {
+		return nil, 0, err
+	}
+	return years, len(years), nil
 }
 
 func (s *RivalInfoService) QueryMainUser() (*entity.RivalInfo, error) {

@@ -125,5 +125,11 @@ watch(currentYear, () => {
 		"message": {
 			"noRecordError": "No record found"
 		}
+	},
+	"zh-CN": {
+		"title": "游玩次数",
+		"message": {
+			"noRecordError": "无任何记录"
+		}
 	}
 }</i18n>

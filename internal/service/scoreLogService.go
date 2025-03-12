@@ -17,7 +17,11 @@ func NewScoreLogService(db *gorm.DB) *ScoreLogService {
 
 func (s *ScoreLogService) FindScoreLogList(maximumTimestamp *int64) ([]*entity.ScoreLog, int, error) {
 	var logs []*entity.ScoreLog
-	if err := s.db.Where("date <= ?", maximumTimestamp).Find(&logs).Error; err != nil {
+	moved := s.db
+	if maximumTimestamp != nil {
+		moved = moved.Where("date <= ?", maximumTimestamp)
+	}
+	if err := moved.Find(&logs).Error; err != nil {
 		return nil, 0, err
 	}
 	return logs, len(logs), nil

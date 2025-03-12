@@ -323,8 +323,13 @@ func incrementalSyncRivalScoreLog(tx *gorm.DB, rivalInfo *entity.RivalInfo) erro
 		return err
 	}
 	syncRivalTag(tx, rivalInfo.ID)
-	// TODO: update rival's playcount here
-	return nil
+	pc, err := selectRivalScoreLogCount(tx, &vo.RivalScoreLogVo{
+		RivalId: rivalInfo.ID,
+	})
+	if err != nil {
+		return err
+	}
+	return tx.Model(&entity.RivalInfo{}).Where("ID = ?", rivalInfo.ID).Update("play_count", pc).Error
 }
 
 func loadScoreLog(scoreLogPath string, maximumTimestamp *int64) ([]*entity.ScoreLog, error) {

@@ -1,4 +1,5 @@
 <template>
+  <!-- TODO: allow user change bar type(count or percentage)-->
   <n-select v-model:value="currentTableId" :options="tableOptions" width="150px" />
   <vue-apex-charts height="450px" type="bar" :options="lampCountChartOptions" :series="lampCountChartOptions.series" />
 </template>
@@ -23,6 +24,7 @@ const LAMPS = [1, 4, 5, 11, 0];
 const STR_LAMPS = ["FAILED", "Easy", "Normal", "Hard+", "NO_PLAY"];
 
 const currentTableId: Ref<number | null> = ref(null);
+const currentHeader: Ref<dto.DiffTableHeaderDto | null> = ref(null);
 const tableOptions: Ref<Array<SelectOption>> = ref([]);
 function loadTableData() {
   FindDiffTableHeaderList()
@@ -85,42 +87,7 @@ function loadLampData() {
       if (result.Code != 200) {
         return Promise.reject(result.Msg);
       }
-      const header: dto.DiffTableHeaderDto = result.Data.DiffTableHeader;
-      lampCountChartOptions.series = [];
-      STR_LAMPS.forEach((lampName) => {
-        lampCountChartOptions.series.push({
-          name: lampName,
-          data: [],
-        });
-      });
-      lampCountChartOptions.xaxis.categories = [];
-      for (let i = 0; i < header.SortedLevels.length; ++i) {
-        const level = header.SortedLevels[i];
-        const levelName = header.Symbol + level;
-        lampCountChartOptions.xaxis.categories.push(levelName);
-        const dataList = header.LevelLayeredContents[level];
-        for (let j = 0; j < LAMPS.length; ++j) {
-          const lampValue = LAMPS[j];
-          // TODO: wtf
-          const count = dataList.filter(
-            (data) =>
-              data.Lamp == lampValue ||
-              (data.Lamp >= 6 && lampValue == 11) ||
-              (lampValue == 1 && data.Lamp < 4 && data.Lamp > 0),
-          ).length;
-          let v = {
-            x: levelName,
-            y: count,
-            fillColor: null,
-            strokeColor: null,
-          };
-          if (lampValue == 0) {
-            v.fillColor = "#FFFFFF";
-            v.strokeColor = "#FFFFFF";
-          }
-          lampCountChartOptions.series[j].data.push(v);
-        }
-      }
+      currentHeader.value = result.Data.DiffTableHeader;
     }).catch(err => {
       notification.error({
         content: err,
@@ -130,25 +97,65 @@ function loadLampData() {
     });
 }
 
+function buildSeries() {
+  lampCountChartOptions.series = STR_LAMPS.map(lampName => {
+    return {
+      name: lampName,
+      data: [],
+    }
+  });
+  lampCountChartOptions.xaxis.categories = [];
+  const header = currentHeader.value;
+  for (let i = 0; i < header.SortedLevels.length; ++i) {
+    const level = header.SortedLevels[i];
+    const levelName = header.Symbol + level;
+    lampCountChartOptions.xaxis.categories.push(levelName);
+    const dataList = header.LevelLayeredContents[level];
+    for (let j = 0; j < LAMPS.length; ++j) {
+      const lampValue = LAMPS[j];
+      // TODO: wtf
+      const count = dataList.filter(
+        (data) =>
+          data.Lamp == lampValue ||
+          (data.Lamp >= 6 && lampValue == 11) ||
+          (lampValue == 1 && data.Lamp < 4 && data.Lamp > 0),
+      ).length;
+      let v = {
+        x: levelName,
+        y: count,
+        fillColor: null,
+        strokeColor: null,
+      };
+      if (lampValue == 0) {
+        v.fillColor = "#FFFFFF";
+        v.strokeColor = "#FFFFFF";
+      }
+      lampCountChartOptions.series[j].data.push(v);
+    }
+  }
+}
+
 watch([currentTableId, () => props.rivalId], ([newTableId, newRivalId]) => {
   if (newTableId == null || newTableId == undefined || newRivalId == null || newRivalId == undefined) {
     return;
   }
   loadLampData();
+});
+
+watch(currentHeader, _ => {
+  buildSeries();
 })
 </script>
 
 <i18n lang="json">{
   "en": {
     "message": {
-			"noTableError": "Cannot handle no difficult table data currenlty, please add at least one table first"
+      "noTableError": "Cannot handle no difficult table data currenlty, please add at least one table first"
     }
   },
   "zh-CN": {
     "message": {
-			"noTableError": "目前无法处理一个难度表都没有的情况，请至少先添加一个难度表"
+      "noTableError": "目前无法处理一个难度表都没有的情况，请至少先添加一个难度表"
     }
   }
-}
-
-</i18n>
+}</i18n>

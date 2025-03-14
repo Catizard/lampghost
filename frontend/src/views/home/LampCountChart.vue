@@ -1,6 +1,10 @@
 <template>
-  <!-- TODO: allow user change bar type(count or percentage)-->
-  <n-select v-model:value="currentTableId" :options="tableOptions" width="150px" />
+  <n-flex justify="flex-start">
+    <n-radio-group v-model:value="currentDisplayType" name="radiogroup">
+      <n-radio-button v-for="dt in displayTypes" :key="dt.type" :value="dt.type" :label="dt.label" />
+    </n-radio-group>
+    <n-select v-model:value="currentTableId" :options="tableOptions" style="width: 150px;" />
+  </n-flex>
   <vue-apex-charts height="450px" type="bar" :options="lampCountChartOptions" :series="lampCountChartOptions.series" />
 </template>
 
@@ -51,6 +55,22 @@ function loadTableData() {
     });
 }
 loadTableData();
+
+interface DisplayType {
+  type: number,
+  label: string
+}
+const displayTypes: Array<DisplayType> = [
+  {
+    type: 0,
+    label: "Count",
+  },
+  {
+    type: 1,
+    label: "Rate"
+  }
+];
+const currentDisplayType: Ref<number | null> = ref(0);
 
 const lampCountChartOptions = reactive({
   chart: {

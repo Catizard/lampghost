@@ -15,6 +15,8 @@
     in pkgs.mkShell {
     	packages = with pkgs; [
         wails
+	gtk3
+	webkitgtk_4_0
       ];
 
       shellHook = with pkgs; ''

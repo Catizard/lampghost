@@ -4,13 +4,15 @@
       <n-h1 prefix="bar" style="text-align: start;">
         <n-text type="primary">{{ t('title') }}</n-text>
       </n-h1>
-      <n-flex justify="end">
-        <n-button>{{ t('button.chooseClearType') }}</n-button>
-        <n-button>{{ t('button.minimumClearType') }}</n-button>
-      </n-flex>
-      <n-data-table remote :columns="columns" :data="data" :pagination="pagination" :bordered="false" :loading="loading"
-        :row-key="row => row.ID" />
     </n-flex>
+    <n-flex justify="start">
+      <n-input :placeholder="t('searchNamePlaceholder')" v-model:value="searchNameLike" @keyup.enter="loadData()"
+        style="width: 150px;" />
+      <!-- <n-button>{{ t('button.chooseClearType') }}</n-button>
+      <n-button>{{ t('button.minimumClearType') }}</n-button> -->
+    </n-flex>
+    <n-data-table remote :columns="columns" :data="data" :pagination="pagination" :bordered="false" :loading="loading"
+      :row-key="row => row.ID" />
   </perfect-scrollbar>
 
   <select-folder v-model:show="showFolderSelection" @submit="handleSubmit"></select-folder>
@@ -33,6 +35,7 @@ const notification = useNotification();
 const loading = ref<boolean>(false);
 const showFolderSelection = ref<boolean>(false);
 const candidateSongDataID = ref<number>(null);
+const searchNameLike: Ref<string | null> = ref(null);
 
 function handleSubmit(selected: [any]) {
   BindRivalSongDataToFolder(candidateSongDataID.value, selected)
@@ -106,6 +109,7 @@ function loadData() {
   loading.value = true;
   let arg: vo.RivalScoreLogVo = {
     Pagination: pagination,
+    SongNameLike: searchNameLike.value,
   } as any;
   QueryRivalScoreLogPageList(arg)
     .then(result => {
@@ -169,7 +173,8 @@ onMounted(() => {
       "loadRecentRecordFailedPrefix": "Load recent records failed, error message: ",
       "bindSuccess": "Bind successfully",
       "bindFailedPrefix": "Failed to bind song to folder, error message: "
-    }
+    },
+    "searchNamePlaceholder": "Search Song"
   },
   "zh-CN": {
     "title": "最近游玩记录",
@@ -189,6 +194,7 @@ onMounted(() => {
       "loadRecentRecordFailedPrefix": "Load recent records failed, error message: ",
       "bindSucess": "绑定成功",
       "bindFailedPrefix": "绑定失败, 错误信息: "
-    }
+    },
+    "searchNamePlaceholder": "搜索歌曲"
   }
 }</i18n>

@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/charmbracelet/log"
 	"github.com/spf13/viper"
 )
 
@@ -25,7 +24,6 @@ func init() {
 	// Setup viper
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
-	log.Infof("config directory: %s", WorkingDirectory[:len(WorkingDirectory)-1])
 	viper.AddConfigPath(WorkingDirectory[:len(WorkingDirectory)-1])
 	// Setup defaults
 	viper.SetDefault("InternalServerPort", 7391)

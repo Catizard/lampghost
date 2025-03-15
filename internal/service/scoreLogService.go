@@ -19,7 +19,7 @@ func (s *ScoreLogService) FindScoreLogList(maximumTimestamp *int64) ([]*entity.S
 	var logs []*entity.ScoreLog
 	moved := s.db
 	if maximumTimestamp != nil {
-		moved = moved.Where("date <= ?", maximumTimestamp)
+		moved = moved.Where("date > ?", maximumTimestamp)
 	}
 	if err := moved.Find(&logs).Error; err != nil {
 		return nil, 0, err

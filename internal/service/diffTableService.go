@@ -370,16 +370,21 @@ func (s *DiffTableService) QueryDiffTableDataWithRival(filter *vo.DiffTableHeade
 
 func (s *DiffTableService) BindDiffTableDataToFolder(diffTableDataID uint, folderIDs []uint) error {
 	return s.db.Transaction(func(tx *gorm.DB) error {
+		fmt.Printf("FUCK YOU")
+		log.Debugf("before find difficult table data")
 		songData, err := findDiffTableDataByID(tx, diffTableDataID)
 		if err != nil {
 			return err
 		}
+		log.Debugf("data: %v", songData)
 
 		content := entity.FolderContent{
 			Sha256: songData.Sha256,
 			Md5:    songData.Md5,
 			Title:  songData.Title,
 		}
+
+		log.Debugf("new folder content: %v", content)
 
 		if err := bindSongToFolder(tx, content, folderIDs); err != nil {
 			return err

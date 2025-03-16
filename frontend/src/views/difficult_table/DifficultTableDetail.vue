@@ -1,7 +1,7 @@
 <template>
 	<n-data-table remote :columns="columns" :data="data" :pagination="pagination" :bordered="false" min-height="500px"
 		:loading="loading" :row-key="(row: dto.DiffTableDataDto) => row.ID" />
-	<select-folder v-model:show="showFolderSelection" @submit="handleSubmit" />
+	<select-folder v-model:show="showFolderSelection" :sha256="candidateSongSha256" @submit="handleSubmit" />
 </template>
 
 <script setup lang="ts">
@@ -30,18 +30,13 @@ const props = defineProps<{
 }>()
 
 const columns: DataTableColumns<dto.DiffTableDataDto> = [
-	{ title: t('column.songName'), key: "Title", width: "300px", ellipsis: { tooltip: true}, resizable: true },
-	{ title: t('column.artist'), key: "Artist", ellipsis: { tooltip: true}, },
+	{ title: t('column.songName'), key: "Title", width: "300px", ellipsis: { tooltip: true }, resizable: true },
+	{ title: t('column.artist'), key: "Artist", ellipsis: { tooltip: true }, },
 	{ title: t('column.count'), key: "PlayCount", width: "100px", },
 	{
 		title: t('column.clear'), key: "Lamp", width: "100px", resizable: true,
-		render(row) {
-			return h(
-				ClearTag,
-				{
-					clear: row.Lamp
-				},
-			)
+		render(row: dto.DiffTableDataDto) {
+			return h(ClearTag, { clear: row.Lamp },)
 		}
 	},
 	{
@@ -60,14 +55,14 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
 		key: "actions",
 		resizable: true,
 		minWidth: "150px",
-		render(row) {
+		render(row: dto.DiffTableDataDto) {
 			return h(
 				NButton,
 				{
 					strong: true,
 					tertiary: true,
 					size: "small",
-					onClick: () => handleAddToFolder(row.ID),
+					onClick: () => handleAddToFolder(row),
 				},
 				{ default: () => t('button.addToFolder') }
 			)
@@ -125,40 +120,35 @@ watch(props, () => {
 	loadData()
 });
 
-const candidateSongDataID = ref<number>(null);
+const candidateDiffDataId = ref<number | null>(null);
+const candidateSongSha256 = ref<string | null>(null);
 const showFolderSelection = ref<boolean>(false);
-function handleAddToFolder(ID: number) {
-	candidateSongDataID.value = ID;
+function handleAddToFolder(row: dto.DiffTableDataDto) {
+	candidateDiffDataId.value = row.ID;
+	candidateSongSha256.value = row.Sha256;
 	showFolderSelection.value = true;
 }
 
 function handleSubmit(selected: [any]) {
-	BindDiffTableDataToFolder(candidateSongDataID.value, selected)
+	BindDiffTableDataToFolder(candidateDiffDataId.value, selected)
 		.then(result => {
 			if (result.Code != 200) {
 				return Promise.reject(result.Msg);
 			}
-			notifySuccess("添加成功");
+			notification.success({
+				content: t('message.bindSuccess'),
+				duration: 3000,
+				keepAliveOnHover: true
+			});
 		}).catch((err) => {
-			notifyError("添加至收藏夹失败:" + err);
+			notification.error({
+				content: t('message.bindFailedPrefix') + err,
+				duration: 3000,
+				keepAliveOnHover: true
+			});
 		});
 }
 
-function notifySuccess(msg: string) {
-	notification.success({
-		content: msg,
-		duration: 5000,
-		keepAliveOnHover: true
-	})
-}
-
-function notifyError(msg: string) {
-	notification.error({
-		content: msg,
-		duration: 5000,
-		keepAliveOnHover: true
-	})
-}
 
 loadData();
 </script>
@@ -175,6 +165,10 @@ loadData();
 		},
 		"button": {
 			"addToFolder": "Add to Folder"
+		},
+		"message": {
+			"bindSuccess": "Bind successfully",
+			"bindFailedPrefix": "Failed to bind song to folder, error message: "
 		}
 	},
 	"zh-CN": {
@@ -188,6 +182,10 @@ loadData();
 		},
 		"button": {
 			"addToFolder": "添加至收藏夹"
+		},
+		"message": {
+			"bindSucess": "绑定成功",
+			"bindFailedPrefix": "绑定失败, 错误信息: "
 		}
 	}
 }</i18n>

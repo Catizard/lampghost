@@ -217,6 +217,7 @@ function handlePositiveClick(): boolean {
 		.then(() => {
 			addFolder(formData.value.name);
 			showAddModal.value = false;
+			formData.value.name = null;
 		})
 		.catch((err) => { });
 	return false;

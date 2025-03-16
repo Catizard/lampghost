@@ -7,6 +7,7 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/vo"
+	"github.com/charmbracelet/log"
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 )
@@ -171,8 +172,38 @@ func (s *FolderService) FindFolderTree() ([]*dto.FolderDto, int, error) {
 	return findFolderTree(s.db, nil)
 }
 
-func (s *FolderService) FindFolderList(filter *vo.FolderVo) ([]*entity.Folder, int, error) {
-	return findFolderList(s.db, filter)
+func (s *FolderService) FindFolderList(filter *vo.FolderVo) ([]*dto.FolderDto, int, error) {
+	rawFolders, _, err := findFolderList(s.db, filter)
+	if err != nil {
+		return nil, 0, err
+	}
+	queryBoundSha256 := filter.IgnoreSha256
+	boundFolderIDs := make(map[uint]interface{})
+	if filter != nil && filter.IgnoreRivalSongDataID != nil {
+		songData, err := findRivalSongDataByID(s.db, *filter.IgnoreRivalSongDataID)
+		if err != nil {
+			return nil, 0, err
+		}
+		queryBoundSha256 = &songData.Sha256
+	}
+	if queryBoundSha256 != nil && *queryBoundSha256 != "" {
+		contents, _, err := findFolderContentList(s.db, &vo.FolderContentVo{Sha256: *queryBoundSha256})
+		if err != nil {
+			return nil, 0, err
+		}
+		for _, content := range contents {
+			boundFolderIDs[content.FolderID] = new(interface{})
+		}
+	}
+	log.Debugf("boundFolderIDs: %v", boundFolderIDs)
+	ret := make([]*dto.FolderDto, 0)
+	for i := range rawFolders {
+		if _, ok := boundFolderIDs[rawFolders[i].ID]; ok {
+			continue
+		}
+		ret = append(ret, dto.NewFolderDto(rawFolders[i], nil))
+	}
+	return ret, len(ret), nil
 }
 
 func (s *FolderService) FindFolderContentList(filter *vo.FolderContentVo) ([]*entity.FolderContent, int, error) {

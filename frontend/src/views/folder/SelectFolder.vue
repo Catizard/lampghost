@@ -3,8 +3,9 @@
 	<n-modal v-model:show="show" preset="dialog" :positive-text="t('dialog.positiveText')"
 		:negative-text="t('dialog.negativeText')" @positive-click="handlePositiveClick"
 		@negative-click="handleNegativeClick" closable @close="() => { show = false }">
-		<n-data-table :columns="columns" :data="data" :pagination="false" :bordered="false" :row-key="rowKey"
-			@update:checked-row-keys="handleCheck" :loading="loading" />
+		<n-data-table :columns="columns" :data="data" :pagination="false" :bordered="false"
+			:row-key="(row: dto.FolderDto) => row.ID" @update:checked-row-keys="handleCheck" :loading="loading"
+			:checked-row-keys="checkedRowKeysRef" />
 	</n-modal>
 </template>
 
@@ -12,14 +13,17 @@
 import { ref, watch, watchEffect } from 'vue';
 import { dto } from '@wailsjs/go/models';
 import { FindFolderList } from '@wailsjs/go/controller/FolderController';
-import { DataTableColumns, DataTableRowKey } from 'naive-ui';
+import { DataTableColumns, DataTableRowKey, useNotification } from 'naive-ui';
 import { useI18n } from 'vue-i18n';
 
-const i18n = useI18n();
-const { t } = i18n;
+const { t } = useI18n();
 const show = defineModel<boolean>("show");
+const props = defineProps<{
+	songDataId?: number,
+	sha256?: string
+}>();
 const emit = defineEmits<{
-	(e: 'submit', selected: Array<any>): void;
+	(e: 'submit', selected: Array<any>): void
 }>();
 
 const loading = ref(false);
@@ -32,17 +36,19 @@ const columns: DataTableColumns<dto.FolderDto> = [
 
 function reload() {
 	loading.value = true;
-	FindFolderList()
-		.then(result => {
-			if (result.Code != 200) {
-				return Promise.reject(result.Msg);
-			}
-			data.value = [...result.Rows];
-		}).catch(err => {
-			console.error(err);
-		}).finally(() => {
-			loading.value = false;
-		})
+	FindFolderList({
+		IgnoreRivalSongDataID: props.songDataId,
+		IgnoreSha256: props.sha256
+	} as any).then(result => {
+		if (result.Code != 200) {
+			return Promise.reject(result.Msg);
+		}
+		data.value = [...result.Rows];
+	}).catch(err => {
+		console.error(err);
+	}).finally(() => {
+		loading.value = false;
+	})
 }
 
 watch(show, (newValue, oldValue) => {
@@ -50,10 +56,6 @@ watch(show, (newValue, oldValue) => {
 		reload();
 	}
 }, { deep: true });
-
-function rowKey(folder: dto.FolderDto): number {
-	return folder.ID
-}
 
 function handleCheck(rowKeys: DataTableRowKey[]) {
 	checkedRowKeysRef.value = rowKeys

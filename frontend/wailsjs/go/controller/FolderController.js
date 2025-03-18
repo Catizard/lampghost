@@ -14,8 +14,12 @@ export function DelFolderContent(arg1) {
   return window['go']['controller']['FolderController']['DelFolderContent'](arg1);
 }
 
-export function FindFolderList() {
-  return window['go']['controller']['FolderController']['FindFolderList']();
+export function FindFolderContentList(arg1) {
+  return window['go']['controller']['FolderController']['FindFolderContentList'](arg1);
+}
+
+export function FindFolderList(arg1) {
+  return window['go']['controller']['FolderController']['FindFolderList'](arg1);
 }
 
 export function FindFolderTree() {

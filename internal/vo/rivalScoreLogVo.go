@@ -34,7 +34,8 @@ type RivalScoreLogVo struct {
 	// Clear >= MinimumClear
 	MinimumClear *int32
 	// year(RecordTime) == specifyYear
-	SpecifyYear *string
+	SpecifyYear  *string
+	SongNameLike *string
 }
 
 func (rivalScoreLog *RivalScoreLogVo) Entity() *entity.RivalScoreLog {

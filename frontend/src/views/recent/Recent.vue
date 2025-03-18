@@ -4,22 +4,23 @@
       <n-h1 prefix="bar" style="text-align: start;">
         <n-text type="primary">{{ t('title') }}</n-text>
       </n-h1>
-      <n-flex justify="end">
-        <n-button>{{ t('button.chooseClearType') }}</n-button>
-        <n-button>{{ t('button.minimumClearType') }}</n-button>
-      </n-flex>
-      <n-data-table remote :columns="columns" :data="data" :pagination="pagination" :bordered="false" :loading="loading"
-        :row-key="row => row.ID" />
     </n-flex>
+    <n-flex justify="start">
+      <n-input :placeholder="t('searchNamePlaceholder')" v-model:value="searchNameLike" @keyup.enter="loadData()"
+        style="width: 150px;" />
+      <!-- <n-button>{{ t('button.chooseClearType') }}</n-button>
+      <n-button>{{ t('button.minimumClearType') }}</n-button> -->
+    </n-flex>
+    <n-data-table remote :columns="columns" :data="data" :pagination="pagination" :bordered="false" :loading="loading"
+      :row-key="row => row.ID" />
   </perfect-scrollbar>
-
-  <select-folder v-model:show="showFolderSelection" @submit="handleSubmit"></select-folder>
+  <select-folder v-model:show="showFolderSelection" :songDataId="candidateSongDataID" @submit="handleSubmit" />
 </template>
 
 <script lang="ts" setup>
 import ClearTag from '@/components/ClearTag.vue';
 import { QueryRivalScoreLogPageList } from '@wailsjs/go/controller/RivalScoreLogController';
-import { DataTableColumns, NButton, useNotification } from 'naive-ui';
+import { DataTableColumns, DataTableRowKey, NButton, useNotification } from 'naive-ui';
 import { h, onMounted, reactive, Ref, ref } from 'vue';
 import SelectFolder from '../folder/SelectFolder.vue';
 import { BindRivalSongDataToFolder } from '@wailsjs/go/controller/RivalSongDataController';
@@ -33,30 +34,31 @@ const notification = useNotification();
 const loading = ref<boolean>(false);
 const showFolderSelection = ref<boolean>(false);
 const candidateSongDataID = ref<number>(null);
+const searchNameLike: Ref<string | null> = ref(null);
 
-function handleSubmit(selected: [any]) {
-  BindRivalSongDataToFolder(candidateSongDataID.value, selected)
+function handleAddToFolder(ID: number) {
+  candidateSongDataID.value = ID;
+  showFolderSelection.value = true;
+}
+
+function handleSubmit(folderIds: number[]) {
+  BindRivalSongDataToFolder(candidateSongDataID.value, folderIds)
     .then(result => {
       if (result.Code != 200) {
         return Promise.reject(result.Msg);
       }
       notification.success({
         content: t('message.bindSuccess'),
-        duration: 5000,
+        duration: 3000,
         keepAliveOnHover: true
       });
     }).catch((err) => {
       notification.error({
         content: t('message.bindFailedPrefix') + err,
-        duration: 5000,
+        duration: 3000,
         keepAliveOnHover: true
       });
     });
-}
-
-function handleAddToFolder(ID: number) {
-  candidateSongDataID.value = ID;
-  showFolderSelection.value = true;
 }
 
 function createColumns(): DataTableColumns<dto.RivalScoreLogDto> {
@@ -65,14 +67,8 @@ function createColumns(): DataTableColumns<dto.RivalScoreLogDto> {
     { title: t('column.tag'), key: "Tag", minWidth: "100px", resizable: true },
     {
       title: t('column.clear'), key: "Clear", minWidth: "100px", resizable: true,
-      render(row) {
-        return h(
-          ClearTag,
-          {
-            clear: row.Clear
-          },
-          {}
-        )
+      render(row: dto.RivalScoreLogDto) {
+        return h(ClearTag, { clear: row.Clear }, {});
       }
     },
     {
@@ -82,11 +78,8 @@ function createColumns(): DataTableColumns<dto.RivalScoreLogDto> {
       }
     },
     {
-      title: t('column.actions'),
-      key: "actions",
-      resizable: true,
-      minWidth: "150px",
-      render(row) {
+      title: t('column.actions'), key: "actions", resizable: true, minWidth: "150px",
+      render(row: dto.RivalScoreLogDto) {
         return h(
           NButton,
           {
@@ -106,6 +99,7 @@ function loadData() {
   loading.value = true;
   let arg: vo.RivalScoreLogVo = {
     Pagination: pagination,
+    SongNameLike: searchNameLike.value,
   } as any;
   QueryRivalScoreLogPageList(arg)
     .then(result => {
@@ -169,7 +163,8 @@ onMounted(() => {
       "loadRecentRecordFailedPrefix": "Load recent records failed, error message: ",
       "bindSuccess": "Bind successfully",
       "bindFailedPrefix": "Failed to bind song to folder, error message: "
-    }
+    },
+    "searchNamePlaceholder": "Search Song"
   },
   "zh-CN": {
     "title": "最近游玩记录",
@@ -186,9 +181,10 @@ onMounted(() => {
       "actions": "操作"
     },
     "message": {
-      "loadRecentRecordFailedPrefix": "Load recent records failed, error message: ",
+      "loadRecentRecordFailedPrefix": "加载最近游玩记录失败，错误信息: ",
       "bindSucess": "绑定成功",
       "bindFailedPrefix": "绑定失败, 错误信息: "
-    }
+    },
+    "searchNamePlaceholder": "搜索歌曲"
   }
 }</i18n>

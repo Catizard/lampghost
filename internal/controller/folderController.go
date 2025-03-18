@@ -5,6 +5,7 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/result"
 	"github.com/Catizard/lampghost_wails/internal/service"
+	"github.com/Catizard/lampghost_wails/internal/vo"
 	"github.com/charmbracelet/log"
 )
 
@@ -58,9 +59,19 @@ func (ctl *FolderController) FindFolderTree() result.RtnDataList {
 	return result.NewRtnDataList(rows)
 }
 
-func (ctl *FolderController) FindFolderList() result.RtnDataList {
+func (ctl *FolderController) FindFolderList(filter *vo.FolderVo) result.RtnDataList {
 	log.Info("[Controller] Calling FolderController.FindFolderList")
-	rows, _, err := ctl.folderService.FindFolderList(nil)
+	rows, _, err := ctl.folderService.FindFolderList(filter)
+	if err != nil {
+		log.Errorf("[FolderController] returning err: %v", err)
+		return result.NewErrorDataList(err)
+	}
+	return result.NewRtnDataList(rows)
+}
+
+func (ctl *FolderController) FindFolderContentList(filter *vo.FolderContentVo) result.RtnDataList {
+	log.Info("[Controller] Calling FolderController.FindFolderContentList")
+	rows, _, err := ctl.folderService.FindFolderContentList(nil)
 	if err != nil {
 		log.Errorf("[FolderController] returning err: %v", err)
 		return result.NewErrorDataList(err)

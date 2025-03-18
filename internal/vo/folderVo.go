@@ -13,6 +13,11 @@ type FolderVo struct {
 
 	// Extra filter fields
 	IDs []uint
+	// When not nil, filter out related data
+	// NOTE: `RivalSongDataID` is actually converts to Sha256, if you set both of them,
+	// then `Sha256` would be overwritted
+	IgnoreSha256          *string
+	IgnoreRivalSongDataID *uint
 }
 
 func (folder *FolderVo) Entity() *entity.Folder {

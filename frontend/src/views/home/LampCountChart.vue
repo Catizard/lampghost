@@ -1,6 +1,7 @@
 <template>
-  <!-- TODO: allow user change bar type(count or percentage)-->
-  <n-select v-model:value="currentTableId" :options="tableOptions" width="150px" />
+  <n-flex justify="flex-start">
+    <n-select v-model:value="currentTableId" :options="tableOptions" style="width: 150px" />
+  </n-flex>
   <vue-apex-charts height="450px" type="bar" :options="lampCountChartOptions" :series="lampCountChartOptions.series" />
 </template>
 
@@ -14,7 +15,7 @@ import { useI18n } from "vue-i18n";
 import VueApexCharts from "vue3-apexcharts";
 
 const props = defineProps<{
-  rivalId?: number
+  rivalId?: number;
 }>();
 
 const { t } = useI18n();
@@ -28,26 +29,27 @@ const currentHeader: Ref<dto.DiffTableHeaderDto | null> = ref(null);
 const tableOptions: Ref<Array<SelectOption>> = ref([]);
 function loadTableData() {
   FindDiffTableHeaderList()
-    .then(result => {
+    .then((result) => {
       if (result.Code != 200) {
         return Promise.reject(result.Msg);
       }
       if (result.Rows.length == 0) {
-        return Promise.reject(t('message.noTableError'));
+        return Promise.reject(t("message.noTableError"));
       }
       tableOptions.value = result.Rows.map((header: dto.DiffTableHeaderDto) => {
         return {
           label: header.Name,
           value: header.ID,
-        } as SelectOption
+        } as SelectOption;
       });
       currentTableId.value = tableOptions.value[0].value as number;
-    }).catch(err => {
+    })
+    .catch((err) => {
       notification.error({
         content: err,
         duration: 3000,
         keepAliveOnHover: true,
-      })
+      });
     });
 }
 loadTableData();
@@ -78,31 +80,35 @@ const lampCountChartOptions = reactive({
     offsetX: 40,
   },
   dataLabels: {
-    enabled: false,
+    enabled: true,
   },
 });
 function loadLampData() {
-  QueryUserInfoWithLevelLayeredDiffTableLampStatus(props.rivalId, currentTableId.value)
-    .then(result => {
+  QueryUserInfoWithLevelLayeredDiffTableLampStatus(
+    props.rivalId,
+    currentTableId.value,
+  )
+    .then((result) => {
       if (result.Code != 200) {
         return Promise.reject(result.Msg);
       }
       currentHeader.value = result.Data.DiffTableHeader;
-    }).catch(err => {
+    })
+    .catch((err) => {
       notification.error({
         content: err,
         duration: 3000,
         keepAliveOnHover: true,
-      })
+      });
     });
 }
 
 function buildSeries() {
-  lampCountChartOptions.series = STR_LAMPS.map(lampName => {
+  lampCountChartOptions.series = STR_LAMPS.map((lampName) => {
     return {
       name: lampName,
       data: [],
-    }
+    };
   });
   lampCountChartOptions.xaxis.categories = [];
   const header = currentHeader.value;
@@ -136,15 +142,18 @@ function buildSeries() {
 }
 
 watch([currentTableId, () => props.rivalId], ([newTableId, newRivalId]) => {
-  if (newTableId == null || newTableId == undefined || newRivalId == null || newRivalId == undefined) {
+  if (newTableId == null || newTableId == undefined) {
+    return;
+  }
+  if (newRivalId == null || newRivalId == undefined) {
     return;
   }
   loadLampData();
 });
 
-watch(currentHeader, _ => {
+watch(currentHeader, (_) => {
   buildSeries();
-})
+});
 </script>
 
 <i18n lang="json">{

@@ -55,6 +55,6 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             ./build/bin/*
-          automatic-release-tag: "latest"
+          automatic_release_tag: "latest"
           prerelease: true
           title: "Auto generated release from Github Actions"

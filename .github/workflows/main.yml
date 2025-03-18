@@ -2,9 +2,8 @@ name: Wails build
 
 on:
   push:
-    tags:
-      # Match any new tag
-      - "*"
+    branches:
+      - "main"
 
 env:
   # Necessary for most environments as build failure can occur due to OOM issues
@@ -56,6 +55,6 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             ./build/bin/*
-          automatic-release-tag: ${{ github.ref }}
+          automatic-release-tag: "latest"
           prerelease: true
           title: "Auto generated release from Github Actions"

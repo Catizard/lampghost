@@ -27,7 +27,9 @@ Grab an executable at `Release` page, then just open it.
 
 ## Attentions
 
-This project is still at early demo phase, you might encounter some mystery problem(Don't worry, won't ruin your save file most likely). You could delete the whole `LampGhost` data folder to have a clean restart:
+First of all, you need to import some difficult tables just like `beatoraja` to make the most features work.
+
+Secondly,this project is still at early demo phase, you might encounter some mystery problem(Don't worry, won't ruin your save file most likely). You could delete the whole `LampGhost` data folder to have a clean restart:
 
 For `Windows` user it's located at `%USERPROFILE%\.lampghost_wails`, for `Linux/OSX` user is `$HOME/.lampghost_wails`
 

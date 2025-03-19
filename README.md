@@ -8,7 +8,7 @@ English | [简体中文](./README.zh-CN.md)
 
 - `I18n`:`English` and `zh-CN` are supported now
 - Add your friends' save file, show your friends' lamp status
-- Compare lamp status between you and your friends, and could even "turn back" your friend's save file time(Suppose your friend is already ^^, using `LampGhost` allows you comparing the lamp status the moment that your friend achived ★5)
+- Compare lamp status between you and your friends, and could even "turn back" your friend's save file time(Suppose your friend is already ★★, using `LampGhost` allows you comparing the lamp status the moment that your friend achived ★5)
 - Customize favorite folder and import it as a difficult table in `beatoraja`(tip: You can reload table by pressing F2 in game). More specifically, import `http://127.0.0.1:7391/table/lampghost.json` in `beatoraja` while keep `LampGhost` opening.
 
 Because `LampGhost` is an **offline** tool, therefore it:

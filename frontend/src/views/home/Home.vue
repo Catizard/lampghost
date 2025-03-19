@@ -35,7 +35,7 @@
 import { computed, reactive, ref } from "vue";
 import { SyncRivalScoreLog, QueryMainUser } from "@wailsjs/go/controller/RivalInfoController";
 import { useNotification } from "naive-ui";
-import * as dayjs from "dayjs";
+import dayjs from "dayjs";
 import router from "@/router";
 import { useI18n } from "vue-i18n";
 import PlayCountChart from "./PlayCountChart.vue";

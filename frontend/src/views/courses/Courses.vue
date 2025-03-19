@@ -13,7 +13,7 @@ import { dto } from '@wailsjs/go/models';
 import { ref, h } from 'vue';
 import { FindCourseInfoListWithRival } from '@wailsjs/go/controller/CourseInfoController';
 import ClearTag from "@/components/ClearTag.vue"
-import * as dayjs from 'dayjs'
+import dayjs from 'dayjs'
 import { useI18n } from 'vue-i18n';
 
 const i18n = useI18n();

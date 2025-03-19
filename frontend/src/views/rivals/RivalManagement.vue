@@ -33,7 +33,7 @@
 <script lang="ts" setup>
 import { AddRivalInfo, QueryRivalInfoPageList, SyncRivalScoreLog } from '@wailsjs/go/controller/RivalInfoController';
 import { dto, entity } from '@wailsjs/go/models';
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import { DataTableColumns, FormInst, NButton, useNotification } from 'naive-ui';
 import { h, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';

@@ -26,7 +26,7 @@ import SelectFolder from '../folder/SelectFolder.vue';
 import { BindRivalSongDataToFolder } from '@wailsjs/go/controller/RivalSongDataController';
 import { dto, vo } from '@wailsjs/go/models';
 import { useI18n } from 'vue-i18n';
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 
 const i18n = useI18n();
 const { t } = i18n;

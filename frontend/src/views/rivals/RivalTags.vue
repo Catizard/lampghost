@@ -32,7 +32,7 @@ import { AddRivalTag, DeleteRivalTagByID, QueryRivalTagPageList, RevertRivalTagE
 import { dto } from '@wailsjs/go/models';
 import { DataTableColumns, FormInst, FormRules, NButton, SelectOption, useDialog, useNotification } from 'naive-ui';
 import { h, reactive, Ref, ref, watch } from 'vue';
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import { useI18n } from 'vue-i18n';
 import YesNotTag from '@/components/YesNotTag.vue';
 

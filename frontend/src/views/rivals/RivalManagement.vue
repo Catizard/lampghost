@@ -24,7 +24,7 @@
 				<n-input v-model:value="formData.ScoreLogPath" :placeholder="t('modal.placeholderScoreLogPath')" />
 			</n-form-item>
 			<n-form-item :label="t('modal.labelSongDataPath')" path="SongDataPath">
-				<n-input disabled v-model:value="formData.SongDataPath" :placeholder="t('modal.placeholderSongDataPath')" />
+				<n-input v-model:value="formData.SongDataPath" :placeholder="t('modal.placeholderSongDataPath')" />
 			</n-form-item>
 		</n-form>
 	</n-modal>
@@ -66,8 +66,8 @@ function createColumns(): DataTableColumns<dto.RivalInfoDto> {
 	return [
 		{ title: t('column.name'), key: "Name", width: "100px", ellipsis: { tooltip: true } },
 		{ title: t('column.count'), key: "PlayCount", width: "100px", ellipsis: { tooltip: true } },
-		{ title: t('column.scoreLogFilePath'), key: "ScoreLogPath", maxWidth: "150px", ellipsis: { tooltip: true }},
-		{ title: t('column.songdataFilePath'), key: "SongDataPath", maxWidth: "150px", ellipsis: { tooltip: true }},
+		{ title: t('column.scoreLogFilePath'), key: "ScoreLogPath", maxWidth: "150px", ellipsis: { tooltip: true } },
+		{ title: t('column.songdataFilePath'), key: "SongDataPath", maxWidth: "150px", ellipsis: { tooltip: true } },
 		{
 			title: t('column.lastSyncTime'),
 			key: "UpdateAt",

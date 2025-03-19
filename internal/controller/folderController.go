@@ -79,16 +79,6 @@ func (ctl *FolderController) FindFolderContentList(filter *vo.FolderContentVo) r
 	return result.NewRtnDataList(rows)
 }
 
-func (ctl *FolderController) SyncSongData() result.RtnMessage {
-	log.Info("[Controller] Calling FolderController.SyncSongData")
-	err := ctl.folderService.SyncSongData()
-	if err != nil {
-		log.Errorf("[FolderController] returning err: %v", err)
-		return result.NewErrorMessage(err)
-	}
-	return result.SUCCESS
-}
-
 func (ctl *FolderController) QueryFolderDefinition() result.RtnDataList {
 	log.Info("[Controller] Calling FolderController.GenerateJson")
 	rows, _, err := ctl.folderService.GenerateFolderDefinition()

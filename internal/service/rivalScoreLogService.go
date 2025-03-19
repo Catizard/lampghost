@@ -96,6 +96,7 @@ func findRivalScoreLogSha256Map(tx *gorm.DB, filter *vo.RivalScoreLogVo) (map[st
 	return sha256ScoreLogsMap, nil
 }
 
+// NOTE: selectRivalScoreLogCount's filter statment should always be equal to selectRivalScoreLog
 func selectRivalScoreLogCount(tx *gorm.DB, filter *vo.RivalScoreLogVo) (int64, error) {
 	if filter == nil {
 		var count int64
@@ -105,9 +106,13 @@ func selectRivalScoreLogCount(tx *gorm.DB, filter *vo.RivalScoreLogVo) (int64, e
 		return count, nil
 	}
 	var count int64
-	if err := tx.Model(&entity.RivalScoreLog{}).Debug().Where(filter.Entity()).Scopes(
+	partial := tx.Model(&entity.RivalScoreLog{}).Joins("left join (select * from rival_song_data group by sha256) as sd on rival_score_log.sha256 = sd.sha256").Scopes(
 		scopeRivalScoreLogFilter(filter),
-	).Count(&count).Error; err != nil {
+	)
+	if filter.SongNameLike != nil && *filter.SongNameLike != "" {
+		partial = partial.Where("sd.title like ('%' || ? || '%')", filter.SongNameLike)
+	}
+	if err := partial.Count(&count).Error; err != nil {
 		return 0, err
 	}
 	return count, nil

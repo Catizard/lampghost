@@ -26,5 +26,3 @@ export function GENERATOR_FOLDER_DEFINITION_DTO():Promise<dto.FolderDefinitionDt
 export function GENERATOR_FOLDER_DTO():Promise<dto.FolderDto>;
 
 export function QueryFolderDefinition():Promise<result.RtnDataList>;
-
-export function SyncSongData():Promise<result.RtnMessage>;

@@ -31,7 +31,7 @@
 </template>
 
 <script lang="ts" setup>
-import { AddRivalInfo, QueryRivalInfoPageList, SyncRivalScoreLog } from '@wailsjs/go/controller/RivalInfoController';
+import { AddRivalInfo, QueryRivalInfoPageList, SyncRivalDataByID } from '@wailsjs/go/controller/RivalInfoController';
 import { dto, entity } from '@wailsjs/go/models';
 import dayjs from 'dayjs';
 import { DataTableColumns, FormInst, NButton, useNotification } from 'naive-ui';
@@ -116,7 +116,7 @@ function loadData() {
 
 function handleSyncClick(id) {
 	loading.value = true;
-	SyncRivalScoreLog(id)
+	SyncRivalDataByID(id)
 		.then(result => {
 			if (result.Code != 200) {
 				return Promise.reject(result.Msg)

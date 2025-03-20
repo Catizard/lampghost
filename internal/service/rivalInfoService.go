@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/Catizard/lampghost_wails/internal/config"
 	"github.com/Catizard/lampghost_wails/internal/dto"
@@ -11,6 +12,8 @@ import (
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 )
+
+const READONLY_PARAMETER = "?open_mode=1"
 
 type RivalInfoService struct {
 	db               *gorm.DB
@@ -335,7 +338,12 @@ func loadScoreLog(scoreLogPath string, maximumTimestamp *int64) ([]*entity.Score
 		return nil, fmt.Errorf("assert: scorelog path cannot be empty")
 	}
 	log.Debugf("[RivalInfoService] Trying to read score log from %s", scoreLogPath)
-	scoreLogDB, err := gorm.Open(sqlite.Open(scoreLogPath))
+	if err := verifyLocalDatabaseFilePath(scoreLogPath); err != nil {
+		return nil, err
+	}
+	dsn := scoreLogPath + READONLY_PARAMETER
+	log.Debugf("[RivalInfoService] Full scorelog.db dsn: %s", dsn)
+	scoreLogDB, err := gorm.Open(sqlite.Open(dsn))
 	if err != nil {
 		return nil, err
 	}
@@ -352,7 +360,12 @@ func loadSongData(songDataPath string) ([]*entity.SongData, error) {
 	if songDataPath == "" {
 		return nil, fmt.Errorf("assert: songdata path cannot be empty")
 	}
-	songDataDB, err := gorm.Open(sqlite.Open(songDataPath))
+	log.Debugf("[RivalInfoService] Trying to read song data from %s", songDataPath)
+	if err := verifyLocalDatabaseFilePath(songDataPath); err != nil {
+		return nil, err
+	}
+	dsn := songDataPath + READONLY_PARAMETER
+	songDataDB, err := gorm.Open(sqlite.Open(dsn))
 	if err != nil {
 		return nil, err
 	}
@@ -363,6 +376,18 @@ func loadSongData(songDataPath string) ([]*entity.SongData, error) {
 	}
 	log.Infof("[RivalInfoService] Read %d song data from %s", n, songDataPath)
 	return rawSongData, nil
+}
+
+func verifyLocalDatabaseFilePath(filePath string) error {
+	if stat, err := os.Stat(filePath); err != nil {
+		if os.IsNotExist(err) {
+			return fmt.Errorf("assert: no file exists at %s", filePath)
+		}
+		return fmt.Errorf("assert: cannot stat file at %s", filePath)
+	} else if stat.IsDir() {
+		return fmt.Errorf("assert: file path %s is a directory, not an valid database file", filePath)
+	}
+	return nil
 }
 
 // Fully delete all content from rival_score_log and rebuild them by rawScoreLog

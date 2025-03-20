@@ -21,6 +21,13 @@ func init() {
 	}
 	// TODO: Make it configurable
 	WorkingDirectory = homeDir + "/.lampghost_wails/"
+	// Create the directory if it's not exist
+	_, err = os.Stat(WorkingDirectory)
+	if err != nil && os.IsNotExist(err) {
+		if err := os.MkdirAll(filepath.Dir(WorkingDirectory), 0700); err != nil {
+			panic(err)
+		}
+	}
 	// Setup viper
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
@@ -32,17 +39,6 @@ func init() {
 	viper.SetDefault("Locale", "en")
 	viper.SetDefault("ForceFullyReload", 0)
 	viper.SafeWriteConfig()
-	// Create the directory if it's not exist
-	_, err = os.Stat(WorkingDirectory)
-	if err == nil {
-		return
-	}
-
-	if os.IsNotExist(err) {
-		if err := os.MkdirAll(filepath.Dir(WorkingDirectory), 0700); err != nil {
-			panic(err)
-		}
-	}
 }
 
 type ApplicationConfig struct {

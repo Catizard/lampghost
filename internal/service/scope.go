@@ -5,6 +5,8 @@ import (
 	"gorm.io/gorm"
 )
 
+const DEFAULT_BATCH_SIZE = 100
+
 // This file defines the scopes shared between services file
 
 // db.Where("ID in (?)", IDs)

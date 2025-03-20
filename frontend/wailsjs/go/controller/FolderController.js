@@ -45,7 +45,3 @@ export function GENERATOR_FOLDER_DTO() {
 export function QueryFolderDefinition() {
   return window['go']['controller']['FolderController']['QueryFolderDefinition']();
 }
-
-export function SyncSongData() {
-  return window['go']['controller']['FolderController']['SyncSongData']();
-}

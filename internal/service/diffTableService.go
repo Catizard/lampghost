@@ -404,6 +404,9 @@ func queryDiffTableHeaderExistence(tx *gorm.DB, filter *entity.DiffTableHeader) 
 
 func fetchDiffTableFromURL(url string) (*vo.DiffTableHeaderVo, error) {
 	jsonUrl := ""
+	splitUrl := strings.Split(url, "/")
+	splitUrl[len(splitUrl)-1] = ""
+	prefixUrl := strings.Join(splitUrl, "/")
 	if strings.HasSuffix(url, ".html") {
 		resp, err := http.Get(url)
 		if err != nil {
@@ -442,9 +445,7 @@ func fetchDiffTableFromURL(url string) (*vo.DiffTableHeaderVo, error) {
 				}
 
 				// Construct the json url path
-				splitUrl := strings.Split(url, "/")
-				splitUrl[len(splitUrl)-1] = line[startp+1 : endp]
-				jsonUrl = strings.Join(splitUrl, "/")
+				jsonUrl = prefixUrl + "/" + line[startp+1:endp]
 				log.Debugf("Construct json url [%s] from [%s]", jsonUrl, url)
 				break
 			}
@@ -459,6 +460,9 @@ func fetchDiffTableFromURL(url string) (*vo.DiffTableHeaderVo, error) {
 	var dth vo.DiffTableHeaderVo
 	log.Debugf("before calling fetchJson, url=%s", jsonUrl)
 	fetchJson(jsonUrl, &dth)
+	if !strings.HasPrefix(dth.DataUrl, "http") {
+		dth.DataUrl = prefixUrl + "/" + dth.DataUrl
+	}
 	return &dth, nil
 }
 

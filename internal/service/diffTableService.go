@@ -98,7 +98,7 @@ func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHead
 		tx.Rollback()
 		return nil, err
 	}
-	if err := tx.Create(&data).Error; err != nil {
+	if err := tx.CreateInBatches(&data, DEFAULT_BATCH_SIZE).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}

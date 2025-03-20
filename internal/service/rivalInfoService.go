@@ -12,8 +12,6 @@ import (
 	"gorm.io/gorm"
 )
 
-const DEFAULT_BATCH_SIZE = 100
-
 type RivalInfoService struct {
 	db               *gorm.DB
 	diffTableService *DiffTableService

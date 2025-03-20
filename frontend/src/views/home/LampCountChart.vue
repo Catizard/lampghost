@@ -60,7 +60,7 @@ const lampCountChartOptions = reactive({
     stacked: true,
     stackType: "100%",
   },
-  colors: ["#FF0000", "#00FF00", "#0000FF", "#00FFFF", "#FFFFFF"],
+  colors: ["#ABABAB", "#00FF00", "#00FFFF", "#FF0000", "#FFFFFF"],
   series: [],
   plotOptions: {
     bar: {

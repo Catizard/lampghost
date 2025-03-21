@@ -77,9 +77,9 @@ func (ctl *RivalInfoController) QueryUserInfoWithLevelLayeredDiffTableLampStatus
 	return result.NewRtnData(data)
 }
 
-func (ctl *RivalInfoController) SyncRivalScoreLog(rivalID uint) result.RtnMessage {
-	log.Info("[Controller] calling RivalInfoController.SyncRivalScorelog")
-	if err := ctl.rivalInfoService.SyncRivalScoreLogByID(rivalID); err != nil {
+func (ctl *RivalInfoController) SyncRivalDataByID(rivalID uint) result.RtnMessage {
+	log.Info("[Controller] calling RivalInfoController.SyncRivalDataByID")
+	if err := ctl.rivalInfoService.SyncRivalDataByID(rivalID); err != nil {
 		return result.NewErrorMessage(err)
 	}
 	return result.SUCCESS

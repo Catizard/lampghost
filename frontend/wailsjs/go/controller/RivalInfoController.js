@@ -50,6 +50,6 @@ export function QueryUserPlayCountInYear(arg1, arg2) {
   return window['go']['controller']['RivalInfoController']['QueryUserPlayCountInYear'](arg1, arg2);
 }
 
-export function SyncRivalScoreLog(arg1) {
-  return window['go']['controller']['RivalInfoController']['SyncRivalScoreLog'](arg1);
+export function SyncRivalDataByID(arg1) {
+  return window['go']['controller']['RivalInfoController']['SyncRivalDataByID'](arg1);
 }

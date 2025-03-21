@@ -2,6 +2,7 @@ package service
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -55,56 +56,48 @@ func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHead
 	}
 
 	// Transaction begins from here
-	tx := s.db.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
-	// (1) difficult table header
 	headerEntity := headerVo.Entity()
-	if err := tx.Create(headerEntity).Error; err != nil {
-		tx.Rollback()
-		return nil, err
-	}
-	// (2) difficult related course contents
-	if len(headerVo.Courses) > 0 {
-		var courseData []entity.CourseInfo
-		for _, arr := range headerVo.Courses {
-			for _, courseInfoVo := range arr {
+	var data []entity.DiffTableData
+	if err := s.db.Transaction(func(tx *gorm.DB) error {
+		// (1) difficult table header
+		if err := tx.Create(headerEntity).Error; err != nil {
+			return err
+		}
+		// (2) difficult related course contents
+		// NOTE: we have to do a custom decode here, some tables provide courses as a two-dimensional array
+		// while some others provide a one-dimensional array instead
+		if err := headerVo.ParseRawCourses(); err != nil {
+			return err
+		}
+		if len(headerVo.Courses) > 0 {
+			var courseData []entity.CourseInfo
+			for _, courseInfoVo := range headerVo.Courses {
 				courseInfo := courseInfoVo.Entity()
 				courseInfo.HeaderID = headerEntity.ID
 				courseData = append(courseData, *courseInfo)
 			}
+			if err := tx.Unscoped().Where("header_id = ?", headerEntity.ID).Delete(&entity.CourseInfo{}).Error; err != nil {
+				return err
+			}
+			if err := tx.Create(&courseData).Error; err != nil {
+				return err
+			}
 		}
-		if err := tx.Unscoped().Where("header_id = ?", headerEntity.ID).Delete(&entity.CourseInfo{}).Error; err != nil {
-			tx.Rollback()
-			return nil, err
+		// (3) difficult table concreate contents
+		if err := fetchJson(headerVo.DataUrl, &data); err != nil {
+			return err
 		}
-		if err := tx.Create(&courseData).Error; err != nil {
-			tx.Rollback()
-			return nil, err
+		for i := range data {
+			data[i].HeaderID = headerEntity.ID
 		}
-	}
-	// (3) difficult table concreate contents
-	var data []entity.DiffTableData
-	if err := fetchJson(headerVo.DataUrl, &data); err != nil {
-		return nil, err
-	}
-	for i := range data {
-		data[i].HeaderID = headerEntity.ID
-	}
-	if err := tx.Unscoped().Where("header_id = ?", headerEntity.ID).Delete(&entity.DiffTableData{}).Error; err != nil {
-		tx.Rollback()
-		return nil, err
-	}
-	if err := tx.CreateInBatches(&data, DEFAULT_BATCH_SIZE).Error; err != nil {
-		tx.Rollback()
-		return nil, err
-	}
-
-	// Transaction ends here
-	if err := tx.Commit().Error; err != nil {
+		if err := tx.Unscoped().Where("header_id = ?", headerEntity.ID).Delete(&entity.DiffTableData{}).Error; err != nil {
+			return err
+		}
+		if err := tx.CreateInBatches(&data, DEFAULT_BATCH_SIZE).Error; err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
 		return nil, err
 	}
 
@@ -553,6 +546,8 @@ func fetchJson(url string, v interface{}) error {
 		return err
 	}
 	body, err := io.ReadAll(resp.Body)
+	// Hack \ufeff out, specially for PMS table
+	body = bytes.ReplaceAll(body, []byte("\ufeff"), []byte(""))
 	if err != nil {
 		return err
 	}

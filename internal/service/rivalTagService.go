@@ -130,7 +130,7 @@ func syncRivalTag(tx *gorm.DB, rivalID uint) error {
 			if err != nil {
 				continue
 			}
-			if scoreLogMode/100 == courseInfo.GetConstraintMode()/100 {
+			if scoreLogMode/100 != courseInfo.GetConstraintMode()/100 {
 				continue
 			}
 			fct := &entity.RivalTag{
@@ -142,6 +142,10 @@ func syncRivalTag(tx *gorm.DB, rivalID uint) error {
 			tags = append(tags, fct)
 			break
 		}
+	}
+
+	if len(tags) == 0 {
+		return nil
 	}
 
 	if err := tx.Unscoped().Where("rival_id = ? and generated = true", rivalID).Error; err != nil {

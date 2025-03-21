@@ -965,13 +965,14 @@ export namespace vo {
 	    name: string;
 	    original_url?: string;
 	    symbol: string;
-	    course: CourseInfoVo[][];
+	    Courses: CourseInfoVo[];
 	    HeaderUrl: string;
 	    Level: string;
 	    RivalID: number;
 	    GhostRivalID: number;
 	    GhostRivalTagID: number;
 	    Pagination?: entity.Page;
+	    course: any[];
 	
 	    static createFrom(source: any = {}) {
 	        return new DiffTableHeaderVo(source);
@@ -987,13 +988,14 @@ export namespace vo {
 	        this.name = source["name"];
 	        this.original_url = source["original_url"];
 	        this.symbol = source["symbol"];
-	        this.course = this.convertValues(source["course"], CourseInfoVo);
+	        this.Courses = this.convertValues(source["Courses"], CourseInfoVo);
 	        this.HeaderUrl = source["HeaderUrl"];
 	        this.Level = source["Level"];
 	        this.RivalID = source["RivalID"];
 	        this.GhostRivalID = source["GhostRivalID"];
 	        this.GhostRivalTagID = source["GhostRivalTagID"];
 	        this.Pagination = this.convertValues(source["Pagination"], entity.Page);
+	        this.course = source["course"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

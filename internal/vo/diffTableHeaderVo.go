@@ -43,6 +43,9 @@ func (header *DiffTableHeaderVo) Entity() *entity.DiffTableHeader {
 
 // Parse field `RawCourses` into `Courses`
 func (header *DiffTableHeaderVo) ParseRawCourses() error {
+	if len(header.RawCourses) == 0 {
+		return nil // Okay dokey
+	}
 	if innerArray, isNested := header.RawCourses[0].([]interface{}); isNested {
 		for _, data := range innerArray {
 			courseInfo := CourseInfoVo{}

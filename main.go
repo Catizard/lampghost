@@ -50,6 +50,9 @@ func main() {
 	if err := c.Provide(service.NewRivalScoreLogService); err != nil {
 		panic(err)
 	}
+	if err := c.Provide(service.NewConfigService); err != nil {
+		panic(err)
+	}
 	if err := c.Provide(controller.NewRivalInfoController); err != nil {
 		panic(err)
 	}

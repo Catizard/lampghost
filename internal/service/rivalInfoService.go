@@ -243,11 +243,13 @@ func (s *RivalInfoService) QueryRivalPlayedYears(rivalID uint) ([]int, int, erro
 }
 
 func (s *RivalInfoService) QueryMainUser() (*entity.RivalInfo, error) {
-	var out entity.RivalInfo
-	if err := s.db.Where(&entity.RivalInfo{MainUser: true}).First(&out).Error; err != nil {
-		return nil, err
-	}
-	return &out, nil
+	return queryMainUser(s.db)
+}
+
+func (s *RivalInfoService) UpdateRivalInfo(rivalInfo *entity.RivalInfo) error {
+	return s.db.Transaction(func(tx *gorm.DB) error {
+		return updateRivalInfo(tx, rivalInfo)
+	})
 }
 
 // Add one rival
@@ -374,6 +376,7 @@ func loadScoreLog(scoreLogPath string, maximumTimestamp *int64) ([]*entity.Score
 	return rawScoreLog, nil
 }
 
+// TODO: should clear DefaultCache after reloading songdata.db
 func loadSongData(songDataPath string) ([]*entity.SongData, error) {
 	if songDataPath == "" {
 		return nil, fmt.Errorf("assert: songdata path cannot be empty")
@@ -458,4 +461,8 @@ func queryMainUser(tx *gorm.DB) (*entity.RivalInfo, error) {
 		return nil, err
 	}
 	return &out, nil
+}
+
+func updateRivalInfo(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
+	return tx.Save(rivalInfo).Error
 }

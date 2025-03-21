@@ -7,12 +7,12 @@ import (
 )
 
 type ConfigController struct {
-	rivalInfoService *service.RivalInfoService
+	service *service.ConfigService
 }
 
-func NewConfigController(rivalInfoService *service.RivalInfoService) *ConfigController {
+func NewConfigController(configService *service.ConfigService) *ConfigController {
 	return &ConfigController{
-		rivalInfoService: rivalInfoService,
+		service: configService,
 	}
 }
 
@@ -25,38 +25,8 @@ func (ctl *ConfigController) ReadConfig() result.RtnData {
 }
 
 func (ctl *ConfigController) WriteConfig(conf *config.ApplicationConfig) result.RtnMessage {
-	prevConf, err := config.ReadConfig()
-	if err != nil {
-		return result.NewErrorMessage(err)
-	}
-	if shouldReload(prevConf, conf) {
-		mainUser, err := ctl.rivalInfoService.QueryMainUser()
-		if err != nil {
-			return result.NewErrorMessage(err)
-		}
-		mainUser.ScoreLogPath = &conf.ScorelogFilePath
-		mainUser.SongDataPath = &conf.SongdataFilePath
-		// TODO: mainUser.scorePath = &conf.ScoreFilePath
-		if err := ctl.rivalInfoService.SyncRivalData(mainUser); err != nil {
-			return result.NewErrorMessage(err)
-		}
-	}
-	// TODO: what if the player is reloaded successfully but the file isn't?
-	if err := conf.WriteConfig(); err != nil {
+	if err := ctl.service.WriteConfig(conf); err != nil {
 		return result.NewErrorMessage(err)
 	}
 	return result.SUCCESS
-}
-
-func shouldReload(prevConf *config.ApplicationConfig, newConf *config.ApplicationConfig) bool {
-	if prevConf.ScorelogFilePath != newConf.ScorelogFilePath {
-		return true
-	}
-	if prevConf.SongdataFilePath != newConf.SongdataFilePath {
-		return true
-	}
-	if prevConf.ScoreFilePath != newConf.ScoreFilePath {
-		return true
-	}
-	return false
 }

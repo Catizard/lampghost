@@ -2,7 +2,7 @@
   <n-flex justify="flex-start">
     <n-select v-model:value="currentTableId" :options="tableOptions" style="width: 150px" />
   </n-flex>
-  <vue-apex-charts height="450px" type="bar" :options="lampCountChartOptions" :series="lampCountChartOptions.series" />
+  <vue-apex-charts :height="chartHeight()" type="bar" :options="lampCountChartOptions" :series="lampCountChartOptions.series" />
 </template>
 
 <script setup lang="ts">
@@ -10,7 +10,7 @@ import { FindDiffTableHeaderList } from "@wailsjs/go/controller/DiffTableControl
 import { QueryUserInfoWithLevelLayeredDiffTableLampStatus } from "@wailsjs/go/controller/RivalInfoController";
 import { dto } from "@wailsjs/go/models";
 import { SelectOption, useNotification } from "naive-ui";
-import { reactive, ref, Ref, watch } from "vue";
+import { computed, reactive, ref, Ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import VueApexCharts from "vue3-apexcharts";
 
@@ -140,6 +140,12 @@ function buildSeries() {
     }
   }
 }
+
+const baseHeight = 400;
+function chartHeight(): string {
+  const addition = lampCountChartOptions.xaxis.categories.length * 5;
+  return `${baseHeight + addition}px` 
+};
 
 watch([currentTableId, () => props.rivalId], ([newTableId, newRivalId]) => {
   if (newTableId == null || newTableId == undefined) {

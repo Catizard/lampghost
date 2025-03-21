@@ -1,16 +1,19 @@
 package dto
 
 import (
+	"strings"
+
 	"github.com/Catizard/lampghost_wails/internal/entity"
 )
 
 type DiffTableHeaderDto struct {
-	ID          uint
-	HeaderUrl   string
-	DataUrl     string
-	Name        string
-	OriginalUrl *string
-	Symbol      string
+	ID                 uint
+	HeaderUrl          string
+	DataUrl            string
+	Name               string
+	OriginalUrl        *string
+	Symbol             string
+	UnjoinedLevelOrder []string
 
 	Contents []*DiffTableDataDto
 
@@ -26,14 +29,15 @@ type DiffTableHeaderDto struct {
 
 func NewDiffTableHeaderDto(header *entity.DiffTableHeader, contents []*DiffTableDataDto) *DiffTableHeaderDto {
 	return &DiffTableHeaderDto{
-		ID:          header.ID,
-		HeaderUrl:   header.HeaderUrl,
-		DataUrl:     header.DataUrl,
-		Name:        header.Name,
-		OriginalUrl: header.OriginalUrl,
-		Symbol:      header.Symbol,
-		Contents:    contents,
-		Children:    make([]DiffTableHeaderDto, 0),
+		ID:                 header.ID,
+		HeaderUrl:          header.HeaderUrl,
+		DataUrl:            header.DataUrl,
+		Name:               header.Name,
+		OriginalUrl:        header.OriginalUrl,
+		Symbol:             header.Symbol,
+		UnjoinedLevelOrder: strings.Split(header.LevelOrders, ","),
+		Contents:           contents,
+		Children:           make([]DiffTableHeaderDto, 0),
 	}
 }
 
@@ -44,6 +48,7 @@ func (header *DiffTableHeaderDto) Entity() *entity.DiffTableHeader {
 		Name:        header.Name,
 		OriginalUrl: header.OriginalUrl,
 		Symbol:      header.Symbol,
+		LevelOrders: strings.Join(header.UnjoinedLevelOrder, ","),
 	}
 }
 

@@ -133,6 +133,7 @@ export namespace dto {
 	    Name: string;
 	    OriginalUrl?: string;
 	    Symbol: string;
+	    UnjoinedLevelOrder: string[];
 	    Contents: DiffTableDataDto[];
 	    SortedLevels: string[];
 	    LevelLayeredContents: Record<string, DiffTableDataDto[]>;
@@ -151,6 +152,7 @@ export namespace dto {
 	        this.Name = source["Name"];
 	        this.OriginalUrl = source["OriginalUrl"];
 	        this.Symbol = source["Symbol"];
+	        this.UnjoinedLevelOrder = source["UnjoinedLevelOrder"];
 	        this.Contents = this.convertValues(source["Contents"], DiffTableDataDto);
 	        this.SortedLevels = source["SortedLevels"];
 	        this.LevelLayeredContents = this.convertValues(source["LevelLayeredContents"], DiffTableDataDto[], true);
@@ -577,6 +579,7 @@ export namespace entity {
 	    Name: string;
 	    OriginalUrl?: string;
 	    Symbol: string;
+	    LevelOrders: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new DiffTableHeader(source);
@@ -593,6 +596,7 @@ export namespace entity {
 	        this.Name = source["Name"];
 	        this.OriginalUrl = source["OriginalUrl"];
 	        this.Symbol = source["Symbol"];
+	        this.LevelOrders = source["LevelOrders"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -967,6 +971,7 @@ export namespace vo {
 	    symbol: string;
 	    Courses: CourseInfoVo[];
 	    HeaderUrl: string;
+	    level_order: string[];
 	    Level: string;
 	    RivalID: number;
 	    GhostRivalID: number;
@@ -990,6 +995,7 @@ export namespace vo {
 	        this.symbol = source["symbol"];
 	        this.Courses = this.convertValues(source["Courses"], CourseInfoVo);
 	        this.HeaderUrl = source["HeaderUrl"];
+	        this.level_order = source["level_order"];
 	        this.Level = source["Level"];
 	        this.RivalID = source["RivalID"];
 	        this.GhostRivalID = source["GhostRivalID"];

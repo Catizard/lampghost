@@ -1,6 +1,8 @@
 package vo
 
 import (
+	"strings"
+
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/go-viper/mapstructure/v2"
 	"gorm.io/gorm"
@@ -8,12 +10,13 @@ import (
 
 type DiffTableHeaderVo struct {
 	gorm.Model
-	DataUrl     string  `json:"data_url"`
-	Name        string  `json:"name"`
-	OriginalUrl *string `json:"original_url"`
-	Symbol      string  `json:"symbol"`
-	Courses     []CourseInfoVo
-	HeaderUrl   string
+	DataUrl            string  `json:"data_url"`
+	Name               string  `json:"name"`
+	OriginalUrl        *string `json:"original_url"`
+	Symbol             string  `json:"symbol"`
+	Courses            []CourseInfoVo
+	HeaderUrl          string
+	UnjoinedLevelOrder []string `json:"level_order"`
 
 	Level           string
 	RivalID         uint
@@ -38,6 +41,7 @@ func (header *DiffTableHeaderVo) Entity() *entity.DiffTableHeader {
 		OriginalUrl: header.OriginalUrl,
 		Symbol:      header.Symbol,
 		HeaderUrl:   header.HeaderUrl,
+		LevelOrders: strings.Join(header.UnjoinedLevelOrder, ","),
 	}
 }
 

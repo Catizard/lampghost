@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -46,6 +47,9 @@ func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHead
 	headerVo.HeaderUrl = url
 	if headerVo.DataUrl == "" {
 		return nil, fmt.Errorf("assert: header.DataUrl cannot be empty")
+	}
+	if !strings.HasSuffix(headerVo.DataUrl, ".json") {
+		return nil, fmt.Errorf("assert: header.DataUrl must endes with .json")
 	}
 	log.Debugf("[DiffTableService] Got header data: %v", headerVo)
 	if isDuplicated, err := queryDiffTableHeaderExistence(s.db, &entity.DiffTableHeader{DataUrl: headerVo.DataUrl}); isDuplicated || err != nil {
@@ -203,19 +207,7 @@ func (s *DiffTableService) FindDiffTableHeaderTree(filter *vo.DiffTableHeaderVo)
 	}
 
 	for headerInx, header := range headers {
-		sortedChildren := make([]dto.DiffTableHeaderDto, len(header.Children))
-		copy(sortedChildren, header.Children)
-		sort.Slice(sortedChildren, func(i, j int) bool {
-			ll := sortedChildren[i].Level
-			rr := sortedChildren[j].Level
-			ill, errL := strconv.Atoi(ll)
-			irr, errR := strconv.Atoi(rr)
-			if errL == nil && errR == nil {
-				return ill < irr
-			}
-			return ll < rr
-		})
-		headers[headerInx].Children = sortedChildren
+		headers[headerInx].Children = sortHeadersByLevel(header.Children, header.SortedLevels)
 	}
 
 	return headers, len(headers), nil
@@ -537,6 +529,35 @@ func queryRelatedLevelByIDS(tx *gorm.DB, IDs []uint) (ret []struct {
 	}
 
 	return
+}
+
+// Sort difficult table headers by following rule:
+//  1. if lhs and rhs are both defined in `preSortLevels`, return index(lhs) < index(rhs)
+//  2. if one of them is not present,
+//     2.1 if lhs and rhs are both number, return number(lhs) < number(rhs)
+//     2.2 if one of them is not number, return lhs < rhs
+func sortHeadersByLevel(headers []dto.DiffTableHeaderDto, preSortLevels []string) []dto.DiffTableHeaderDto {
+	sorted := make([]dto.DiffTableHeaderDto, len(headers))
+	sort.Slice(sorted, func(i, j int) bool {
+		ll := sorted[i].Level
+		rr := sorted[j].Level
+		inxL := -1
+		inxR := -1
+		if preSortLevels != nil {
+			inxL = slices.Index(preSortLevels, ll)
+			inxR = slices.Index(preSortLevels, rr)
+		}
+		if inxL == -1 || inxR == -1 {
+			ill, errL := strconv.Atoi(ll)
+			irr, errR := strconv.Atoi(rr)
+			if errL == nil && errR == nil {
+				return ill < irr
+			}
+			return ll < rr
+		}
+		return inxL < inxR
+	})
+	return sorted
 }
 
 func fetchJson(url string, v interface{}) error {

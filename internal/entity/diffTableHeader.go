@@ -10,6 +10,7 @@ type DiffTableHeader struct {
 	Name        string
 	OriginalUrl *string
 	Symbol      string
+	LevelOrders string
 }
 
 func (DiffTableHeader) TableName() string {

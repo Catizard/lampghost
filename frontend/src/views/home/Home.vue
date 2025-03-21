@@ -62,7 +62,6 @@ function initUser() {
 					duration: 3000,
 				});
 				router.push("/initialize");
-				return Promise.reject();
 			}
 			const data: dto.RivalInfoDto = result.Data;
 			mainUser.value = data;

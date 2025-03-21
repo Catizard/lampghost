@@ -207,7 +207,7 @@ func (s *DiffTableService) FindDiffTableHeaderTree(filter *vo.DiffTableHeaderVo)
 	}
 
 	for headerInx, header := range headers {
-		headers[headerInx].Children = sortHeadersByLevel(header.Children, header.SortedLevels)
+		headers[headerInx].Children = sortHeadersByLevel(header.Children, header.UnjoinedLevelOrder)
 	}
 
 	return headers, len(headers), nil
@@ -538,6 +538,7 @@ func queryRelatedLevelByIDS(tx *gorm.DB, IDs []uint) (ret []struct {
 //     2.2 if one of them is not number, return lhs < rhs
 func sortHeadersByLevel(headers []dto.DiffTableHeaderDto, preSortLevels []string) []dto.DiffTableHeaderDto {
 	sorted := make([]dto.DiffTableHeaderDto, len(headers))
+	copy(sorted, headers)
 	sort.Slice(sorted, func(i, j int) bool {
 		ll := sorted[i].Level
 		rr := sorted[j].Level

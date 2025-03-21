@@ -37,7 +37,7 @@ func (ctl *ConfigController) WriteConfig(conf *config.ApplicationConfig) result.
 		mainUser.ScoreLogPath = &conf.ScorelogFilePath
 		mainUser.SongDataPath = &conf.SongdataFilePath
 		// TODO: mainUser.scorePath = &conf.ScoreFilePath
-		if err := ctl.rivalInfoService.SyncRivalScoreLog(mainUser); err != nil {
+		if err := ctl.rivalInfoService.SyncRivalData(mainUser); err != nil {
 			return result.NewErrorMessage(err)
 		}
 	}

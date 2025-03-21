@@ -33,7 +33,7 @@
 
 <script setup lang="ts">
 import { computed, reactive, ref } from "vue";
-import { SyncRivalScoreLog, QueryMainUser } from "@wailsjs/go/controller/RivalInfoController";
+import { SyncRivalDataByID, QueryMainUser } from "@wailsjs/go/controller/RivalInfoController";
 import { useNotification } from "naive-ui";
 import dayjs from "dayjs";
 import router from "@/router";
@@ -75,8 +75,8 @@ function initUser() {
 const syncLoading = ref(false);
 function handleSyncClick() {
 	syncLoading.value = true;
-	SyncRivalScoreLog(mainUser.value.ID)
-		.then((result) => {
+	SyncRivalDataByID(mainUser.value.ID)
+		.then(result => {
 			if (result.Code != 200) {
 				return Promise.reject();
 			}

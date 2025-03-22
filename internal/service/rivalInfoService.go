@@ -195,14 +195,6 @@ func (s *RivalInfoService) QueryUserPlayCountInYear(ID uint, yearNum string) ([]
 	return ret, nil
 }
 
-func (s *RivalInfoService) FindRivalScoreLogByRivalId(ID uint) ([]entity.RivalScoreLog, error) {
-	var logs []entity.RivalScoreLog
-	if err := s.db.Find(&logs).Error; err != nil {
-		return nil, err
-	}
-	return logs, nil
-}
-
 func (s *RivalInfoService) QueryUserInfoWithLevelLayeredDiffTableLampStatus(rivalID uint, headerID uint) (*dto.RivalInfoDto, error) {
 	log.Debugf("[RivalInfoService] QueryUserInfoWithLevelLayeredDiffTableLampStatus: rivalID=%d, headerId=%d", rivalID, headerID)
 	rivalInfo, err := s.FindRivalInfoByID(rivalID)
@@ -213,10 +205,13 @@ func (s *RivalInfoService) QueryUserInfoWithLevelLayeredDiffTableLampStatus(riva
 	if err != nil {
 		return nil, err
 	}
-	logs, err := s.FindRivalScoreLogByRivalId(rivalID)
+	logs, n, err := findRivalScoreLogList(s.db, &vo.RivalScoreLogVo{
+		RivalId: rivalID,
+	})
 	if err != nil {
 		return nil, err
 	}
+	log.Debugf("[RivalInfoService] QueryUserInfoWithLevelLayeredDiffTableLampStatus: got %d logs", n)
 
 	sha256MaxLamp := make(map[string]int32)
 	for _, log := range logs {

@@ -141,6 +141,9 @@ func scopeRivalScoreLogFilter(filter *vo.RivalScoreLogVo) func(db *gorm.DB) *gor
 		if filter.SpecifyYear != nil {
 			moved = moved.Where("STRFTIME('%Y', `rival_score_log`.`record_time`) = ?", filter.SpecifyYear)
 		}
+		if filter.RivalId > 0 {
+			moved = moved.Where("rival_score_log.rival_id = ?", filter.RivalId)
+		}
 		return moved
 	}
 }

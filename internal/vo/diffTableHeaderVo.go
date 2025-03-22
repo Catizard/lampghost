@@ -50,22 +50,25 @@ func (header *DiffTableHeaderVo) ParseRawCourses() error {
 	if len(header.RawCourses) == 0 {
 		return nil // Okay dokey
 	}
-	if innerArray, isNested := header.RawCourses[0].([]interface{}); isNested {
-		for _, data := range innerArray {
-			courseInfo := CourseInfoVo{}
-			if err := mapstructure.Decode(data, &courseInfo); err != nil {
-				return err
+	for i := range header.RawCourses {
+		if innerArray, isNested := header.RawCourses[i].([]interface{}); isNested {
+			for _, data := range innerArray {
+				courseInfo := CourseInfoVo{}
+				if err := mapstructure.Decode(data, &courseInfo); err != nil {
+					return err
+				}
+				header.Courses = append(header.Courses, courseInfo)
 			}
-			header.Courses = append(header.Courses, courseInfo)
-		}
-	} else {
-		for _, data := range header.RawCourses {
-			courseInfo := CourseInfoVo{}
-			if err := mapstructure.Decode(data, &courseInfo); err != nil {
-				return err
+		} else {
+			for _, data := range header.RawCourses {
+				courseInfo := CourseInfoVo{}
+				if err := mapstructure.Decode(data, &courseInfo); err != nil {
+					return err
+				}
+				header.Courses = append(header.Courses, courseInfo)
 			}
-			header.Courses = append(header.Courses, courseInfo)
 		}
 	}
+
 	return nil
 }

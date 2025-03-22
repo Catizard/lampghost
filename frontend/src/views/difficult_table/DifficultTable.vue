@@ -88,7 +88,7 @@ const columns = createColumns({
   deleteHeader(row: any) {
     dialog.warning({
       title: t('deleteDialog.title'),
-      positiveText: t('deleteDialog.postiveText'),
+      positiveText: t('deleteDialog.positiveText'),
       negativeText: t('deleteDialog.negativeText'),
       onPositiveClick: () => {
         delDiffTableHeader(row.ID)

@@ -97,7 +97,9 @@ function createColumns(): DataTableColumns<dto.RivalScoreLogDto> {
 
 function loadData() {
   loading.value = true;
+  // TODO: remove magical 1 here
   let arg: vo.RivalScoreLogVo = {
+    RivalID: 1,
     Pagination: pagination,
     SongNameLike: searchNameLike.value,
   } as any;

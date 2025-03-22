@@ -99,6 +99,7 @@ func syncRivalTag(tx *gorm.DB, rivalID uint) error {
 	}
 	var minimumClear int32 = entity.Normal
 	rawScorelogs, _, err := findRivalScoreLogList(tx, &vo.RivalScoreLogVo{
+		RivalId:        rivalID,
 		OnlyCourseLogs: true,
 		MinimumClear:   &minimumClear,
 	})

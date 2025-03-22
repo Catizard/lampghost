@@ -2,7 +2,8 @@
   <n-flex justify="flex-start">
     <n-select v-model:value="currentTableId" :options="tableOptions" style="width: 150px" />
   </n-flex>
-  <vue-apex-charts :height="chartHeight()" type="bar" :options="lampCountChartOptions" :series="lampCountChartOptions.series" />
+  <vue-apex-charts :height="chartHeight()" type="bar" :options="lampCountChartOptions"
+    :series="lampCountChartOptions.series" />
 </template>
 
 <script setup lang="ts">
@@ -21,8 +22,8 @@ const props = defineProps<{
 const { t } = useI18n();
 const notification = useNotification();
 
-const LAMPS = [1, 4, 5, 11, 0];
-const STR_LAMPS = ["FAILED", "Easy", "Normal", "Hard+", "NO_PLAY"];
+const LAMPS = [1, 4, 5, 6, 7, 8, 9, 10, 0];
+const STR_LAMPS = ["FAILED", "Easy", "Normal", "Hard", "EXH", "FC", "PERFECT", "MAX", "NO_PLAY"];
 
 const currentTableId: Ref<number | null> = ref(null);
 const currentHeader: Ref<dto.DiffTableHeaderDto | null> = ref(null);
@@ -60,7 +61,17 @@ const lampCountChartOptions = reactive({
     stacked: true,
     stackType: "100%",
   },
-  colors: ["#FF0000", "#00FF00", "#0000FF", "#00FFFF", "#FFFFFF"],
+  colors: [
+    "#CC5C76",
+    "#49E670",
+    "#4FBCF7",
+    "#FF6B74",
+    "#FFAD70",
+    "#FFD251",
+    "#FFD251",
+    "#FFD251",
+    "#FFFFFF"
+  ],
   series: [],
   plotOptions: {
     bar: {
@@ -123,7 +134,6 @@ function buildSeries() {
       const count = dataList.filter(
         (data) =>
           data.Lamp == lampValue ||
-          (data.Lamp >= 6 && lampValue == 11) ||
           (lampValue == 1 && data.Lamp < 4 && data.Lamp > 0),
       ).length;
       let v = {
@@ -144,7 +154,7 @@ function buildSeries() {
 const baseHeight = 400;
 function chartHeight(): string {
   const addition = lampCountChartOptions.xaxis.categories.length * 5;
-  return `${baseHeight + addition}px` 
+  return `${baseHeight + addition}px`
 };
 
 watch([currentTableId, () => props.rivalId], ([newTableId, newRivalId]) => {

@@ -144,6 +144,10 @@ const pagination = reactive({
     pagination.pageSize = pageSize;
     pagination.page = 1;
     loadData();
+  },
+  reset: () => {
+    pagination.page = 1;
+    loadData();
   }
 });
 function loadData() {
@@ -248,9 +252,10 @@ function revertTagEnabledState(tag: dto.RivalTagDto) {
     });
 }
 
-// Watch: Whenever changing current rival, reload the tag table
+// Watch: Whenever changing current rival, reset current page to the first one
+// NOTE: There is no need to call loadData(), reset method would call it
 watch(currentRivalID, () => {
-  loadData();
+  pagination.reset();
 })
 </script>
 

@@ -149,7 +149,7 @@ func syncRivalTag(tx *gorm.DB, rivalID uint) error {
 		return nil
 	}
 
-	if err := tx.Unscoped().Where("rival_id = ? and generated = true", rivalID).Error; err != nil {
+	if err := tx.Debug().Unscoped().Where("rival_id = ? and generated = true", rivalID).Delete(&entity.RivalTag{}).Error; err != nil {
 		return err
 	}
 
@@ -247,6 +247,7 @@ func findRivalTagList(tx *gorm.DB, filter *vo.RivalTagVo) ([]*entity.RivalTag, i
 	if filter != nil && filter.Pagination != nil {
 		if filter.Pagination != nil {
 			count, err := selectRivalTagCount(tx, filter)
+			log.Debugf("[RivalTagService] findRivalTagList: count: %d", count)
 			if err != nil {
 				return nil, 0, err
 			}
@@ -270,7 +271,7 @@ func selectRivalTagCount(tx *gorm.DB, filter *vo.RivalTagVo) (int64, error) {
 		querying = querying.Where(filter.Entity())
 	}
 	var count int64
-	if err := querying.Count(&count).Error; err != nil {
+	if err := querying.Debug().Count(&count).Error; err != nil {
 		return 0, err
 	}
 	return count, nil

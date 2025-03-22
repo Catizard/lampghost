@@ -161,15 +161,13 @@ func (s *DiffTableService) FindDiffTableHeaderListWithRival(rivalID uint) ([]dto
 // Query difficult table data as tree
 //
 // Example result:
-// Satelite
-//
-//	+-- satelite0
-//	+-- satelite1
-//	+-- satelite2
-//	+-- ....
-//
-// BMS Insane table
-// +-- ...
+//  1. Satelite:
+//     1.1 satelite0
+//     1.2 satelite1
+//     1.3 satelite2
+//     ... ....
+//  2. BMS Insane table
+//     ...
 func (s *DiffTableService) FindDiffTableHeaderTree(filter *vo.DiffTableHeaderVo) ([]dto.DiffTableHeaderDto, int, error) {
 	// NOTE: Don't call s.FindDiffTableHeaderList, call findDiffTableHeaderList instead
 	rawHeaders, _, err := findDiffTableHeaderList(s.db, filter)

@@ -74,7 +74,7 @@ const columns: DataTableColumns<dto.DiffTableHeaderDto> = [
           headerId: row.ID,
           level: row.Level,
           ghostRivalId: currentRivalID.value,
-          ghostRivalTagId: currentRivalTagID.value 
+          ghostRivalTagId: currentRivalTagID.value
         }
       )
     }
@@ -119,7 +119,7 @@ const currentRivalID: Ref<number | null> = ref(null);
 const currentRivalTagID: Ref<number | null> = ref(null);
 const rivalOptions: Ref<Array<SelectOption>> = ref([]);
 const rivalTagOptions: Ref<Array<SelectOption>> = ref([]);
-function renderRivalTagOption({node, option}: {node: VNode, option: SelectOption}) {
+function renderRivalTagOption({ node, option }: { node: VNode, option: SelectOption }) {
   return h(NTooltip, {
     style: "max-width: 200px; font-color: white",
   }, {
@@ -188,8 +188,6 @@ watch(currentDiffTableID, (newID: string | number) => {
 watch(currentRivalID, (newID: number) => {
   loadRivalTagOptions(newID);
 });
-
-// TODO: Watch3: Whenever changing current rival ID or tag, reload the song table
 </script>
 
 <i18n lang="json">{

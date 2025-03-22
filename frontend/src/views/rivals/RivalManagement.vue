@@ -17,8 +17,8 @@
 		:positive-text="t('modal.positiveText')" :negative-text="t('modal.negativeText')"
 		@positive-click="handlePositiveClick" @negative-click="handleNegativeClick" :mask-closable="false">
 		<n-form ref="formRef" :model="formData" :rules="rules">
-			<n-form-item :label="t('modal.labelRivalName')" path="RivalName">
-				<n-input v-model:value="formData.RivalName" :placeholder="t('modal.placeholderRivalName')" />
+			<n-form-item :label="t('modal.labelRivalName')" path="Name">
+				<n-input v-model:value="formData.Name" :placeholder="t('modal.placeholderRivalName')" />
 			</n-form-item>
 			<n-form-item :label="t('modal.labelScoreLogPath')" path="ScoreLogPath">
 				<n-input v-model:value="formData.ScoreLogPath" :placeholder="t('modal.placeholderScoreLogPath')" />
@@ -66,8 +66,8 @@ function createColumns(): DataTableColumns<dto.RivalInfoDto> {
 	return [
 		{ title: t('column.name'), key: "Name", width: "100px", ellipsis: { tooltip: true } },
 		{ title: t('column.count'), key: "PlayCount", width: "100px", ellipsis: { tooltip: true } },
-		{ title: t('column.scoreLogFilePath'), key: "ScoreLogPath", maxWidth: "150px", ellipsis: { tooltip: true }},
-		{ title: t('column.songdataFilePath'), key: "SongDataPath", maxWidth: "150px", ellipsis: { tooltip: true }},
+		{ title: t('column.scoreLogFilePath'), key: "ScoreLogPath", maxWidth: "150px", ellipsis: { tooltip: true } },
+		{ title: t('column.songdataFilePath'), key: "SongDataPath", maxWidth: "150px", ellipsis: { tooltip: true } },
 		{
 			title: t('column.lastSyncTime'),
 			key: "UpdateAt",
@@ -142,12 +142,12 @@ loadData();
 const showAddModal = ref(false);
 const formRef = ref<FormInst | null>(null);
 const formData = ref({
-	RivalName: null,
+	Name: null,
 	ScoreLogPath: null,
 	SongDataPath: null,
 });
 const rules = {
-	RivalName: {
+	Name: {
 		required: true,
 		message: t('rules.missingRivalName'),
 		trigger: ["input", "blur"],
@@ -168,26 +168,27 @@ function handlePositiveClick(): boolean {
 	formRef.value
 		?.validate()
 		.then(() => {
-			AddRivalInfo(formData.value as any as entity.RivalInfo)
+			return AddRivalInfo(formData.value as any as entity.RivalInfo)
 				.then(result => {
 					if (result.Code != 200) {
-						return result.Msg;
+						return Promise.reject(result.Msg);
 					}
 					showAddModal.value = false;
-				}).catch((err) => {
-					notification.error({
-						content: err,
-						duration: 3000,
-						keepAliveOnHover: true
-					})
-				})
+					loadData();
+				});
 		})
-		.catch((err) => { });
+		.catch((err) => {
+			notification.error({
+				content: err,
+				duration: 3000,
+				keepAliveOnHover: true
+			});
+		});
 	return false;
 }
 
 function handleNegativeClick() {
-	formData.value.RivalName = null;
+	formData.value.Name = null;
 	formData.value.ScoreLogPath = null;
 	formData.value.SongDataPath = null;
 }

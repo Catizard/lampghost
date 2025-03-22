@@ -75,6 +75,9 @@ func (s *RivalInfoService) AddRivalInfo(rivalInfo *entity.RivalInfo) error {
 	if rivalInfo.ScoreLogPath == nil || *rivalInfo.ScoreLogPath == "" {
 		return fmt.Errorf("scorelog.db path cannot be empty")
 	}
+	if rivalInfo.Name == "" {
+		return fmt.Errorf("rival name cannot be empty")
+	}
 	// No, you can never add a main user by using this inteface
 	rivalInfo.MainUser = false
 	return s.db.Transaction(func(tx *gorm.DB) error {

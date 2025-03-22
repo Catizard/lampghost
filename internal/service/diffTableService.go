@@ -220,6 +220,9 @@ func (s *DiffTableService) DelDiffTableHeader(ID uint) error {
 		if err := tx.Unscoped().Where("header_id = ?", candidate.ID).Delete(&entity.DiffTableData{}).Error; err != nil {
 			return err
 		}
+		if err := tx.Unscoped().Where("header_id = ?", candidate.ID).Delete(&entity.CourseInfo{}).Error; err != nil {
+			return err
+		}
 		if err := tx.Delete(&entity.DiffTableHeader{}, candidate.ID).Error; err != nil {
 			return err
 		}

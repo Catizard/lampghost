@@ -19,7 +19,7 @@
 			</n-flex>
 		</n-gi>
 		<n-gi :span="8">
-			<PlayCountChart :rival-id="mainUser?.ID" />
+			<PlayCountChart :rival-id="currentUser?.ID" />
 		</n-gi>
 	</n-grid>
 	<n-divider />
@@ -28,53 +28,72 @@
 			{{ t("lampStatusTitle") }}
 		</n-text>
 	</n-h1>
-	<LampCountChart :rival-id="mainUser?.ID" />
+	<LampCountChart :rival-id="currentUser?.ID" />
 </template>
 
 <script setup lang="ts">
 import { computed, reactive, ref } from "vue";
-import { SyncRivalDataByID, QueryMainUser } from "@wailsjs/go/controller/RivalInfoController";
+import { SyncRivalDataByID, QueryMainUser, QueryUserInfoByID } from "@wailsjs/go/controller/RivalInfoController";
 import { useNotification } from "naive-ui";
 import dayjs from "dayjs";
-import router from "@/router";
 import { useI18n } from "vue-i18n";
 import PlayCountChart from "./PlayCountChart.vue";
 import LampCountChart from "./LampCountChart.vue";
 import { dto } from '@wailsjs/go/models';
+import { useRoute, useRouter } from "vue-router";
 
 const i18n = useI18n();
 const { t } = i18n;
 const notification = useNotification();
+const router = useRouter();
+const route = useRoute();
 
-const mainUser = ref(null);
+const currentUser = ref(null);
 const playerData = reactive({
 	playerName: "U",
 	playCount: 0,
 	lastUpdate: "",
 });
+const currentRivalID = ref(null);
 
 function initUser() {
 	QueryMainUser()
 		.then((result) => {
 			if (result.Code != 200) {
-				notification.error({
-					content: t("message.noMainUserError"),
-					duration: 3000,
-				});
 				router.push("/initialize");
+				return Promise.reject(t("message.noMainUserError"));
 			}
-			const data: dto.RivalInfoDto = result.Data;
-			mainUser.value = data;
+			return result.Data;
+		}).then((mainUserData: dto.RivalInfoDto) => {
+			currentRivalID.value = route?.query?.rivalID ?? 1;
+			if (currentRivalID.value == 1) {
+				return mainUserData;
+			} else {
+				return QueryUserInfoByID(parseInt(currentRivalID.value))
+					.then(result => {
+						if (result.Code != 200) {
+							return Promise.reject(result.Msg);
+						}
+						return result.Data;
+					});
+			}
+		}).then((data: dto.RivalInfoDto) => {
+			currentUser.value = data;
 			playerData.playerName = data.Name;
 			playerData.playCount = data.PlayCount;
 			playerData.lastUpdate = dayjs(data.UpdatedAt).format("YYYY-MM-DD HH:mm:ss");
+		}).catch(err => {
+			notification.error({
+				content: err,
+				duration: 3000,
+			});
 		});
 }
 
 const syncLoading = ref(false);
 function handleSyncClick() {
 	syncLoading.value = true;
-	SyncRivalDataByID(mainUser.value.ID)
+	SyncRivalDataByID(currentUser.value.ID)
 		.then(result => {
 			if (result.Code != 200) {
 				return Promise.reject();

@@ -31,10 +31,11 @@
 </template>
 
 <script lang="ts" setup>
+import router from '@/router';
 import { AddRivalInfo, QueryRivalInfoPageList, SyncRivalDataByID } from '@wailsjs/go/controller/RivalInfoController';
 import { dto, entity } from '@wailsjs/go/models';
 import dayjs from 'dayjs';
-import { DataTableColumns, FormInst, NButton, useNotification } from 'naive-ui';
+import { DataTableColumns, FormInst, NAnchorLink, NButton, useNotification } from 'naive-ui';
 import { h, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -64,7 +65,20 @@ const loading = ref<boolean>(false);
 
 function createColumns(): DataTableColumns<dto.RivalInfoDto> {
 	return [
-		{ title: t('column.name'), key: "Name", width: "100px", ellipsis: { tooltip: true } },
+		{
+			title: t('column.name'), key: "Name", width: "100px", ellipsis: { tooltip: true },
+			render: (row: dto.RivalInfoDto) => {
+				return h(
+					NButton,
+					{
+						text: true,
+						type: "info",
+						onClick: () => router.push({ path: "/home", query: { rivalID: row.ID } })
+					},
+					{ default: () => row.Name }
+				)
+			}
+		},
 		{ title: t('column.count'), key: "PlayCount", width: "100px", ellipsis: { tooltip: true } },
 		{ title: t('column.scoreLogFilePath'), key: "ScoreLogPath", maxWidth: "150px", ellipsis: { tooltip: true } },
 		{ title: t('column.songdataFilePath'), key: "SongDataPath", maxWidth: "150px", ellipsis: { tooltip: true } },

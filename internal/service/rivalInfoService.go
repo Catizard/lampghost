@@ -162,12 +162,32 @@ func (s *RivalInfoService) IncrementalSyncRivalData(rivalInfo *entity.RivalInfo)
 }
 
 func (s *RivalInfoService) DelRivalInfo(ID uint) error {
+	mainUser, err := queryMainUser(s.db)
+	if err != nil {
+		return err
+	}
+	if ID == mainUser.ID {
+		return fmt.Errorf("DelRivalInfo: cannot delete main user")
+	}
 	if err := s.db.Transaction(func(tx *gorm.DB) error {
 		var candidate entity.RivalInfo
 		if err := tx.First(&candidate, ID).Error; err != nil {
 			return err
 		}
+		// RivalInfo
 		if err := tx.Delete(&entity.RivalInfo{}, candidate.ID).Error; err != nil {
+			return err
+		}
+		// RivalScoreLog
+		if err := tx.Unscoped().Where("rival_id = ?", candidate.ID).Delete(&entity.RivalScoreLog{}).Error; err != nil {
+			return err
+		}
+		// RivalSongData
+		if err := tx.Unscoped().Where("rival_id = ?", candidate.ID).Delete(&entity.RivalSongData{}).Error; err != nil {
+			return err
+		}
+		// RivalTag
+		if err := tx.Unscoped().Where("rival_id = ?", candidate.ID).Delete(entity.RivalTag{}).Error; err != nil {
 			return err
 		}
 		return nil

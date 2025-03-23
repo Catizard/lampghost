@@ -32,16 +32,17 @@
 
 <script lang="ts" setup>
 import router from '@/router';
-import { AddRivalInfo, QueryRivalInfoPageList, SyncRivalDataByID } from '@wailsjs/go/controller/RivalInfoController';
+import { AddRivalInfo, DelRivalInfo, QueryRivalInfoPageList, SyncRivalDataByID } from '@wailsjs/go/controller/RivalInfoController';
 import { dto, entity } from '@wailsjs/go/models';
 import dayjs from 'dayjs';
-import { DataTableColumns, FormInst, NAnchorLink, NButton, useNotification } from 'naive-ui';
-import { h, reactive, ref } from 'vue';
+import { DataTableColumns, FormInst, NAnchorLink, NButton, useDialog, useNotification } from 'naive-ui';
+import { h, reactive, ref, VNode } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const i18n = useI18n();
 const { t } = i18n;
 const notification = useNotification();
+const dialog = useDialog();
 
 const pagination = reactive({
 	page: 1,
@@ -93,15 +94,32 @@ function createColumns(): DataTableColumns<dto.RivalInfoDto> {
 			title: t('column.actions'),
 			key: "action",
 			render: (row: dto.RivalInfoDto) => {
-				return h(
+				let vnodes: VNode[] = [];
+				const reloadBubutton = h(
 					NButton,
 					{
 						strong: true,
 						tertiary: true,
+						type: 'primary',
 						onClick: () => { handleSyncClick(row.ID) }
 					},
 					{ default: () => t('button.reload') }
-				)
+				);
+				vnodes.push(reloadBubutton);
+				if (!row.MainUser) {
+					const deleteButton = h(
+						NButton,
+						{
+							strong: true,
+							tertiary: true,
+							type: "error",
+							onClick: () => { handleDeleteClick(row.ID) }
+						},
+						{ default: () => t('button.delete') }
+					);
+					vnodes.push(deleteButton);
+				}
+				return vnodes;
 			}
 		}
 	]
@@ -128,7 +146,7 @@ function loadData() {
 		});
 }
 
-function handleSyncClick(id) {
+function handleSyncClick(id: number) {
 	loading.value = true;
 	SyncRivalDataByID(id)
 		.then(result => {
@@ -149,6 +167,32 @@ function handleSyncClick(id) {
 		}).finally(() => {
 			loading.value = false;
 		})
+}
+
+function handleDeleteClick(id: number) {
+	dialog.warning({
+		title: t('deleteDialog.title'),
+		positiveText: t('deleteDialog.positiveText'),
+		negativeText: t('deleteDialog.negativeText'),
+		onPositiveClick: () => {
+			loading.value = true;
+			DelRivalInfo(id)
+				.then(result => {
+					if (result.Code != 200) {
+						return Promise.reject(result.Msg);
+					}
+				}).catch(err => {
+					notification.error({
+						content: err,
+						duration: 3000,
+						keepAliveOnHover: true
+					});
+				}).finally(() => {
+					loadData();
+					loading.value = false;
+				});
+		}
+	})
 }
 
 loadData();
@@ -221,7 +265,8 @@ function handleNegativeClick() {
 		},
 		"button": {
 			"reload": "Reload",
-			"add": "Add Rival"
+			"add": "Add Rival",
+			"delete": "Delete"
 		},
 		"message": {
 			"reloadSuccess": "Reload successfully"
@@ -241,6 +286,11 @@ function handleNegativeClick() {
 			"missingRivalName": "Rival's name cannot be empty",
 			"missingScoreLogPath": "scorelog.db file path cannot be empty",
 			"missingSongDataPath": "songdata.db file path cannot be empty"
+		},
+		"deleteDialog": {
+			"title": "Confirm to delete?",
+			"positiveText": "Yes",
+			"negativeText": "No"
 		}
 	},
 	"zh-CN": {
@@ -255,7 +305,8 @@ function handleNegativeClick() {
 		},
 		"button": {
 			"reload": "同步",
-			"add": "添加好友"
+			"add": "添加好友",
+			"delete": "删除"
 		},
 		"message": {
 			"reloadSuccess": "同步成功"
@@ -275,6 +326,11 @@ function handleNegativeClick() {
 			"missingRivalName": "好友名称不可为空",
 			"missingScoreLogPath": "scorelog.db文件路径不可为空",
 			"missingSongDataPath": "songdata.db文件路径不可为空"
+		},
+		"deleteDialog": {
+			"title": "确定要删除吗？",
+			"positiveText": "是",
+			"negativeText": "否"
 		}
 	}
 }</i18n>

@@ -234,7 +234,7 @@ func (s *RivalInfoService) QueryUserInfoWithLevelLayeredDiffTableLampStatus(riva
 
 func (s *RivalInfoService) QueryRivalPlayedYears(rivalID uint) ([]int, int, error) {
 	var years []int
-	if err := s.db.Model(&entity.RivalScoreLog{}).Select("distinct STRFTIME('%Y', record_time)").Find(&years).Error; err != nil {
+	if err := s.db.Model(&entity.RivalScoreLog{}).Where("rival_id = ?", rivalID).Select("distinct STRFTIME('%Y', record_time)").Find(&years).Error; err != nil {
 		return nil, 0, err
 	}
 	return years, len(years), nil

@@ -323,15 +323,10 @@ func (s *DiffTableService) QueryDiffTableDataWithRival(filter *vo.DiffTableHeade
 		return nil, 0, err
 	}
 	contents := dto.NewDiffTableDataDtoArray(rawContents)
-	sha256ScoreLogsMap, err := findRivalScoreLogSha256Map(s.db, &vo.RivalScoreLogVo{
-		RivalId: filter.RivalID,
-	})
-	if err != nil {
-		return nil, 0, err
-	}
-	if err := mergeRivalRelatedData(sha256ScoreLogsMap, contents, false); err != nil {
-		return nil, 0, err
-	}
+	// NOTE: Here's a small hack to set correct play count in final result
+	// "Play Count" column is setted by calling "mergeRivalRelatedData" method,
+	// therefore if we merge "ghost"'s data first and "main user"'s data second,
+	// "Play Count" column's data is always "main user"'s, not "ghost"'s.
 	if filter.GhostRivalID > 0 {
 		queryGhostScoreLogParam := &vo.RivalScoreLogVo{
 			RivalId: filter.GhostRivalID,
@@ -350,6 +345,15 @@ func (s *DiffTableService) QueryDiffTableDataWithRival(filter *vo.DiffTableHeade
 		if err := mergeRivalRelatedData(ghostScoreLogsMap, contents, true); err != nil {
 			return nil, 0, err
 		}
+	}
+	sha256ScoreLogsMap, err := findRivalScoreLogSha256Map(s.db, &vo.RivalScoreLogVo{
+		RivalId: filter.RivalID,
+	})
+	if err != nil {
+		return nil, 0, err
+	}
+	if err := mergeRivalRelatedData(sha256ScoreLogsMap, contents, false); err != nil {
+		return nil, 0, err
 	}
 	return contents, len(contents), nil
 }
@@ -476,6 +480,8 @@ func mergeRivalRelatedData(sha256ScoreLogsMap map[string][]*dto.RivalScoreLogDto
 					contents[i].Lamp = max(content.Lamp, int(log.Clear))
 				}
 			}
+		} else {
+			contents[i].PlayCount = 0
 		}
 	}
 	return nil

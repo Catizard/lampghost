@@ -114,6 +114,16 @@ func syncRivalTag(tx *gorm.DB, rivalID uint) error {
 	}
 	if len(interestScoreLogs) == 0 {
 		log.Warn("[RivalTagService] There's no course related play record, skip tag build")
+		// Small hack for clearing unexpected tags
+		if count, err := selectRivalTagCount(tx, &vo.RivalTagVo{
+			RivalId: rivalID,
+		}); err != nil {
+			return err
+		} else if count > 0 {
+			if err := deleteGeneratedTagsByRivalID(tx, rivalID); err != nil {
+				return err
+			}
+		}
 		return nil
 	}
 
@@ -192,6 +202,16 @@ func syncRivalTagFromRawData(tx *gorm.DB, rivalID uint, rawScoreLog []*entity.Sc
 	}
 	if len(interestScoreLogs) == 0 {
 		log.Warn("[RivalTagService] There's no course related play record, skip tag build")
+		// Small hack for clearing unexpected tags
+		if count, err := selectRivalTagCount(tx, &vo.RivalTagVo{
+			RivalId: rivalID,
+		}); err != nil {
+			return err
+		} else if count > 0 {
+			if err := deleteGeneratedTagsByRivalID(tx, rivalID); err != nil {
+				return err
+			}
+		}
 		return nil
 	}
 	sort.Slice(interestScoreLogs, func(i int, j int) bool {
@@ -225,7 +245,7 @@ func syncRivalTagFromRawData(tx *gorm.DB, rivalID uint, rawScoreLog []*entity.Sc
 	}
 
 	// NOTE: We only delete generated tags
-	if err := tx.Unscoped().Where("rival_id = ? and generated = true", rivalID).Delete(&entity.RivalTag{}).Error; err != nil {
+	if err := deleteGeneratedTagsByRivalID(tx, rivalID); err != nil {
 		return err
 	}
 
@@ -279,4 +299,9 @@ func selectRivalTagCount(tx *gorm.DB, filter *vo.RivalTagVo) (int64, error) {
 
 func deleteRivalTagByID(tx *gorm.DB, rivalTagID uint) error {
 	return tx.Unscoped().Where("ID = ?", rivalTagID).Delete(&entity.RivalTag{}).Error
+}
+
+// Removes one rival's all generated tags
+func deleteGeneratedTagsByRivalID(tx *gorm.DB, rivalID uint) error {
+	return tx.Unscoped().Where("rival_id = ? and generated = true", rivalID).Delete(&entity.RivalTag{}).Error
 }

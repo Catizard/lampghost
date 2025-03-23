@@ -480,6 +480,8 @@ func mergeRivalRelatedData(sha256ScoreLogsMap map[string][]*dto.RivalScoreLogDto
 					contents[i].Lamp = max(content.Lamp, int(log.Clear))
 				}
 			}
+		} else {
+			contents[i].PlayCount = 0
 		}
 	}
 	return nil

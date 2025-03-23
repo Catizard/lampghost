@@ -101,6 +101,8 @@ function createColumns(): DataTableColumns<dto.RivalInfoDto> {
 						strong: true,
 						tertiary: true,
 						type: 'primary',
+						size: "small",
+						style: "margin-right: 5px",
 						onClick: () => { handleSyncClick(row.ID) }
 					},
 					{ default: () => t('button.reload') }
@@ -113,6 +115,7 @@ function createColumns(): DataTableColumns<dto.RivalInfoDto> {
 							strong: true,
 							tertiary: true,
 							type: "error",
+							size: "small",
 							onClick: () => { handleDeleteClick(row.ID) }
 						},
 						{ default: () => t('button.delete') }

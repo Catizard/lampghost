@@ -360,7 +360,6 @@ func (s *DiffTableService) QueryDiffTableDataWithRival(filter *vo.DiffTableHeade
 
 func (s *DiffTableService) BindDiffTableDataToFolder(diffTableDataID uint, folderIDs []uint) error {
 	return s.db.Transaction(func(tx *gorm.DB) error {
-		fmt.Printf("FUCK YOU")
 		log.Debugf("before find difficult table data")
 		songData, err := findDiffTableDataByID(tx, diffTableDataID)
 		if err != nil {

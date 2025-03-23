@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/Catizard/lampghost_wails/internal/config"
+	"github.com/charmbracelet/log"
 	"gorm.io/gorm"
 )
 
@@ -35,6 +36,8 @@ func (s *ConfigService) WriteConfig(conf *config.ApplicationConfig) error {
 			if err := syncRivalData(tx, mainUser); err != nil {
 				return err
 			}
+		} else {
+			log.Warn("[Config] no save file path changed, skip reload")
 		}
 		if err := conf.WriteConfig(); err != nil {
 			return err

@@ -11,6 +11,8 @@ type DiffTableHeader struct {
 	OriginalUrl *string
 	Symbol      string
 	LevelOrders string
+	// defaults to false, if flagged and LevelOrders is empty, sort levels by custom sort strategy, otherwise do nothing
+	EnableFallbackSort int `gorm:"default:0"`
 }
 
 func (DiffTableHeader) TableName() string {

@@ -5,6 +5,8 @@ import (
 
 	"github.com/Catizard/lampghost_wails/internal/config"
 	"github.com/Catizard/lampghost_wails/internal/database"
+	"github.com/Catizard/lampghost_wails/internal/entity"
+	"github.com/charmbracelet/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -17,6 +19,7 @@ type EmptyMemoryDatabaseTestSuite struct {
 }
 
 func (suite *EmptyMemoryDatabaseTestSuite) SetupTest() {
+	log.SetLevel(log.DebugLevel)
 	dbConfig := config.DatabaseConfig{
 		DSN: ":memory:",
 	}
@@ -25,7 +28,7 @@ func (suite *EmptyMemoryDatabaseTestSuite) SetupTest() {
 	suite.db = db
 }
 
-func (s *EmptyMemoryDatabaseTestSuite) TearDownTest() {
+func (suite *EmptyMemoryDatabaseTestSuite) TearDownTest() {
 }
 
 type diffTableDefinition struct {
@@ -107,6 +110,69 @@ func (suite *EmptyMemoryDatabaseTestSuite) TestAddDiffTableHeader() {
 		})
 		// NOTE: we cannot use CourseInfoService here to query inserted courses, because `FindCourseInfoList` method requires data from `RivalSongData`.
 	}
+}
+
+// Basic test for `EnabledFallbackSort` field in `DiffTableHeader`
+func (suite *EmptyMemoryDatabaseTestSuite) TestLevelSortStrategy() {
+	require.Nil(suite.T(), suite.db.Create(&entity.RivalInfo{
+		Name:     "-",
+		MainUser: true,
+	}).Error)
+	// create hand crafted table for testing
+	header := &entity.DiffTableHeader{
+		Name: "test",
+	}
+	require.Nil(suite.T(), suite.db.Create(&header).Error)
+	// NOTE: don't put headerDatas in db.Create directory
+	// if do so, the insert sequence is undefined
+	var headerDatas = []entity.DiffTableData{
+		{HeaderID: header.ID, Level: "5"},
+		{HeaderID: header.ID, Level: "4"},
+		{HeaderID: header.ID, Level: "3"},
+		{HeaderID: header.ID, Level: "2"},
+		{HeaderID: header.ID, Level: "1"},
+	}
+	require.Nil(suite.T(), suite.db.Create(headerDatas).Error)
+
+	service := NewDiffTableService(suite.db)
+	suite.T().Run("NoOrder-NoFallback", func(t *testing.T) {
+		_, err := service.QueryLevelLayeredDiffTableInfoById(header.ID)
+		require.Nil(t, err)
+		// NOTE: don't do this, the sequence is uncertain
+		// assert.Equal(t, []string{"5", "4", "3", "2", "1"}, header_.SortedLevels)
+	})
+
+	header.LevelOrders = "5,2,3,4,1"
+	require.Nil(suite.T(), suite.db.Save(header).Error)
+	suite.T().Run("HasOrder-NoFallback", func(t *testing.T) {
+		header_, err := service.QueryLevelLayeredDiffTableInfoById(header.ID)
+		require.Nil(t, err)
+		assert.Equal(t, []string{"5", "2", "3", "4", "1"}, header_.SortedLevels)
+	})
+	header.LevelOrders = ""
+	require.Nil(suite.T(), suite.db.Save(header).Error)
+
+	header.EnableFallbackSort = 0
+	require.Nil(suite.T(), suite.db.Save(header).Error)
+	suite.T().Run("NoOrder-EnableFallback", func(t *testing.T) {
+		header_, err := service.QueryLevelLayeredDiffTableInfoById(header.ID)
+		require.Nil(t, err)
+		assert.Equal(t, []string{"1", "2", "3", "4", "5"}, header_.SortedLevels)
+	})
+	header.EnableFallbackSort = 0
+	require.Nil(suite.T(), suite.db.Save(header).Error)
+
+	header.LevelOrders = "5,2,3,4,1"
+	header.EnableFallbackSort = 0
+	require.Nil(suite.T(), suite.db.Save(header).Error)
+	suite.T().Run("HasOrder-NoFallback", func(t *testing.T) {
+		header_, err := service.QueryLevelLayeredDiffTableInfoById(header.ID)
+		require.Nil(t, err)
+		assert.Equal(t, []string{"5", "2", "3", "4", "1"}, header_.SortedLevels)
+	})
+	header.LevelOrders = ""
+	header.EnableFallbackSort = 0
+	require.Nil(suite.T(), suite.db.Save(header).Error)
 }
 
 func TestDatabaseRelatedWrapper(t *testing.T) {

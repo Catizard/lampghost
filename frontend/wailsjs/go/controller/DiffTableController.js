@@ -53,3 +53,7 @@ export function QueryDiffTableInfoWithRival(arg1, arg2) {
 export function QueryLevelLayeredDiffTableInfoById(arg1) {
   return window['go']['controller']['DiffTableController']['QueryLevelLayeredDiffTableInfoById'](arg1);
 }
+
+export function UpdateDiffTableHeader(arg1) {
+  return window['go']['controller']['DiffTableController']['UpdateDiffTableHeader'](arg1);
+}

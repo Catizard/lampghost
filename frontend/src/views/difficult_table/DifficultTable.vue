@@ -10,82 +10,79 @@
       :row-key="(row: dto.DiffTableHeaderDto) => row.ID" />
   </perfect-scrollbar>
 
-  <n-modal v-model:show="showAddModal" preset="dialog" :title="t('modal.title')"
-    :positive-text="t('modal.positiveText')" :negative-text="t('modal.negativeText')"
-    @positive-click="handlePositiveClick" @negative-click="handleNegativeClick" :mask-closable="false">
-    <n-form ref="formRef" :model="formData" :rules="rules">
-      <n-form-item :label="t('modal.labelAddress')" path="url">
-        <n-input v-model:value="formData.url" :placeholder="t('modal.placeholderAddress')" />
-      </n-form-item>
-    </n-form>
-  </n-modal>
+  <DifficultTableAddForm v-model:show="showAddModal" @refresh="loadDiffTableData()" />
+  <DifficultTableEditForm ref="editFormRef" @refresh="loadDiffTableData()" />
 </template>
 
 <script lang="ts" setup>
-import type { DataTableColumns, FormInst } from "naive-ui";
-import { NButton, NDataTable, useDialog } from "naive-ui";
+import type { DataTableColumns, DropdownOption, FormInst } from "naive-ui";
+import { NButton, NDataTable, NDropdown, useDialog } from "naive-ui";
 import { useNotification } from "naive-ui";
 import { h, Ref, ref } from "vue";
 import {
-  AddDiffTableHeader,
   DelDiffTableHeader,
   FindDiffTableHeaderTree
 } from "@wailsjs/go/controller/DiffTableController";
 import { dto } from "@wailsjs/go/models";
 import { useI18n } from "vue-i18n";
+import DifficultTableAddForm from "./DifficultTableAddForm.vue";
+import DifficultTableEditForm from "./DifficultTableEditForm.vue";
 
 const i18n = useI18n();
 const { t } = i18n;
 const showAddModal = ref(false);
-
-const formRef = ref<FormInst | null>(null);
-const formData = ref({
-  url: "",
-});
-const rules = {
-  url: {
-    required: true,
-    message: t('rules.missingAddress'),
-    trigger: ["input", "blur"],
-  },
-};
+const editFormRef = ref<InstanceType<typeof DifficultTableEditForm>>(null);
 
 const notification = useNotification();
 const dialog = useDialog();
 const loading = ref(false);
 loadDiffTableData();
 
-function createColumns({
-  deleteHeader,
-}: {
-  deleteHeader: (row: dto.DiffTableHeaderDto) => void;
-}): DataTableColumns<dto.DiffTableHeaderDto> {
-  return [
-    { title: t('column.name'), key: "Name", },
-    { title: t('column.url'), key: "HeaderUrl", },
-    {
-      title: t('column.actions'),
-      key: "actions",
-      render(row) {
-        return h(
-          NButton,
-          {
-            strong: true,
-            tertiary: true,
-            size: "small",
-            onClick: () => deleteHeader(row),
-          },
-          { default: () => t('button.delete') },
-        );
-      },
+const columns = [
+  { title: t('column.name'), key: "Name", },
+  { title: t('column.url'), key: "HeaderUrl", },
+  {
+    title: t('column.actions'),
+    key: "actions",
+    render(row) {
+      return h(
+        NDropdown,
+        {
+          trigger: "hover",
+          options: otherActionOptions,
+          onSelect: (key: string) => handleSelectOtherAction(row, key)
+        },
+        {
+          default: () => h(
+            NButton,
+            null,
+            { default: () => '...' }
+          )
+        },
+      );
     },
-  ];
-}
+  },
+];
 
 let data: Ref<Array<any>> = ref([]);
 const pagination = false as const;
-const columns = createColumns({
-  deleteHeader(row: any) {
+
+const otherActionOptions: Array<DropdownOption> = [
+  {
+    label: t('button.edit'),
+    key: "Edit",
+  },
+  {
+    label: t('button.delete'),
+    key: "Delete",
+    props: {
+      style: "color: red"
+    }
+  }
+];
+const currentEditingHeaderId = ref(null);
+function handleSelectOtherAction(row: dto.DiffTableHeaderDto, key: string) {
+  if ("Delete" === key) {
     dialog.warning({
       title: t('deleteDialog.title'),
       positiveText: t('deleteDialog.positiveText'),
@@ -95,22 +92,9 @@ const columns = createColumns({
       }
     })
   }
-});
-
-function addDiffTableHeader(url: string) {
-  loading.value = true;
-  AddDiffTableHeader(url)
-    .then((result) => {
-      if (result.Code != 200) {
-        return Promise.reject(result.Msg);
-      }
-      formData.value.url = "";
-      loadDiffTableData();
-    })
-    .catch((err) => {
-      notifyError(t('message.addTableFailedPrefix') + err)
-      loadDiffTableData();
-    }).finally(() => loading.value = false);
+  if ("Edit" === key) {
+    editFormRef.value.open(row.ID);
+  }
 }
 
 function delDiffTableHeader(id: number) {
@@ -126,21 +110,6 @@ function delDiffTableHeader(id: number) {
       notifyError(err)
       loadDiffTableData();
     }).finally(() => loading.value = false);
-}
-
-function handlePositiveClick(): boolean {
-  formRef.value
-    ?.validate()
-    .then(() => {
-      addDiffTableHeader(formData.value.url);
-      showAddModal.value = false;
-    })
-    .catch((err) => { });
-  return false;
-}
-
-function handleNegativeClick() {
-  formData.value.url = "";
 }
 
 function loadDiffTableData() {
@@ -182,17 +151,8 @@ function notifyError(msg: string) {
     "title": "Table Management",
     "button": {
       "add": "Add Table",
-      "delete": "Delete"
-    },
-    "modal": {
-      "title": "Add a new table",
-      "positiveText": "add",
-      "negativeText": "cancel",
-      "labelAddress": "Address",
-      "placeholderAddress": "Input address"
-    },
-    "rules": {
-      "missingAddress": "Please input address"
+      "delete": "Delete",
+      "edit": "Edit"
     },
     "column": {
       "name": "Name",
@@ -214,17 +174,8 @@ function notifyError(msg: string) {
     "title": "难度表管理",
     "button": {
       "add": "新增",
-      "delete": "删除"
-    },
-    "modal": {
-      "title": "新增难度表",
-      "positiveText": "新增",
-      "negativeText": "取消",
-      "labelAddress": "地址",
-      "placeholderAddress": "请输入地址"
-    },
-    "rules": {
-      "missingAddress": "请输入地址"
+      "delete": "删除",
+      "edit": "修改"
     },
     "column": {
       "name": "名称",

@@ -162,7 +162,6 @@ func main() {
 		},
 		LogLevel: logger.DEBUG,
 	})
-
 	if err != nil {
 		println("Error:", err.Error())
 	}

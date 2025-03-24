@@ -133,6 +133,8 @@ export namespace dto {
 	    Name: string;
 	    OriginalUrl?: string;
 	    Symbol: string;
+	    EnableFallbackSort: number;
+	    LevelOrders: string;
 	    UnjoinedLevelOrder: string[];
 	    Contents: DiffTableDataDto[];
 	    SortedLevels: string[];
@@ -152,6 +154,8 @@ export namespace dto {
 	        this.Name = source["Name"];
 	        this.OriginalUrl = source["OriginalUrl"];
 	        this.Symbol = source["Symbol"];
+	        this.EnableFallbackSort = source["EnableFallbackSort"];
+	        this.LevelOrders = source["LevelOrders"];
 	        this.UnjoinedLevelOrder = source["UnjoinedLevelOrder"];
 	        this.Contents = this.convertValues(source["Contents"], DiffTableDataDto);
 	        this.SortedLevels = source["SortedLevels"];
@@ -580,6 +584,7 @@ export namespace entity {
 	    OriginalUrl?: string;
 	    Symbol: string;
 	    LevelOrders: string;
+	    EnableFallbackSort: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new DiffTableHeader(source);
@@ -597,6 +602,7 @@ export namespace entity {
 	        this.OriginalUrl = source["OriginalUrl"];
 	        this.Symbol = source["Symbol"];
 	        this.LevelOrders = source["LevelOrders"];
+	        this.EnableFallbackSort = source["EnableFallbackSort"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -945,6 +951,7 @@ export namespace vo {
 	    name: string;
 	    md5: string[];
 	    constraint: string[];
+	    HeaderID: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new CourseInfoVo(source);
@@ -955,6 +962,7 @@ export namespace vo {
 	        this.name = source["name"];
 	        this.md5 = source["md5"];
 	        this.constraint = source["constraint"];
+	        this.HeaderID = source["HeaderID"];
 	    }
 	}
 	export class DiffTableHeaderVo {
@@ -971,6 +979,8 @@ export namespace vo {
 	    symbol: string;
 	    Courses: CourseInfoVo[];
 	    HeaderUrl: string;
+	    EnableFallbackSort: number;
+	    LevelOrders: string;
 	    level_order: string[];
 	    Level: string;
 	    RivalID: number;
@@ -995,6 +1005,8 @@ export namespace vo {
 	        this.symbol = source["symbol"];
 	        this.Courses = this.convertValues(source["Courses"], CourseInfoVo);
 	        this.HeaderUrl = source["HeaderUrl"];
+	        this.EnableFallbackSort = source["EnableFallbackSort"];
+	        this.LevelOrders = source["LevelOrders"];
 	        this.level_order = source["level_order"];
 	        this.Level = source["Level"];
 	        this.RivalID = source["RivalID"];

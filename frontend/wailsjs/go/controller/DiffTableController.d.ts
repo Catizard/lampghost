@@ -30,3 +30,5 @@ export function QueryDiffTableInfoById(arg1:number):Promise<result.RtnData>;
 export function QueryDiffTableInfoWithRival(arg1:number,arg2:number):Promise<result.RtnData>;
 
 export function QueryLevelLayeredDiffTableInfoById(arg1:number):Promise<result.RtnData>;
+
+export function UpdateDiffTableHeader(arg1:vo.DiffTableHeaderVo):Promise<result.RtnMessage>;

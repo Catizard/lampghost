@@ -13,6 +13,8 @@ type DiffTableHeaderDto struct {
 	Name               string
 	OriginalUrl        *string
 	Symbol             string
+	EnableFallbackSort int
+	LevelOrders        string
 	UnjoinedLevelOrder []string
 
 	Contents []*DiffTableDataDto
@@ -35,6 +37,8 @@ func NewDiffTableHeaderDto(header *entity.DiffTableHeader, contents []*DiffTable
 		Name:               header.Name,
 		OriginalUrl:        header.OriginalUrl,
 		Symbol:             header.Symbol,
+		EnableFallbackSort: header.EnableFallbackSort,
+		LevelOrders:        header.LevelOrders,
 		UnjoinedLevelOrder: strings.Split(header.LevelOrders, ","),
 		Contents:           contents,
 		Children:           make([]DiffTableHeaderDto, 0),
@@ -43,12 +47,13 @@ func NewDiffTableHeaderDto(header *entity.DiffTableHeader, contents []*DiffTable
 
 func (header *DiffTableHeaderDto) Entity() *entity.DiffTableHeader {
 	return &entity.DiffTableHeader{
-		HeaderUrl:   header.HeaderUrl,
-		DataUrl:     header.DataUrl,
-		Name:        header.Name,
-		OriginalUrl: header.OriginalUrl,
-		Symbol:      header.Symbol,
-		LevelOrders: strings.Join(header.UnjoinedLevelOrder, ","),
+		HeaderUrl:          header.HeaderUrl,
+		DataUrl:            header.DataUrl,
+		Name:               header.Name,
+		OriginalUrl:        header.OriginalUrl,
+		Symbol:             header.Symbol,
+		EnableFallbackSort: header.EnableFallbackSort,
+		LevelOrders:        strings.Join(header.UnjoinedLevelOrder, ","),
 	}
 }
 

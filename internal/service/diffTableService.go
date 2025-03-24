@@ -8,7 +8,6 @@ import (
 	"io"
 	"net/http"
 	"slices"
-	"sort"
 	"strconv"
 	"strings"
 
@@ -108,6 +107,14 @@ func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHead
 	return headerEntity, nil
 }
 
+func (s *DiffTableService) UpdateDiffTableHeader(param *vo.DiffTableHeaderVo) error {
+	if param.ID == 0 {
+		return fmt.Errorf("UpdateDiffTableHeader: ID should > 0")
+	}
+	// No, I hate this
+	return s.db.Debug().Select("enable_fallback_sort").Updates(param.Entity()).Error
+}
+
 // Query all difficult table datas
 //
 // Returns difficult header and its contents
@@ -204,6 +211,11 @@ func (s *DiffTableService) FindDiffTableHeaderTree(filter *vo.DiffTableHeaderVo)
 	}
 
 	for headerInx, header := range headers {
+		// Skip sort if no order is pre-defined and the header is not configured to use the fallback sort strategy
+		if header.LevelOrders == "" && header.EnableFallbackSort != 0 {
+			log.Debugf("[DiffTableService] no pre-defined orders & fallback is unset, skipping sort")
+			continue
+		}
 		headers[headerInx].Children = sortHeadersByLevel(header.Children, header.UnjoinedLevelOrder)
 	}
 
@@ -269,14 +281,14 @@ func (s *DiffTableService) QueryLevelLayeredDiffTableInfoById(ID uint) (*dto.Dif
 	if err != nil {
 		return nil, err
 	}
-	levels := make(map[string]interface{})
+	levels := make(map[string]any)
 	levelLayeredContent := make(map[string][]*dto.DiffTableDataDto)
 	for _, v := range header.Contents {
 		if _, ok := levelLayeredContent[v.Level]; !ok {
 			levelLayeredContent[v.Level] = make([]*dto.DiffTableDataDto, 0)
 		}
 		if _, ok := levels[v.Level]; !ok {
-			levels[v.Level] = new(interface{})
+			levels[v.Level] = new(any)
 		}
 		levelLayeredContent[v.Level] = append(levelLayeredContent[v.Level], v)
 	}
@@ -285,16 +297,13 @@ func (s *DiffTableService) QueryLevelLayeredDiffTableInfoById(ID uint) (*dto.Dif
 	for level := range levels {
 		sortedLevels = append(sortedLevels, level)
 	}
-	sort.Slice(sortedLevels, func(i, j int) bool {
-		ll := sortedLevels[i]
-		rr := sortedLevels[j]
-		ill, errL := strconv.Atoi(ll)
-		irr, errR := strconv.Atoi(rr)
-		if errL == nil && errR == nil {
-			return ill < irr
-		}
-		return ll < rr
-	})
+	// Skip sort if no order is pre-defined and the header is not configured to use the fallback sort strategy
+	if header.LevelOrders == "" && header.EnableFallbackSort != 0 {
+		// do nothing...
+		log.Debugf("[DiffTableService] no pre-defined orders & fallback is unset, skipping sort")
+	} else {
+		sortedLevels = sortLevels(sortedLevels, header.UnjoinedLevelOrder)
+	}
 	return dto.NewLevelLayeredDiffTableHeaderDto(header.Entity(), sortedLevels, levelLayeredContent), nil
 }
 
@@ -544,26 +553,47 @@ func queryRelatedLevelByIDS(tx *gorm.DB, IDs []uint) (ret []struct {
 func sortHeadersByLevel(headers []dto.DiffTableHeaderDto, preSortLevels []string) []dto.DiffTableHeaderDto {
 	sorted := make([]dto.DiffTableHeaderDto, len(headers))
 	copy(sorted, headers)
-	sort.Slice(sorted, func(i, j int) bool {
-		ll := sorted[i].Level
-		rr := sorted[j].Level
-		inxL := -1
-		inxR := -1
-		if preSortLevels != nil {
-			inxL = slices.Index(preSortLevels, ll)
-			inxR = slices.Index(preSortLevels, rr)
-		}
-		if inxL == -1 || inxR == -1 {
-			ill, errL := strconv.Atoi(ll)
-			irr, errR := strconv.Atoi(rr)
-			if errL == nil && errR == nil {
-				return ill < irr
-			}
-			return ll < rr
-		}
-		return inxL < inxR
+	slices.SortFunc(sorted, func(lhs dto.DiffTableHeaderDto, rhs dto.DiffTableHeaderDto) int {
+		return levelComparator(lhs.Level, rhs.Level, preSortLevels)
 	})
 	return sorted
+}
+
+func sortLevels(levels []string, preSortLevels []string) []string {
+	sorted := make([]string, len(levels))
+	copy(sorted, levels)
+	slices.SortFunc(sorted, func(lhs string, rhs string) int {
+		return levelComparator(lhs, rhs, preSortLevels)
+	})
+	return sorted
+}
+
+// Compares two level string by following rule:
+//  1. if lhs and rhs are both defined in `preSortLevels`, return index(lhs) < index(rhs)
+//  2. if one of them is not present,
+//     2.1 if lhs and rhs are both number, return number(lhs) < number(rhs)
+//     2.2 if one of them is not number, return lhs < rhs
+func levelComparator(lhs string, rhs string, preSortLevels []string) int {
+	inxL := -1
+	inxR := -1
+	if len(preSortLevels) > 0 {
+		inxL = slices.Index(preSortLevels, lhs)
+		inxR = slices.Index(preSortLevels, rhs)
+	}
+	if inxL == -1 || inxR == -1 {
+		ill, errL := strconv.Atoi(lhs)
+		irr, errR := strconv.Atoi(rhs)
+		if errL == nil && errR == nil {
+			return ill - irr
+		}
+		if lhs < rhs {
+			return -1
+		} else if lhs > rhs {
+			return 1
+		}
+		return 0
+	}
+	return inxL - inxR
 }
 
 func fetchJson(url string, v interface{}) error {

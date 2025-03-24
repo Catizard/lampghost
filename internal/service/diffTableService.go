@@ -20,17 +20,16 @@ import (
 )
 
 type DiffTableService struct {
-	db                   *gorm.DB
-	rivalSongDataService *RivalSongDataService
+	db *gorm.DB
 }
 
-func NewDiffTableService(db *gorm.DB, rivalSongDataService *RivalSongDataService) *DiffTableService {
+func NewDiffTableService(db *gorm.DB) *DiffTableService {
 	return &DiffTableService{
-		db:                   db,
-		rivalSongDataService: rivalSongDataService,
+		db: db,
 	}
 }
 
+// Insert one difficult table by providing its url
 func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHeader, error) {
 	url = strings.TrimSpace(url)
 	log.Debugf("[DiffTableService] calling AddDiffTableHeader with url: %s", url)
@@ -74,16 +73,16 @@ func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHead
 			return err
 		}
 		if len(headerVo.Courses) > 0 {
-			var courseData []entity.CourseInfo
+			var courseData []*entity.CourseInfo
 			for _, courseInfoVo := range headerVo.Courses {
 				courseInfo := courseInfoVo.Entity()
 				courseInfo.HeaderID = headerEntity.ID
-				courseData = append(courseData, *courseInfo)
+				courseData = append(courseData, courseInfo)
 			}
-			if err := tx.Unscoped().Where("header_id = ?", headerEntity.ID).Delete(&entity.CourseInfo{}).Error; err != nil {
+			if err := delCourseInfo(tx, &vo.CourseInfoVo{HeaderID: headerEntity.ID}); err != nil {
 				return err
 			}
-			if err := tx.Create(&courseData).Error; err != nil {
+			if err := addBatchCourseInfo(tx, courseData); err != nil {
 				return err
 			}
 		}
@@ -511,12 +510,12 @@ func findDiffTableHeaderList(tx *gorm.DB, filter *vo.DiffTableHeaderVo) ([]*enti
 func queryRelatedLevelByIDS(tx *gorm.DB, IDs []uint) (ret []struct {
 	header_id uint
 	level     string
-}, err error) {
+}, err error,
+) {
 	rows, err := tx.Raw(`select dd.header_id, dd."level"
 		from difftable_data dd
 		group by dd.header_id, dd."level"
 		having dd.header_id in ? `, IDs).Rows()
-
 	if err != nil {
 		return nil, err
 	}

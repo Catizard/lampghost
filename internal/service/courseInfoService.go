@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"slices"
 	"strconv"
 	"strings"
@@ -50,6 +51,31 @@ func (s *CourseInfoService) FindCourseInfoListWithRival(rivalID uint) ([]*dto.Co
 	}
 	mergeRivalScoreLogToCourses(rawCourses, logs)
 	return rawCourses, n, nil
+}
+
+// Insert a list of courses into database
+//
+// Requirements:
+//
+//	courseInfo's md5/name should not be empty
+//	courseInfo's headerID should > 0
+func addBatchCourseInfo(tx *gorm.DB, courseInfos []*entity.CourseInfo) error {
+	for _, courseInfo := range courseInfos {
+		if courseInfo.Md5s == "" {
+			return fmt.Errorf("addCourseInfo: md5s should not be empty")
+		}
+		if courseInfo.Name == "" {
+			return fmt.Errorf("addCourseInfo: name should not be empty")
+		}
+		if courseInfo.HeaderID == 0 {
+			return fmt.Errorf("addCourseInfo: headerID should be bigger than 0")
+		}
+	}
+	return tx.Create(courseInfos).Error
+}
+
+func delCourseInfo(tx *gorm.DB, filter *vo.CourseInfoVo) error {
+	return tx.Unscoped().Where(filter.Entity()).Delete(&entity.CourseInfo{}).Error
 }
 
 // This function returns CourseInfoDto directly due to some historical problem

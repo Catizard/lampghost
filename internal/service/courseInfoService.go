@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"slices"
 	"strconv"
 	"strings"
@@ -20,6 +19,7 @@ var shouldIgnoreConstraintDefinition []string = []string{
 	"no_speed",
 }
 
+// NOTE: NEVER USE MD5 AT DATA PROCESSING
 type CourseInfoService struct {
 	db *gorm.DB
 }
@@ -54,23 +54,7 @@ func (s *CourseInfoService) FindCourseInfoListWithRival(rivalID uint) ([]*dto.Co
 }
 
 // Insert a list of courses into database
-//
-// Requirements:
-//
-//	courseInfo's md5/name should not be empty
-//	courseInfo's headerID should > 0
 func addBatchCourseInfo(tx *gorm.DB, courseInfos []*entity.CourseInfo) error {
-	for _, courseInfo := range courseInfos {
-		if courseInfo.Md5s == "" {
-			return fmt.Errorf("addCourseInfo: md5s should not be empty")
-		}
-		if courseInfo.Name == "" {
-			return fmt.Errorf("addCourseInfo: name should not be empty")
-		}
-		if courseInfo.HeaderID == 0 {
-			return fmt.Errorf("addCourseInfo: headerID should be bigger than 0")
-		}
-	}
 	return tx.Create(courseInfos).Error
 }
 
@@ -80,7 +64,7 @@ func delCourseInfo(tx *gorm.DB, filter *vo.CourseInfoVo) error {
 
 // This function returns CourseInfoDto directly due to some historical problem
 //
-// scorelog.db only records the sha256 while courses doesn't have, what it has is "md5"
+// scorelog.db only records the sha256 while most courses doesn't have, what it has is "md5"
 // therefore we always need to link the md5 with sha256, so the code is written in basic find method
 //
 // TODO: This function forces using the main user's songdata.db to build the cache, should be implemented with a config
@@ -122,6 +106,7 @@ func findCourseInfoList(tx *gorm.DB, filter *vo.CourseInfoVo) ([]*dto.CourseInfo
 			}
 		}
 		if shouldIgnore {
+			log.Debugf("Ignoring course: %s because user has set IgnoreVariantCourse true", raw[i].Name)
 			continue
 		}
 		out = append(out, dto.NewCourseInfoDto(raw[i], cache))

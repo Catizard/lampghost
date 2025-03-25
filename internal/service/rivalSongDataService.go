@@ -85,6 +85,13 @@ func queryDefaultSongHashCache(tx *gorm.DB) (*entity.SongHashCache, error) {
 	return cache, nil
 }
 
+// Should be called every time there is a change in the data of songdata table
+func expireDefaultCache() {
+	defaultSongHashCacheLock.Lock()
+	defer defaultSongHashCacheLock.Unlock()
+	defaultSongHashCache = nil
+}
+
 func querySongHashCache(tx *gorm.DB, rivalID uint) (*entity.SongHashCache, error) {
 	md5KeyCache := make(map[string]string)
 	sha256KeyCache := make(map[string]string)

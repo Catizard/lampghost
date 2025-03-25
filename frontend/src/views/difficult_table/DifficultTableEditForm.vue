@@ -1,7 +1,7 @@
 <template>
-  <n-modal v-model:show="show" preset="dialog" :title="t('modal.title')" :positive-text="t('modal.positiveText')"
-    :negative-text="t('modal.negativeText')" @positive-click="handlePositiveClick" @negative-click="handleNegativeClick"
-    :mask-closable="false">
+  <n-modal :loading="loading" v-model:show="show" preset="dialog" :title="t('modal.title')"
+    :positive-text="t('modal.positiveText')" :negative-text="t('modal.negativeText')"
+    @positive-click="handlePositiveClick" @negative-click="handleNegativeClick" :mask-closable="false">
     <n-form ref="formRef" :model="formData">
       <n-form-item :label="t('modal.labelEnableFallbackSort')" path="url">
         <n-select v-model:value="formData.EnableFallbackSort" :options="yesnoOptions" />

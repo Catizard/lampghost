@@ -1,7 +1,7 @@
 <template>
-  <n-modal v-model:show="show" preset="dialog" :title="t('modal.title')" :positive-text="t('modal.positiveText')"
-    :negative-text="t('modal.negativeText')" @positive-click="handlePositiveClick" @negative-click="handleNegativeClick"
-    :mask-closable="false">
+  <n-modal :loading="loading" v-model:show="show" preset="dialog" :title="t('modal.title')"
+    :positive-text="t('modal.positiveText')" :negative-text="t('modal.negativeText')"
+    @positive-click="handlePositiveClick" @negative-click="handleNegativeClick" :mask-closable="false">
     <n-form ref="formRef" :model="formData" :rules="rules">
       <n-form-item :label="t('modal.labelAddress')" path="url">
         <n-input v-model:value="formData.url" :placeholder="t('modal.placeholderAddress')" />
@@ -40,8 +40,7 @@ function handlePositiveClick(): boolean {
   formRef.value
     ?.validate()
     .then(() => {
-      addDiffTableHeader(formData.value.url);
-      show.value = false;
+      addDiffTableHeader(formData.value.url)
     })
     .catch((err) => { });
   return false;
@@ -54,11 +53,13 @@ function handleNegativeClick() {
 function addDiffTableHeader(url: string) {
   loading.value = true;
   AddDiffTableHeader(url)
-    .then((result) => {
+    .then(result => {
       if (result.Code != 200) {
         return Promise.reject(result.Msg);
       }
       formData.value.url = "";
+      show.value = false;
+      emit('refresh');
     })
     .catch((err) => {
       notification.error({

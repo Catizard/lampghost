@@ -533,6 +533,7 @@ export namespace entity {
 	    DeletedAt: any;
 	    HeaderID: number;
 	    Name: string;
+	    Sha256s: string;
 	    Md5s: string;
 	    Constraints: string;
 	
@@ -548,6 +549,7 @@ export namespace entity {
 	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
 	        this.HeaderID = source["HeaderID"];
 	        this.Name = source["Name"];
+	        this.Sha256s = source["Sha256s"];
 	        this.Md5s = source["Md5s"];
 	        this.Constraints = source["Constraints"];
 	    }
@@ -947,10 +949,32 @@ export namespace result {
 
 export namespace vo {
 	
+	export class ChartInfoVo {
+	    Title: string;
+	    SubTitle: string;
+	    Artist: string;
+	    sha256: string;
+	    md5: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ChartInfoVo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Title = source["Title"];
+	        this.SubTitle = source["SubTitle"];
+	        this.Artist = source["Artist"];
+	        this.sha256 = source["sha256"];
+	        this.md5 = source["md5"];
+	    }
+	}
 	export class CourseInfoVo {
 	    name: string;
 	    md5: string[];
+	    sha256: string[];
 	    constraint: string[];
+	    charts: ChartInfoVo[];
 	    HeaderID: number;
 	
 	    static createFrom(source: any = {}) {
@@ -961,9 +985,29 @@ export namespace vo {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.name = source["name"];
 	        this.md5 = source["md5"];
+	        this.sha256 = source["sha256"];
 	        this.constraint = source["constraint"];
+	        this.charts = this.convertValues(source["charts"], ChartInfoVo);
 	        this.HeaderID = source["HeaderID"];
 	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
 	}
 	export class DiffTableHeaderVo {
 	    ID: number;

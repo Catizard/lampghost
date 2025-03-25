@@ -17,7 +17,7 @@ type RivalTagService struct {
 	db *gorm.DB
 }
 
-func NewRivalTagService(db *gorm.DB, diffTableService *DiffTableService) *RivalTagService {
+func NewRivalTagService(db *gorm.DB) *RivalTagService {
 	return &RivalTagService{
 		db: db,
 	}
@@ -133,11 +133,11 @@ func syncRivalTag(tx *gorm.DB, rivalID uint) error {
 
 	tags := make([]*entity.RivalTag, 0)
 	for _, courseInfo := range courseInfoDtos {
-		for _, log := range interestScoreLogs {
-			if log.Sha256 != courseInfo.GetJoinedSha256("") {
+		for _, scoreLog := range interestScoreLogs {
+			if scoreLog.Sha256 != courseInfo.GetJoinedSha256("") {
 				continue
 			}
-			scoreLogMode, err := strconv.Atoi(log.Mode)
+			scoreLogMode, err := strconv.Atoi(scoreLog.Mode)
 			if err != nil {
 				continue
 			}
@@ -148,7 +148,7 @@ func syncRivalTag(tx *gorm.DB, rivalID uint) error {
 				RivalId:    rivalID,
 				TagName:    courseInfo.Name + " First Clear",
 				Generated:  true,
-				RecordTime: log.RecordTime,
+				RecordTime: scoreLog.RecordTime,
 			}
 			tags = append(tags, fct)
 			break
@@ -156,6 +156,7 @@ func syncRivalTag(tx *gorm.DB, rivalID uint) error {
 	}
 
 	if len(tags) == 0 {
+		log.Warn("no tags to build")
 		return nil
 	}
 

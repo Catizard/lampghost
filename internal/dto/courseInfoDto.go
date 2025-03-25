@@ -29,30 +29,41 @@ func NewCourseInfoDto(courseInfo *entity.CourseInfo, cache *entity.SongHashCache
 		HeaderID:    courseInfo.HeaderID,
 		Name:        courseInfo.Name,
 		Md5s:        courseInfo.Md5s,
+		Sha256s:     courseInfo.Sha256s,
 		Constraints: courseInfo.Constraints,
 		Constraint:  strings.Split(courseInfo.Constraints, ","),
 	}
 	ret.Md5 = strings.Split(ret.Md5s, ",")
-	ret.Sha256 = make([]string, 0)
-	build := true
-	for _, md5 := range ret.Md5 {
-		sha256, ok := cache.GetSHA256(md5)
-		if !ok {
-			build = false
-			break
+	// Only apply repair steps when sha256s is absent
+	if courseInfo.Sha256s == "" {
+		ret.Sha256 = make([]string, 0)
+		build := true
+		for _, md5 := range ret.Md5 {
+			sha256, ok := cache.GetSHA256(md5)
+			if !ok {
+				build = false
+				break
+			}
+			ret.Sha256 = append(ret.Sha256, sha256)
 		}
-		ret.Sha256 = append(ret.Sha256, sha256)
-	}
-	if !build {
-		ret.Sha256 = nil
+		if !build {
+			ret.Sha256 = nil
+		} else {
+			ret.Sha256s = strings.Join(ret.Sha256, ",")
+			ret.NoSepJoinedSha256s = strings.Join(ret.Sha256, "")
+		}
 	} else {
-		ret.Sha256s = strings.Join(ret.Sha256, ",")
+		ret.Sha256 = strings.Split(ret.Sha256s, ",")
 		ret.NoSepJoinedSha256s = strings.Join(ret.Sha256, "")
 	}
 	return ret
 }
 
 func (courseInfo *CourseInfoDto) RepairHash(cache *entity.SongHashCache) {
+	// Only apply repair steps when sha256s is absent
+	if courseInfo.Sha256s != "" {
+		return
+	}
 	courseInfo.Sha256 = make([]string, 0)
 	build := true
 	for _, md5 := range courseInfo.Md5 {

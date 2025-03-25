@@ -60,12 +60,18 @@ func (header *DiffTableHeaderVo) ParseRawCourses() error {
 				if err := mapstructure.Decode(data, &courseInfo); err != nil {
 					return err
 				}
+				if err := courseInfo.pushupChartsHashField(); err != nil {
+					return err
+				}
 				header.Courses = append(header.Courses, courseInfo)
 			}
 		} else {
 			for _, data := range header.RawCourses {
 				courseInfo := CourseInfoVo{}
 				if err := mapstructure.Decode(data, &courseInfo); err != nil {
+					return err
+				}
+				if err := courseInfo.pushupChartsHashField(); err != nil {
 					return err
 				}
 				header.Courses = append(header.Courses, courseInfo)

@@ -30,3 +30,5 @@ export function QueryUserInfoWithLevelLayeredDiffTableLampStatus(arg1:number,arg
 export function QueryUserPlayCountInYear(arg1:number,arg2:string):Promise<result.RtnDataList>;
 
 export function SyncRivalDataByID(arg1:number):Promise<result.RtnMessage>;
+
+export function UpdateRivalInfo(arg1:vo.RivalInfoVo):Promise<result.RtnMessage>;

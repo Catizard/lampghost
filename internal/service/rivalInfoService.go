@@ -58,9 +58,6 @@ func (s *RivalInfoService) InitializeMainUser(rivalInfo *vo.RivalInfoVo) error {
 	if err != nil {
 		return err
 	}
-	config.UserName = rivalInfo.Name
-	config.SongdataFilePath = *rivalInfo.SongDataPath
-	config.ScorelogFilePath = *rivalInfo.ScoreLogPath
 	config.WriteConfig()
 	rivalInfo.MainUser = true
 	return s.db.Transaction(func(tx *gorm.DB) error {
@@ -133,7 +130,13 @@ func (s *RivalInfoService) SyncRivalData(rivalInfo *entity.RivalInfo) error {
 		return fmt.Errorf("cannot sync rival %s's score log: score log file path is empty", rivalInfo.Name)
 	}
 	return s.db.Transaction(func(tx *gorm.DB) error {
-		return syncRivalData(tx, rivalInfo)
+		if err := syncRivalData(tx, rivalInfo); err != nil {
+			return err
+		}
+		if err := updateRivalPlayCount(tx, rivalInfo.ID); err != nil {
+			return err
+		}
+		return nil
 	})
 }
 
@@ -157,7 +160,13 @@ func (s *RivalInfoService) IncrementalSyncRivalData(rivalInfo *entity.RivalInfo)
 		return fmt.Errorf("incrementalSyncRivalData: rivalInfo.ScoreLogPath cannot be empty")
 	}
 	return s.db.Transaction(func(tx *gorm.DB) error {
-		return incrementalSyncRivalData(tx, rivalInfo)
+		if err := incrementalSyncRivalData(tx, rivalInfo); err != nil {
+			return err
+		}
+		if err := updateRivalPlayCount(tx, rivalInfo.ID); err != nil {
+			return err
+		}
+		return nil
 	})
 }
 
@@ -264,9 +273,12 @@ func (s *RivalInfoService) QueryMainUser() (*entity.RivalInfo, error) {
 	return queryMainUser(s.db)
 }
 
-func (s *RivalInfoService) UpdateRivalInfo(rivalInfo *entity.RivalInfo) error {
+func (s *RivalInfoService) UpdateRivalInfo(rivalInfo *vo.RivalInfoVo) error {
+	if rivalInfo == nil {
+		return fmt.Errorf("UpdateRivalInfo: rivalInfo cannot be nil")
+	}
 	return s.db.Transaction(func(tx *gorm.DB) error {
-		return updateRivalInfo(tx, rivalInfo)
+		return updateRivalInfo(tx, rivalInfo.Entity())
 	})
 }
 
@@ -278,6 +290,9 @@ func addRivalInfo(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
 		return err
 	}
 	if err := syncRivalData(tx, rivalInfo); err != nil {
+		return err
+	}
+	if err := updateRivalPlayCount(tx, rivalInfo.ID); err != nil {
 		return err
 	}
 	return nil
@@ -297,9 +312,16 @@ func selectRivalInfoCount(tx *gorm.DB, filter *vo.RivalInfoVo) (int64, error) {
 
 // Fully reload one rival's saves files
 //
+// WARN: This function wouldn't update rival's play count, it's not this function's purpose
+//
 // For now, theses files would be reloaded
 //  1. songdata.db
 //  2. scorelog.db
+//
+// And these tables' data would be re-generated
+//  1. rival_score_log
+//  2. rival_song_data
+//  3. rival_tag
 //
 // Specially, songdata.db file path is not provide, this method wouldn't return any error but skip.
 // This hack is because we haven't implmeneted the correct seperate songdata.db for different rivals
@@ -329,6 +351,8 @@ func syncRivalData(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
 		if err := syncRivalTagFromRawData(tx, rivalInfo.ID, rawScoreLog, rawSongData); err != nil {
 			return err
 		}
+		// invalidate default song cache since we have rebuilt the `rival_song_data` table
+		expireDefaultCache()
 	} else {
 		// (3) generate rival tags
 		// Since we don't have rawSongData here, we need to build tags by using the default song data cache
@@ -336,14 +360,22 @@ func syncRivalData(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
 			return err
 		}
 	}
-
-	// (4) update rival itself
-	return tx.Model(rivalInfo).Updates(entity.RivalInfo{
-		PlayCount: len(rawScoreLog),
-	}).Error
+	return nil
 }
 
 // Incrementally reload one rival's save files
+//
+// WARN: This function wouldn't update rival's play count, it's not this function's purpose
+//
+// For now, theses files would be reloaded
+//  1. scorelog.db
+//
+// And these tables' data would be re-generated
+//  1. rival_score_log
+//  2. rival_tag
+//
+// NOTE: This function wouldn't read `songdata.db` file, therefore there is no need to invalidate the
+// default song cache
 func incrementalSyncRivalData(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
 	lastRivalScoreLog, err := findLastRivalScoreLogList(tx, &vo.RivalScoreLogVo{RivalId: rivalInfo.ID})
 	if err != nil {
@@ -361,16 +393,10 @@ func incrementalSyncRivalData(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
 	if err := appendScoreLog(tx, rawScoreLog, rivalInfo.ID); err != nil {
 		return err
 	}
-	syncRivalTag(tx, rivalInfo.ID)
-	pc, err := selectRivalScoreLogCount(tx, &vo.RivalScoreLogVo{
-		RivalId: rivalInfo.ID,
-	})
-	if err != nil {
-		return err
-	}
-	return tx.Model(&entity.RivalInfo{}).Where("ID = ?", rivalInfo.ID).Update("play_count", pc).Error
+	return syncRivalTag(tx, rivalInfo.ID)
 }
 
+// Read one `scorelog.db` file into memory
 func loadScoreLog(scoreLogPath string, maximumTimestamp *int64) ([]*entity.ScoreLog, error) {
 	if scoreLogPath == "" {
 		return nil, fmt.Errorf("assert: scorelog path cannot be empty")
@@ -394,7 +420,7 @@ func loadScoreLog(scoreLogPath string, maximumTimestamp *int64) ([]*entity.Score
 	return rawScoreLog, nil
 }
 
-// TODO: should clear DefaultCache after reloading songdata.db
+// Read one `songdata.db` file into memory
 func loadSongData(songDataPath string) ([]*entity.SongData, error) {
 	if songDataPath == "" {
 		return nil, fmt.Errorf("assert: songdata path cannot be empty")
@@ -417,6 +443,7 @@ func loadSongData(songDataPath string) ([]*entity.SongData, error) {
 	return rawSongData, nil
 }
 
+// Helper function for validating local databasement file path
 func verifyLocalDatabaseFilePath(filePath string) error {
 	if stat, err := os.Stat(filePath); err != nil {
 		if os.IsNotExist(err) {
@@ -481,6 +508,69 @@ func queryMainUser(tx *gorm.DB) (*entity.RivalInfo, error) {
 	return &out, nil
 }
 
+// Update one rival info
+//
+// Fully reload save files if one of theses file paths not nil and has been changed:
+//
+//	1.ScoreLogPath
+//	2.SongDataPath
+//
+// Special Requirements:
+//  1. when updating main user, songdata.db file path cannot be empty
+//
+// Warning: You should never be able to edit `MainUser` by using update interface
 func updateRivalInfo(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
-	return tx.Save(rivalInfo).Error
+	if rivalInfo.ID == 0 {
+		return fmt.Errorf("updateRivalInfo: rivalInfo.ID cannot be 0")
+	}
+
+	var prev entity.RivalInfo
+	if err := tx.First(&prev, rivalInfo.ID).Error; err != nil {
+		return err
+	}
+
+	if prev.MainUser && (rivalInfo.SongDataPath == nil || *rivalInfo.SongDataPath == "") {
+		return fmt.Errorf("updateRivalInfo: SongDataPath cannot be empty when updateing main user")
+	}
+
+	// TODO: we haven't implemented the correct seperate songdata file feature
+	if !prev.MainUser && (rivalInfo.SongDataPath != nil && *rivalInfo.SongDataPath != "") {
+		return fmt.Errorf("updateRivalInfo: cannot provide songdata path for a non main user")
+	}
+
+	shouldFullyReload := false
+	if rivalInfo.ScoreLogPath != nil && *rivalInfo.ScoreLogPath != *prev.ScoreLogPath {
+		shouldFullyReload = true
+	}
+	if rivalInfo.SongDataPath != nil && *rivalInfo.SongDataPath != *prev.SongDataPath {
+		shouldFullyReload = true
+	}
+
+	if shouldFullyReload {
+		if err := syncRivalData(tx, rivalInfo); err != nil {
+			return err
+		}
+
+		// Since we have fully reloaded save files, we need also update play count here
+		pc, err := selectRivalScoreLogCount(tx, &vo.RivalScoreLogVo{RivalId: rivalInfo.ID})
+		if err != nil {
+			return err
+		}
+		rivalInfo.PlayCount = int(pc)
+	}
+
+	return tx.Updates(rivalInfo).Error
+}
+
+// Simple helper function for updating one rival's play count field
+func updateRivalPlayCount(tx *gorm.DB, rivalID uint) error {
+	if rivalID == 0 {
+		return fmt.Errorf("updateRivalPlayCount: rivalID cannot be 0")
+	}
+
+	pc, err := selectRivalScoreLogCount(tx, &vo.RivalScoreLogVo{RivalId: rivalID})
+	if err != nil {
+		return err
+	}
+	return tx.Model(&entity.RivalInfo{Model: gorm.Model{ID: rivalID}}).UpdateColumn("play_count", pc).Error
 }

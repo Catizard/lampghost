@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { DataTableColumns, DropdownOption, FormInst } from "naive-ui";
+import type { DropdownOption } from "naive-ui";
 import { NButton, NDataTable, NDropdown, useDialog } from "naive-ui";
 import { useNotification } from "naive-ui";
 import { h, Ref, ref } from "vue";
@@ -80,7 +80,6 @@ const otherActionOptions: Array<DropdownOption> = [
     }
   }
 ];
-const currentEditingHeaderId = ref(null);
 function handleSelectOtherAction(row: dto.DiffTableHeaderDto, key: string) {
   if ("Delete" === key) {
     dialog.warning({

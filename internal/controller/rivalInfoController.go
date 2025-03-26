@@ -125,5 +125,15 @@ func (ctl *RivalInfoController) DelRivalInfo(ID uint) result.RtnMessage {
 	return result.SUCCESS
 }
 
+func (ctl *RivalInfoController) UpdateRivalInfo(updateParam *vo.RivalInfoVo) result.RtnMessage {
+	log.Info("[Controller] calling RivalInfoController.UpdateRivalInfo")
+	err := ctl.rivalInfoService.UpdateRivalInfo(updateParam)
+	if err != nil {
+		log.Errorf("[RivalInfoController] returning error: %v", err)
+		return result.NewErrorMessage(err)
+	}
+	return result.SUCCESS
+}
+
 func (ctl *RivalInfoController) GENERATOR_RIVAL_INFO() *entity.RivalInfo     { return nil }
 func (ctl *RivalInfoController) GENERATOR_RIVAL_INFO_DTO() *dto.RivalInfoDto { return nil }

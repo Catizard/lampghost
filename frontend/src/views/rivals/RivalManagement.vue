@@ -13,21 +13,8 @@
 			:loading="loading" />
 	</perfect-scrollbar>
 
-	<n-modal v-model:show="showAddModal" preset="dialog" :title="t('modal.title')"
-		:positive-text="t('modal.positiveText')" :negative-text="t('modal.negativeText')"
-		@positive-click="handlePositiveClick" @negative-click="handleNegativeClick" :mask-closable="false">
-		<n-form ref="formRef" :model="formData" :rules="rules">
-			<n-form-item :label="t('modal.labelRivalName')" path="Name">
-				<n-input v-model:value="formData.Name" :placeholder="t('modal.placeholderRivalName')" />
-			</n-form-item>
-			<n-form-item :label="t('modal.labelScoreLogPath')" path="ScoreLogPath">
-				<n-input v-model:value="formData.ScoreLogPath" :placeholder="t('modal.placeholderScoreLogPath')" />
-			</n-form-item>
-			<n-form-item :label="t('modal.labelSongDataPath')" path="SongDataPath">
-				<n-input disabled v-model:value="formData.SongDataPath" :placeholder="t('modal.placeholderSongDataPath')" />
-			</n-form-item>
-		</n-form>
-	</n-modal>
+	<RivalAddForm v-model:show="showAddModal" @refresh="loadData()" />
+	<RivalEditForm ref="editFormRef" @refresh="loadData()" />
 </template>
 
 <script lang="ts" setup>
@@ -35,9 +22,14 @@ import router from '@/router';
 import { AddRivalInfo, DelRivalInfo, QueryRivalInfoPageList, SyncRivalDataByID } from '@wailsjs/go/controller/RivalInfoController';
 import { dto, entity } from '@wailsjs/go/models';
 import dayjs from 'dayjs';
-import { DataTableColumns, FormInst, NAnchorLink, NButton, useDialog, useNotification } from 'naive-ui';
+import { DataTableColumns, DropdownOption, FormInst, NAnchorLink, NButton, NDropdown, useDialog, useNotification } from 'naive-ui';
 import { h, reactive, ref, VNode } from 'vue';
 import { useI18n } from 'vue-i18n';
+import RivalAddForm from './RivalAddForm.vue';
+import RivalEditForm from './RivalEditForm.vue';
+
+const showAddModal = ref(false);
+const editFormRef = ref<InstanceType<typeof RivalEditForm>>(null);
 
 const i18n = useI18n();
 const { t } = i18n;
@@ -94,7 +86,6 @@ function createColumns(): DataTableColumns<dto.RivalInfoDto> {
 			title: t('column.actions'),
 			key: "action",
 			render: (row: dto.RivalInfoDto) => {
-				let vnodes: VNode[] = [];
 				const reloadBubutton = h(
 					NButton,
 					{
@@ -107,25 +98,78 @@ function createColumns(): DataTableColumns<dto.RivalInfoDto> {
 					},
 					{ default: () => t('button.reload') }
 				);
-				vnodes.push(reloadBubutton);
-				if (!row.MainUser) {
-					const deleteButton = h(
-						NButton,
-						{
-							strong: true,
-							tertiary: true,
-							type: "error",
-							size: "small",
-							onClick: () => { handleDeleteClick(row.ID) }
-						},
-						{ default: () => t('button.delete') }
-					);
-					vnodes.push(deleteButton);
-				}
-				return vnodes;
+				const otherActions: VNode = h(
+					NDropdown,
+					{
+						trigger: "hover",
+						options: otherActionOptions,
+						size: "small",
+						onSelect: (key: string) => handleSelectOtherAction(row, key)
+					},
+					{
+						default: () => h(
+							NButton,
+							null,
+							{ default: () => '...' }
+						)
+					},
+				);
+				return [reloadBubutton, otherActions];
 			}
 		}
 	]
+}
+
+const otherActionOptions: Array<DropdownOption> = [
+	{
+		label: t('button.edit'),
+		key: "Edit",
+	},
+	{
+		label: t('button.delete'),
+		key: "Delete",
+		props: {
+			style: "color: red"
+		}
+	}
+];
+function handleSelectOtherAction(row: dto.RivalInfoDto, key: string) {
+	if ("Delete" === key) {
+		if (row.MainUser) {
+			notification.error({
+				content: t('message.cannotDeleteMainUser'),
+				duration: 3000,
+				keepAliveOnHover: true
+			});
+			return;
+		}
+		dialog.warning({
+			title: t('deleteDialog.title'),
+			positiveText: t('deleteDialog.positiveText'),
+			negativeText: t('deleteDialog.negativeText'),
+			onPositiveClick: () => {
+				loading.value = true;
+				DelRivalInfo(row.ID)
+					.then(result => {
+						if (result.Code != 200) {
+							return Promise.reject(result.Msg);
+						}
+					}).catch(err => {
+						notification.error({
+							content: err,
+							duration: 3000,
+							keepAliveOnHover: true
+						});
+					}).finally(() => {
+						loadData();
+						loading.value = false;
+					});
+			}
+		})
+	}
+	if ("Edit" === key) {
+		editFormRef.value.open(row.ID);
+	}
 }
 
 function loadData() {
@@ -172,87 +216,7 @@ function handleSyncClick(id: number) {
 		})
 }
 
-function handleDeleteClick(id: number) {
-	dialog.warning({
-		title: t('deleteDialog.title'),
-		positiveText: t('deleteDialog.positiveText'),
-		negativeText: t('deleteDialog.negativeText'),
-		onPositiveClick: () => {
-			loading.value = true;
-			DelRivalInfo(id)
-				.then(result => {
-					if (result.Code != 200) {
-						return Promise.reject(result.Msg);
-					}
-				}).catch(err => {
-					notification.error({
-						content: err,
-						duration: 3000,
-						keepAliveOnHover: true
-					});
-				}).finally(() => {
-					loadData();
-					loading.value = false;
-				});
-		}
-	})
-}
-
 loadData();
-
-const showAddModal = ref(false);
-const formRef = ref<FormInst | null>(null);
-const formData = ref({
-	Name: null,
-	ScoreLogPath: null,
-	SongDataPath: null,
-});
-const rules = {
-	Name: {
-		required: true,
-		message: t('rules.missingRivalName'),
-		trigger: ["input", "blur"],
-	},
-	ScoreLogPath: {
-		required: true,
-		message: t('rules.missingScoreLogPath'),
-		trigger: ["input", "blur"],
-	},
-	// SongDataPath: {
-	// 	required: true,
-	// 	message: t('rules.missingSongDataPath'),
-	// 	trigger: ["input", "blur"],
-	// }
-};
-
-function handlePositiveClick(): boolean {
-	formRef.value
-		?.validate()
-		.then(() => {
-			return AddRivalInfo(formData.value as any as entity.RivalInfo)
-				.then(result => {
-					if (result.Code != 200) {
-						return Promise.reject(result.Msg);
-					}
-					showAddModal.value = false;
-					loadData();
-				});
-		})
-		.catch((err) => {
-			notification.error({
-				content: err,
-				duration: 3000,
-				keepAliveOnHover: true
-			});
-		});
-	return false;
-}
-
-function handleNegativeClick() {
-	formData.value.Name = null;
-	formData.value.ScoreLogPath = null;
-	formData.value.SongDataPath = null;
-}
 </script>
 
 <i18n lang="json">{
@@ -269,26 +233,12 @@ function handleNegativeClick() {
 		"button": {
 			"reload": "Reload",
 			"add": "Add Rival",
-			"delete": "Delete"
+			"delete": "Delete",
+			"edit": "Edit"
 		},
 		"message": {
-			"reloadSuccess": "Reload successfully"
-		},
-		"modal": {
-			"title": "Add Rival",
-			"positiveText": "Submit",
-			"negativeText": "Cancel",
-			"labelRivalName": "Name",
-			"labelScoreLogPath": "scorelog.db file path",
-			"labelSongDataPath": "songdata.db file path",
-			"placeholderRivalName": "Please input rival's name",
-			"placeholderScoreLogPath": "Please input scorelog.db file path",
-			"placeholderSongDataPath": "Please input songdata.db file path"
-		},
-		"rules": {
-			"missingRivalName": "Rival's name cannot be empty",
-			"missingScoreLogPath": "scorelog.db file path cannot be empty",
-			"missingSongDataPath": "songdata.db file path cannot be empty"
+			"reloadSuccess": "Reload successfully",
+			"cannotDeleteMainUser": "Cannot delete main user"
 		},
 		"deleteDialog": {
 			"title": "Confirm to delete?",
@@ -309,10 +259,12 @@ function handleNegativeClick() {
 		"button": {
 			"reload": "同步",
 			"add": "添加好友",
-			"delete": "删除"
+			"delete": "删除",
+			"edit": "修改"
 		},
 		"message": {
-			"reloadSuccess": "同步成功"
+			"reloadSuccess": "同步成功",
+			"cannotDeleteMainUser": "不能删除主用户"
 		},
 		"modal": {
 			"title": "新增好友",
@@ -324,11 +276,6 @@ function handleNegativeClick() {
 			"placeholderRivalName": "请输入好友名称",
 			"placeholderScoreLogPath": "请输入scorelog.db文件路径",
 			"placeholderSongDataPath": "请输入songdata.db文件路径"
-		},
-		"rules": {
-			"missingRivalName": "好友名称不可为空",
-			"missingScoreLogPath": "scorelog.db文件路径不可为空",
-			"missingSongDataPath": "songdata.db文件路径不可为空"
 		},
 		"deleteDialog": {
 			"title": "确定要删除吗？",

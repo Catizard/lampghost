@@ -33,59 +33,6 @@
         </n-p>
       </n-h2>
       <n-h2>
-        {{ t('saveSettings.title') }}
-        <n-p>
-          <n-form-item path="forceFullyReload">
-            <template #label>
-              <n-tooltip trigger="hover" style="max-width: 400px; text-align: left; white-space: pre-line;">
-                <template #trigger>
-                  <n-icon :component="HintIcon" />
-                </template>
-                {{ t('saveSettings.tipForceFullyReload') }}
-              </n-tooltip>
-              {{ t('saveSettings.labelForceFullyReload') }}
-            </template>
-            <n-select v-model:value="model.ForceFullyReload" :options="yesnoOptions" style="width: 150px;" />
-          </n-form-item>
-        </n-p>
-        <n-p>
-          <n-form-item :label="t('saveSettings.labelUserName')" path="userName">
-            <n-input show-count v-model:value="model.UserName" :placeholder="t('saveSettings.placeholderUserName')"
-              style="width: 50%;" :loading="loading" />
-          </n-form-item>
-        </n-p>
-        <n-p class="alert-p">
-          {{ t('saveSettings.alert') }}
-        </n-p>
-        <n-p>
-          <n-form-item :label="t('saveSettings.labelScorelogPath')" path="scorelogFilePath">
-            <n-input clearable v-model:value="model.ScorelogFilePath"
-              :placeholder="t('saveSettings.placeholderScorelogPath')" style="width: 50%;" :loading="loading" />
-          </n-form-item>
-        </n-p>
-        <n-p>
-          <n-form-item :label="t('saveSettings.labelSongdataPath')" path="songdataFilePath">
-            <n-input clearable v-model:value="model.SongdataFilePath"
-              :placeholder="t('saveSettings.placeholderSongdataPath')" style="width: 50%;" :loading="loading" />
-          </n-form-item>
-        </n-p>
-        <!-- <n-p>
-          <n-form-item path="scoreFilePath">
-            <template #label>
-              <n-tooltip trigger="hover">
-                <template #trigger>
-                  <n-icon :component="HintIcon" />
-                </template>
-                添加该路径之后可以显示玩家当前的游玩时间等信息, 可加可不加
-              </n-tooltip>
-              score.db文件路径
-            </template>
-            <n-input disabled clearable v-model:value="model.ScoreFilePath" placeholder="请输入score.db文件路径"
-              style="width: 50%;" :loading="loading" />
-          </n-form-item>
-        </n-p> -->
-      </n-h2>
-      <n-h2>
         <n-text>
           {{ t('folderSettings.title') }}
         </n-text>
@@ -142,10 +89,6 @@ const localeOptions: Array<SelectOption> = [
 const formRef = ref<FormInst | null>(null);
 const model = ref<config.ApplicationConfig>({
   InternalServerPort: null,
-  UserName: null,
-  ScorelogFilePath: null,
-  SongdataFilePath: null,
-  ScoreFilePath: null,
   FolderSymbol: null,
   IgnoreVariantCourse: null,
   Locale: null,

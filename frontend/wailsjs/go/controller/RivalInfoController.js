@@ -53,3 +53,7 @@ export function QueryUserPlayCountInYear(arg1, arg2) {
 export function SyncRivalDataByID(arg1) {
   return window['go']['controller']['RivalInfoController']['SyncRivalDataByID'](arg1);
 }
+
+export function UpdateRivalInfo(arg1) {
+  return window['go']['controller']['RivalInfoController']['UpdateRivalInfo'](arg1);
+}

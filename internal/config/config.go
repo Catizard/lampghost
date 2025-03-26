@@ -42,10 +42,6 @@ func init() {
 }
 
 type ApplicationConfig struct {
-	UserName            string
-	ScorelogFilePath    string
-	SongdataFilePath    string
-	ScoreFilePath       string
 	InternalServerPort  int32
 	FolderSymbol        string
 	IgnoreVariantCourse int32
@@ -58,10 +54,6 @@ func ReadConfig() (*ApplicationConfig, error) {
 		return nil, err
 	}
 	return &ApplicationConfig{
-		UserName:            viper.GetString("UserName"),
-		ScorelogFilePath:    viper.GetString("ScoreLogFilePath"),
-		SongdataFilePath:    viper.GetString("SongDataFilePath"),
-		ScoreFilePath:       viper.GetString("ScoreFilePath"),
 		InternalServerPort:  viper.GetInt32("InternalServerPort"),
 		FolderSymbol:        viper.GetString("FolderSymbol"),
 		IgnoreVariantCourse: viper.GetInt32("IgnoreVariantCourse"),
@@ -71,10 +63,6 @@ func ReadConfig() (*ApplicationConfig, error) {
 }
 
 func (c *ApplicationConfig) WriteConfig() error {
-	viper.Set("UserName", c.UserName)
-	viper.Set("ScoreLogFilePath", c.ScorelogFilePath)
-	viper.Set("SongDataFilePath", c.SongdataFilePath)
-	viper.Set("ScoreFilePath", c.ScoreFilePath)
 	viper.Set("InternalServerPort", c.InternalServerPort)
 	viper.Set("FolderSymbol", c.FolderSymbol)
 	viper.Set("IgnoreVariantCourse", c.IgnoreVariantCourse)

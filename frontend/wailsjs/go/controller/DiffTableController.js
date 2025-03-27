@@ -26,6 +26,10 @@ export function FindDiffTableHeaderTree(arg1) {
   return window['go']['controller']['DiffTableController']['FindDiffTableHeaderTree'](arg1);
 }
 
+export function FindDiffTableHeaderTreeWithRival(arg1) {
+  return window['go']['controller']['DiffTableController']['FindDiffTableHeaderTreeWithRival'](arg1);
+}
+
 export function GENERATOR_TABLE_DATA() {
   return window['go']['controller']['DiffTableController']['GENERATOR_TABLE_DATA']();
 }

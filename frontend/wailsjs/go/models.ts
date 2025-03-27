@@ -133,6 +133,8 @@ export namespace dto {
 	    LevelLayeredContents: Record<string, DiffTableDataDto[]>;
 	    Level: string;
 	    Children: DiffTableHeaderDto[];
+	    LampCount: Record<number, number>;
+	    SongCount: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new DiffTableHeaderDto(source);
@@ -154,6 +156,8 @@ export namespace dto {
 	        this.LevelLayeredContents = this.convertValues(source["LevelLayeredContents"], DiffTableDataDto[], true);
 	        this.Level = source["Level"];
 	        this.Children = this.convertValues(source["Children"], DiffTableHeaderDto);
+	        this.LampCount = source["LampCount"];
+	        this.SongCount = source["SongCount"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1257,6 +1261,7 @@ export namespace vo {
 	    MinimumClear?: number;
 	    SpecifyYear?: string;
 	    SongNameLike?: string;
+	    Sha256s: string[];
 	
 	    static createFrom(source: any = {}) {
 	        return new RivalScoreLogVo(source);
@@ -1289,6 +1294,7 @@ export namespace vo {
 	        this.MinimumClear = source["MinimumClear"];
 	        this.SpecifyYear = source["SpecifyYear"];
 	        this.SongNameLike = source["SongNameLike"];
+	        this.Sha256s = source["Sha256s"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

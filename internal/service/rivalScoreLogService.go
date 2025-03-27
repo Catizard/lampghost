@@ -71,6 +71,35 @@ func findRivalScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.Riva
 	return out, len(out), nil
 }
 
+// Like findRivalScoreLogList, but only reserve the maximum clear one
+func findRivalMaximumClearScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.RivalScoreLogDto, int, error) {
+	fields := `
+		rival_score_log.*,
+		max(rival_score_log.clear) as clear
+	`
+	partial := tx.Model(&entity.RivalScoreLog{}).Order("record_time desc").Select(fields)
+	var out []*dto.RivalScoreLogDto
+	partial = partial.Scopes(scopeRivalScoreLogFilter(filter))
+	if filter != nil {
+		partial = partial.Scopes(scopeInSha256s(filter.Sha256s))
+	}
+	if err := partial.Find(&out).Error; err != nil {
+		return nil, 0, err
+	}
+	return out, len(out), nil
+}
+
+// Extend function to findRivalMaximumClearScoreLogList
+//
+// Returns sha256 grouped array
+func findRivalMaximumClearScoreLogSha256Map(tx *gorm.DB, filter *vo.RivalScoreLogVo) (map[string][]*dto.RivalScoreLogDto, error) {
+	scorelogs, _, err := findRivalMaximumClearScoreLogList(tx, filter)
+	if err != nil {
+		return nil, err
+	}
+	return groupingScoreLogsBySha256(scorelogs), err
+}
+
 // Query the last played score log
 func findLastRivalScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) (*entity.RivalScoreLog, error) {
 	ret := entity.RivalScoreLog{}
@@ -86,6 +115,11 @@ func findRivalScoreLogSha256Map(tx *gorm.DB, filter *vo.RivalScoreLogVo) (map[st
 	if err != nil {
 		return nil, err
 	}
+	return groupingScoreLogsBySha256(scoreLogs), nil
+}
+
+// Group score logs to a map, which key is sha256
+func groupingScoreLogsBySha256(scoreLogs []*dto.RivalScoreLogDto) map[string][]*dto.RivalScoreLogDto {
 	sha256ScoreLogsMap := make(map[string][]*dto.RivalScoreLogDto)
 	for _, scoreLog := range scoreLogs {
 		if _, ok := sha256ScoreLogsMap[scoreLog.Sha256]; !ok {
@@ -93,7 +127,7 @@ func findRivalScoreLogSha256Map(tx *gorm.DB, filter *vo.RivalScoreLogVo) (map[st
 		}
 		sha256ScoreLogsMap[scoreLog.Sha256] = append(sha256ScoreLogsMap[scoreLog.Sha256], scoreLog)
 	}
-	return sha256ScoreLogsMap, nil
+	return sha256ScoreLogsMap
 }
 
 // NOTE: selectRivalScoreLogCount's filter statment should always be equal to selectRivalScoreLog

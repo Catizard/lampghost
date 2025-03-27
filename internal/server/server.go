@@ -47,7 +47,7 @@ func (s *InternalServer) tableHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *InternalServer) tableContentHandler(w http.ResponseWriter, r *http.Request) {
-	folders, _, err := s.folderService.FindFolderTree()
+	folders, _, err := s.folderService.FindFolderTree(nil)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("query folder tree: %v", err), 500)
 		return

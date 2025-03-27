@@ -49,9 +49,9 @@ func (ctl *FolderController) DelFolderContent(contentID uint) result.RtnMessage 
 	return result.SUCCESS
 }
 
-func (ctl *FolderController) FindFolderTree() result.RtnDataList {
+func (ctl *FolderController) FindFolderTree(filter *vo.FolderVo) result.RtnDataList {
 	log.Info("[Controller] Calling FolderController.FindFolderTree")
-	rows, _, err := ctl.folderService.FindFolderTree()
+	rows, _, err := ctl.folderService.FindFolderTree(filter)
 	if err != nil {
 		log.Errorf("[FolderController] returning err: %v", err)
 		return result.NewErrorDataList(err)

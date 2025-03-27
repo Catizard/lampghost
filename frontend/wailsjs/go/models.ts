@@ -185,6 +185,7 @@ export namespace dto {
 	    Sha256: string;
 	    Md5: string;
 	    Title: string;
+	    Lamp: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new FolderContentDto(source);
@@ -198,6 +199,7 @@ export namespace dto {
 	        this.Sha256 = source["Sha256"];
 	        this.Md5 = source["Md5"];
 	        this.Title = source["Title"];
+	        this.Lamp = source["Lamp"];
 	    }
 	}
 	export class FolderDefinitionDto {
@@ -1140,6 +1142,7 @@ export namespace vo {
 	    IDs: number[];
 	    IgnoreSha256?: string;
 	    IgnoreRivalSongDataID?: number;
+	    RivalID: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new FolderVo(source);
@@ -1156,6 +1159,7 @@ export namespace vo {
 	        this.IDs = source["IDs"];
 	        this.IgnoreSha256 = source["IgnoreSha256"];
 	        this.IgnoreRivalSongDataID = source["IgnoreRivalSongDataID"];
+	        this.RivalID = source["RivalID"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

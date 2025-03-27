@@ -15,7 +15,7 @@ export function FindFolderContentList(arg1:vo.FolderContentVo):Promise<result.Rt
 
 export function FindFolderList(arg1:vo.FolderVo):Promise<result.RtnDataList>;
 
-export function FindFolderTree():Promise<result.RtnDataList>;
+export function FindFolderTree(arg1:vo.FolderVo):Promise<result.RtnDataList>;
 
 export function GENERATOR_FOLDER():Promise<entity.Folder>;
 

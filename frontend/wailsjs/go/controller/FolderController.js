@@ -22,8 +22,8 @@ export function FindFolderList(arg1) {
   return window['go']['controller']['FolderController']['FindFolderList'](arg1);
 }
 
-export function FindFolderTree() {
-  return window['go']['controller']['FolderController']['FindFolderTree']();
+export function FindFolderTree(arg1) {
+  return window['go']['controller']['FolderController']['FindFolderTree'](arg1);
 }
 
 export function GENERATOR_FOLDER() {

@@ -143,8 +143,8 @@ func bindSongToFolder(tx *gorm.DB, content entity.FolderContent, folderIDs []uin
 	return tx.Create(&candidate).Error
 }
 
-func (s *FolderService) FindFolderTree() ([]*dto.FolderDto, int, error) {
-	return findFolderTree(s.db, nil)
+func (s *FolderService) FindFolderTree(filter *vo.FolderVo) ([]*dto.FolderDto, int, error) {
+	return findFolderTree(s.db, filter)
 }
 
 func (s *FolderService) FindFolderList(filter *vo.FolderVo) ([]*dto.FolderDto, int, error) {
@@ -292,12 +292,34 @@ func findFolderTree(tx *gorm.DB, filter *vo.FolderVo) ([]*dto.FolderDto, int, er
 		folderIDMapsToContents[content.FolderID] = append(folderIDMapsToContents[content.FolderID], content)
 	}
 
+	// Hack: If no specific rival, skip for merging score log
+	scoreLogSha256Map := make(map[string][]*dto.RivalScoreLogDto)
+	if filter != nil && filter.RivalID != 0 {
+		sha256s := make([]string, 0)
+		for _, rawContent := range rawContents {
+			sha256s = append(sha256s, rawContent.Sha256)
+		}
+		scoreLogSha256Map, err = findRivalMaximumClearScoreLogSha256Map(tx, &vo.RivalScoreLogVo{
+			RivalId: filter.RivalID,
+			Sha256s: sha256s,
+		})
+		if err != nil {
+			return nil, 0, err
+		}
+	}
+
 	folders := make([]*dto.FolderDto, len(rawFolders))
 	for i, rawFolder := range rawFolders {
 		contents := make([]*dto.FolderContentDto, 0)
 		if rawContents, ok := folderIDMapsToContents[rawFolder.ID]; ok {
 			for _, rawContent := range rawContents {
-				contents = append(contents, dto.NewFolderContentDto(rawContent))
+				content := dto.NewFolderContentDto(rawContent)
+				if _, ok := scoreLogSha256Map[content.Sha256]; ok {
+					content.Lamp = int(scoreLogSha256Map[content.Sha256][0].Clear)
+				} else {
+					content.Lamp = 0
+				}
+				contents = append(contents, content)
 			}
 		}
 		folders[i] = dto.NewFolderDto(rawFolder, contents)

@@ -18,6 +18,7 @@ type FolderVo struct {
 	// then `Sha256` would be overwritted
 	IgnoreSha256          *string
 	IgnoreRivalSongDataID *uint
+	RivalID               uint
 }
 
 func (folder *FolderVo) Entity() *entity.Folder {

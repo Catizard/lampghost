@@ -12,6 +12,8 @@ type FolderContentDto struct {
 	Sha256     string
 	Md5        string
 	Title      string
+
+	Lamp int
 }
 
 func NewFolderContentDto(folderContent *entity.FolderContent) *FolderContentDto {

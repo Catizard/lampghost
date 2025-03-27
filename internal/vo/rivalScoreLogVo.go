@@ -36,6 +36,8 @@ type RivalScoreLogVo struct {
 	// year(RecordTime) == specifyYear
 	SpecifyYear  *string
 	SongNameLike *string
+	// TODO: cannot be used in `findRivalScoreLogList`
+	Sha256s []string
 }
 
 func (rivalScoreLog *RivalScoreLogVo) Entity() *entity.RivalScoreLog {

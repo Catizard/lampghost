@@ -174,7 +174,7 @@ func (s *DiffTableService) FindDiffTableHeaderListWithRival(rivalID uint) ([]dto
 //     ... ....
 //  2. BMS Insane table
 //     ...
-func (s *DiffTableService) FindDiffTableHeaderTree(filter *vo.DiffTableHeaderVo) ([]dto.DiffTableHeaderDto, int, error) {
+func (s *DiffTableService) FindDiffTableHeaderTree(filter *vo.DiffTableHeaderVo) ([]*dto.DiffTableHeaderDto, int, error) {
 	// NOTE: Don't call s.FindDiffTableHeaderList, call findDiffTableHeaderList instead
 	rawHeaders, _, err := findDiffTableHeaderList(s.db, filter)
 	if err != nil {
@@ -182,7 +182,7 @@ func (s *DiffTableService) FindDiffTableHeaderTree(filter *vo.DiffTableHeaderVo)
 	}
 
 	if len(rawHeaders) == 0 {
-		return make([]dto.DiffTableHeaderDto, 0), 0, nil
+		return make([]*dto.DiffTableHeaderDto, 0), 0, nil
 	}
 
 	headerIDs := make([]uint, 0)
@@ -195,7 +195,7 @@ func (s *DiffTableService) FindDiffTableHeaderTree(filter *vo.DiffTableHeaderVo)
 		return nil, 0, err
 	}
 
-	headers := make([]dto.DiffTableHeaderDto, 0)
+	headers := make([]*dto.DiffTableHeaderDto, 0)
 	for _, header := range rawHeaders {
 		headerDto := dto.NewDiffTableHeaderDto(header, nil)
 		for _, pair := range pairs {
@@ -207,7 +207,98 @@ func (s *DiffTableService) FindDiffTableHeaderTree(filter *vo.DiffTableHeaderVo)
 				))
 			}
 		}
-		headers = append(headers, *headerDto)
+		headers = append(headers, headerDto)
+	}
+
+	for headerInx, header := range headers {
+		// Skip sort if no order is pre-defined and the header is not configured to use the fallback sort strategy
+		if header.LevelOrders == "" && header.EnableFallbackSort != 0 {
+			log.Debugf("[DiffTableService] no pre-defined orders & fallback is unset, skipping sort")
+			continue
+		}
+		headers[headerInx].Children = sortHeadersByLevel(header.Children, header.UnjoinedLevelOrder)
+	}
+
+	return headers, len(headers), nil
+}
+
+// Extend function for FindDiffTableHeaderTree
+//
+// Adds player related field (e.g PlayCount, Lamp status)
+func (s *DiffTableService) FindDiffTableHeaderTreeWithRival(filter *vo.DiffTableHeaderVo) ([]*dto.DiffTableHeaderDto, int, error) {
+	if filter == nil || filter.RivalID == 0 {
+		return nil, 0, fmt.Errorf("FindDiffTableHeaderTreeWithRival: rival id is empty or 0")
+	}
+	// NOTE: Unlike FindDiffTableHeaderTree, this function must query complete table data
+	// Therefore, there is no re-usable code
+	rawHeaders, n, err := findDiffTableHeaderList(s.db, filter)
+	if err != nil {
+		return nil, 0, err
+	}
+	if n == 0 {
+		return make([]*dto.DiffTableHeaderDto, 0), 0, nil
+	}
+
+	headerIDs := make([]uint, 0)
+	for _, header := range rawHeaders {
+		headerIDs = append(headerIDs, header.ID)
+	}
+
+	// Here, we must query the complete difficult table data
+	// While FindDiffTableHeaderTree could only query levels
+	rawDiffTableDataList, _, err := findDiffTableDataList(s.db, &vo.DiffTableDataVo{
+		HeaderIDs: headerIDs,
+	})
+	if err != nil {
+		return nil, 0, err
+	}
+	// headerID#level => [sha256]
+	difftableSha256List := make(map[string][]string)
+	headerIDMapsToLevelList := make(map[uint][]string)
+	// headerID#level set
+	dupLevelSet := make(map[string]any)
+	for _, diffTableData := range rawDiffTableDataList {
+		headerID := diffTableData.HeaderID
+		key := fmt.Sprintf("%d#%s", headerID, diffTableData.Level)
+		if _, ok := difftableSha256List[key]; !ok {
+			difftableSha256List[key] = make([]string, 0)
+		}
+		difftableSha256List[key] = append(difftableSha256List[key], diffTableData.Sha256)
+		if _, ok := headerIDMapsToLevelList[headerID]; !ok {
+			headerIDMapsToLevelList[headerID] = make([]string, 0)
+		}
+		if _, ok := dupLevelSet[key]; !ok {
+			headerIDMapsToLevelList[headerID] = append(headerIDMapsToLevelList[headerID], diffTableData.Level)
+			dupLevelSet[key] = new(any)
+		}
+	}
+
+	// Query player's maximum clear and group them by sha256
+	scoreLogSha256Map, err := findRivalScoreLogSha256Map(s.db, &vo.RivalScoreLogVo{RivalId: filter.RivalID})
+	if err != nil {
+		return nil, 0, err
+	}
+
+	headers := make([]*dto.DiffTableHeaderDto, 0)
+	for _, header := range rawHeaders {
+		headerDto := dto.NewDiffTableHeaderDto(header, nil)
+		for _, level := range headerIDMapsToLevelList[header.ID] {
+			levelNode := dto.NewLevelChildNode(
+				header.ID,
+				fmt.Sprintf("%s%s", header.Symbol, level),
+				level,
+			)
+			relatedSha256List := difftableSha256List[fmt.Sprintf("%d#%s", header.ID, level)]
+			levelNode.SongCount = len(relatedSha256List)
+			levelNode.LampCount = make(map[int]int)
+			for _, sha256 := range relatedSha256List {
+				if maximumLog, ok := scoreLogSha256Map[sha256]; ok {
+					levelNode.LampCount[int(maximumLog[0].Clear)] += 1
+				}
+			}
+			headerDto.Children = append(headerDto.Children, *levelNode)
+		}
+		headers = append(headers, headerDto)
 	}
 
 	for headerInx, header := range headers {

@@ -42,6 +42,17 @@ func scopeInHeaderIDs(headerIDs []uint) func(db *gorm.DB) *gorm.DB {
 	}
 }
 
+// db.Where("sha256 in ?", sha256s)
+// Requirements: len(sha256) > 0
+func scopeInSha256s(sha256s []string) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if len(sha256s) > 0 {
+			return db.Where("sha256 in ?", sha256s)
+		}
+		return db
+	}
+}
+
 // pagination with page & pageSize
 //
 // Forcements:

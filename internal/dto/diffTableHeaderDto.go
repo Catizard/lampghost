@@ -27,6 +27,9 @@ type DiffTableHeaderDto struct {
 	Level string
 	// NOTE: children field should never be nil
 	Children []DiffTableHeaderDto
+	// clear => count
+	LampCount map[int]int
+	SongCount int
 }
 
 func NewDiffTableHeaderDto(header *entity.DiffTableHeader, contents []*DiffTableDataDto) *DiffTableHeaderDto {
@@ -42,6 +45,7 @@ func NewDiffTableHeaderDto(header *entity.DiffTableHeader, contents []*DiffTable
 		UnjoinedLevelOrder: strings.Split(header.LevelOrders, ","),
 		Contents:           contents,
 		Children:           make([]DiffTableHeaderDto, 0),
+		LampCount:          make(map[int]int),
 	}
 }
 
@@ -69,9 +73,10 @@ func NewLevelLayeredDiffTableHeaderDto(header *entity.DiffTableHeader, sortedLev
 // NOTE: almost only passed fields are significant
 func NewLevelChildNode(id uint, name string, level string) *DiffTableHeaderDto {
 	return &DiffTableHeaderDto{
-		ID:    id,
-		Name:  name,
-		Level: level,
+		ID:        id,
+		Name:      name,
+		Level:     level,
+		LampCount: make(map[int]int),
 	}
 }
 

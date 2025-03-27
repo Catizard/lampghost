@@ -78,6 +78,16 @@ func (ctl *DiffTableController) FindDiffTableHeaderTree(filter *vo.DiffTableHead
 	return result.NewRtnDataList(rows)
 }
 
+func (ctl *DiffTableController) FindDiffTableHeaderTreeWithRival(filter *vo.DiffTableHeaderVo) result.RtnDataList {
+	log.Info("[Controller] calling DiffTableController.FindDiffTableHeaderTreeWithRival")
+	rows, _, err := ctl.diffTableService.FindDiffTableHeaderTreeWithRival(filter)
+	if err != nil {
+		log.Errorf("[DiffTableController] returning error: %v", err)
+		return result.NewErrorDataList(err)
+	}
+	return result.NewRtnDataList(rows)
+}
+
 func (ctl *DiffTableController) QueryDiffTableInfoById(ID uint) result.RtnData {
 	log.Info("[Controller] calling DiffTableController.QueryDiffTableInfoById")
 	data, err := ctl.diffTableService.QueryDiffTableInfoByID(ID)

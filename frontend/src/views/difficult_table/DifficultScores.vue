@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { FindDiffTableHeaderList, FindDiffTableHeaderTree } from '@wailsjs/go/controller/DiffTableController';
+import { FindDiffTableHeaderList, FindDiffTableHeaderTree, FindDiffTableHeaderTreeWithRival } from '@wailsjs/go/controller/DiffTableController';
 import { FindRivalInfoList } from '@wailsjs/go/controller/RivalInfoController';
 import { FindRivalTagList } from '@wailsjs/go/controller/RivalTagController';
 import { dto } from '@wailsjs/go/models';
@@ -27,6 +27,7 @@ import { DataTableColumns, NDataTable, NTooltip, SelectOption, useNotification }
 import { h, Ref, ref, VNode, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import DifficultTableDetail from './DifficultTableDetail.vue';
+import ClearType from '@/constants/cleartype';
 
 const i18n = useI18n();
 const { t } = i18n;
@@ -80,7 +81,40 @@ const columns: DataTableColumns<dto.DiffTableHeaderDto> = [
     }
   },
   { title: "Level Name", key: "Name" },
-  { title: "HC+ Count", key: "HCPlusCount" },
+  {
+    title: "Fail Count", key: "FailCount",
+    render: (row: dto.DiffTableHeaderDto) => {
+      return (row.LampCount[ClearType.Failed] ?? 0)
+           + (row.LampCount[ClearType.AssistEasy] ?? 0)
+           + (row.LampCount[ClearType.LightAssistEasy] ?? 0);
+    }
+  },
+  {
+    title: "Easy Count", key: "ECCount",
+    render: (row: dto.DiffTableHeaderDto) => {
+      return row.LampCount[ClearType.Easy] ?? 0
+    }
+  },
+  {
+    title: "Hard Count", key: "HCCount",
+    render: (row: dto.DiffTableHeaderDto) => {
+      return row.LampCount[ClearType.Hard] ?? 0;
+    }
+  },
+  {
+    title: "EXHard Count", key: "EXHCCount",
+    render: (row: dto.DiffTableHeaderDto) => {
+      return row.LampCount[ClearType.ExHard] ?? 0;
+    }
+  },
+  {
+    title: "FC+ Count", key: "FCPlusCount",
+    render: (row: dto.DiffTableHeaderDto) => {
+      return (row.LampCount[ClearType.FullCombo] ?? 0)
+           + (row.LampCount[ClearType.Perfect] ?? 0)
+           + (row.LampCount[ClearType.Max] ?? 0);
+    }
+  },
   { title: "Song Count", key: "SongCount" },
 ];
 const data: Ref<Array<dto.DiffTableHeaderDto>> = ref([]);
@@ -90,7 +124,8 @@ const levelTableLoading = ref<boolean>(false);
 const levelData = new Map<string, Array<dto.DiffTableDataDto>>();
 function loadLevelTableData(difftableID: string | number) {
   levelTableLoading.value = true;
-  FindDiffTableHeaderTree({ ID: difftableID as number } as any)
+  // TODO: remove magic one
+  FindDiffTableHeaderTreeWithRival({ ID: difftableID as number, RivalID: 1 } as any)
     .then(result => {
       if (result.Code != 200) {
         return Promise.reject(result.Msg);

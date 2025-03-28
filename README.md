@@ -4,7 +4,9 @@ English | [简体中文](./README.zh-CN.md)
 
 ## What is LampGhost?
 
-`LampGhost` is an **offline** and **cross-platform** `beatoraja` save file viewer, or say "lamp viewer". It supports:
+![showcase](./doc/showcase.png)
+
+`LampGhost` is an **offline** and **cross-platform** `beatoraja` save file viewer, favorite folder manager and provides lamp diff view . It supports:
 
 - `I18n`:`English` and `zh-CN` are supported now
 - Add your friends' save file, show your friends' lamp status

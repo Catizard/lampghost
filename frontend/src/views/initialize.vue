@@ -13,9 +13,17 @@
 						<n-input v-model:value="formData.userName" :placeholder="t('form.placeholderUserName')" />
 					</n-form-item>
 					<n-form-item :label="t('form.labelSongdataPath')" path="songdataPath">
+						<n-button type="info" @click="chooseFile('Choose songdata.db', 'songdataPath')">
+							{{ t('button.chooseFile') }}
+						</n-button>
+						<n-divider vertical />
 						<n-input v-model:value="formData.songdataPath" :placeholder="t('form.placeholderSongdataPath')" />
 					</n-form-item>
 					<n-form-item :label="t('form.labelScorelogPath')" path="scorelogPath">
+						<n-button type="info" @click="chooseFile('Choose scorelog.db', 'scorelogPath')">
+							{{ t('button.chooseFile') }}
+						</n-button>
+						<n-divider vertical />
 						<n-input v-model:value="formData.scorelogPath" :placeholder="t('form.placeholderScorelogPath')" />
 					</n-form-item>
 					<n-form-item>
@@ -35,10 +43,35 @@ import { ref, watch } from "vue";
 import { InitializeMainUser } from "@wailsjs/go/controller/RivalInfoController";
 import router from "../router";
 import { useI18n } from "vue-i18n";
+import { OpenFileDialog } from "@wailsjs/go/main/App";
+
 
 const { t } = useI18n();
 const globalI18n = useI18n({ useScope: 'global' });
 const notification = useNotification();
+
+// target == "scorelogPath" | "songdataPath"
+function chooseFile(title, target) {
+	OpenFileDialog(title)
+		.then(result => {
+			if (result.Code != 200) {
+				return Promise.reject(result.Msg);
+			}
+			if (result.Data != null && result.Data != undefined && result.Data != "") {
+				if (target == "scorelogPath") {
+					formData.scorelogPath = result.Data;
+				} else if (target == "songdataPath") {
+					formData.songdataPath = result.Data;
+				}
+			}
+		}).catch(err => {
+			notification.error({
+				content: err,
+				duration: 3000,
+				keepAliveOnHover: true
+			})
+		});
+}
 
 const loading = ref(false);
 const formRef = ref(null);
@@ -127,7 +160,8 @@ function handleSubmit(e) {
 			"placeholderScorelogPath": "Please input scorelog.db file path"
 		},
 		"button": {
-			"submit": "submit"
+			"submit": "submit",
+			"chooseFile": "Choose File"
 		},
 		"rule": {
 			"missingUserName": "Name cannot be empty",
@@ -147,7 +181,8 @@ function handleSubmit(e) {
 			"placeholderScorelogPath": "请输入scorelog.db文件路径"
 		},
 		"button": {
-			"submit": "提交"
+			"submit": "提交",
+			"chooseFile": "选择文件"
 		},
 		"rule": {
 			"missingUserName": "用户名不可为空",

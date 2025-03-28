@@ -7,9 +7,17 @@
         <n-input v-model:value="formData.Name" :placeholder="t('modal.placeholderRivalName')" />
       </n-form-item>
       <n-form-item :label="t('modal.labelScoreLogPath')" path="ScoreLogPath">
+        <n-button :disabled="!formData.MainUser" type="info" @click="chooseFile('Choose scorelog.db', 'scorelogPath')">
+          {{ t('button.chooseFile') }}
+        </n-button>
+        <n-divider vertical />
         <n-input v-model:value="formData.ScoreLogPath" :placeholder="t('modal.placeholderScoreLogPath')" />
       </n-form-item>
       <n-form-item :label="t('modal.labelSongDataPath')" path="SongDataPath">
+        <n-button type="info" @click="chooseFile('Choose songdata.db', 'songdataPath')">
+          {{ t('button.chooseFile') }}
+        </n-button>
+        <n-divider vertical />
         <n-input :disabled="!formData.MainUser" v-model:value="formData.SongDataPath"
           :placeholder="t('modal.placeholderSongDataPath')" />
       </n-form-item>
@@ -19,6 +27,7 @@
 
 <script lang="ts" setup>
 import { QueryUserInfoByID, UpdateRivalInfo } from '@wailsjs/go/controller/RivalInfoController';
+import { OpenFileDialog } from '@wailsjs/go/main/App';
 import { dto } from '@wailsjs/go/models';
 import { FormInst, useNotification } from 'naive-ui';
 import { reactive, ref, watch } from 'vue';
@@ -132,6 +141,29 @@ function handleNegativeClick() {
   formData.value.MainUser = false;
 }
 
+// target == "scorelogPath" | "songdataPath"
+function chooseFile(title, target) {
+  OpenFileDialog(title)
+    .then(result => {
+      if (result.Code != 200) {
+        return Promise.reject(result.Msg);
+      }
+      if (result.Data != null && result.Data != undefined && result.Data != "") {
+        if (target == "scorelogPath") {
+          formData.value.ScoreLogPath = result.Data;
+        } else if (target == "songdataPath") {
+          formData.value.SongDataPath = result.Data;
+        }
+      }
+    }).catch(err => {
+      notification.error({
+        content: err,
+        duration: 3000,
+        keepAliveOnHover: true
+      })
+    });
+}
+
 watch(() => formData.value.MainUser, newValue => {
   rules.SongDataPath.required = newValue;
 })
@@ -150,6 +182,9 @@ watch(() => formData.value.MainUser, newValue => {
       "placeholderScoreLogPath": "Please input scorelog.db file path",
       "placeholderSongDataPath": "Please input songdata.db file path"
     },
+    "button": {
+      "chooseFile": "Choose File"
+    },
     "rules": {
       "missingRivalName": "Rival's name cannot be empty",
       "missingScoreLogPath": "scorelog.db file path cannot be empty",
@@ -167,6 +202,9 @@ watch(() => formData.value.MainUser, newValue => {
       "placeholderRivalName": "请输入好友名称",
       "placeholderScoreLogPath": "请输入scorelog.db文件路径",
       "placeholderSongDataPath": "请输入songdata.db文件路径"
+    },
+    "button": {
+      "chooseFile": "选择文件"
     },
     "rules": {
       "missingRivalName": "好友名称不可为空",

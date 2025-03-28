@@ -7,6 +7,10 @@
         <n-input v-model:value="formData.Name" :placeholder="t('modal.placeholderRivalName')" />
       </n-form-item>
       <n-form-item :label="t('modal.labelScoreLogPath')" path="ScoreLogPath">
+        <n-button type="info" @click="chooseFile('Choose scorelog.db', 'scorelogPath')">
+          {{ t('button.chooseFile') }}
+        </n-button>
+        <n-divider vertical />
         <n-input v-model:value="formData.ScoreLogPath" :placeholder="t('modal.placeholderScoreLogPath')" />
       </n-form-item>
       <n-form-item :label="t('modal.labelSongDataPath')" path="SongDataPath">
@@ -18,6 +22,7 @@
 
 <script lang="ts" setup>
 import { AddRivalInfo } from '@wailsjs/go/controller/RivalInfoController';
+import { OpenFileDialog } from '@wailsjs/go/main/App';
 import { entity } from '@wailsjs/go/models';
 import { FormInst, useNotification } from 'naive-ui';
 import { ref } from 'vue';
@@ -85,6 +90,29 @@ function handleNegativeClick() {
   formData.value.ScoreLogPath = null;
   formData.value.SongDataPath = null;
 }
+
+// target == "scorelogPath" | "songdataPath"
+function chooseFile(title, target) {
+  OpenFileDialog(title)
+    .then(result => {
+      if (result.Code != 200) {
+        return Promise.reject(result.Msg);
+      }
+      if (result.Data != null && result.Data != undefined && result.Data != "") {
+        if (target == "scorelogPath") {
+          formData.value.ScoreLogPath = result.Data;
+        } else if (target == "songdataPath") {
+          formData.value.SongDataPath = result.Data;
+        }
+      }
+    }).catch(err => {
+      notification.error({
+        content: err,
+        duration: 3000,
+        keepAliveOnHover: true
+      })
+    });
+}
 </script>
 
 <i18n lang="json">{
@@ -99,6 +127,9 @@ function handleNegativeClick() {
       "placeholderRivalName": "Please input rival's name",
       "placeholderScoreLogPath": "Please input scorelog.db file path",
       "placeholderSongDataPath": "Please input songdata.db file path"
+    },
+    "button": {
+      "chooseFile": "Choose File"
     },
     "rules": {
       "missingRivalName": "Rival's name cannot be empty",
@@ -117,6 +148,9 @@ function handleNegativeClick() {
       "placeholderRivalName": "请输入好友名称",
       "placeholderScoreLogPath": "请输入scorelog.db文件路径",
       "placeholderSongDataPath": "请输入songdata.db文件路径"
+    },
+    "button": {
+      "chooseFile": "选择文件"
     },
     "rules": {
       "missingRivalName": "好友名称不可为空",

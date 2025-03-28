@@ -145,6 +145,7 @@ func main() {
 
 	// Create an instance of the app structure
 	app := NewApp()
+	bind = append(bind, app)
 
 	// Create application with options
 	err := wails.Run(&options.App{

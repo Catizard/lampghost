@@ -3,6 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
+
+	"github.com/Catizard/lampghost_wails/internal/result"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 // App struct
@@ -41,4 +44,14 @@ func (a *App) shutdown(ctx context.Context) {
 // Greet returns a greeting for the given name
 func (a *App) Greet(name string) string {
 	return fmt.Sprintf("Hello %s, It's show time!", name)
+}
+
+func (a *App) OpenFileDialog(title string) result.RtnData {
+	fp, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
+		Title: title,
+	})
+	if err != nil {
+		return result.NewErrorData(err)
+	}
+	return result.NewRtnData(fp)
 }

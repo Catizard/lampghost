@@ -80,42 +80,48 @@ const columns: DataTableColumns<dto.DiffTableHeaderDto> = [
       )
     }
   },
-  { title: "Level Name", key: "Name" },
+  { title: "Level", key: "Name" },
   {
-    title: "Fail Count", key: "FailCount",
+    title: "Failed", key: "FailCount",
     render: (row: dto.DiffTableHeaderDto) => {
       return (row.LampCount[ClearType.Failed] ?? 0)
-           + (row.LampCount[ClearType.AssistEasy] ?? 0)
-           + (row.LampCount[ClearType.LightAssistEasy] ?? 0);
+        + (row.LampCount[ClearType.AssistEasy] ?? 0)
+        + (row.LampCount[ClearType.LightAssistEasy] ?? 0);
     }
   },
   {
-    title: "Easy Count", key: "ECCount",
+    title: "Easy Clear", key: "ECCount",
     render: (row: dto.DiffTableHeaderDto) => {
       return row.LampCount[ClearType.Easy] ?? 0
     }
   },
   {
-    title: "Hard Count", key: "HCCount",
+    title: "Normal Clear", key: "NCCount",
+    render: (row: dto.DiffTableHeaderDto) => {
+      return row.LampCount[ClearType.Normal] ?? 0;
+    }
+  },
+  {
+    title: "Hard Clear", key: "HCCount",
     render: (row: dto.DiffTableHeaderDto) => {
       return row.LampCount[ClearType.Hard] ?? 0;
     }
   },
   {
-    title: "EXHard Count", key: "EXHCCount",
+    title: "EX Hard Clear", key: "EXHCCount",
     render: (row: dto.DiffTableHeaderDto) => {
       return row.LampCount[ClearType.ExHard] ?? 0;
     }
   },
   {
-    title: "FC+ Count", key: "FCPlusCount",
+    title: "Full Combo+", key: "FCPlusCount",
     render: (row: dto.DiffTableHeaderDto) => {
       return (row.LampCount[ClearType.FullCombo] ?? 0)
-           + (row.LampCount[ClearType.Perfect] ?? 0)
-           + (row.LampCount[ClearType.Max] ?? 0);
+        + (row.LampCount[ClearType.Perfect] ?? 0)
+        + (row.LampCount[ClearType.Max] ?? 0);
     }
   },
-  { title: "Song Count", key: "SongCount" },
+  { title: "Chart Count", key: "SongCount" },
 ];
 const data: Ref<Array<dto.DiffTableHeaderDto>> = ref([]);
 const pagination = false as const;

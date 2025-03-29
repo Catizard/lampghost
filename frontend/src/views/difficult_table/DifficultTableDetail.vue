@@ -173,11 +173,11 @@ loadData();
 	},
 	"zh-CN": {
 		"column": {
-			"songName": "谱名",
+			"songName": "谱面名称",
 			"artist": "作者",
 			"count": "游玩次数",
-			"clear": "点灯",
-			"ghost": "影子灯",
+			"clear": "通关状态",
+			"ghost": "对比通关状态",
 			"actions": "操作"
 		},
 		"button": {

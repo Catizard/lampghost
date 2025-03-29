@@ -176,9 +176,9 @@ onMounted(() => {
       "addToFolder": "添加至收藏夹"
     },
     "column": {
-      "name": "谱名",
+      "name": "谱面名称",
       "tag": "标签",
-      "clear": "点灯",
+      "clear": "通关状态",
       "time": "记录时间",
       "actions": "操作"
     },

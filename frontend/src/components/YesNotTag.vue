@@ -1,5 +1,5 @@
 <template>
-  <n-tag :color="{ color: def.color, textColor: def.textColor}">
+  <n-tag :color="{ color: def.color, textColor: def.textColor }">
     {{ def.text }}
   </n-tag>
 </template>
@@ -22,14 +22,14 @@ const table: Array<TagDef> = [
   {
     value: false,
     text: "NO",
-    color: "#FF0000",
-    textColor: "#000000",
+    color: "#FF6B74",
+    textColor: "#ffffff",
   },
   {
     value: true,
     text: "YES",
-    color: "#00FF00",
-    textColor: "#000000",
+    color: "#49E670",
+    textColor: "#ffffff",
   }
 ];
 

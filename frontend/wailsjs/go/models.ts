@@ -1029,6 +1029,8 @@ export namespace vo {
 	    GhostRivalID: number;
 	    GhostRivalTagID: number;
 	    Pagination?: entity.Page;
+	    SortBy?: string;
+	    SortOrder?: string;
 	    course: any[];
 	
 	    static createFrom(source: any = {}) {
@@ -1055,6 +1057,8 @@ export namespace vo {
 	        this.GhostRivalID = source["GhostRivalID"];
 	        this.GhostRivalTagID = source["GhostRivalTagID"];
 	        this.Pagination = this.convertValues(source["Pagination"], entity.Page);
+	        this.SortBy = source["SortBy"];
+	        this.SortOrder = source["SortOrder"];
 	        this.course = source["course"];
 	    }
 	

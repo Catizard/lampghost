@@ -1,11 +1,11 @@
 <template>
 	<n-data-table remote :columns="columns" :data="data" :pagination="pagination" :bordered="false" min-height="500px"
-		:loading="loading" :row-key="(row: dto.DiffTableDataDto) => row.ID" />
+		:loading="loading" :row-key="(row: dto.DiffTableDataDto) => row.ID" @update-sorter="handleUpdateSorter" />
 	<select-folder v-model:show="showFolderSelection" :sha256="candidateSongSha256" @submit="handleSubmit" />
 </template>
 
 <script setup lang="ts">
-import { DataTableColumns, NButton, useNotification } from 'naive-ui';
+import { DataTableColumns, DataTableSortState, NButton, useNotification } from 'naive-ui';
 import { dto } from '@wailsjs/go/models';
 import { h, reactive, ref, Ref, watch } from 'vue';
 import { BindDiffTableDataToFolder, QueryDiffTableDataWithRival } from '@wailsjs/go/controller/DiffTableController';
@@ -29,10 +29,14 @@ const props = defineProps<{
 	ghostRivalTagId?: number
 }>()
 
+const sorter: Ref<Sorter> = ref({
+	SortBy: null,
+	SortOrder: null,
+});
 const columns: DataTableColumns<dto.DiffTableDataDto> = [
-	{ title: t('column.songName'), key: "Title", width: "300px", ellipsis: { tooltip: true }, resizable: true },
-	{ title: t('column.artist'), key: "Artist", ellipsis: { tooltip: true }, },
-	{ title: t('column.count'), key: "PlayCount", width: "100px", },
+	{ title: t('column.songName'), key: "Title", width: "300px", ellipsis: { tooltip: true }, resizable: true, sorter: true },
+	{ title: t('column.artist'), key: "Artist", ellipsis: { tooltip: true }, sorter: true, },
+	{ title: t('column.count'), key: "PlayCount", width: "100px" },
 	{
 		title: t('column.clear'), key: "Lamp", width: "100px", resizable: true,
 		render(row: dto.DiffTableDataDto) {
@@ -81,6 +85,8 @@ function loadData() {
 		GhostRivalID: props.ghostRivalId ?? 0,
 		GhostRivalTagID: props.ghostRivalTagId ?? 0,
 		Pagination: pagination,
+		SortBy: sorter.value.SortBy,
+		SortOrder: sorter.value.SortOrder,
 	} as any)
 		.then(result => {
 			if (result.Code != 200) {
@@ -149,6 +155,18 @@ function handleSubmit(selected: [any]) {
 		});
 }
 
+function handleUpdateSorter(option: DataTableSortState | null) {
+	// TODO: This is a pain in the a**
+	switch (option.columnKey) {
+		case "Title": sorter.value.SortBy = "title"; break;
+		case "Artist": sorter.value.SortBy = "artist"; break;
+		default: sorter.value.SortBy = option.columnKey as string; break;
+	}
+	if (option.order != false) {
+		sorter.value.SortOrder = option.order;
+	}
+	loadData();
+}
 
 loadData();
 </script>

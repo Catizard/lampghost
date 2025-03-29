@@ -2,6 +2,7 @@ package vo
 
 import (
 	"github.com/Catizard/lampghost_wails/internal/entity"
+	"github.com/charmbracelet/log"
 	"gorm.io/gorm"
 )
 
@@ -20,6 +21,9 @@ type DiffTableDataVo struct {
 	Sha256   string
 
 	Pagination *entity.Page
+	SortBy     *string
+	// NOTE: NEVER access this field directly, use GetOrder() instead
+	SortOrder *string
 	// Extra filter fields
 	IDs       []uint
 	HeaderIDs []uint
@@ -44,5 +48,20 @@ func (data *DiffTableDataVo) Entity() *entity.DiffTableData {
 		Url:      data.Url,
 		UrlDiff:  data.UrlDiff,
 		Sha256:   data.Sha256,
+	}
+}
+
+func (data *DiffTableDataVo) GetOrder() string {
+	if data.SortOrder == nil {
+		return "asc"
+	}
+	switch *data.SortOrder {
+	case "ascend":
+		return "asc"
+	case "descend":
+		return "desc"
+	default:
+		log.Warnf("unexpected SortOrder value: %s", *data.SortOrder)
+		return "asc"
 	}
 }

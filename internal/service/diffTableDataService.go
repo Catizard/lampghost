@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/vo"
 	"gorm.io/gorm"
@@ -31,11 +33,17 @@ func findDiffTableDataList(tx *gorm.DB, filter *vo.DiffTableDataVo) ([]*entity.D
 	}
 
 	var contents []*entity.DiffTableData
-	if err := tx.Where(filter.Entity()).Scopes(
+	partial := tx.Where(filter.Entity()).Scopes(
 		scopeInIDs(filter.IDs),
 		scopeInHeaderIDs(filter.HeaderIDs),
 		pagination(filter.Pagination),
-	).Find(&contents).Error; err != nil {
+	)
+
+	if filter.SortOrder != nil && *filter.SortOrder != "" {
+		partial.Order(fmt.Sprintf("%s %s", *filter.SortBy, filter.GetOrder()))
+	}
+
+	if err := partial.Debug().Find(&contents).Error; err != nil {
 		return nil, 0, err
 	}
 

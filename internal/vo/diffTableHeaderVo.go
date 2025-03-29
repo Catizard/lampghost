@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/Catizard/lampghost_wails/internal/entity"
+	"github.com/charmbracelet/log"
 	"github.com/go-viper/mapstructure/v2"
 	"gorm.io/gorm"
 )
@@ -25,6 +26,9 @@ type DiffTableHeaderVo struct {
 	GhostRivalID    uint
 	GhostRivalTagID uint
 	Pagination      *entity.Page
+	SortBy          *string
+	// NOTE: NEVER access this field directly, use GetOrder() instead
+	SortOrder *string
 
 	// Hack, see add method of difficult table for details
 	RawCourses []interface{} `json:"course"`
@@ -45,6 +49,21 @@ func (header *DiffTableHeaderVo) Entity() *entity.DiffTableHeader {
 		HeaderUrl:          header.HeaderUrl,
 		EnableFallbackSort: header.EnableFallbackSort,
 		LevelOrders:        strings.Join(header.UnjoinedLevelOrder, ","),
+	}
+}
+
+func (header *DiffTableHeaderVo) GetOrder() string {
+	if header.SortOrder == nil {
+		return "asc"
+	}
+	switch *header.SortOrder {
+	case "ascend":
+		return "asc"
+	case "descend":
+		return "desc"
+	default:
+		log.Warnf("unexpected SortOrder value: %s", *header.SortOrder)
+		return "asc"
 	}
 }
 

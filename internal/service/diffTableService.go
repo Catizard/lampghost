@@ -417,6 +417,8 @@ func (s *DiffTableService) QueryDiffTableDataWithRival(filter *vo.DiffTableHeade
 		HeaderID:   filter.ID,
 		Level:      filter.Level,
 		Pagination: filter.Pagination,
+		SortBy:     filter.SortBy,
+		SortOrder:  filter.SortOrder,
 	})
 	if err != nil {
 		return nil, 0, err

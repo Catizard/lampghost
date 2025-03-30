@@ -14,7 +14,7 @@
         style="width: 200px;" :placeholder="t('placeHolderRivalTag')" :render-option="renderRivalTagOption" />
     </n-flex>
     <n-data-table :columns="columns" :data="data" :pagination="pagination" :loading="levelTableLoading"
-      :row-key="(row: dto.DiffTableHeaderDto) => row.Level" />
+      :row-key="(row: dto.DiffTableHeaderDto) => row.Level" :row-class-name="rowClassName" />
   </perfect-scrollbar>
 </template>
 
@@ -27,7 +27,7 @@ import { DataTableColumns, NDataTable, NTooltip, SelectOption, useNotification }
 import { h, Ref, ref, VNode, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import DifficultTableDetail from './DifficultTableDetail.vue';
-import ClearType from '@/constants/cleartype';
+import { ClearType, ClearTypeDef, DefaultClearTypeColorStyle } from '@/constants/cleartype';
 
 const i18n = useI18n();
 const { t } = i18n;
@@ -123,6 +123,21 @@ const columns: DataTableColumns<dto.DiffTableHeaderDto> = [
   },
   { title: "Chart Count", key: "SongCount" },
 ];
+
+// NOTE: we don't build failed lamp marker, that means nothing for user
+function rowClassName(row: dto.DiffTableHeaderDto): string {
+  let sum = 0;
+  for (const [k, v] of Object.entries(ClearType).reverse()) {
+    sum += row.LampCount[k] ?? 0;
+    if (sum == row.SongCount && v != ClearType.Failed) {
+      // I don't have a better idea for managing this  
+      const def: ClearTypeDef = DefaultClearTypeColorStyle[k];
+      console.log('row: ', row.Level, 'picking', def.text);
+      return def.text;
+    }
+  }
+  return ""
+}
 const data: Ref<Array<dto.DiffTableHeaderDto>> = ref([]);
 const pagination = false as const;
 const levelTableLoading = ref<boolean>(false);
@@ -277,3 +292,35 @@ watch(currentRivalID, (newID: number) => {
     "placeHolderRivalTag": "选择对比玩家的标签"
   }
 }</i18n>
+
+<style lang="css" scoped>
+/* background color when clearing whole difficult level */
+/* NOTE: This color style is actually different with ClearTag, so no code reuse here */
+:deep(.EASY > td) {
+  background-color: rgba(200, 247, 212, 0.7) !important;
+}
+
+:deep(.NORMAL > td) {
+  background-color: rgba(202, 235, 253, 0.7) !important;
+}
+
+:deep(.HARD > td) {
+  background-color: rgba(255, 210, 213, 0.7) !important;
+}
+
+:deep(.EX-HARD > td) {
+  background-color: rgba(255, 230, 212, 0.7) !important;
+}
+
+:deep(.FULL_COMBO> td) {
+  background-color: rgba(255, 241, 202, 0.7) !important;
+}
+
+:deep(.PERFECT > td) {
+  background-color: rgba(255, 241, 202, 0.7) !important;
+}
+
+:deep(.MAX > td) {
+  background-color: rgba(255, 241, 202, 0.7) !important;
+}
+</style>

@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import ClearType from "@/constants/cleartype";
+import { ClearType } from "@/constants/cleartype";
 import { FindDiffTableHeaderList } from "@wailsjs/go/controller/DiffTableController";
 import { QueryUserInfoWithLevelLayeredDiffTableLampStatus } from "@wailsjs/go/controller/RivalInfoController";
 import { dto } from "@wailsjs/go/models";

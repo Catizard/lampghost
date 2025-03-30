@@ -27,7 +27,7 @@ const table: Array<ClearTypeDef> = [
   },
   {
     value: 1,
-    text: "FAIELD",
+    text: "FAILED",
     color: "#CC5C76",
     textColor: "#ffffff",
   },

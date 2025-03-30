@@ -21,6 +21,7 @@ type DiffTableDataDto struct {
 	GhostLamp int
 
 	PlayCount int
+	DataLost  bool
 }
 
 func NewDiffTableDataDto(data *entity.DiffTableData) *DiffTableDataDto {
@@ -43,7 +44,8 @@ func NewDiffTableDataDto(data *entity.DiffTableData) *DiffTableDataDto {
 // Extends to NewDiffTableDataDto, calling RepairHash internally
 func NewDiffTableDataDtoWithCache(data *entity.DiffTableData, cache *entity.SongHashCache) *DiffTableDataDto {
 	ret := NewDiffTableDataDto(data)
-	ret.RepairHash(cache)
+	ok := ret.RepairHash(cache)
+	ret.DataLost = !ok
 	return ret
 }
 
@@ -56,6 +58,7 @@ func NewDiffTableDataDtoArray(arr []*entity.DiffTableData) []*DiffTableDataDto {
 	return contents
 }
 
+// Returns true if this song could be found in cache
 func (data *DiffTableDataDto) RepairHash(cache *entity.SongHashCache) bool {
 	if data.Sha256 != "" {
 		if md5, ok := cache.GetMD5(data.Sha256); ok {

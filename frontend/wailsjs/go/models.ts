@@ -94,6 +94,7 @@ export namespace dto {
 	    Lamp: number;
 	    GhostLamp: number;
 	    PlayCount: number;
+	    DataLost: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new DiffTableDataDto(source);
@@ -116,6 +117,7 @@ export namespace dto {
 	        this.Lamp = source["Lamp"];
 	        this.GhostLamp = source["GhostLamp"];
 	        this.PlayCount = source["PlayCount"];
+	        this.DataLost = source["DataLost"];
 	    }
 	}
 	export class DiffTableHeaderDto {

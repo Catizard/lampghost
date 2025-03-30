@@ -127,20 +127,20 @@ func (s *DiffTableService) FindDiffTableHeaderList(filter *vo.DiffTableHeaderVo)
 	for i, header := range headers {
 		headerIds[i] = header.ID
 	}
-	rawContents, _, err := findDiffTableDataList(s.db, &vo.DiffTableDataVo{HeaderIDs: headerIds})
+	contents, _, err := findDiffTableDataList(s.db, &vo.DiffTableDataVo{HeaderIDs: headerIds})
 	if err != nil {
 		return nil, 0, err
 	}
 
 	ret := make([]dto.DiffTableHeaderDto, len(headers))
 	for i, header := range headers {
-		contents := make([]*dto.DiffTableDataDto, 0)
-		for _, content := range rawContents {
+		sc := make([]*dto.DiffTableDataDto, 0)
+		for _, content := range contents {
 			if content.HeaderID == header.ID {
-				contents = append(contents, dto.NewDiffTableDataDto(content))
+				sc = append(sc, content)
 			}
 		}
-		ret[i] = *dto.NewDiffTableHeaderDto(header, contents)
+		ret[i] = *dto.NewDiffTableHeaderDto(header, sc)
 	}
 
 	return ret, len(ret), nil
@@ -343,11 +343,10 @@ func (s *DiffTableService) QueryDiffTableInfoByID(ID uint) (*dto.DiffTableHeader
 	if err != nil {
 		return nil, err
 	}
-	rawContents, _, err := findDiffTableDataList(s.db, &vo.DiffTableDataVo{HeaderID: ID})
+	contents, _, err := findDiffTableDataList(s.db, &vo.DiffTableDataVo{HeaderID: ID})
 	if err != nil {
 		return nil, err
 	}
-	contents := dto.NewDiffTableDataDtoArray(rawContents)
 	return dto.NewDiffTableHeaderDto(header, contents), nil
 }
 
@@ -413,7 +412,7 @@ func (s *DiffTableService) QueryDiffTableDataWithRival(filter *vo.DiffTableHeade
 	if filter.RivalID <= 0 {
 		return nil, 0, fmt.Errorf("RivalID should > 0")
 	}
-	rawContents, _, err := findDiffTableDataList(s.db, &vo.DiffTableDataVo{
+	contents, _, err := findDiffTableDataList(s.db, &vo.DiffTableDataVo{
 		HeaderID:   filter.ID,
 		Level:      filter.Level,
 		Pagination: filter.Pagination,
@@ -423,7 +422,6 @@ func (s *DiffTableService) QueryDiffTableDataWithRival(filter *vo.DiffTableHeade
 	if err != nil {
 		return nil, 0, err
 	}
-	contents := dto.NewDiffTableDataDtoArray(rawContents)
 	// NOTE: Here's a small hack to set correct play count in final result
 	// "Play Count" column is setted by calling "mergeRivalRelatedData" method,
 	// therefore if we merge "ghost"'s data first and "main user"'s data second,

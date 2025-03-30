@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 
+	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/vo"
 	"gorm.io/gorm"
@@ -19,17 +20,22 @@ func findDiffTableDataByID(tx *gorm.DB, ID uint) (*entity.DiffTableData, error) 
 	return data, nil
 }
 
-func findDiffTableDataList(tx *gorm.DB, filter *vo.DiffTableDataVo) ([]*entity.DiffTableData, int, error) {
+func findDiffTableDataList(tx *gorm.DB, filter *vo.DiffTableDataVo) ([]*dto.DiffTableDataDto, int, error) {
 	if filter == nil {
 		var contents []*entity.DiffTableData
 		if err := tx.Find(&contents).Error; err != nil {
 			return nil, 0, err
 		}
 
-		if err := fixDiffTableDataHashField(tx, contents...); err != nil {
+		ret := make([]*dto.DiffTableDataDto, len(contents))
+		defaultCache, err := queryDefaultSongHashCache(tx)
+		if err != nil {
 			return nil, 0, err
 		}
-		return contents, len(contents), nil
+		for i := range contents {
+			ret[i] = dto.NewDiffTableDataDtoWithCache(contents[i], defaultCache)
+		}
+		return ret, len(ret), nil
 	}
 
 	var contents []*entity.DiffTableData
@@ -55,10 +61,15 @@ func findDiffTableDataList(tx *gorm.DB, filter *vo.DiffTableDataVo) ([]*entity.D
 		filter.Pagination.PageCount = calcPageCount(count, filter.Pagination.PageSize)
 	}
 
-	if err := fixDiffTableDataHashField(tx, contents...); err != nil {
+	ret := make([]*dto.DiffTableDataDto, len(contents))
+	defaultCache, err := queryDefaultSongHashCache(tx)
+	if err != nil {
 		return nil, 0, err
 	}
-	return contents, len(contents), nil
+	for i := range contents {
+		ret[i] = dto.NewDiffTableDataDtoWithCache(contents[i], defaultCache)
+	}
+	return ret, len(ret), nil
 }
 
 func selectDiffTableDataCount(tx *gorm.DB, filter *vo.DiffTableDataVo) (int64, error) {

@@ -5,13 +5,14 @@
 </template>
 
 <script setup lang="ts">
-import { DataTableColumns, DataTableSortState, NButton, useNotification } from 'naive-ui';
+import { DataTableColumns, DataTableSortState, NButton, NIcon, NText, NTooltip, useNotification } from 'naive-ui';
 import { dto } from '@wailsjs/go/models';
 import { h, reactive, ref, Ref, watch } from 'vue';
 import { BindDiffTableDataToFolder, QueryDiffTableDataWithRival } from '@wailsjs/go/controller/DiffTableController';
 import SelectFolder from '@/views/folder/SelectFolder.vue';
 import ClearTag from '@/components/ClearTag.vue';
 import { useI18n } from 'vue-i18n';
+import { WarningOutline } from '@vicons/ionicons5';
 
 defineExpose({
 	loadData,
@@ -34,7 +35,17 @@ const sorter: Ref<Sorter> = ref({
 	SortOrder: null,
 });
 const columns: DataTableColumns<dto.DiffTableDataDto> = [
-	{ title: t('column.songName'), key: "Title", width: "300px", ellipsis: { tooltip: true }, resizable: true, sorter: true },
+	{
+		title: t('column.songName'), key: "Title", width: "300px", ellipsis: { tooltip: true }, resizable: true, sorter: true,
+		render: (row: dto.DiffTableDataDto) => {
+			let vnodes = [];
+			if (row.DataLost) {
+				vnodes.push(h(NIcon, { component: WarningOutline, color: "red" }));
+			}
+			vnodes.push(h(NText, {}, () => row.Title));
+			return vnodes;
+		}
+	},
 	{ title: t('column.artist'), key: "Artist", ellipsis: { tooltip: true }, sorter: true, },
 	{ title: t('column.count'), key: "PlayCount", width: "100px" },
 	{

@@ -83,7 +83,9 @@ func findRivalMaximumClearScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) 
 	if filter != nil {
 		partial = partial.Scopes(scopeInSha256s(filter.Sha256s))
 	}
-	if err := partial.Find(&out).Error; err != nil {
+	// NOTE: without this statement, this function has strange behaviour
+	partial = partial.Group("sha256")
+	if err := partial.Debug().Find(&out).Error; err != nil {
 		return nil, 0, err
 	}
 	return out, len(out), nil
@@ -174,9 +176,6 @@ func scopeRivalScoreLogFilter(filter *vo.RivalScoreLogVo) func(db *gorm.DB) *gor
 		}
 		if filter.SpecifyYear != nil {
 			moved = moved.Where("STRFTIME('%Y', `rival_score_log`.`record_time`) = ?", filter.SpecifyYear)
-		}
-		if filter.RivalId > 0 {
-			moved = moved.Where("rival_score_log.rival_id = ?", filter.RivalId)
 		}
 		return moved
 	}

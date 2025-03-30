@@ -234,27 +234,20 @@ func (s *RivalInfoService) QueryUserInfoWithLevelLayeredDiffTableLampStatus(riva
 	if err != nil {
 		return nil, err
 	}
-	logs, n, err := findRivalScoreLogList(s.db, &vo.RivalScoreLogVo{
+	sha256MaxLamp, err := findRivalMaximumClearScoreLogSha256Map(s.db, &vo.RivalScoreLogVo{
 		RivalId: rivalID,
 	})
 	if err != nil {
 		return nil, err
 	}
-	log.Debugf("[RivalInfoService] QueryUserInfoWithLevelLayeredDiffTableLampStatus: got %d logs", n)
-
-	sha256MaxLamp := make(map[string]int32)
-	for _, log := range logs {
-		if _, ok := sha256MaxLamp[log.Sha256]; !ok {
-			sha256MaxLamp[log.Sha256] = log.Clear
-		}
-		sha256MaxLamp[log.Sha256] = max(sha256MaxLamp[log.Sha256], log.Clear)
-	}
 
 	ret := dto.NewRivalInfoDtoWithDiffTable(rivalInfo, header)
 	for _, dataList := range ret.DiffTableHeader.LevelLayeredContents {
 		for i, data := range dataList {
+			ret.DiffTableHeader.SongCount++
 			if _, ok := sha256MaxLamp[data.Sha256]; ok {
-				dataList[i].Lamp = int(sha256MaxLamp[data.Sha256])
+				dataList[i].Lamp = int(sha256MaxLamp[data.Sha256][0].Clear)
+				ret.DiffTableHeader.LampCount[dataList[i].Lamp]++
 			}
 		}
 	}

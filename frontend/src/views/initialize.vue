@@ -39,7 +39,7 @@
 
 <script setup>
 import { useNotification } from "naive-ui";
-import { ref, watch } from "vue";
+import { ref, watch, reactive } from "vue";
 import { InitializeMainUser } from "@wailsjs/go/controller/RivalInfoController";
 import router from "../router";
 import { useI18n } from "vue-i18n";
@@ -75,7 +75,7 @@ function chooseFile(title, target) {
 
 const loading = ref(false);
 const formRef = ref(null);
-const formData = ref({
+const formData = reactive({
 	locale: null,
 	songdataPath: "",
 	scorelogPath: "",
@@ -124,9 +124,9 @@ function handleSubmit(e) {
 		} else {
 			loading.value = true;
 			const rivalInfo = {
-				Name: formData.value.userName,
-				ScoreLogPath: formData.value.scorelogPath,
-				SongDataPath: formData.value.songdataPath,
+				Name: formData.userName,
+				ScoreLogPath: formData.scorelogPath,
+				SongDataPath: formData.songdataPath,
 				Locale: globalI18n.locale.value,
 			};
 			InitializeMainUser(rivalInfo)

@@ -35,15 +35,6 @@ func (RivalSongData) TableName() string {
 	return "rival_song_data"
 }
 
-// Snippet for creating an entity with id
-func NewRivalSongDataWithID(ID uint) *RivalSongData {
-	return &RivalSongData{
-		Model: gorm.Model{
-			ID: ID,
-		},
-	}
-}
-
 func FromRawSongDataToRivalSongData(songData *SongData) RivalSongData {
 	return RivalSongData{
 		Md5:        songData.Md5,

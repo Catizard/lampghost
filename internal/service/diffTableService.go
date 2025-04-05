@@ -507,7 +507,7 @@ func fetchDiffTableFromURL(url string) (*vo.DiffTableHeaderVo, error) {
 			if err := scanner.Err(); err != nil {
 				return nil, err
 			}
-			line := strings.Trim(scanner.Text(), " ")
+			line := strings.TrimSpace(scanner.Text())
 			// TODO: Any other cases?
 			// Its pattern should be <meta name="bmstable" content="xxx.json" />
 			if strings.HasPrefix(line, "<meta name=\"bmstable\"") {
@@ -532,8 +532,14 @@ func fetchDiffTableFromURL(url string) (*vo.DiffTableHeaderVo, error) {
 					log.Fatalf("Cannot find 'content' field in %s", url)
 				}
 
-				// Construct the json url path
-				jsonUrl = prefixUrl + "/" + line[startp+1:endp]
+				content := line[startp+1 : endp]
+				if !strings.HasPrefix(content, "http") {
+					// Construct the json url path
+					jsonUrl = prefixUrl + "/" + line[startp+1:endp]
+				} else {
+					jsonUrl = content
+				}
+
 				log.Debugf("Construct json url [%s] from [%s]", jsonUrl, url)
 				break
 			}

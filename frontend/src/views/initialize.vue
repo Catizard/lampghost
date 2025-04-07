@@ -5,7 +5,7 @@
 				<n-h1 prefix="bar" style="text-align: start">
 					<n-text type="primary">{{ t('title') }}</n-text>
 				</n-h1>
-				<n-form ref="formRef" :rules="rules" :model="formData">
+				<n-form ref="formRef" :rules="rules" :model="formData" :loading="loading">
 					<n-form-item :label="t('form.labelLanguage')">
 						<n-select v-model:value="locale" :options="localeOptions" style="width: 150px;" />
 					</n-form-item>
@@ -27,7 +27,7 @@
 						<n-input v-model:value="formData.scorelogPath" :placeholder="t('form.placeholderScorelogPath')" />
 					</n-form-item>
 					<n-form-item>
-						<n-button @loading="loading" attr-type="button" @click="handleSubmit" type="primary">
+						<n-button :loading="loading" attr-type="button" @click="handleSubmit" type="primary">
 							{{ t('button.submit') }}
 						</n-button>
 					</n-form-item>

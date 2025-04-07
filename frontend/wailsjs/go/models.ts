@@ -585,6 +585,7 @@ export namespace entity {
 	    Name: string;
 	    OriginalUrl?: string;
 	    Symbol: string;
+	    OrderNumber: number;
 	    LevelOrders: string;
 	    EnableFallbackSort: number;
 	
@@ -603,6 +604,7 @@ export namespace entity {
 	        this.Name = source["Name"];
 	        this.OriginalUrl = source["OriginalUrl"];
 	        this.Symbol = source["Symbol"];
+	        this.OrderNumber = source["OrderNumber"];
 	        this.LevelOrders = source["LevelOrders"];
 	        this.EnableFallbackSort = source["EnableFallbackSort"];
 	    }

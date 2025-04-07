@@ -10,6 +10,7 @@ type DiffTableHeader struct {
 	Name        string
 	OriginalUrl *string
 	Symbol      string
+	OrderNumber int `gorm:"default:0"`
 	LevelOrders string
 	// defaults to false, if flagged and LevelOrders is empty, sort levels by custom sort strategy, otherwise do nothing
 	EnableFallbackSort int `gorm:"default:0"`

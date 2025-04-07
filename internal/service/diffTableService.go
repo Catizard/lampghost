@@ -481,6 +481,27 @@ func (s *DiffTableService) BindDiffTableDataToFolder(diffTableDataID uint, folde
 	})
 }
 
+func (s *DiffTableService) UpdateHeaderOrder(headerIDs []uint) error {
+	return s.db.Transaction(func(tx *gorm.DB) error {
+		return updateHeaderOrder(tx, headerIDs)
+	})
+}
+
+func (s *DiffTableService) UpdateHeaderLevelOrders(updateParam *vo.DiffTableHeaderVo) error {
+	if updateParam == nil {
+		return fmt.Errorf("assert: UpdateHeaderLevelOrders: updateParam cannot be nil")
+	}
+	if updateParam.ID == 0 {
+		return fmt.Errorf("assert: UpdateHeaderLevelOrders: updateParam.ID cannot be 0")
+	}
+	if updateParam.LevelOrders == "" {
+		return fmt.Errorf("assert: UpdateHeaderLevelOrders: updateParam.LevelOrders cannot be empty")
+	}
+	return s.db.Transaction(func(tx *gorm.DB) error {
+		return updateHeaderLevelOrders(tx, updateParam.ID, updateParam.LevelOrders)
+	})
+}
+
 // Query if there exists a header that satisfies the condition
 func queryDiffTableHeaderExistence(tx *gorm.DB, filter *entity.DiffTableHeader) (bool, error) {
 	var dupCount int64
@@ -594,7 +615,7 @@ func mergeRivalRelatedData(sha256ScoreLogsMap map[string][]*dto.RivalScoreLogDto
 func findDiffTableHeaderList(tx *gorm.DB, filter *vo.DiffTableHeaderVo) ([]*entity.DiffTableHeader, int, error) {
 	if filter == nil {
 		var headers []*entity.DiffTableHeader
-		if err := tx.Find(&headers).Error; err != nil {
+		if err := tx.Order("order_number").Find(&headers).Error; err != nil {
 			log.Error("[DiffTableService] Find difftable header failed with %v", err)
 			return nil, 0, err
 		}
@@ -602,10 +623,30 @@ func findDiffTableHeaderList(tx *gorm.DB, filter *vo.DiffTableHeaderVo) ([]*enti
 	}
 
 	var headers []*entity.DiffTableHeader
-	if err := tx.Where(filter.Entity()).Find(&headers).Error; err != nil {
+	if err := tx.Where(filter.Entity()).Order("order_number").Find(&headers).Error; err != nil {
 		return nil, 0, err
 	}
 	return headers, len(headers), nil
+}
+
+func updateHeaderOrder(tx *gorm.DB, headerIDs []uint) error {
+	if len(headerIDs) == 0 {
+		return nil
+	}
+	for i, headerID := range headerIDs {
+		entity := &entity.DiffTableHeader{}
+		entity.ID = headerID
+		if err := tx.Model(entity).Update("order_number", i).Error; err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func updateHeaderLevelOrders(tx *gorm.DB, headerID uint, levelOrders string) error {
+	entity := &entity.DiffTableHeader{}
+	entity.ID = headerID
+	return tx.Model(entity).Update("level_orders", levelOrders).Error
 }
 
 // Query multiple difficult table's related level list by header ids

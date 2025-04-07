@@ -61,3 +61,11 @@ export function QueryLevelLayeredDiffTableInfoById(arg1) {
 export function UpdateDiffTableHeader(arg1) {
   return window['go']['controller']['DiffTableController']['UpdateDiffTableHeader'](arg1);
 }
+
+export function UpdateHeaderLevelOrders(arg1) {
+  return window['go']['controller']['DiffTableController']['UpdateHeaderLevelOrders'](arg1);
+}
+
+export function UpdateHeaderOrder(arg1) {
+  return window['go']['controller']['DiffTableController']['UpdateHeaderOrder'](arg1);
+}

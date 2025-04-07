@@ -1,17 +1,22 @@
 <template>
   <perfect-scrollbar>
-    <n-space justify="space-between">
+    <n-flex justify="space-between">
       <n-h1 prefix="bar" style="text-align: start">
         <n-text type="primary">{{ t('title') }}</n-text>
       </n-h1>
-      <n-button :loading="loading" type="primary" @click="showAddModal = true">{{ t('button.add') }}</n-button>
-    </n-space>
+      <n-flex justify="flex-end">
+        <n-button :loading="loading" type="info" @click="showSortModal = true"> {{ t('button.sort') }}</n-button>
+        <n-button :loading="loading" type="primary" @click="showAddModal = true">{{ t('button.add') }}</n-button>
+      </n-flex>
+    </n-flex>
     <n-data-table :loading="loading" :columns="columns" :data="data" :pagination="pagination" :bordered="false"
       :row-key="(row: dto.DiffTableHeaderDto) => row.ID" />
   </perfect-scrollbar>
 
+  <DifficultTableSortModal v-model:show="showSortModal" @refresh="loadDiffTableData()" />
   <DifficultTableAddForm v-model:show="showAddModal" @refresh="loadDiffTableData()" />
   <DifficultTableEditForm ref="editFormRef" @refresh="loadDiffTableData()" />
+  <DifficultTableLevelSortModal ref="levelSortModalRef" />
 </template>
 
 <script lang="ts" setup>
@@ -27,11 +32,15 @@ import { dto } from "@wailsjs/go/models";
 import { useI18n } from "vue-i18n";
 import DifficultTableAddForm from "./DifficultTableAddForm.vue";
 import DifficultTableEditForm from "./DifficultTableEditForm.vue";
+import DifficultTableSortModal from "./DifficultTableSortModal.vue";
+import DifficultTableLevelSortModal from "./DifficultTableLevelSortModal.vue";
 
 const i18n = useI18n();
 const { t } = i18n;
+const showSortModal = ref(false);
 const showAddModal = ref(false);
 const editFormRef = ref<InstanceType<typeof DifficultTableEditForm>>(null);
+const levelSortModalRef = ref<InstanceType<typeof DifficultTableLevelSortModal>>(null);
 
 const notification = useNotification();
 const dialog = useDialog();
@@ -73,6 +82,10 @@ const otherActionOptions: Array<DropdownOption> = [
     key: "Edit",
   },
   {
+    label: t('button.sortLevels'),
+    key: "SortLevels",
+  },
+  {
     label: t('button.delete'),
     key: "Delete",
     props: {
@@ -93,6 +106,9 @@ function handleSelectOtherAction(row: dto.DiffTableHeaderDto, key: string) {
   }
   if ("Edit" === key) {
     editFormRef.value.open(row.ID);
+  }
+  if ("SortLevels" === key) {
+    levelSortModalRef.value.open(row.ID);
   }
 }
 
@@ -151,7 +167,9 @@ function notifyError(msg: string) {
     "button": {
       "add": "Add Table",
       "delete": "Delete",
-      "edit": "Edit"
+      "edit": "Edit",
+      "sort": "Sort",
+      "sortLevels": "Sort Levels"
     },
     "column": {
       "name": "Name",
@@ -174,7 +192,9 @@ function notifyError(msg: string) {
     "button": {
       "add": "新增",
       "delete": "删除",
-      "edit": "修改"
+      "edit": "修改",
+      "sort": "排序",
+      "sortLevels": "设定难度排序"
     },
     "column": {
       "name": "名称",

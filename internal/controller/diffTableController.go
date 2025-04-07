@@ -138,6 +138,24 @@ func (ctl *DiffTableController) BindDiffTableDataToFolder(diffTableDataID uint, 
 	return result.SUCCESS
 }
 
+func (ctl *DiffTableController) UpdateHeaderOrder(headerIDs []uint) result.RtnMessage {
+	log.Info("[Controller] Calling DiffTableController.UpdateHeaderOrder")
+	if err := ctl.diffTableService.UpdateHeaderOrder(headerIDs); err != nil {
+		log.Errorf("[DiffTableController] returning err: %v", err)
+		return result.NewErrorMessage(err)
+	}
+	return result.SUCCESS
+}
+
+func (ctl *DiffTableController) UpdateHeaderLevelOrders(updateParam *vo.DiffTableHeaderVo) result.RtnMessage {
+	log.Info("[Controller] Calling DiffTableController.UpdateHeaderLevelOrders")
+	if err := ctl.diffTableService.UpdateHeaderLevelOrders(updateParam); err != nil {
+		log.Errorf("[DiffTableController] returning err: %v", err)
+		return result.NewErrorMessage(err)
+	}
+	return result.SUCCESS
+}
+
 func (ctl *DiffTableController) GENERATOR_TABLE_HEADER() *entity.DiffTableHeader { return nil }
 
 func (ctl *DiffTableController) GENERATOR_TABLE_HEADER_DTO() *dto.DiffTableHeaderDto { return nil }

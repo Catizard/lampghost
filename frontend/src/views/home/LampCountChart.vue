@@ -206,30 +206,37 @@ const overviewColumns: DataTableColumns<dto.DiffTableHeaderDto> = [
   {
     title: "No Play",
     key: ClearType.NO_PLAY,
+    width: "60px",
   },
   {
     title: "Failed",
     key: ClearType.Failed,
+    width: "60px",
   },
   {
     title: "Easy Clear+",
     key: ClearType.Easy,
+    width: "60px",
   },
   {
     title: "Normal Clear+",
     key: ClearType.Normal,
+    width: "60px",
   },
   {
     title: "Hard Clear+",
-    key: ClearType.Hard
+    key: ClearType.Hard,
+    width: "60px",
   },
   {
     title: "EX Hard Clear+",
     key: ClearType.ExHard,
+    width: "60px",
   },
   {
     title: "Full Combo+",
-    key: ClearType.FullCombo
+    key: ClearType.FullCombo,
+    width: "60px",
   },
 ];
 // overviewData is a two-dimensional array

@@ -78,6 +78,12 @@ function createColumns(): DataTableColumns<dto.RivalScoreLogDto> {
       }
     },
     {
+      title: t('column.minbp'), key: "MinBP", minWidth: "100px", resizable: true,
+      render(row: dto.RivalScoreLogDto) {
+        return row.Minbp;
+      }
+    },
+    {
       title: t('column.actions'), key: "actions", resizable: true, minWidth: "150px",
       render(row: dto.RivalScoreLogDto) {
         return h(
@@ -159,6 +165,7 @@ onMounted(() => {
       "tag": "Tag",
       "clear": "Clear",
       "time": "Record Time",
+      "minbp": "Min BP",
       "actions": "Actions"
     },
     "message": {
@@ -180,6 +187,7 @@ onMounted(() => {
       "tag": "标签",
       "clear": "通关状态",
       "time": "记录时间",
+      "minbp": "最小BP",
       "actions": "操作"
     },
     "message": {

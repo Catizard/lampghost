@@ -1,6 +1,10 @@
 <template>
   <n-flex justify="flex-start">
     <n-select v-model:value="currentTableId" :options="tableOptions" style="width: 150px" />
+    <n-radio-group v-model:value="currentLampOrder">
+      <n-radio-button :key='"reverse"' :value='"reverse"' :label="t('radio.reverse')" />
+      <n-radio-button :key='"ordered"' :value='"ordered"' :label="t('radio.ordered')" />
+    </n-radio-group>
   </n-flex>
   <n-data-table :columns="overviewColumns" :data="overviewData" :row-class-name="'test'" />
   <vue-apex-charts :height="chartHeight()" type="bar" :options="lampCountChartOptions"
@@ -24,7 +28,9 @@ const props = defineProps<{
 const { t } = useI18n();
 const notification = useNotification();
 
+// TODO: I need a better solution, err
 const LAMPS = [1, 4, 5, 6, 7, 8, 9, 10, 0];
+const REVERSE_LAMPS = [10, 9, 8, 7, 6, 5, 4, 1, 0];
 const STR_LAMPS = [
   "FAILED",
   "Easy",
@@ -36,7 +42,41 @@ const STR_LAMPS = [
   "MAX",
   "NO_PLAY",
 ];
+const REVERSE_STR_LAMPS = [
+  "MAX",
+  "PERFECT",
+  "FC",
+  "EXH",
+  "Hard",
+  "Normal",
+  "Easy",
+  "FAILED",
+  "NO_PLAY"
+];
+const LAMP_COLOR = [
+  "#CC5C76",
+  "#49E670",
+  "#4FBCF7",
+  "#FF6B74",
+  "#FFAD70",
+  "#FFD251",
+  "#FFD251",
+  "#FFD251",
+  "#FFFFFF",
+];
+const REVERSE_LAMP_COLOR = [
+  "#FFD251",
+  "#FFD251",
+  "#FFD251",
+  "#FFAD70",
+  "#FF6B74",
+  "#4FBCF7",
+  "#49E670",
+  "#CC5C76",
+  "#FFFFFF",
+];
 
+const currentLampOrder: Ref<"reverse" | "ordered"> = ref("reverse")
 const currentTableId: Ref<number | null> = ref(null);
 const currentHeader: Ref<dto.DiffTableHeaderDto | null> = ref(null);
 const tableOptions: Ref<Array<SelectOption>> = ref([]);
@@ -74,15 +114,7 @@ const lampCountChartOptions = reactive({
     stackType: "100%",
   },
   colors: [
-    "#CC5C76",
-    "#49E670",
-    "#4FBCF7",
-    "#FF6B74",
-    "#FFAD70",
-    "#FFD251",
-    "#FFD251",
-    "#FFD251",
-    "#FFFFFF",
+
   ],
   series: [],
   plotOptions: {
@@ -110,24 +142,25 @@ function loadLampData() {
   QueryUserInfoWithLevelLayeredDiffTableLampStatus(
     props.rivalId,
     currentTableId.value,
-  )
-    .then((result) => {
-      if (result.Code != 200) {
-        return Promise.reject(result.Msg);
-      }
-      currentHeader.value = result.Data.DiffTableHeader;
-    })
-    .catch((err) => {
-      notification.error({
-        content: err,
-        duration: 3000,
-        keepAliveOnHover: true,
-      });
+  ).then((result) => {
+    if (result.Code != 200) {
+      return Promise.reject(result.Msg);
+    }
+    currentHeader.value = result.Data.DiffTableHeader;
+  }).catch((err) => {
+    notification.error({
+      content: err,
+      duration: 3000,
+      keepAliveOnHover: true,
     });
+  });
 }
 
 function buildSeries() {
-  lampCountChartOptions.series = STR_LAMPS.map((lampName) => {
+  const lampNames = currentLampOrder.value == "reverse" ? REVERSE_STR_LAMPS : STR_LAMPS;
+  const lampValues = currentLampOrder.value == "reverse" ? REVERSE_LAMPS : LAMPS;
+  lampCountChartOptions.colors = (currentLampOrder.value == "reverse" ? REVERSE_LAMP_COLOR : LAMP_COLOR);
+  lampCountChartOptions.series = lampNames.map((lampName) => {
     return {
       name: lampName,
       data: [],
@@ -140,8 +173,8 @@ function buildSeries() {
     const levelName = header.Symbol + level;
     lampCountChartOptions.xaxis.categories.push(levelName);
     const dataList = header.LevelLayeredContents[level];
-    for (let j = 0; j < LAMPS.length; ++j) {
-      const lampValue = LAMPS[j];
+    for (let j = 0; j < lampValues.length; ++j) {
+      const lampValue = lampValues[j];
       // TODO: wtf
       const count = dataList.filter(
         (data) =>
@@ -241,7 +274,7 @@ watch([currentTableId, () => props.rivalId], ([newTableId, newRivalId]) => {
   loadLampData();
 });
 
-watch(currentHeader, (_) => {
+watch([currentHeader, currentLampOrder], (_) => {
   buildSeries();
   buildOverviewTable();
 });
@@ -251,11 +284,19 @@ watch(currentHeader, (_) => {
   "en": {
     "message": {
       "noTableError": "Cannot handle no difficult table data currenlty, please add at least one table first"
+    },
+    "radio": {
+      "reverse": "Reverse",
+      "ordered": "Ordered"
     }
   },
   "zh-CN": {
     "message": {
       "noTableError": "目前无法处理一个难度表都没有的情况，请至少先添加一个难度表"
+    },
+    "radio": {
+      "reverse": "倒序",
+      "ordered": "正序"
     }
   }
 }</i18n>

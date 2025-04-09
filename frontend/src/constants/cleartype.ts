@@ -10,7 +10,6 @@ export enum ClearType {
   FullCombo,
   Perfect,
   Max,
-  HardPlus,
 }
 
 export class ClearTypeDef {

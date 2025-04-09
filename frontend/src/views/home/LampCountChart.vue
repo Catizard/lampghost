@@ -256,15 +256,18 @@ function buildOverviewTable() {
     + (lampCount[ClearType.LightAssistEasy] ?? 0);
   overviewData.value[0][ClearType.Failed] = `${(100 * failCount / songCount).toFixed(2)}%`;
   overviewData.value[1][ClearType.Failed] = `${failCount}/${songCount}`
-  for (const [k, v] of Object.entries(ClearType).reverse()) {
-    const count = lampCount[k] ?? 0;
+  const reversedClearTypeKeys = Object.keys(ClearType)
+  for (let i = reversedClearTypeKeys.length - 1; i >= 0; --i) {
+    // This is not cool typescript :(
+    const v: any = ClearType[reversedClearTypeKeys[i]];
+    const count = lampCount[v] ?? 0;
     sum += count;
     // We should continue to calculate sum here
     if (v == ClearType.LightAssistEasy || v == ClearType.AssistEasy || v == ClearType.Failed || v == ClearType.NO_PLAY) {
       continue;
     }
-    overviewData.value[0][k] = `${(100 * sum / songCount).toFixed(2)}%`;
-    overviewData.value[1][k] = `${sum}/${songCount}`
+    overviewData.value[0][v] = `${(100 * sum / songCount).toFixed(2)}%`;
+    overviewData.value[1][v] = `${sum}/${songCount}`
   }
   // We cannot have NO_PLAY count directly
   overviewData.value[0][ClearType.NO_PLAY] = `${(100 * (songCount - sum) / songCount).toFixed(2)}%`;

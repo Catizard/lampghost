@@ -55,7 +55,7 @@ func (s *CourseInfoService) FindCourseInfoListWithRival(rivalID uint) ([]*dto.Co
 
 // Insert a list of courses into database
 func addBatchCourseInfo(tx *gorm.DB, courseInfos []*entity.CourseInfo) error {
-	return tx.Create(courseInfos).Error
+	return tx.CreateInBatches(courseInfos, DEFAULT_BATCH_SIZE).Error
 }
 
 func delCourseInfo(tx *gorm.DB, filter *vo.CourseInfoVo) error {

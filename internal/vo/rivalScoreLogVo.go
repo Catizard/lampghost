@@ -38,6 +38,9 @@ type RivalScoreLogVo struct {
 	SongNameLike *string
 	// TODO: cannot be used in `findRivalScoreLogList`
 	Sha256s []string
+	// difftable_data.header_id == headerId
+	// This filter field would generate a left join statement, be aware!
+	HeaderID uint
 }
 
 func (rivalScoreLog *RivalScoreLogVo) Entity() *entity.RivalScoreLog {

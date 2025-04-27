@@ -5,23 +5,25 @@ import (
 )
 
 type DiffTableDataDto struct {
-	ID        uint
-	HeaderID  uint
-	Artist    string
-	Comment   string
-	Level     string
-	Lr2BmsId  string
-	Md5       string
-	NameDiff  string
-	Title     string
-	Url       string
-	UrlDiff   string
-	Sha256    string
-	Lamp      int
-	GhostLamp int
+	ID       uint
+	HeaderID uint
+	Artist   string
+	Comment  string
+	Level    string
+	Lr2BmsId string
+	Md5      string
+	NameDiff string
+	Title    string
+	Url      string
+	UrlDiff  string
+	Sha256   string
 
+	Lamp      int
 	PlayCount int
-	DataLost  bool
+
+	GhostLamp      int
+	GhostPlayCount int
+	DataLost       bool
 }
 
 func NewDiffTableDataDto(data *entity.DiffTableData) *DiffTableDataDto {

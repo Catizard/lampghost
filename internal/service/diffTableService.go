@@ -10,6 +10,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
@@ -401,7 +402,8 @@ func (s *DiffTableService) QueryLevelLayeredDiffTableInfoById(ID uint) (*dto.Dif
 //
 // Requirements:
 //
-//	Level & ID & RivalID should not be empty
+//  1. Level & ID & RivalID should not be empty
+//  2. The rival's data must be queryed with one sql, because these fields are sortable
 func (s *DiffTableService) QueryDiffTableDataWithRival(filter *vo.DiffTableHeaderVo) ([]*dto.DiffTableDataDto, int, error) {
 	if filter.Level == "" {
 		return nil, 0, fmt.Errorf("Level should not be empty")
@@ -412,49 +414,25 @@ func (s *DiffTableService) QueryDiffTableDataWithRival(filter *vo.DiffTableHeade
 	if filter.RivalID <= 0 {
 		return nil, 0, fmt.Errorf("RivalID should > 0")
 	}
-	contents, _, err := findDiffTableDataList(s.db, &vo.DiffTableDataVo{
-		HeaderID:   filter.ID,
-		Level:      filter.Level,
-		Pagination: filter.Pagination,
-		SortBy:     filter.SortBy,
-		SortOrder:  filter.SortOrder,
-	})
-	if err != nil {
-		return nil, 0, err
-	}
-	// NOTE: Here's a small hack to set correct play count in final result
-	// "Play Count" column is setted by calling "mergeRivalRelatedData" method,
-	// therefore if we merge "ghost"'s data first and "main user"'s data second,
-	// "Play Count" column's data is always "main user"'s, not "ghost"'s.
-	if filter.GhostRivalID > 0 {
-		queryGhostScoreLogParam := &vo.RivalScoreLogVo{
-			RivalId: filter.GhostRivalID,
-		}
-		if filter.GhostRivalTagID > 0 {
-			tag, err := findRivalTagByID(s.db, filter.GhostRivalTagID)
-			if err != nil {
-				return nil, 0, err
-			}
-			queryGhostScoreLogParam.EndRecordTime = tag.RecordTime
-		}
-		ghostScoreLogsMap, err := findRivalScoreLogSha256Map(s.db, queryGhostScoreLogParam)
+
+	var endGhostRecordTime time.Time
+	if filter.GhostRivalTagID > 0 {
+		tag, err := findRivalTagByID(s.db, filter.GhostRivalTagID)
 		if err != nil {
 			return nil, 0, err
 		}
-		if err := mergeRivalRelatedData(ghostScoreLogsMap, contents, true); err != nil {
-			return nil, 0, err
-		}
+		endGhostRecordTime = tag.RecordTime
 	}
-	sha256ScoreLogsMap, err := findRivalScoreLogSha256Map(s.db, &vo.RivalScoreLogVo{
-		RivalId: filter.RivalID,
+	return findDiffTableDataListWithRival(s.db, &vo.DiffTableDataVo{
+		HeaderID:           filter.ID,
+		Level:              filter.Level,
+		Pagination:         filter.Pagination,
+		SortBy:             filter.SortBy,
+		SortOrder:          filter.SortOrder,
+		RivalID:            filter.RivalID,
+		GhostRivalID:       filter.GhostRivalID,
+		EndGhostRecordTime: endGhostRecordTime,
 	})
-	if err != nil {
-		return nil, 0, err
-	}
-	if err := mergeRivalRelatedData(sha256ScoreLogsMap, contents, false); err != nil {
-		return nil, 0, err
-	}
-	return contents, len(contents), nil
 }
 
 func (s *DiffTableService) BindDiffTableDataToFolder(diffTableDataID uint, folderIDs []uint) error {

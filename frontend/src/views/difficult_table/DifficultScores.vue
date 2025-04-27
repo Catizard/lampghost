@@ -19,9 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { FindDiffTableHeaderList, FindDiffTableHeaderTree, FindDiffTableHeaderTreeWithRival } from '@wailsjs/go/controller/DiffTableController';
-import { FindRivalInfoList } from '@wailsjs/go/controller/RivalInfoController';
-import { FindRivalTagList } from '@wailsjs/go/controller/RivalTagController';
+import { FindDiffTableHeaderList, FindDiffTableHeaderTreeWithRival, FindRivalInfoList, FindRivalTagList } from '@wailsjs/go/main/App';
 import { dto } from '@wailsjs/go/models';
 import { DataTableColumns, NDataTable, NTooltip, SelectOption, useNotification } from 'naive-ui';
 import { h, Ref, ref, VNode, watch } from 'vue';

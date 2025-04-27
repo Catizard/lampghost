@@ -19,7 +19,7 @@
 
 <script lang="ts" setup>
 import router from '@/router';
-import { AddRivalInfo, DelRivalInfo, QueryRivalInfoPageList, SyncRivalDataByID } from '@wailsjs/go/controller/RivalInfoController';
+import { AddRivalInfo, DelRivalInfo, QueryRivalInfoPageList, SyncRivalDataByID } from '@wailsjs/go/main/App';
 import { dto, entity } from '@wailsjs/go/models';
 import dayjs from 'dayjs';
 import { DataTableColumns, DropdownOption, FormInst, NAnchorLink, NButton, NDropdown, useDialog, useNotification } from 'naive-ui';

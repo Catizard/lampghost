@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts" setup>
-import { AddFolder } from '@wailsjs/go/controller/FolderController';
+import { AddFolder } from '@wailsjs/go/main/App';
 import { FormInst, useNotification } from 'naive-ui';
 import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';

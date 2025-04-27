@@ -69,7 +69,7 @@ import { ref } from 'vue';
 import {
   ChatboxEllipsesOutline as HintIcon,
 } from '@vicons/ionicons5';
-import { ReadConfig, WriteConfig } from '@wailsjs/go/controller/ConfigController';
+import { ReadConfig, WriteConfig } from '@wailsjs/go/main/App';
 import { config } from '../../../wailsjs/go/models';
 import { useI18n } from 'vue-i18n';
 

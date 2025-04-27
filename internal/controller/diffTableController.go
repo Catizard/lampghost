@@ -118,9 +118,9 @@ func (ctl *DiffTableController) QueryDiffTableDataWithRival(filter *vo.DiffTable
 	return result.NewRtnPage(*filter.Pagination, rows)
 }
 
-func (ctl *DiffTableController) QueryLevelLayeredDiffTableInfoById(ID uint) result.RtnData {
+func (ctl *DiffTableController) QueryLevelLayeredDiffTableInfoByID(ID uint) result.RtnData {
 	log.Info("[Controller] calling QueryLevelLayeredDiffTableInfoById")
-	data, err := ctl.diffTableService.QueryLevelLayeredDiffTableInfoById(ID)
+	data, err := ctl.diffTableService.QueryLevelLayeredDiffTableInfoByID(ID)
 	if err != nil {
 		log.Errorf("[DiffTableController] returning err: %v", err)
 		return result.NewErrorData(err)

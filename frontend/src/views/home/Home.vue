@@ -33,7 +33,7 @@
 
 <script setup lang="ts">
 import { computed, reactive, ref } from "vue";
-import { SyncRivalDataByID, QueryMainUser, QueryUserInfoByID } from "@wailsjs/go/controller/RivalInfoController";
+import { SyncRivalDataByID, QueryMainUser, QueryUserInfoByID } from "@wailsjs/go/main/App";
 import { useNotification } from "naive-ui";
 import dayjs from "dayjs";
 import { useI18n } from "vue-i18n";

@@ -109,7 +109,7 @@ func TestLevelSortStrategy(t *testing.T) {
 	require.Nil(t, db.Create(&header).Error)
 	// NOTE: don't put headerDatas in db.Create directory
 	// if do so, the insert sequence is undefined
-	var headerDatas = []entity.DiffTableData{
+	headerDatas := []entity.DiffTableData{
 		{HeaderID: header.ID, Level: "5"},
 		{HeaderID: header.ID, Level: "4"},
 		{HeaderID: header.ID, Level: "3"},
@@ -120,7 +120,7 @@ func TestLevelSortStrategy(t *testing.T) {
 
 	service := NewDiffTableService(db)
 	t.Run("NoOrder-NoFallback", func(t *testing.T) {
-		_, err := service.QueryLevelLayeredDiffTableInfoById(header.ID)
+		_, err := service.QueryLevelLayeredDiffTableInfoByID(header.ID)
 		require.Nil(t, err)
 		// NOTE: don't do this, the sequence is uncertain
 		// assert.Equal(t, []string{"5", "4", "3", "2", "1"}, header_.SortedLevels)
@@ -129,7 +129,7 @@ func TestLevelSortStrategy(t *testing.T) {
 	header.LevelOrders = "5,2,3,4,1"
 	require.Nil(t, db.Save(header).Error)
 	t.Run("HasOrder-NoFallback", func(t *testing.T) {
-		header_, err := service.QueryLevelLayeredDiffTableInfoById(header.ID)
+		header_, err := service.QueryLevelLayeredDiffTableInfoByID(header.ID)
 		require.Nil(t, err)
 		assert.Equal(t, []string{"5", "2", "3", "4", "1"}, header_.SortedLevels)
 	})
@@ -139,7 +139,7 @@ func TestLevelSortStrategy(t *testing.T) {
 	header.EnableFallbackSort = 0
 	require.Nil(t, db.Save(header).Error)
 	t.Run("NoOrder-EnableFallback", func(t *testing.T) {
-		header_, err := service.QueryLevelLayeredDiffTableInfoById(header.ID)
+		header_, err := service.QueryLevelLayeredDiffTableInfoByID(header.ID)
 		require.Nil(t, err)
 		assert.Equal(t, []string{"1", "2", "3", "4", "5"}, header_.SortedLevels)
 	})
@@ -150,7 +150,7 @@ func TestLevelSortStrategy(t *testing.T) {
 	header.EnableFallbackSort = 0
 	require.Nil(t, db.Save(header).Error)
 	t.Run("HasOrder-NoFallback", func(t *testing.T) {
-		header_, err := service.QueryLevelLayeredDiffTableInfoById(header.ID)
+		header_, err := service.QueryLevelLayeredDiffTableInfoByID(header.ID)
 		require.Nil(t, err)
 		assert.Equal(t, []string{"5", "2", "3", "4", "1"}, header_.SortedLevels)
 	})

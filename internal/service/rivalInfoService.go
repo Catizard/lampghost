@@ -16,16 +16,12 @@ import (
 const READONLY_PARAMETER = "?open_mode=1"
 
 type RivalInfoService struct {
-	db               *gorm.DB
-	diffTableService *DiffTableService
-	rivalTagService  *RivalTagService
+	db *gorm.DB
 }
 
-func NewRivalInfoService(db *gorm.DB, diffTableService *DiffTableService, rivalTagService *RivalTagService) *RivalInfoService {
+func NewRivalInfoService(db *gorm.DB) *RivalInfoService {
 	return &RivalInfoService{
-		db:               db,
-		diffTableService: diffTableService,
-		rivalTagService:  rivalTagService,
+		db: db,
 	}
 }
 
@@ -230,7 +226,7 @@ func (s *RivalInfoService) QueryUserInfoWithLevelLayeredDiffTableLampStatus(riva
 	if err != nil {
 		return nil, err
 	}
-	header, err := s.diffTableService.QueryLevelLayeredDiffTableInfoById(headerID)
+	header, err := queryLevelLayeredDiffTableInfoById(s.db, headerID)
 	if err != nil {
 		return nil, err
 	}

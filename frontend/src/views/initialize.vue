@@ -40,10 +40,9 @@
 <script setup>
 import { useNotification } from "naive-ui";
 import { ref, watch, reactive } from "vue";
-import { InitializeMainUser } from "@wailsjs/go/controller/RivalInfoController";
+import { InitializeMainUser, OpenFileDialog } from "@wailsjs/go/main/App";
 import router from "../router";
 import { useI18n } from "vue-i18n";
-import { OpenFileDialog } from "@wailsjs/go/main/App";
 
 
 const { t } = useI18n();

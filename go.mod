@@ -11,7 +11,6 @@ require (
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.10.0
 	github.com/wailsapp/wails/v2 v2.10.1
-	go.uber.org/dig v1.18.0
 	gorm.io/gorm v1.25.12
 )
 
@@ -77,5 +76,3 @@ require (
 	modernc.org/memory v1.5.0 // indirect
 	modernc.org/sqlite v1.23.1 // indirect
 )
-
-// replace github.com/wailsapp/wails/v2 v2.9.1 => /Users/xiangyang/go/pkg/mod

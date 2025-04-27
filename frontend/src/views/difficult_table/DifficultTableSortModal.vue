@@ -11,7 +11,7 @@
 import { nextTick, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { dto } from '@wailsjs/go/models';
-import { FindDiffTableHeaderTree, UpdateHeaderOrder } from '@wailsjs/go/controller/DiffTableController';
+import { FindDiffTableHeaderTree, UpdateHeaderOrder } from '@wailsjs/go/main/App';
 import { NDataTable, useNotification } from 'naive-ui';
 import Sortable from "sortablejs";
 

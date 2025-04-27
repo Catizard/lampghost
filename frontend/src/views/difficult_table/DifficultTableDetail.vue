@@ -8,7 +8,7 @@
 import { DataTableColumns, DataTableSortState, NButton, NIcon, NText, NTooltip, useNotification } from 'naive-ui';
 import { dto } from '@wailsjs/go/models';
 import { h, reactive, ref, Ref, watch } from 'vue';
-import { BindDiffTableDataToFolder, QueryDiffTableDataWithRival } from '@wailsjs/go/controller/DiffTableController';
+import { BindDiffTableDataToFolder, QueryDiffTableDataWithRival } from '@wailsjs/go/main/App';
 import SelectFolder from '@/views/folder/SelectFolder.vue';
 import ClearTag from '@/components/ClearTag.vue';
 import { useI18n } from 'vue-i18n';

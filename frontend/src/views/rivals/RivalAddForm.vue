@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts" setup>
-import { AddRivalInfo } from '@wailsjs/go/controller/RivalInfoController';
+import { AddRivalInfo } from '@wailsjs/go/main/App';
 import { OpenFileDialog } from '@wailsjs/go/main/App';
 import { entity } from '@wailsjs/go/models';
 import { FormInst, useNotification } from 'naive-ui';

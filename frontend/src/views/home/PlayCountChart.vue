@@ -5,7 +5,7 @@
 
 <script setup lang="ts">
 import VueApexCharts from "vue3-apexcharts";
-import { QueryRivalPlayedYears, QueryUserPlayCountInYear } from "@wailsjs/go/controller/RivalInfoController";
+import { QueryRivalPlayedYears, QueryUserPlayCountInYear } from "@wailsjs/go/main/App";
 import { SelectOption, useNotification } from "naive-ui";
 import { reactive, Ref, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";

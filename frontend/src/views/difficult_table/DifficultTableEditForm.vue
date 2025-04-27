@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { QueryDiffTableInfoById, UpdateDiffTableHeader } from '@wailsjs/go/controller/DiffTableController';
+import { QueryDiffTableInfoById, UpdateDiffTableHeader } from '@wailsjs/go/main/App';
 import { dto, vo } from '@wailsjs/go/models';
 import { FormInst, SelectOption, useNotification } from 'naive-ui';
 import { onMounted, ref, watch } from 'vue';

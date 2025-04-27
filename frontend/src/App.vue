@@ -1,5 +1,5 @@
 <script setup>
-import { ReadConfig } from '@wailsjs/go/controller/ConfigController';
+import { ReadConfig } from '@wailsjs/go/main/App';
 import { Provider, Viewer } from './components';
 import { useI18n } from 'vue-i18n';
 import { ref } from 'vue';

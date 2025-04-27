@@ -27,8 +27,8 @@
 </template>
 
 <script setup lang="ts">
-import { FindRivalInfoList } from '@wailsjs/go/controller/RivalInfoController';
-import { AddRivalTag, DeleteRivalTagByID, QueryRivalTagPageList, RevertRivalTagEnabledState } from '@wailsjs/go/controller/RivalTagController';
+import { FindRivalInfoList } from '@wailsjs/go/main/App';
+import { AddRivalTag, DeleteRivalTagByID, QueryRivalTagPageList, RevertRivalTagEnabledState } from '@wailsjs/go/main/App';
 import { dto } from '@wailsjs/go/models';
 import { DataTableColumns, FormInst, FormRules, NButton, SelectOption, useDialog, useNotification } from 'naive-ui';
 import { h, reactive, Ref, ref, watch } from 'vue';

@@ -27,7 +27,7 @@ import { h, Ref, ref } from "vue";
 import {
   DelDiffTableHeader,
   FindDiffTableHeaderTree
-} from "@wailsjs/go/controller/DiffTableController";
+} from "@wailsjs/go/main/App";
 import { dto } from "@wailsjs/go/models";
 import { useI18n } from "vue-i18n";
 import DifficultTableAddForm from "./DifficultTableAddForm.vue";

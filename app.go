@@ -2,25 +2,84 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"log"
 
+	"github.com/Catizard/lampghost_wails/internal/config"
+	"github.com/Catizard/lampghost_wails/internal/controller"
+	"github.com/Catizard/lampghost_wails/internal/database"
 	"github.com/Catizard/lampghost_wails/internal/result"
+	"github.com/Catizard/lampghost_wails/internal/server"
+	"github.com/Catizard/lampghost_wails/internal/service"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 // App struct
 type App struct {
 	ctx context.Context
+	*controller.ConfigController
+	*controller.RivalInfoController
+	*controller.RivalTagController
+	*controller.RivalScoreLogController
+	*controller.RivalSongDataController
+	*controller.DiffTableController
+	*controller.CourseInfoController
+	*controller.FolderController
+	*server.InternalServer
 }
 
 // NewApp creates a new App application struct
 func NewApp() *App {
-	return &App{}
+	dbConfig := config.NewDatabaseConfig()
+	db, err := database.NewDatabase(dbConfig)
+	if err != nil {
+		log.Fatalf("initialize database: %s", err)
+	}
+
+	// config module
+	configService := service.NewConfigService(db)
+	configController := controller.NewConfigController(configService)
+
+	// rival module
+	rivalInfoService := service.NewRivalInfoService(db)
+	rivalTagService := service.NewRivalTagService(db)
+	rivalScoreLogService := service.NewRivalScoreLogService(db)
+	rivalSongDataService := service.NewRivalSongDataService(db)
+	rivalInfoController := controller.NewRivalInfoController(rivalInfoService)
+	rivalTagController := controller.NewRivalTagController(rivalTagService)
+	rivalScoreLogController := controller.NewRivalScoreLogController(rivalScoreLogService)
+	rivalSongDataController := controller.NewRivalSongDataController(rivalSongDataService)
+
+	// difficult table module
+	diffTableService := service.NewDiffTableService(db)
+	diffTableController := controller.NewDiffTableController(diffTableService)
+	courseInfoService := service.NewCourseInfoSerivce(db)
+	courseInfoController := controller.NewCourseInfoController(courseInfoService)
+
+	// folder module
+	folderService := service.NewFolderService(db)
+	folderController := controller.NewFolderController(folderService)
+	folderInternalServer := server.NewInternalServer(folderService)
+
+	return &App{
+		nil,
+		configController,
+		rivalInfoController,
+		rivalTagController,
+		rivalScoreLogController,
+		rivalSongDataController,
+		diffTableController,
+		courseInfoController,
+		folderController,
+		folderInternalServer,
+	}
 }
 
 // startup is called at application startup
 func (a *App) startup(ctx context.Context) {
-	// Perform your setup here
+	// Start internal server
+	if err := a.RunServer(); err != nil {
+		log.Fatalf("cannot start internal server: %s", err)
+	}
 	a.ctx = ctx
 }
 
@@ -39,11 +98,6 @@ func (a *App) beforeClose(ctx context.Context) (prevent bool) {
 // shutdown is called at application termination
 func (a *App) shutdown(ctx context.Context) {
 	// Perform your teardown here
-}
-
-// Greet returns a greeting for the given name
-func (a *App) Greet(name string) string {
-	return fmt.Sprintf("Hello %s, It's show time!", name)
 }
 
 func (a *App) OpenFileDialog(title string) result.RtnData {

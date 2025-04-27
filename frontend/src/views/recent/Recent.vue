@@ -19,11 +19,11 @@
 
 <script lang="ts" setup>
 import ClearTag from '@/components/ClearTag.vue';
-import { QueryRivalScoreLogPageList } from '@wailsjs/go/controller/RivalScoreLogController';
+import { QueryRivalScoreLogPageList } from '@wailsjs/go/main/App';
 import { DataTableColumns, DataTableRowKey, NButton, useNotification } from 'naive-ui';
 import { h, onMounted, reactive, Ref, ref } from 'vue';
 import SelectFolder from '../folder/SelectFolder.vue';
-import { BindRivalSongDataToFolder } from '@wailsjs/go/controller/RivalSongDataController';
+import { BindRivalSongDataToFolder } from '@wailsjs/go/main/App';
 import { dto, vo } from '@wailsjs/go/models';
 import { useI18n } from 'vue-i18n';
 import dayjs from 'dayjs';

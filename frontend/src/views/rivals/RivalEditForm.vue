@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts" setup>
-import { QueryUserInfoByID, UpdateRivalInfo } from '@wailsjs/go/controller/RivalInfoController';
+import { QueryUserInfoByID, UpdateRivalInfo } from '@wailsjs/go/main/App';
 import { OpenFileDialog } from '@wailsjs/go/main/App';
 import { dto } from '@wailsjs/go/models';
 import { FormInst, useNotification } from 'naive-ui';

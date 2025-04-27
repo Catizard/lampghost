@@ -13,8 +13,8 @@
 
 <script setup lang="ts">
 import { ClearType } from "@/constants/cleartype";
-import { FindDiffTableHeaderList } from "@wailsjs/go/controller/DiffTableController";
-import { QueryUserInfoWithLevelLayeredDiffTableLampStatus } from "@wailsjs/go/controller/RivalInfoController";
+import { FindDiffTableHeaderList } from "@wailsjs/go/main/App";
+import { QueryUserInfoWithLevelLayeredDiffTableLampStatus } from "@wailsjs/go/main/App";
 import { dto } from "@wailsjs/go/models";
 import { DataTableColumns, SelectOption, useNotification } from "naive-ui";
 import { computed, reactive, ref, Ref, watch } from "vue";

@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { AddDiffTableHeader } from '@wailsjs/go/controller/DiffTableController';
+import { AddDiffTableHeader } from '@wailsjs/go/main/App';
 import { FormInst, useNotification } from 'naive-ui';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';

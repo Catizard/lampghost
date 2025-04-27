@@ -16,7 +16,7 @@
 <script setup lang="ts">
 import { ref, watch, watchEffect } from 'vue';
 import { dto } from '@wailsjs/go/models';
-import { FindFolderList } from '@wailsjs/go/controller/FolderController';
+import { FindFolderList } from '@wailsjs/go/main/App';
 import { DataTableColumns, DataTableRowKey, useNotification } from 'naive-ui';
 import { useI18n } from 'vue-i18n';
 import FolderAddForm from './FolderAddForm.vue';

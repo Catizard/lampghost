@@ -11,7 +11,7 @@
 import { DataTableColumns, useNotification } from 'naive-ui';
 import { dto } from '@wailsjs/go/models';
 import { ref, h } from 'vue';
-import { FindCourseInfoListWithRival } from '@wailsjs/go/controller/CourseInfoController';
+import { FindCourseInfoListWithRival } from '@wailsjs/go/main/App';
 import ClearTag from "@/components/ClearTag.vue"
 import dayjs from 'dayjs'
 import { useI18n } from 'vue-i18n';

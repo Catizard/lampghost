@@ -29,7 +29,7 @@ import {
 	DelFolder,
 	DelFolderContent,
 	FindFolderTree,
-} from "@wailsjs/go/controller/FolderController";
+} from "@wailsjs/go/main/App";
 import { useI18n } from "vue-i18n";
 import FolderAddForm from "./FolderAddForm.vue";
 import ClearTag from "@/components/ClearTag.vue";

@@ -339,15 +339,7 @@ func (s *DiffTableService) DelDiffTableHeader(ID uint) error {
 //
 // Returns one header with detailed contents, ensure every content's hash field is compitable
 func (s *DiffTableService) QueryDiffTableInfoByID(ID uint) (*dto.DiffTableHeaderDto, error) {
-	header, err := queryDiffTableInfoByID(s.db, ID)
-	if err != nil {
-		return nil, err
-	}
-	contents, _, err := findDiffTableDataList(s.db, &vo.DiffTableDataVo{HeaderID: ID})
-	if err != nil {
-		return nil, err
-	}
-	return dto.NewDiffTableHeaderDto(header, contents), nil
+	return queryDiffTableInfoByID(s.db, ID)
 }
 
 // Extend function for QueryDiffTableInfoByID
@@ -366,35 +358,8 @@ func (s *DiffTableService) QueryDiffTableInfoByIDWithRival(ID uint, rivalID uint
 	return header, nil
 }
 
-func (s *DiffTableService) QueryLevelLayeredDiffTableInfoById(ID uint) (*dto.DiffTableHeaderDto, error) {
-	header, err := s.QueryDiffTableInfoByID(ID)
-	if err != nil {
-		return nil, err
-	}
-	levels := make(map[string]any)
-	levelLayeredContent := make(map[string][]*dto.DiffTableDataDto)
-	for _, v := range header.Contents {
-		if _, ok := levelLayeredContent[v.Level]; !ok {
-			levelLayeredContent[v.Level] = make([]*dto.DiffTableDataDto, 0)
-		}
-		if _, ok := levels[v.Level]; !ok {
-			levels[v.Level] = new(any)
-		}
-		levelLayeredContent[v.Level] = append(levelLayeredContent[v.Level], v)
-	}
-
-	sortedLevels := make([]string, 0)
-	for level := range levels {
-		sortedLevels = append(sortedLevels, level)
-	}
-	// Skip sort if no order is pre-defined and the header is not configured to use the fallback sort strategy
-	if header.LevelOrders == "" && header.EnableFallbackSort != 0 {
-		// do nothing...
-		log.Debugf("[DiffTableService] no pre-defined orders & fallback is unset, skipping sort")
-	} else {
-		sortedLevels = sortLevels(sortedLevels, header.UnjoinedLevelOrder)
-	}
-	return dto.NewLevelLayeredDiffTableHeaderDto(header.Entity(), sortedLevels, levelLayeredContent), nil
+func (s *DiffTableService) QueryLevelLayeredDiffTableInfoByID(ID uint) (*dto.DiffTableHeaderDto, error) {
+	return queryLevelLayeredDiffTableInfoById(s.db, ID)
 }
 
 // Query specific difficult table's one level data contents with player related field (e.g PlayCount, Lamp status...)
@@ -511,6 +476,37 @@ func queryDiffTableHeaderExistence(tx *gorm.DB, filter *entity.DiffTableHeader) 
 	return dupCount > 0, nil
 }
 
+func queryLevelLayeredDiffTableInfoById(tx *gorm.DB, ID uint) (*dto.DiffTableHeaderDto, error) {
+	header, err := queryDiffTableInfoByID(tx, ID)
+	if err != nil {
+		return nil, err
+	}
+	levels := make(map[string]any)
+	levelLayeredContent := make(map[string][]*dto.DiffTableDataDto)
+	for _, v := range header.Contents {
+		if _, ok := levelLayeredContent[v.Level]; !ok {
+			levelLayeredContent[v.Level] = make([]*dto.DiffTableDataDto, 0)
+		}
+		if _, ok := levels[v.Level]; !ok {
+			levels[v.Level] = new(any)
+		}
+		levelLayeredContent[v.Level] = append(levelLayeredContent[v.Level], v)
+	}
+
+	sortedLevels := make([]string, 0)
+	for level := range levels {
+		sortedLevels = append(sortedLevels, level)
+	}
+	// Skip sort if no order is pre-defined and the header is not configured to use the fallback sort strategy
+	if header.LevelOrders == "" && header.EnableFallbackSort != 0 {
+		// do nothing...
+		log.Debugf("[DiffTableService] no pre-defined orders & fallback is unset, skipping sort")
+	} else {
+		sortedLevels = sortLevels(sortedLevels, header.UnjoinedLevelOrder)
+	}
+	return dto.NewLevelLayeredDiffTableHeaderDto(header.Entity(), sortedLevels, levelLayeredContent), nil
+}
+
 func fetchDiffTableFromURL(url string) (*vo.DiffTableHeaderVo, error) {
 	jsonUrl := ""
 	splitUrl := strings.Split(url, "/")
@@ -581,12 +577,19 @@ func fetchDiffTableFromURL(url string) (*vo.DiffTableHeaderVo, error) {
 	return &dth, nil
 }
 
-func queryDiffTableInfoByID(tx *gorm.DB, ID uint) (*entity.DiffTableHeader, error) {
+// Query one difficult table header and its related contents by header's ID
+//
+// Related contents would be attached on `Contents` field
+func queryDiffTableInfoByID(tx *gorm.DB, ID uint) (*dto.DiffTableHeaderDto, error) {
 	var header entity.DiffTableHeader
 	if err := tx.First(&header, ID).Error; err != nil {
 		return nil, err
 	}
-	return &header, nil
+	contents, _, err := findDiffTableDataList(tx, &vo.DiffTableDataVo{HeaderID: ID})
+	if err != nil {
+		return nil, err
+	}
+	return dto.NewDiffTableHeaderDto(&header, contents), nil
 }
 
 // Merge player related data onto DiffTableDataDto (e.g PlayCount LampStatus...)

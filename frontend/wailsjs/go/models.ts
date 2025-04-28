@@ -92,8 +92,9 @@ export namespace dto {
 	    UrlDiff: string;
 	    Sha256: string;
 	    Lamp: number;
-	    GhostLamp: number;
 	    PlayCount: number;
+	    GhostLamp: number;
+	    GhostPlayCount: number;
 	    DataLost: boolean;
 	
 	    static createFrom(source: any = {}) {
@@ -115,8 +116,9 @@ export namespace dto {
 	        this.UrlDiff = source["UrlDiff"];
 	        this.Sha256 = source["Sha256"];
 	        this.Lamp = source["Lamp"];
-	        this.GhostLamp = source["GhostLamp"];
 	        this.PlayCount = source["PlayCount"];
+	        this.GhostLamp = source["GhostLamp"];
+	        this.GhostPlayCount = source["GhostPlayCount"];
 	        this.DataLost = source["DataLost"];
 	    }
 	}
@@ -1274,6 +1276,7 @@ export namespace vo {
 	    SpecifyYear?: string;
 	    SongNameLike?: string;
 	    Sha256s: string[];
+	    HeaderID: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new RivalScoreLogVo(source);
@@ -1307,6 +1310,7 @@ export namespace vo {
 	        this.SpecifyYear = source["SpecifyYear"];
 	        this.SongNameLike = source["SongNameLike"];
 	        this.Sha256s = source["Sha256s"];
+	        this.HeaderID = source["HeaderID"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

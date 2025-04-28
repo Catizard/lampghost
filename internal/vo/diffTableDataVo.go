@@ -1,6 +1,8 @@
 package vo
 
 import (
+	"time"
+
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/charmbracelet/log"
 	"gorm.io/gorm"
@@ -27,6 +29,11 @@ type DiffTableDataVo struct {
 	// Extra filter fields
 	IDs       []uint
 	HeaderIDs []uint
+
+	RivalID      uint
+	GhostRivalID uint
+	// See diffTableDataService#findDiffTableDataListWithRival for usage
+	EndGhostRecordTime time.Time
 }
 
 func (data *DiffTableDataVo) Entity() *entity.DiffTableData {

@@ -49,20 +49,16 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
 	{ title: t('column.artist'), key: "Artist", ellipsis: { tooltip: true }, sorter: true, },
 	{ title: t('column.count'), key: "PlayCount", width: "100px" },
 	{
-		title: t('column.clear'), key: "Lamp", width: "100px", resizable: true,
+		title: t('column.clear'), key: "Lamp", width: "100px", resizable: true, sorter: true,
 		render(row: dto.DiffTableDataDto) {
 			return h(ClearTag, { clear: row.Lamp },)
 		}
 	},
 	{
-		title: t('column.ghost'), key: "GhostLamp", width: "100px", resizable: true,
+		// TODO: Change sorter from false to true when user choosed ghost rival
+		title: t('column.ghost'), key: "GhostLamp", width: "100px", resizable: true, sorter: true,
 		render(row: dto.DiffTableDataDto) {
-			return h(
-				ClearTag,
-				{
-					clear: row.GhostLamp,
-				},
-			)
+			return h(ClearTag, { clear: row.GhostLamp, },)
 		}
 	},
 	{

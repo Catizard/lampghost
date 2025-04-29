@@ -2,13 +2,12 @@
   <n-flex justify="flex-start">
     <n-select v-model:value="currentTableId" :options="tableOptions" style="width: 150px" />
     <n-radio-group v-model:value="currentLampOrder">
-      <n-radio-button :key='"reverse"' :value='"reverse"' :label="t('radio.reverse')" />
-      <n-radio-button :key='"ordered"' :value='"ordered"' :label="t('radio.ordered')" />
+      <n-radio-button :key="'reverse'" :value="'reverse'" :label="t('radio.reverse')" />
+      <n-radio-button :key="'ordered'" :value="'ordered'" :label="t('radio.ordered')" />
     </n-radio-group>
   </n-flex>
   <n-data-table :columns="overviewColumns" :data="overviewData" :row-class-name="'test'" />
-  <vue-apex-charts :height="chartHeight()" type="bar" :options="lampCountChartOptions"
-    :series="lampCountChartOptions.series" />
+  <vue-apex-charts :height="chartHeight()" type="bar" :options="lampCountChartOptions" :series="lampCountChartSeries" />
 </template>
 
 <script setup lang="ts">
@@ -28,7 +27,7 @@ const props = defineProps<{
 const { t } = useI18n();
 const notification = useNotification();
 
-// TODO: I need a better solution, err
+// TODO: I need a better solution, eh
 const LAMPS = [1, 4, 5, 6, 7, 8, 9, 10, 0];
 const REVERSE_LAMPS = [10, 9, 8, 7, 6, 5, 4, 1, 0];
 const STR_LAMPS = [
@@ -51,7 +50,7 @@ const REVERSE_STR_LAMPS = [
   "Normal",
   "Easy",
   "FAILED",
-  "NO_PLAY"
+  "NO_PLAY",
 ];
 const LAMP_COLOR = [
   "#CC5C76",
@@ -76,7 +75,7 @@ const REVERSE_LAMP_COLOR = [
   "#FFFFFF",
 ];
 
-const currentLampOrder: Ref<"reverse" | "ordered"> = ref("reverse")
+const currentLampOrder: Ref<"reverse" | "ordered"> = ref("reverse");
 const currentTableId: Ref<number | null> = ref(null);
 const currentHeader: Ref<dto.DiffTableHeaderDto | null> = ref(null);
 const tableOptions: Ref<Array<SelectOption>> = ref([]);
@@ -107,60 +106,66 @@ function loadTableData() {
 }
 loadTableData();
 
-const lampCountChartOptions = reactive({
-  chart: {
-    type: "bar",
-    stacked: true,
-    stackType: "100%",
-  },
-  colors: [
-
-  ],
-  series: [],
-  plotOptions: {
-    bar: {
-      horizontal: true,
-      columnHeight: "100%",
+// NOTE: ApexCharts Vue doesn't give any responses if we changed lampCountChartOptions.colors
+// The only way to correctly reassign the colors is by rebuilding whole lampCountChartOptions
+// I believe this is a ApexCharts Vue bug or design failure
+let lampCountChartOptions = reactive(buildLampCountChartOptions("reverse"));
+function buildLampCountChartOptions(order: "reverse" | "ordered") {
+  return {
+    chart: {
+      type: "bar",
+      stacked: true,
+      stackType: "100%",
     },
-  },
-  xaxis: {
-    categories: [],
-  },
-  fill: {
-    opacity: 1,
-  },
-  legend: {
-    position: "top",
-    horizontalAlign: "left",
-    offsetX: 40,
-  },
-  dataLabels: {
-    enabled: true,
-  },
-});
+    colors: order == "reverse" ? REVERSE_LAMP_COLOR : LAMP_COLOR,
+    plotOptions: {
+      bar: {
+        horizontal: true,
+        columnHeight: "100%",
+      },
+    },
+    xaxis: {
+      categories: [],
+    },
+    fill: {
+      opacity: 1,
+    },
+    legend: {
+      position: "top",
+      horizontalAlign: "left",
+      offsetX: 40,
+    },
+    dataLabels: {
+      enabled: true,
+    },
+  };
+}
+let lampCountChartSeries = [];
 function loadLampData() {
   QueryUserInfoWithLevelLayeredDiffTableLampStatus(
     props.rivalId,
     currentTableId.value,
-  ).then((result) => {
-    if (result.Code != 200) {
-      return Promise.reject(result.Msg);
-    }
-    currentHeader.value = result.Data.DiffTableHeader;
-  }).catch((err) => {
-    notification.error({
-      content: err,
-      duration: 3000,
-      keepAliveOnHover: true,
+  )
+    .then((result) => {
+      if (result.Code != 200) {
+        return Promise.reject(result.Msg);
+      }
+      currentHeader.value = result.Data.DiffTableHeader;
+    })
+    .catch((err) => {
+      notification.error({
+        content: err,
+        duration: 3000,
+        keepAliveOnHover: true,
+      });
     });
-  });
 }
 
 function buildSeries() {
   const lampNames = currentLampOrder.value == "reverse" ? REVERSE_STR_LAMPS : STR_LAMPS;
   const lampValues = currentLampOrder.value == "reverse" ? REVERSE_LAMPS : LAMPS;
-  lampCountChartOptions.colors = (currentLampOrder.value == "reverse" ? REVERSE_LAMP_COLOR : LAMP_COLOR);
-  lampCountChartOptions.series = lampNames.map((lampName) => {
+  lampCountChartOptions = buildLampCountChartOptions(currentLampOrder.value);
+  lampCountChartSeries = lampNames.map((lampName) => {
     return {
       name: lampName,
       data: [],
@@ -191,7 +196,7 @@ function buildSeries() {
         v.fillColor = "#FFFFFF";
         v.strokeColor = "#FFFFFF";
       }
-      lampCountChartOptions.series[j].data.push(v);
+      lampCountChartSeries[j].data.push(v);
     }
   }
 }
@@ -251,27 +256,35 @@ function buildOverviewTable() {
   overviewData.value = [{}, {}];
   // TODO: currently, Assist/Light Assist would be calculated as fail
   // Some of the ClearType has special calculate way, I haven't found a good way to write this code
-  const failCount = (lampCount[ClearType.Failed] ?? 0)
-    + (lampCount[ClearType.AssistEasy] ?? 0)
-    + (lampCount[ClearType.LightAssistEasy] ?? 0);
-  overviewData.value[0][ClearType.Failed] = `${(100 * failCount / songCount).toFixed(2)}%`;
-  overviewData.value[1][ClearType.Failed] = `${failCount}/${songCount}`
-  const reversedClearTypeKeys = Object.keys(ClearType)
+  const failCount =
+    (lampCount[ClearType.Failed] ?? 0) +
+    (lampCount[ClearType.AssistEasy] ?? 0) +
+    (lampCount[ClearType.LightAssistEasy] ?? 0);
+  overviewData.value[0][ClearType.Failed] =
+    `${((100 * failCount) / songCount).toFixed(2)}%`;
+  overviewData.value[1][ClearType.Failed] = `${failCount}/${songCount}`;
+  const reversedClearTypeKeys = Object.keys(ClearType);
   for (let i = reversedClearTypeKeys.length - 1; i >= 0; --i) {
     // This is not cool typescript :(
     const v: any = ClearType[reversedClearTypeKeys[i]];
     const count = lampCount[v] ?? 0;
     sum += count;
     // We should continue to calculate sum here
-    if (v == ClearType.LightAssistEasy || v == ClearType.AssistEasy || v == ClearType.Failed || v == ClearType.NO_PLAY) {
+    if (
+      v == ClearType.LightAssistEasy ||
+      v == ClearType.AssistEasy ||
+      v == ClearType.Failed ||
+      v == ClearType.NO_PLAY
+    ) {
       continue;
     }
-    overviewData.value[0][v] = `${(100 * sum / songCount).toFixed(2)}%`;
-    overviewData.value[1][v] = `${sum}/${songCount}`
+    overviewData.value[0][v] = `${((100 * sum) / songCount).toFixed(2)}%`;
+    overviewData.value[1][v] = `${sum}/${songCount}`;
   }
   // We cannot have NO_PLAY count directly
-  overviewData.value[0][ClearType.NO_PLAY] = `${(100 * (songCount - sum) / songCount).toFixed(2)}%`;
-  overviewData.value[1][ClearType.NO_PLAY] = `${songCount - sum}/${songCount}`
+  overviewData.value[0][ClearType.NO_PLAY] =
+    `${((100 * (songCount - sum)) / songCount).toFixed(2)}%`;
+  overviewData.value[1][ClearType.NO_PLAY] = `${songCount - sum}/${songCount}`;
 }
 
 watch([currentTableId, () => props.rivalId], ([newTableId, newRivalId]) => {

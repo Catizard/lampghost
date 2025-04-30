@@ -17,6 +17,7 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/vo"
 	"github.com/charmbracelet/log"
 	"github.com/rotisserie/eris"
+	. "github.com/samber/lo"
 	"gorm.io/gorm"
 )
 
@@ -115,38 +116,31 @@ func (s *DiffTableService) UpdateDiffTableHeader(param *vo.DiffTableHeaderVo) er
 // Query all difficult table datas
 //
 // Returns difficult header and its contents
-func (s *DiffTableService) FindDiffTableHeaderList(filter *vo.DiffTableHeaderVo) ([]dto.DiffTableHeaderDto, int, error) {
+func (s *DiffTableService) FindDiffTableHeaderList(filter *vo.DiffTableHeaderVo) ([]*dto.DiffTableHeaderDto, int, error) {
 	headers, _, err := findDiffTableHeaderList(s.db, filter)
 	if err != nil {
 		return nil, 0, err
 	}
-	headerIds := make([]uint, len(headers))
-	for i, header := range headers {
-		headerIds[i] = header.ID
-	}
+	headerIds := Map(headers, func(item *entity.DiffTableHeader, index int) uint {
+		return item.ID
+	})
 	contents, _, err := findDiffTableDataList(s.db, &vo.DiffTableDataVo{HeaderIDs: headerIds})
 	if err != nil {
 		return nil, 0, err
 	}
 
-	ret := make([]dto.DiffTableHeaderDto, len(headers))
-	for i, header := range headers {
-		sc := make([]*dto.DiffTableDataDto, 0)
-		for _, content := range contents {
-			if content.HeaderID == header.ID {
-				sc = append(sc, content)
-			}
-		}
-		ret[i] = *dto.NewDiffTableHeaderDto(header, sc)
-	}
-
+	ret := Map(headers, func(header *entity.DiffTableHeader, _ int) *dto.DiffTableHeaderDto {
+		return dto.NewDiffTableHeaderDto(header, Filter(contents, func(content *dto.DiffTableDataDto, _ int) bool {
+			return content.HeaderID == header.ID
+		}))
+	})
 	return ret, len(ret), nil
 }
 
 // Extend function for FindDiffTableHeaderList
 //
 // Adds player related field (e.g PlayCount, Lamp status)
-func (s *DiffTableService) FindDiffTableHeaderListWithRival(rivalID uint) ([]dto.DiffTableHeaderDto, int, error) {
+func (s *DiffTableService) FindDiffTableHeaderListWithRival(rivalID uint) ([]*dto.DiffTableHeaderDto, int, error) {
 	headers, _, err := s.FindDiffTableHeaderList(nil)
 	if err != nil {
 		return nil, 0, err
@@ -367,7 +361,7 @@ func (s *DiffTableService) QueryLevelLayeredDiffTableInfoByID(ID uint) (*dto.Dif
 //  2. The rival's data must be queryed with one sql, because these fields are sortable
 func (s *DiffTableService) QueryDiffTableDataWithRival(filter *vo.DiffTableHeaderVo) ([]*dto.DiffTableDataDto, int, error) {
 	if filter.Level == "" {
-		return nil, 0, fmt.Errorf("Level should not be empty")
+		return nil, 0, eris.Errorf("Level should not be empty")
 	}
 	if filter.ID <= 0 {
 		return nil, 0, fmt.Errorf("ID should > 0")
@@ -578,7 +572,7 @@ func queryDiffTableInfoByID(tx *gorm.DB, ID uint) (*dto.DiffTableHeaderDto, erro
 
 // Merge player related data onto DiffTableDataDto (e.g PlayCount LampStatus...)
 // TODO: We can actaully combine "query rival's related data" and "merge rival's data with DiffTableDataDto" two steps together
-// The impede is mainly FindDiffTableHeaderListWithRival function, which requires redesign the data loading sequence
+// The obstacle is mainly FindDiffTableHeaderListWithRival function, which requires redesign the data loading sequence
 //
 // This function would modify data in place rather than return a new array
 func mergeRivalRelatedData(sha256ScoreLogsMap map[string][]*dto.RivalScoreLogDto, contents []*dto.DiffTableDataDto, isGhostRival bool) error {
@@ -721,20 +715,25 @@ func levelComparator(lhs string, rhs string, preSortLevels []string) int {
 	return inxL - inxR
 }
 
-func fetchJson(url string, v interface{}) error {
+// Simple wrapper function for:
+//  1. Fetch a json from url
+//  2. Handle pitfalls
+//  3. Unmarshall the json into v
+func fetchJson(url string, v any) error {
 	log.Debugf("Fetching json from url: %s", url)
 	resp, err := http.Get(url)
 	if err != nil {
-		return err
+		return eris.Errorf("cannot get json from %s", url)
 	}
 	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return eris.New("failed to read body")
+	}
 	// Hack \ufeff out, specially for PMS table
 	body = bytes.ReplaceAll(body, []byte("\ufeff"), []byte(""))
-	if err != nil {
-		return err
-	}
+
 	if err := json.Unmarshal(body, v); err != nil {
-		return err
+		return eris.Wrap(err, "failed to unmarshal")
 	}
 	return nil
 }

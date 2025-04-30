@@ -6,69 +6,76 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/vo"
+	"github.com/rotisserie/eris"
 	"gorm.io/gorm"
+
+	. "github.com/samber/lo"
 )
 
-func findDiffTableDataByID(tx *gorm.DB, ID uint) (*entity.DiffTableData, error) {
+// Basic query function for diff_table_data table
+//
+// Difficult table's data might be lack of sha256 or md5. Therefore, we need to
+// do repairment manually. This is why this function returns Dto instead of Entity.
+func findDiffTableDataByID(tx *gorm.DB, ID uint) (*dto.DiffTableDataDto, error) {
 	var data *entity.DiffTableData
 	if err := tx.Find(&data, ID).Error; err != nil {
-		return nil, err
+		return nil, eris.Wrap(err, "failed to find diff_table_data by id")
 	}
-	if err := fixDiffTableDataHashField(tx, data); err != nil {
-		return nil, err
+	defaultCache, err := queryDefaultSongHashCache(tx)
+	if err != nil {
+		return nil, eris.Wrap(err, "failed to query default cache")
 	}
-	return data, nil
+	return dto.NewDiffTableDataDtoWithCache(data, defaultCache), nil
 }
 
-func findDiffTableDataList(tx *gorm.DB, filter *vo.DiffTableDataVo) ([]*dto.DiffTableDataDto, int, error) {
-	if filter == nil {
-		var contents []*entity.DiffTableData
-		if err := tx.Find(&contents).Error; err != nil {
-			return nil, 0, err
-		}
-
-		ret := make([]*dto.DiffTableDataDto, len(contents))
-		defaultCache, err := queryDefaultSongHashCache(tx)
-		if err != nil {
-			return nil, 0, err
-		}
-		for i := range contents {
-			ret[i] = dto.NewDiffTableDataDtoWithCache(contents[i], defaultCache)
-		}
-		return ret, len(ret), nil
+// Basic count query function for diff_table_data table
+func selectDiffTableDataCount(tx *gorm.DB, filter *vo.DiffTableDataVo) (int64, error) {
+	partial := tx.Model(&entity.DiffTableData{})
+	if filter != nil {
+		partial = partial.Where(filter.Entity())
 	}
+	var count int64
+	if err := partial.Count(&count).Error; err != nil {
+		return 0, eris.Wrap(err, "failed to query")
+	}
+	return count, nil
+}
 
+// Basic query function for diff_table_data table
+func findDiffTableDataList(tx *gorm.DB, filter *vo.DiffTableDataVo) ([]*dto.DiffTableDataDto, int, error) {
 	var contents []*entity.DiffTableData
-	partial := tx.Where(filter.Entity()).Scopes(
-		scopeInIDs(filter.IDs),
-		scopeInHeaderIDs(filter.HeaderIDs),
-		pagination(filter.Pagination),
-	)
+	partial := tx.Model(&entity.DiffTableData{})
+	if filter != nil {
+		partial = tx.Where(filter.Entity()).Scopes(
+			scopeInIDs(filter.IDs),
+			scopeInHeaderIDs(filter.HeaderIDs),
+			pagination(filter.Pagination),
+		)
 
-	if filter.SortOrder != nil && *filter.SortOrder != "" {
-		partial.Order(fmt.Sprintf("%s %s", *filter.SortBy, filter.GetOrder()))
+		if filter.SortOrder != nil && *filter.SortOrder != "" {
+			partial.Order(fmt.Sprintf("%s %s", *filter.SortBy, filter.GetOrder()))
+		}
 	}
 
 	if err := partial.Debug().Find(&contents).Error; err != nil {
-		return nil, 0, err
+		return nil, 0, eris.Wrap(err, "failed to query")
 	}
 
-	if filter.Pagination != nil {
+	if filter != nil && filter.Pagination != nil {
 		count, err := selectDiffTableDataCount(tx, filter)
 		if err != nil {
-			return nil, 0, err
+			return nil, 0, eris.Wrap(err, "failed to query")
 		}
 		filter.Pagination.PageCount = calcPageCount(count, filter.Pagination.PageSize)
 	}
 
-	ret := make([]*dto.DiffTableDataDto, len(contents))
 	defaultCache, err := queryDefaultSongHashCache(tx)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, eris.Wrap(err, "failed to query default song hash cache")
 	}
-	for i := range contents {
-		ret[i] = dto.NewDiffTableDataDtoWithCache(contents[i], defaultCache)
-	}
+	ret := Map(contents, func(content *entity.DiffTableData, _ int) *dto.DiffTableDataDto {
+		return dto.NewDiffTableDataDtoWithCache(content, defaultCache)
+	})
 	return ret, len(ret), nil
 }
 
@@ -156,33 +163,4 @@ func findDiffTableDataListWithRival(tx *gorm.DB, filter *vo.DiffTableDataVo) ([]
 	}
 
 	return contents, len(contents), nil
-}
-
-func selectDiffTableDataCount(tx *gorm.DB, filter *vo.DiffTableDataVo) (int64, error) {
-	if filter == nil {
-		var count int64
-		if err := tx.Model(&entity.DiffTableData{}).Count(&count).Error; err != nil {
-			return 0, err
-		}
-		return count, nil
-	}
-	var count int64
-	if err := tx.Model(&entity.DiffTableData{}).Where(filter.Entity()).Count(&count).Error; err != nil {
-		return 0, err
-	}
-	return count, nil
-}
-
-// Fix the hash field on difficult table data
-//
-// NOTE: This function uses default user's song data to build the cache
-func fixDiffTableDataHashField(tx *gorm.DB, rawContents ...*entity.DiffTableData) error {
-	cache, err := queryDefaultSongHashCache(tx)
-	if err != nil {
-		return err
-	}
-	for _, rawContent := range rawContents {
-		rawContent.RepairHash(cache)
-	}
-	return nil
 }

@@ -27,7 +27,11 @@ type DiffTableHeaderVo struct {
 	GhostRivalID    uint
 	GhostRivalTagID uint
 	Pagination      *entity.Page
-	SortBy          *string
+	// TODO: DiffTableHeaderVo has two sort field, it works as follow:
+	//  If SortBy is nil or empty string, sorting by SortNumber field
+	//  Otherwise, sorting by combination of SortBy and SortOrder
+	// As for now, this strategy isn't implemented
+	SortBy *string
 	// NOTE: NEVER access this field directly, use GetOrder() instead
 	SortOrder *string
 

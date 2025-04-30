@@ -103,7 +103,8 @@ function handleSyncClick() {
 				content: t("message.reloadSuccess"),
 				duration: 3000,
 			});
-			// TODO: should reload all contents here
+			// Reload data by simply reloading this page
+			window.location.reload();
 		})
 		.catch((err) => {
 			notification.error({

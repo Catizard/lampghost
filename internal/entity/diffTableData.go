@@ -20,20 +20,3 @@ type DiffTableData struct {
 func (DiffTableData) TableName() string {
 	return "difftable_data"
 }
-
-func (data *DiffTableData) RepairHash(cache *SongHashCache) bool {
-	if data.Sha256 != "" {
-		if md5, ok := cache.GetMD5(data.Sha256); ok {
-			data.Md5 = md5
-			return true
-		}
-		return false
-	} else if data.Md5 != "" {
-		if sha256, ok := cache.GetSHA256(data.Md5); ok {
-			data.Sha256 = sha256
-			return true
-		}
-		return false
-	}
-	return false
-}

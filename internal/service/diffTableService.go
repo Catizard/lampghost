@@ -2,7 +2,6 @@ package service
 
 import (
 	"bufio"
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -49,8 +48,11 @@ func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHead
 	if headerVo.DataUrl == "" {
 		return nil, eris.Errorf("assert: header.DataUrl cannot be empty")
 	}
+	// NOTE: DataURL is expected to have a suffix of '.json', however some pms table broke
+	// this rule and we have no choice but to remove the guard
 	if !strings.HasSuffix(headerVo.DataUrl, ".json") {
-		return nil, eris.Errorf("assert: header.DataUrl must endes with .json")
+		log.Warnf("headerVo.DataUrl has no .json suffix, please be careful!")
+		// return nil, eris.Errorf("assert: header.DataUrl(%s) must endes with .json", headerVo.DataUrl)
 	}
 	log.Debugf("[DiffTableService] Got header data: %v", headerVo)
 	if isDuplicated, err := queryDiffTableHeaderExistence(s.db, &entity.DiffTableHeader{DataUrl: headerVo.DataUrl}); isDuplicated || err != nil {
@@ -62,7 +64,6 @@ func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHead
 
 	// Transaction begins from here
 	headerEntity := headerVo.Entity()
-	var data []entity.DiffTableData
 	if err := s.db.Transaction(func(tx *gorm.DB) error {
 		// (1) difficult table header
 		if err := tx.Create(headerEntity).Error; err != nil {
@@ -84,12 +85,15 @@ func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHead
 			}
 		}
 		// (3) difficult table concreate contents
-		if err := fetchJson(headerVo.DataUrl, &data); err != nil {
+		var importData []vo.ImportDiffTableDataVo
+		if err := fetchJson(headerVo.DataUrl, &importData); err != nil {
 			return eris.Wrapf(err, "cannot fetch data from %s", headerVo.DataUrl)
 		}
-		for i := range data {
-			data[i].HeaderID = headerEntity.ID
-		}
+		data := Map(importData, func(iv vo.ImportDiffTableDataVo, _ int) *entity.DiffTableData {
+			ret := iv.PortBack().Entity()
+			ret.HeaderID = headerEntity.ID
+			return ret
+		})
 		if err := tx.Unscoped().Where("header_id = ?", headerEntity.ID).Delete(&entity.DiffTableData{}).Error; err != nil {
 			return eris.Wrap(err, "failed to delete previous difficult table data")
 		}
@@ -101,7 +105,6 @@ func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHead
 		return nil, eris.Wrap(err, "transaction failed")
 	}
 
-	log.Infof("[DiffTableService] Inserted one header with %d contents", len(data))
 	return headerEntity, nil
 }
 
@@ -364,17 +367,17 @@ func (s *DiffTableService) QueryDiffTableDataWithRival(filter *vo.DiffTableHeade
 		return nil, 0, eris.Errorf("Level should not be empty")
 	}
 	if filter.ID <= 0 {
-		return nil, 0, fmt.Errorf("ID should > 0")
+		return nil, 0, eris.Errorf("ID should > 0")
 	}
 	if filter.RivalID <= 0 {
-		return nil, 0, fmt.Errorf("RivalID should > 0")
+		return nil, 0, eris.Errorf("RivalID should > 0")
 	}
 
 	var endGhostRecordTime time.Time
 	if filter.GhostRivalTagID > 0 {
 		tag, err := findRivalTagByID(s.db, filter.GhostRivalTagID)
 		if err != nil {
-			return nil, 0, err
+			return nil, 0, eris.Wrap(err, "failed to query rival tag by id")
 		}
 		endGhostRecordTime = tag.RecordTime
 	}
@@ -481,6 +484,10 @@ func queryLevelLayeredDiffTableInfoById(tx *gorm.DB, ID uint) (*dto.DiffTableHea
 // no more extra steps for the caller to do. There is no need to understand
 // the chaos of the difficult table specification for the client side
 //
+// TODO: The existence of ImportDiffTableHeaderVo/ImportDiffTableDataVo is
+// kind of breaking the simplicity and makes things harder to understand,
+// this function's process should be re-implmenented later.
+//
 // TODO: This part of the code might be extracted as a library in the furture
 func fetchDiffTableFromURL(url string) (*vo.DiffTableHeaderVo, error) {
 	jsonURL := ""
@@ -490,14 +497,14 @@ func fetchDiffTableFromURL(url string) (*vo.DiffTableHeaderVo, error) {
 	if strings.HasSuffix(url, ".html") {
 		resp, err := http.Get(url)
 		if err != nil {
-			return nil, err
+			return nil, eris.Wrapf(err, "failed to get contents from %s", url)
 		}
 		defer resp.Body.Close()
 
 		scanner := bufio.NewScanner(resp.Body)
 		for scanner.Scan() {
 			if err := scanner.Err(); err != nil {
-				return nil, err
+				return nil, eris.Wrap(err, "failed to read contents")
 			}
 			line := strings.TrimSpace(scanner.Text())
 			// TODO: Any other cases?
@@ -543,16 +550,18 @@ func fetchDiffTableFromURL(url string) (*vo.DiffTableHeaderVo, error) {
 	if jsonURL == "" {
 		return nil, eris.Errorf("cannot fetch possible json url from %s", url)
 	}
-	var dth vo.DiffTableHeaderVo
-	fetchJson(jsonURL, &dth)
-	if !strings.HasPrefix(dth.DataUrl, "http") {
-		dth.DataUrl = prefixURL + "/" + dth.DataUrl
+	var rawHeader vo.ImportDiffTableHeaderVo
+	if err := fetchJson(jsonURL, &rawHeader); err != nil {
+		return nil, eris.Wrapf(err, "failed to fetch json from %s", jsonURL)
+	}
+	if !strings.HasPrefix(rawHeader.DataUrl, "http") {
+		rawHeader.DataUrl = prefixURL + "/" + rawHeader.DataUrl
 	}
 	// NOTE: We have to do an extra step to make the courses parsed correctly
-	if err := dth.ParseRawCourses(); err != nil {
+	if err := rawHeader.ParseRawCourses(); err != nil {
 		return nil, eris.Wrap(err, "cannot parse courses")
 	}
-	return &dth, nil
+	return rawHeader.PortBack(), nil
 }
 
 // Query one difficult table header and its related contents by header's ID
@@ -723,14 +732,15 @@ func fetchJson(url string, v any) error {
 	log.Debugf("Fetching json from url: %s", url)
 	resp, err := http.Get(url)
 	if err != nil {
-		return eris.Errorf("cannot get json from %s", url)
+		return eris.Wrapf(err, "cannot get contents from %s", url)
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return eris.New("failed to read body")
+		return eris.Wrapf(err, "cannot read contents from %s", url)
 	}
-	// Hack \ufeff out, specially for PMS table
-	body = bytes.ReplaceAll(body, []byte("\ufeff"), []byte(""))
+	// Hack \ufeff, \r, \n out, especially for PMS tables
+	replacer := strings.NewReplacer("\r", "", "\n", "", "\ufeff", "")
+	body = []byte(replacer.Replace(string(body)))
 
 	if err := json.Unmarshal(body, v); err != nil {
 		return eris.Wrap(err, "failed to unmarshal")

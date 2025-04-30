@@ -51,29 +51,30 @@ func NewDiffTableDataDtoWithCache(data *entity.DiffTableData, cache *entity.Song
 	return ret
 }
 
-// []*entity.DiffTableData -> []*dto.DiffTableData
-func NewDiffTableDataDtoArray(arr []*entity.DiffTableData) []*DiffTableDataDto {
-	contents := make([]*DiffTableDataDto, len(arr))
-	for i, rawContent := range arr {
-		contents[i] = NewDiffTableDataDto(rawContent)
-	}
-	return contents
-}
-
-// Returns true if this song could be found in cache
+// Repair the data that has only sha256 or md5
+//
+// Return whether this data could be found in cache or not. In other words, do we have this song?
+// The reason that 'repair' step and 'check' step are implemented seperately is to ensure correctness
 func (data *DiffTableDataDto) RepairHash(cache *entity.SongHashCache) bool {
 	if data.Sha256 != "" {
 		if md5, ok := cache.GetMD5(data.Sha256); ok {
 			data.Md5 = md5
-			return true
 		}
-		return false
 	} else if data.Md5 != "" {
 		if sha256, ok := cache.GetSHA256(data.Md5); ok {
 			data.Sha256 = sha256
+		}
+	}
+
+	if data.Sha256 != "" {
+		if _, ok := cache.GetMD5(data.Sha256); ok {
 			return true
 		}
-		return false
+	}
+	if data.Md5 != "" {
+		if _, ok := cache.GetSHA256(data.Md5); ok {
+			return true
+		}
 	}
 	return false
 }

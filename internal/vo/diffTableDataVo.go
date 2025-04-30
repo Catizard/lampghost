@@ -72,3 +72,32 @@ func (data *DiffTableDataVo) GetOrder() string {
 		return "asc"
 	}
 }
+
+// Used only in add difficult table process.
+// Table "Luminous" passes an "ID" field in and breaks the serialization, THANK YOU!
+type ImportDiffTableDataVo struct {
+	Artist   string
+	Comment  string
+	Level    string
+	Lr2BmsId string `json:"lr2_bmdid"`
+	Md5      string
+	NameDiff string
+	Title    string
+	Url      string `json:"url"`
+	UrlDiff  string `json:"url_diff"`
+	Sha256   string
+}
+
+func (iv *ImportDiffTableDataVo) PortBack() *DiffTableDataVo {
+	return &DiffTableDataVo{
+		Comment:  iv.Comment,
+		Level:    iv.Level,
+		Lr2BmsId: iv.Lr2BmsId,
+		Md5:      iv.Md5,
+		NameDiff: iv.NameDiff,
+		Title:    iv.Title,
+		Url:      iv.Url,
+		UrlDiff:  iv.UrlDiff,
+		Sha256:   iv.Sha256,
+	}
+}

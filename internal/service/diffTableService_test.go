@@ -40,7 +40,7 @@ var realTableDefintion = [...]diffTableDefinition{
 	{"LN難易度", "http://zris.work/bmstable/ln/ln_header.json", "◆", true},
 	{"Scramble難易度表", "http://zris.work/bmstable/scramble/header.json", "SB", true},
 	{"PMSデータベース(Lv1~45)", "http://zris.work/bmstable/pms_normal/pmsdatabase_header.json", "PLv", false},
-	{"発狂PMSデータベース(lv46～)", "http://zris.work/bmstable/pms_insane/insane_pmsdatabase_header.json", "P●", false},
+	{"発狂PMSデータベース(lv46～)", "https://pmsdifficulty.xxxxxxxx.jp/insane_PMSdifficulty.html", "P●", false},
 	{"発狂PMS難易度表", "http://zris.work/bmstable/pms_upper/header.json", "●", true},
 	{"PMS Database コースデータ案内所", "http://zris.work/bmstable/pms_course/course_header.json", "Pcourse", true},
 	{"Stellalite", "http://zris.work/bmstable/stellalite/Stellalite-header.json", "stl", false},

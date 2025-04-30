@@ -1,6 +1,8 @@
 package vo
 
 import (
+	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/Catizard/lampghost_wails/internal/entity"
@@ -8,6 +10,8 @@ import (
 	"github.com/go-viper/mapstructure/v2"
 	"github.com/rotisserie/eris"
 	"gorm.io/gorm"
+
+	. "github.com/samber/lo"
 )
 
 type DiffTableHeaderVo struct {
@@ -34,9 +38,6 @@ type DiffTableHeaderVo struct {
 	SortBy *string
 	// NOTE: NEVER access this field directly, use GetOrder() instead
 	SortOrder *string
-
-	// Hack, see add method of difficult table for details
-	RawCourses []any `json:"course"`
 }
 
 func (header *DiffTableHeaderVo) Entity() *entity.DiffTableHeader {
@@ -72,6 +73,41 @@ func (header *DiffTableHeaderVo) GetOrder() string {
 	}
 }
 
+// Used only in add difficult table process
+// Table "発狂PMSデータベース(lv46～)" contains a level-order array
+// which mixes number and string breaks the serialization
+type ImportDiffTableHeaderVo struct {
+	DataUrl     string  `json:"data_url"`
+	Name        string  `json:"name"`
+	OriginalUrl *string `json:"original_url"`
+	Symbol      string  `json:"symbol"`
+	HeaderUrl   string
+	LevelOrders []any `json:"level_order"`
+	RawCourses  []any `json:"course"`
+	Courses     []CourseInfoVo
+}
+
+func (header *ImportDiffTableHeaderVo) PortBack() *DiffTableHeaderVo {
+	castedLevelOrders := Map(header.LevelOrders, func(l any, _ int) string {
+		if l, ok := l.(string); ok {
+			return l
+		}
+		if l, ok := l.(int); ok {
+			return strconv.Itoa(l)
+		}
+		return fmt.Sprintf("%v", l)
+	})
+	return &DiffTableHeaderVo{
+		DataUrl:            header.DataUrl,
+		Name:               header.Name,
+		OriginalUrl:        header.OriginalUrl,
+		Symbol:             header.Symbol,
+		HeaderUrl:          header.HeaderUrl,
+		UnjoinedLevelOrder: castedLevelOrders,
+		Courses:            header.Courses,
+	}
+}
+
 // Parse field 'RawCourses' into 'Courses'
 //
 // Possible layouts:
@@ -80,7 +116,7 @@ func (header *DiffTableHeaderVo) GetOrder() string {
 //  3. courses is an array of a wrapped struct, the real courses are laid inside 'charts' field
 //
 // For Item3, see pushupChartsHashField for details
-func (header *DiffTableHeaderVo) ParseRawCourses() error {
+func (header *ImportDiffTableHeaderVo) ParseRawCourses() error {
 	if len(header.RawCourses) == 0 {
 		return nil // Okay dokey
 	}

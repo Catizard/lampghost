@@ -1,10 +1,10 @@
 package vo
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/Catizard/lampghost_wails/internal/entity"
+	"github.com/rotisserie/eris"
 )
 
 type CourseInfoVo struct {
@@ -36,7 +36,6 @@ func (courseInfo *CourseInfoVo) Entity() *entity.CourseInfo {
 }
 
 // Some tables' courses are defined in an inner field `charts`, this function is 'pushing' them up
-// TODO: Allow sha256 here
 func (courseInfo *CourseInfoVo) pushupChartsHashField() error {
 	if len(courseInfo.Charts) > 0 {
 		// `charts` may provide `sha256` or `md5`
@@ -52,7 +51,7 @@ func (courseInfo *CourseInfoVo) pushupChartsHashField() error {
 				courseInfo.Sha256 = append(courseInfo.Sha256, chart.Sha256)
 			}
 		} else {
-			return fmt.Errorf("ParseRawCourses: no sha256 or md5 provides")
+			return eris.New("no sha256 or md5 provides")
 		}
 	}
 	return nil

@@ -10,6 +10,7 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/vo"
 	"github.com/charmbracelet/log"
+	"github.com/rotisserie/eris"
 	"gorm.io/gorm"
 )
 
@@ -75,11 +76,10 @@ func findCourseInfoList(tx *gorm.DB, filter *vo.CourseInfoVo) ([]*dto.CourseInfo
 	}
 	config, err := config.ReadConfig()
 	if err != nil {
-		log.Error("cannot read in config")
-		return nil, 0, err
+		return nil, 0, eris.Wrap(err, "cannot read config")
 	}
 	var raw []*entity.CourseInfo
-	if err := partial.Find(&raw).Error; err != nil {
+	if err = partial.Find(&raw).Error; err != nil {
 		return nil, 0, err
 	}
 	if len(raw) == 0 {

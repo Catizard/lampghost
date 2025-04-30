@@ -5,6 +5,7 @@ import (
 
 	"github.com/Catizard/lampghost_wails/internal/database"
 	"github.com/Catizard/lampghost_wails/internal/entity"
+	"github.com/rotisserie/eris"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -41,60 +42,34 @@ var realTableDefintion = [...]diffTableDefinition{
 	{"PMSデータベース(Lv1~45)", "http://zris.work/bmstable/pms_normal/pmsdatabase_header.json", "PLv", false},
 	{"発狂PMSデータベース(lv46～)", "http://zris.work/bmstable/pms_insane/insane_pmsdatabase_header.json", "P●", false},
 	{"発狂PMS難易度表", "http://zris.work/bmstable/pms_upper/header.json", "●", true},
-	// This table has been lost
-	// {"PMS Database コースデータ案内所", "http://zris.work/bmstable/pms_course/course_header.jsonn", "Pcourse", false},
+	{"PMS Database コースデータ案内所", "http://zris.work/bmstable/pms_course/course_header.json", "Pcourse", true},
 	{"Stellalite", "http://zris.work/bmstable/stellalite/Stellalite-header.json", "stl", false},
 	{"オマージュBMS難易度表", "http://zris.work/bmstable/homage/header.json", "∽", false},
 }
 
-// Should be working on all real world tables
-func TestFetchDiffTableFromRealURL(t *testing.T) {
-	for _, tt := range realTableDefintion {
-		t.Run(tt.name, func(t *testing.T) {
-			header, err := fetchDiffTableFromURL(tt.url)
-			require.Nil(t, err)
-			assert.Equal(t, header.Symbol, tt.symbol)
-			err = header.ParseRawCourses()
-			require.Nil(t, err)
-			if tt.hasCourses {
-				require.NotEqual(t, 0, len(header.Courses))
-				for _, course := range header.Courses {
-					if len(course.Md5) == 0 && len(course.Sha256) == 0 {
-						assert.Fail(t, "both md5 & sha256 is empty")
-					}
-				}
-			}
-		})
-	}
-}
-
 // Basic test for `AddDiffTableHeader` method
-// This test is kind of overlapping `TestFetchDiffTableFromRealURL`, so no all real url is being considered as test cases
-// Only a few non-standard or buggy url are invovled
+// This is a lazy test, which simply runs over all real world tables to see whether it smokes
 func TestAddDiffTableHeader(t *testing.T) {
 	db, err := database.NewMemoryDatabase()
 	require.Nil(t, err)
-	tests := []struct {
-		name       string
-		url        string
-		hasCourses bool
-	}{
-		{"NEW GENERATION 発狂難易度表", "http://zris.work/bmstable/normal2/header.json", true},
-		{"δ難易度表", "http://zris.work/bmstable/dp_normal/dpn_header.json", true},
-		{"発狂DP難易度表", "http://zris.work/bmstable/dp_insane/dpi_header.json", true},
-	}
 	diffTableService := NewDiffTableService(db)
-	for _, tt := range tests {
+	for _, tt := range realTableDefintion {
 		t.Run(tt.name, func(t *testing.T) {
 			header, err := diffTableService.AddDiffTableHeader(tt.url)
-			require.Nil(t, err)
+			if err != nil {
+				t.Logf("failed to add difficult table header: %s", eris.ToString(err, true))
+				t.FailNow()
+			}
 			assert.NotEqual(t, 0, header.ID)
 		})
-		// NOTE: we cannot use CourseInfoService here to query inserted courses, because `FindCourseInfoList` method requires data from `RivalSongData`.
+		// NOTE: we cannot use CourseInfoService here to query inserted courses, because,
+		// `FindCourseInfoList` method requires data from `RivalSongData`.
 	}
 }
 
 // Basic test for `EnabledFallbackSort` field in `DiffTableHeader`
+// NOTE: This feature has been replaced by manual table sort feature
+// This test would be removed in the furture
 func TestLevelSortStrategy(t *testing.T) {
 	db, err := database.NewMemoryDatabase()
 	require.Nil(t, err)

@@ -115,8 +115,12 @@ func init() {
 	ConstraintsDefinition = append(ConstraintsDefinition, NewConstraint("gauge_24k", 5))
 }
 
-// TODO: we cannot find the LN mode value and option value here, therefore the comparison
+// TODO: we cannot find the LN mode value and option value here, therefore, the comparison
 // step should ignore the LN mode value and option value too.
+// Yes, we can set the settings in config but I personally disapprove the idea about
+// seperating different LN mode and options. The random options might be a deal but LN mode
+// is completely useless for KB users.
+// Currently, I leave the problem behind to reduce the complexity.
 func (courseInfo *CourseInfoDto) GetConstraintMode() int {
 	hispeed := 0
 	judge := 0
@@ -125,28 +129,22 @@ func (courseInfo *CourseInfoDto) GetConstraintMode() int {
 	// NOTE: there is no very good method to handle this and it's not worthy to do so
 	// so I just hardcode this part
 	for _, c := range constraints {
-		if "no_speed" == c {
+		switch c {
+		case "no_speed":
 			hispeed = 1
-		}
-		if "no_good" == c {
+		case "no_good":
 			judge = 1
-		}
-		if "no_great" == c {
+		case "no_great":
 			judge = 2
-		}
-		if "gauge_lr2" == c {
+		case "gauge_lr2":
 			gauge = 1
-		}
-		if "gauge_5k" == c {
+		case "gauge_5k":
 			gauge = 2
-		}
-		if "gauge_7k" == c {
+		case "gauge_7k":
 			gauge = 3
-		}
-		if "gauge_9k" == c {
+		case "gauge_9k":
 			gauge = 4
-		}
-		if "gauge_24k" == c {
+		case "gauge_24k":
 			gauge = 5
 		}
 	}

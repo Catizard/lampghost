@@ -6,6 +6,7 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/charmbracelet/log"
 	"github.com/go-viper/mapstructure/v2"
+	"github.com/rotisserie/eris"
 	"gorm.io/gorm"
 )
 
@@ -31,7 +32,7 @@ type DiffTableHeaderVo struct {
 	SortOrder *string
 
 	// Hack, see add method of difficult table for details
-	RawCourses []interface{} `json:"course"`
+	RawCourses []any `json:"course"`
 }
 
 func (header *DiffTableHeaderVo) Entity() *entity.DiffTableHeader {
@@ -67,20 +68,27 @@ func (header *DiffTableHeaderVo) GetOrder() string {
 	}
 }
 
-// Parse field `RawCourses` into `Courses`
+// Parse field 'RawCourses' into 'Courses'
+//
+// Possible layouts:
+//  1. courses is an array of valid courses
+//  2. courses is a two-dimensional array, every element might be an array of valid courses
+//  3. courses is an array of a wrapped struct, the real courses are laid inside 'charts' field
+//
+// For Item3, see pushupChartsHashField for details
 func (header *DiffTableHeaderVo) ParseRawCourses() error {
 	if len(header.RawCourses) == 0 {
 		return nil // Okay dokey
 	}
 	for i := range header.RawCourses {
-		if innerArray, isNested := header.RawCourses[i].([]interface{}); isNested {
+		if innerArray, isNested := header.RawCourses[i].([]any); isNested {
 			for _, data := range innerArray {
 				courseInfo := CourseInfoVo{}
 				if err := mapstructure.Decode(data, &courseInfo); err != nil {
 					return err
 				}
 				if err := courseInfo.pushupChartsHashField(); err != nil {
-					return err
+					return eris.Wrapf(err, "cannot pushup up charts hash field")
 				}
 				header.Courses = append(header.Courses, courseInfo)
 			}
@@ -91,7 +99,7 @@ func (header *DiffTableHeaderVo) ParseRawCourses() error {
 					return err
 				}
 				if err := courseInfo.pushupChartsHashField(); err != nil {
-					return err
+					return eris.Wrapf(err, "cannot pushup up charts hash field")
 				}
 				header.Courses = append(header.Courses, courseInfo)
 			}

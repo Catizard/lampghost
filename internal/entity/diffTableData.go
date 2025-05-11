@@ -1,6 +1,9 @@
 package entity
 
-import "gorm.io/gorm"
+import (
+	"github.com/Catizard/bmstable"
+	"gorm.io/gorm"
+)
 
 type DiffTableData struct {
 	gorm.Model
@@ -19,4 +22,20 @@ type DiffTableData struct {
 
 func (DiffTableData) TableName() string {
 	return "difftable_data"
+}
+
+// Convert bmstable's type definition into internal one
+func NewDiffTableDataFromImport(importData *bmstable.DifficultTableData) *DiffTableData {
+	return &DiffTableData{
+		Artist:   importData.Artist,
+		Comment:  importData.Comment,
+		Level:    importData.Level,
+		Lr2BmsId: importData.Lr2BmsID,
+		Md5:      importData.Md5,
+		NameDiff: importData.NameDiff,
+		Title:    importData.Title,
+		Url:      importData.URL,
+		UrlDiff:  importData.URLDiff,
+		Sha256:   importData.Sha256,
+	}
 }

@@ -1,6 +1,11 @@
 package entity
 
-import "gorm.io/gorm"
+import (
+	"strings"
+
+	"github.com/Catizard/bmstable"
+	"gorm.io/gorm"
+)
 
 type DiffTableHeader struct {
 	gorm.Model
@@ -18,4 +23,16 @@ type DiffTableHeader struct {
 
 func (DiffTableHeader) TableName() string {
 	return "difftable_header"
+}
+
+// Convert external difficult table definition to internal one
+func NewDiffTableHeaderFromImport(importHeader *bmstable.DifficultTable) *DiffTableHeader {
+	return &DiffTableHeader{
+		HeaderUrl:   importHeader.HeaderURL,
+		DataUrl:     importHeader.DataURL,
+		Name:        importHeader.Name,
+		OriginalUrl: &importHeader.OriginalURL,
+		Symbol:      importHeader.Symbol,
+		LevelOrders: strings.Join(importHeader.LevelOrder, ","),
+	}
 }

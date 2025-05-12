@@ -1037,7 +1037,6 @@ export namespace vo {
 	    Pagination?: entity.Page;
 	    SortBy?: string;
 	    SortOrder?: string;
-	    course: any[];
 	
 	    static createFrom(source: any = {}) {
 	        return new DiffTableHeaderVo(source);
@@ -1065,7 +1064,6 @@ export namespace vo {
 	        this.Pagination = this.convertValues(source["Pagination"], entity.Page);
 	        this.SortBy = source["SortBy"];
 	        this.SortOrder = source["SortOrder"];
-	        this.course = source["course"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

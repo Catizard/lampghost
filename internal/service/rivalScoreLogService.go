@@ -103,7 +103,7 @@ func findRivalMaximumClearScoreLogSha256Map(tx *gorm.DB, filter *vo.RivalScoreLo
 }
 
 // Query the last played score log
-func findLastRivalScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) (*entity.RivalScoreLog, error) {
+func findLastRivalScoreLog(tx *gorm.DB, filter *vo.RivalScoreLogVo) (*entity.RivalScoreLog, error) {
 	ret := entity.RivalScoreLog{}
 	err := tx.Model(&entity.RivalScoreLog{}).Scopes(scopeRivalScoreLogFilter(filter)).Order("record_time desc").Limit(1).Find(&ret).Error
 	return &ret, err

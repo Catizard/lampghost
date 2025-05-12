@@ -26,6 +26,13 @@
 						<n-divider vertical />
 						<n-input v-model:value="formData.scorelogPath" :placeholder="t('form.placeholderScorelogPath')" />
 					</n-form-item>
+					<n-form-item :label="t('form.labelScoredatalogPath')" path="scoredatalogPath">
+						<n-button type="info" @click="chooseFile('Choose scoredatalog.db', 'scoredatalogPath')">
+							{{ t('button.chooseFile') }}
+						</n-button>
+						<n-divider vertical />
+						<n-input v-model:value="formData.scorelogPath" :placeholder="t('form.placeholderScorelogPath')" />
+					</n-form-item>
 					<n-form-item>
 						<n-button :loading="loading" attr-type="button" @click="handleSubmit" type="primary">
 							{{ t('button.submit') }}
@@ -49,7 +56,7 @@ const { t } = useI18n();
 const globalI18n = useI18n({ useScope: 'global' });
 const notification = useNotification();
 
-// target == "scorelogPath" | "songdataPath"
+// target == "scorelogPath" | "songdataPath" | "scoredatalogPath"
 function chooseFile(title, target) {
 	OpenFileDialog(title)
 		.then(result => {
@@ -61,6 +68,8 @@ function chooseFile(title, target) {
 					formData.scorelogPath = result.Data;
 				} else if (target == "songdataPath") {
 					formData.songdataPath = result.Data;
+				} else if (target == "scoredatalogPath") {
+					formData.scoredatalogPath = result.Data;
 				}
 			}
 		}).catch(err => {
@@ -78,6 +87,7 @@ const formData = reactive({
 	locale: null,
 	songdataPath: "",
 	scorelogPath: "",
+	scoredatalogPath: "",
 	userName: "",
 });
 
@@ -113,6 +123,9 @@ const rules = {
 		message: t('rule.missingScorelogPath'),
 		trigger: ["input", "blur"],
 	},
+	scoredatalogPath: {
+		required: false,
+	},
 };
 
 function handleSubmit(e) {
@@ -126,6 +139,7 @@ function handleSubmit(e) {
 				Name: formData.userName,
 				ScoreLogPath: formData.scorelogPath,
 				SongDataPath: formData.songdataPath,
+				ScoreDataLogPath: formData.scoredatalogPath,
 				Locale: globalI18n.locale.value,
 			};
 			InitializeMainUser(rivalInfo)
@@ -154,9 +168,11 @@ function handleSubmit(e) {
 			"labelUserName": "Your user name",
 			"labelSongdataPath": "songdata.db file path",
 			"labelScorelogPath": "scorelog.db file path",
+			"labelScoredatalogPath": "scorelog.db file path(optional)",
 			"placeholderUserName": "Please input your name",
 			"placeholderSongdataPath": "Please input songdata.db file path",
-			"placeholderScorelogPath": "Please input scorelog.db file path"
+			"placeholderScorelogPath": "Please input scorelog.db file path",
+			"placeholderScoredatalogPath": "scorelog.db file path(optional)"
 		},
 		"button": {
 			"submit": "submit",
@@ -175,9 +191,11 @@ function handleSubmit(e) {
 			"labelUserName": "用户名称",
 			"labelSongdataPath": "songdata.db文件路径",
 			"labelScorelogPath": "scorelog.db文件路径",
+			"labelScoredatalogPath": "scorelog.db文件路径(可选)",
 			"placeholderUserName": "请输入用户名",
 			"placeholderSongdataPath": "请输入songdata.db文件路径",
-			"placeholderScorelogPath": "请输入scorelog.db文件路径"
+			"placeholderScorelogPath": "请输入scorelog.db文件路径",
+			"placeholderScoredatalogPath": "scorelog.db文件路径(可选)"
 		},
 		"button": {
 			"submit": "提交",

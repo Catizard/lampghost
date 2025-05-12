@@ -20,6 +20,7 @@ type App struct {
 	*controller.RivalInfoController
 	*controller.RivalTagController
 	*controller.RivalScoreLogController
+	*controller.RivalScoreDataLogController
 	*controller.RivalSongDataController
 	*controller.DiffTableController
 	*controller.CourseInfoController
@@ -44,9 +45,11 @@ func NewApp() *App {
 	rivalTagService := service.NewRivalTagService(db)
 	rivalScoreLogService := service.NewRivalScoreLogService(db)
 	rivalSongDataService := service.NewRivalSongDataService(db)
+	rivalScoreDataLogService := service.NewRivalScoreDataLogService(db)
 	rivalInfoController := controller.NewRivalInfoController(rivalInfoService)
 	rivalTagController := controller.NewRivalTagController(rivalTagService)
 	rivalScoreLogController := controller.NewRivalScoreLogController(rivalScoreLogService)
+	rivalScoreDataLogController := controller.NewRivalScoreDataLogController(rivalScoreDataLogService)
 	rivalSongDataController := controller.NewRivalSongDataController(rivalSongDataService)
 
 	// difficult table module
@@ -66,6 +69,7 @@ func NewApp() *App {
 		rivalInfoController,
 		rivalTagController,
 		rivalScoreLogController,
+		rivalScoreDataLogController,
 		rivalSongDataController,
 		diffTableController,
 		courseInfoController,

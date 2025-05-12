@@ -14,7 +14,7 @@ import (
 )
 
 // Some tables' courses are defined by using sha256 instead of md5
-// This test ensures that they are compati
+// This test ensures that they are compatible when building tags
 func TestSha256CoursesTagBuild(t *testing.T) {
 	log.SetLevel(log.DebugLevel)
 	db, err := database.NewMemoryDatabase()
@@ -38,7 +38,7 @@ func TestSha256CoursesTagBuild(t *testing.T) {
 		Name: "test",
 	}
 	require.Nil(t, db.Create(&header).Error)
-	var courseDatas = []entity.CourseInfo{
+	courseDatas := []entity.CourseInfo{
 		{HeaderID: header.ID, Name: "Course-1", Sha256s: strings.Join([]string{one_64, two_64, three_64, four_64}, ","), Md5s: ""},
 		{HeaderID: header.ID, Name: "Course-2", Sha256s: strings.Join([]string{two_64, three_64, four_64, five_64}, ","), Md5s: ""},
 		{HeaderID: header.ID, Name: "Course-3", Sha256s: "", Md5s: strings.Join([]string{one_64, two_64, three_64, four_64}, ",")},
@@ -70,13 +70,14 @@ func TestSha256CoursesTagBuild(t *testing.T) {
 	})
 	// fill the blank between sha256 to md5
 	// 1 -> 1; 2 -> 2; 3 -> 3; 4 -> 4;
-	var songDatas = []entity.RivalSongData{
+	songDatas := []entity.RivalSongData{
 		{RivalId: 1, Sha256: one_64, Md5: one_64},
 		{RivalId: 1, Sha256: two_64, Md5: two_64},
 		{RivalId: 1, Sha256: three_64, Md5: three_64},
 		{RivalId: 1, Sha256: four_64, Md5: four_64},
 	}
 	require.Nil(t, db.Create(&songDatas).Error)
+	// TODO: Can we get rid of this?
 	// NOTE: we need expire the default cache after writing data into songdata table
 	expireDefaultCache()
 	t.Run("OneLog-HasSongData", func(t *testing.T) {

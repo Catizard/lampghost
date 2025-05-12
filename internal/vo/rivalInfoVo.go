@@ -7,11 +7,12 @@ import (
 
 type RivalInfoVo struct {
 	gorm.Model
-	Name         string
-	ScoreLogPath *string
-	SongDataPath *string
-	PlayCount    int
-	MainUser     bool
+	Name             string
+	ScoreLogPath     *string
+	SongDataPath     *string
+	ScoreDataLogPath *string
+	PlayCount        int
+	MainUser         bool
 
 	Pagination *entity.Page
 	Locale     *string // only passed at initialized phase
@@ -25,10 +26,11 @@ func (rivalInfo *RivalInfoVo) Entity() *entity.RivalInfo {
 			UpdatedAt: rivalInfo.UpdatedAt,
 			DeletedAt: rivalInfo.DeletedAt,
 		},
-		Name:         rivalInfo.Name,
-		ScoreLogPath: rivalInfo.ScoreLogPath,
-		SongDataPath: rivalInfo.SongDataPath,
-		PlayCount:    rivalInfo.PlayCount,
-		MainUser:     rivalInfo.MainUser,
+		Name:             rivalInfo.Name,
+		ScoreLogPath:     rivalInfo.ScoreLogPath,
+		SongDataPath:     rivalInfo.SongDataPath,
+		ScoreDataLogPath: rivalInfo.ScoreDataLogPath,
+		PlayCount:        rivalInfo.PlayCount,
+		MainUser:         rivalInfo.MainUser,
 	}
 }

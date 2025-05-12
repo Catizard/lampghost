@@ -6,11 +6,12 @@ import (
 
 type RivalInfo struct {
 	gorm.Model
-	Name         string
-	ScoreLogPath *string
-	SongDataPath *string
-	PlayCount    int
-	MainUser     bool
+	Name             string
+	ScoreLogPath     *string
+	SongDataPath     *string
+	ScoreDataLogPath *string
+	PlayCount        int
+	MainUser         bool
 }
 
 func (RivalInfo) TableName() string {

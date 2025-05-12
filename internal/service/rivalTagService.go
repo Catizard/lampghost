@@ -63,7 +63,8 @@ func (s *RivalTagService) SyncRivalTag(rivalID uint) error {
 // Rebuild one rival's tags but use the raw contents from scorelog.db & songdata.db
 //
 // Implementaion Details:
-// All user customized tags would be kept
+//
+//	All user customized tags would be kept
 func (s *RivalTagService) SyncRivalTagFromRawData(rivalID uint, rawScoreLog []*entity.ScoreLog, rawSongData []*entity.SongData) error {
 	return s.db.Transaction(func(tx *gorm.DB) error {
 		return syncRivalTagFromRawData(tx, rivalID, rawScoreLog, rawSongData)

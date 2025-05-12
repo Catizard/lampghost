@@ -8,11 +8,12 @@ import (
 type RivalInfoDto struct {
 	gorm.Model
 
-	Name         string
-	ScoreLogPath *string
-	SongDataPath *string
-	PlayCount    int
-	MainUser     bool
+	Name             string
+	ScoreLogPath     *string
+	SongDataPath     *string
+	ScoreDataLogPath *string
+	PlayCount        int
+	MainUser         bool
 
 	DiffTableHeader *DiffTableHeaderDto
 }
@@ -25,21 +26,23 @@ func NewRivalInfoDto(rival *entity.RivalInfo) *RivalInfoDto {
 			UpdatedAt: rival.UpdatedAt,
 			DeletedAt: rival.DeletedAt,
 		},
-		Name:         rival.Name,
-		ScoreLogPath: rival.ScoreLogPath,
-		SongDataPath: rival.SongDataPath,
-		PlayCount:    rival.PlayCount,
-		MainUser:     rival.MainUser,
+		Name:             rival.Name,
+		ScoreLogPath:     rival.ScoreLogPath,
+		SongDataPath:     rival.SongDataPath,
+		ScoreDataLogPath: rival.ScoreDataLogPath,
+		PlayCount:        rival.PlayCount,
+		MainUser:         rival.MainUser,
 	}
 }
 
 func (rival *RivalInfoDto) Entity() *entity.RivalInfo {
 	return &entity.RivalInfo{
-		Name:         rival.Name,
-		PlayCount:    rival.PlayCount,
-		ScoreLogPath: rival.ScoreLogPath,
-		SongDataPath: rival.SongDataPath,
-		MainUser:     rival.MainUser,
+		Name:             rival.Name,
+		PlayCount:        rival.PlayCount,
+		ScoreLogPath:     rival.ScoreLogPath,
+		SongDataPath:     rival.SongDataPath,
+		ScoreDataLogPath: rival.ScoreDataLogPath,
+		MainUser:         rival.MainUser,
 	}
 }
 

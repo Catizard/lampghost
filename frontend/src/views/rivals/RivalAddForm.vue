@@ -13,6 +13,13 @@
         <n-divider vertical />
         <n-input v-model:value="formData.ScoreLogPath" :placeholder="t('modal.placeholderScoreLogPath')" />
       </n-form-item>
+      <n-form-item :label="t('modal.labelScoreDataLogPath')" path="ScoreDataLogPath">
+        <n-button type="info" @click="chooseFile('Choose scoredatalog.db', 'scoredatalogPath')">
+          {{ t('button.chooseFile') }}
+        </n-button>
+        <n-divider vertical />
+        <n-input v-model:value="formData.ScoreDataLogPath" :placeholder="t('modal.placeholderScoreDataLogPath')" />
+      </n-form-item>
       <n-form-item :label="t('modal.labelSongDataPath')" path="SongDataPath">
         <n-input disabled v-model:value="formData.SongDataPath" :placeholder="t('modal.placeholderSongDataPath')" />
       </n-form-item>
@@ -42,6 +49,7 @@ const formData = ref({
   Name: null,
   ScoreLogPath: null,
   SongDataPath: null,
+  ScoreDataLogPath: null,
 });
 const rules = {
   Name: {
@@ -58,7 +66,10 @@ const rules = {
   // 	required: true,
   // 	message: t('rules.missingSongDataPath'),
   // 	trigger: ["input", "blur"],
-  // }
+  // },
+  ScoreDataLogPath: {
+    required: false,
+  },
 };
 
 function handlePositiveClick(): boolean {
@@ -89,20 +100,21 @@ function handleNegativeClick() {
   formData.value.Name = null;
   formData.value.ScoreLogPath = null;
   formData.value.SongDataPath = null;
+  formData.value.ScoreDataLogPath = null;
 }
 
 // target == "scorelogPath" | "songdataPath"
-function chooseFile(title, target) {
+function chooseFile(title, target: "scorelogPath" | "songdataPath" | "scoredatalogPath") {
   OpenFileDialog(title)
     .then(result => {
       if (result.Code != 200) {
         return Promise.reject(result.Msg);
       }
       if (result.Data != null && result.Data != undefined && result.Data != "") {
-        if (target == "scorelogPath") {
-          formData.value.ScoreLogPath = result.Data;
-        } else if (target == "songdataPath") {
-          formData.value.SongDataPath = result.Data;
+        switch (target) {
+          case "scorelogPath": formData.value.ScoreLogPath = result.Data; break;
+          case "songdataPath": formData.value.SongDataPath = result.Data; break;
+          case "scoredatalogPath": formData.value.ScoreDataLogPath = result.Data; break;
         }
       }
     }).catch(err => {
@@ -124,9 +136,11 @@ function chooseFile(title, target) {
       "labelRivalName": "Name",
       "labelScoreLogPath": "scorelog.db file path",
       "labelSongDataPath": "songdata.db file path",
+      "labelScoreDataLogPath": "scoredatalog.db file path",
       "placeholderRivalName": "Please input rival's name",
       "placeholderScoreLogPath": "Please input scorelog.db file path",
-      "placeholderSongDataPath": "Please input songdata.db file path"
+      "placeholderSongDataPath": "Please input songdata.db file path",
+      "placeholderScoreDataLogPath": "Please input scoredatalog.db file path"
     },
     "button": {
       "chooseFile": "Choose File"
@@ -145,9 +159,11 @@ function chooseFile(title, target) {
       "labelRivalName": "名称",
       "labelScoreLogPath": "scorelog.db文件路径",
       "labelSongDataPath": "songdata.db文件路径",
+      "labelScoreDataLogPath": "scoredatalog.db文件路径",
       "placeholderRivalName": "请输入好友名称",
       "placeholderScoreLogPath": "请输入scorelog.db文件路径",
-      "placeholderSongDataPath": "请输入songdata.db文件路径"
+      "placeholderSongDataPath": "请输入songdata.db文件路径",
+      "placeholderScoreDataLogPath": "请输入scoredatalog.db文件路径"
     },
     "button": {
       "chooseFile": "选择文件"

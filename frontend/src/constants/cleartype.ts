@@ -77,3 +77,7 @@ export const DefaultClearTypeColorStyle: Record<number, ClearTypeDef> = {
     textColor: "#ffffff",
   },
 };
+
+export function queryClearTypeColorStyle(clearType: number): ClearTypeDef {
+  return DefaultClearTypeColorStyle[clearType];
+}

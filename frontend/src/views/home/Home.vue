@@ -29,6 +29,12 @@
 		</n-text>
 	</n-h1>
 	<LampCountChart :rival-id="currentUser?.ID" />
+	<n-h1 prefix="bar" style="text-align: start;">
+		<n-text type="primary">
+			{{ t("timelineTitle") }}
+		</n-text>
+	</n-h1>
+	<RecentTimeline />
 </template>
 
 <script setup lang="ts">
@@ -41,6 +47,7 @@ import PlayCountChart from "./PlayCountChart.vue";
 import LampCountChart from "./LampCountChart.vue";
 import { dto } from '@wailsjs/go/models';
 import { useRoute, useRouter } from "vue-router";
+import RecentTimeline from "./RecentTimeline.vue";
 
 const i18n = useI18n();
 const { t } = i18n;
@@ -132,6 +139,7 @@ initUser();
 			"chooseYear": "Choose Year"
 		},
 		"lampStatusTitle": "Lamp Status",
+		"timelineTitle": "Recent Activity",
 		"message": {
 			"noMainUserError": "Found no main user, please first load your save file in",
 			"loadUserDataErrorPrefix": "Cannot load user data: ",
@@ -151,6 +159,7 @@ initUser();
 			"chooseYear": "选择年份"
 		},
 		"lampStatusTitle": "点灯情况",
+		"timelineTitle": "最近游玩",
 		"message": {
 			"noMainUserError": "找不到主用户信息，请先导入你自己的存档",
 			"loadUserDataErrorPrefix": "获取用户信息失败: ",

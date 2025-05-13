@@ -4,6 +4,7 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/vo"
+	"github.com/rotisserie/eris"
 	"gorm.io/gorm"
 )
 
@@ -38,6 +39,25 @@ func (s *RivalScoreLogService) QueryRivalScoreLogPageList(filter *vo.RivalScoreL
 		return nil, 0, err
 	}
 	return scoreLogs, n, nil
+}
+
+// Return play logs in one specified day, which satisfy:
+//  1. It's strict lower than filter.EndRecordTime
+//  2. It's the maximum possible one
+//
+// The frontend should call this function as follow:
+//  1. Pass now() + 1 day
+//  2. If return value is not empty, pick record time from anyone and set it to next parameter
+//  3. If return value is empty, mark no more values and stop querying
+//  4. Or repeat querying the next stocks
+//
+// TODO: This function actually drops course challenge logs, it's a lilltle hard to write it
+// correctly so I decided to leave this feature as a todo.
+//
+// NOTE: Result is unique, only the maximum clear one would be reserved. And it's ordered,
+// the higher clear one would be placed before the lower one.
+func (s *RivalScoreLogService) QueryPrevDayScoreLogList(filter *vo.RivalScoreLogVo) ([]*dto.RivalScoreLogDto, int, error) {
+	return queryPrevDayScoreLogList(s.db, filter)
 }
 
 func findRivalScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.RivalScoreLogDto, int, error) {
@@ -152,6 +172,28 @@ func selectRivalScoreLogCount(tx *gorm.DB, filter *vo.RivalScoreLogVo) (int64, e
 		return 0, err
 	}
 	return count, nil
+}
+
+func queryPrevDayScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.RivalScoreLogDto, int, error) {
+	fields := `
+		rival_score_log.*,
+		max(rival_score_log.clear),
+		sd.title as title,
+		sd.md5 as md5,
+		sd.ID as rival_song_data_id
+	`
+	// NOTE: Some filter statements should be applied to both subquery and the outer one
+	partial := tx.Model(&entity.RivalScoreLog{}).Select(fields).Joins("left join (select ID, title, sha256, md5 from rival_song_data group by sha256) as sd on rival_score_log.sha256 = sd.sha256")
+	// TODO: This sql is stricted with "clear >= 4", should we make this configurable?
+	maximumDateQuery := tx.Model(&entity.RivalScoreLog{}).
+		Select("date(max(rival_score_log.record_time))").
+		Where("length(rival_score_log.sha256) = 64 and rival_score_log.clear >= 4 and date(record_time) < date(?)", filter.EndRecordTime)
+	var out []*dto.RivalScoreLogDto
+	partial = partial.Where("length(rival_score_log.sha256) = 64 and rival_score_log.clear >= 4").Order("rival_score_log.clear desc")
+	if err := partial.Debug().Where("date(rival_score_log.record_time) = (?)", maximumDateQuery).Group("rival_score_log.sha256").Find(&out).Error; err != nil {
+		return nil, 0, eris.Wrap(err, "failed to query prev day score log")
+	}
+	return out, len(out), nil
 }
 
 // Specialized scope for vo.RivalScoreLogVo

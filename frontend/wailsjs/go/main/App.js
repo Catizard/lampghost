@@ -182,6 +182,10 @@ export function QueryMainUser() {
   return window['go']['main']['App']['QueryMainUser']();
 }
 
+export function QueryPrevDayScoreLogList(arg1) {
+  return window['go']['main']['App']['QueryPrevDayScoreLogList'](arg1);
+}
+
 export function QueryRivalInfoPageList(arg1) {
   return window['go']['main']['App']['QueryRivalInfoPageList'](arg1);
 }

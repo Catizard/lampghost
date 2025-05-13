@@ -96,6 +96,8 @@ export function QueryLevelLayeredDiffTableInfoByID(arg1:number):Promise<result.R
 
 export function QueryMainUser():Promise<result.RtnData>;
 
+export function QueryPrevDayScoreLogList(arg1:vo.RivalScoreLogVo):Promise<result.RtnDataList>;
+
 export function QueryRivalInfoPageList(arg1:vo.RivalInfoVo):Promise<result.RtnPage>;
 
 export function QueryRivalPlayedYears(arg1:number):Promise<result.RtnDataList>;

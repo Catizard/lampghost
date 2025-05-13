@@ -2,7 +2,9 @@ package entity
 
 import (
 	"fmt"
+	"strings"
 
+	"github.com/Catizard/bmstable"
 	"gorm.io/gorm"
 )
 
@@ -18,6 +20,16 @@ type CourseInfo struct {
 
 func (CourseInfo) TableName() string {
 	return "course_info"
+}
+
+// Convert bmstable's type definition into internal one
+func NewCourseInfoFromImport(importCourse *bmstable.CourseInfo) *CourseInfo {
+	return &CourseInfo{
+		Name:        importCourse.Name,
+		Sha256s:     strings.Join(importCourse.Sha256, ","),
+		Md5s:        strings.Join(importCourse.Md5, ","),
+		Constraints: strings.Join(importCourse.Constraint, ","),
+	}
 }
 
 // Before create requirements:

@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"github.com/Catizard/lampghost_wails/internal/entity"
-	"github.com/rotisserie/eris"
 )
 
 type CourseInfoVo struct {
@@ -33,26 +32,4 @@ func (courseInfo *CourseInfoVo) Entity() *entity.CourseInfo {
 		Constraints: strings.Join(courseInfo.Constraint, ","),
 		HeaderID:    courseInfo.HeaderID,
 	}
-}
-
-// Some tables' courses are defined in an inner field `charts`, this function is 'pushing' them up
-func (courseInfo *CourseInfoVo) pushupChartsHashField() error {
-	if len(courseInfo.Charts) > 0 {
-		// `charts` may provide `sha256` or `md5`
-		firstChartDef := courseInfo.Charts[0]
-		if firstChartDef.Md5 != "" {
-			courseInfo.Md5 = make([]string, 0)
-			for _, chart := range courseInfo.Charts {
-				courseInfo.Md5 = append(courseInfo.Md5, chart.Md5)
-			}
-		} else if firstChartDef.Sha256 != "" {
-			courseInfo.Sha256 = make([]string, 0)
-			for _, chart := range courseInfo.Charts {
-				courseInfo.Sha256 = append(courseInfo.Sha256, chart.Sha256)
-			}
-		} else {
-			return eris.New("no sha256 or md5 provides")
-		}
-	}
-	return nil
 }

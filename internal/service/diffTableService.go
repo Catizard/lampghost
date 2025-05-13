@@ -1,16 +1,13 @@
 package service
 
 import (
-	"bufio"
-	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 	"slices"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/Catizard/bmstable"
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/vo"
@@ -31,6 +28,11 @@ func NewDiffTableService(db *gorm.DB) *DiffTableService {
 }
 
 // Insert one difficult table by providing its url
+//
+// Requirements:
+//
+//	1.difficult table's url must be unique
+//	2.difficult table's data_url must be unique
 func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHeader, error) {
 	url = strings.TrimSpace(url)
 	log.Debugf("[DiffTableService] calling AddDiffTableHeader with url: %s", url)
@@ -40,64 +42,52 @@ func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHead
 		}
 		return nil, eris.Errorf("add difficult table header failed: header_url[%s] is duplicated", url)
 	}
-	headerVo, err := fetchDiffTableFromURL(url)
+	rawHeader, err := bmstable.ParseFromURL(url)
 	if err != nil {
-		return nil, eris.Wrap(err, "cannot fetch remote table")
+		return nil, eris.Wrapf(err, "failed to parse difficult table url: %s", url)
 	}
-	headerVo.HeaderUrl = url
-	if headerVo.DataUrl == "" {
-		return nil, eris.Errorf("assert: header.DataUrl cannot be empty")
+	if rawHeader.DataURL == "" {
+		return nil, eris.Errorf("assert: data_url is empty")
 	}
-	// NOTE: DataURL is expected to have a suffix of '.json', however some pms table broke
-	// this rule and we have no choice but to remove the guard
-	if !strings.HasSuffix(headerVo.DataUrl, ".json") {
-		log.Warnf("headerVo.DataUrl has no .json suffix, please be careful!")
-		// return nil, eris.Errorf("assert: header.DataUrl(%s) must endes with .json", headerVo.DataUrl)
-	}
-	log.Debugf("[DiffTableService] Got header data: %v", headerVo)
-	if isDuplicated, err := queryDiffTableHeaderExistence(s.db, &entity.DiffTableHeader{DataUrl: headerVo.DataUrl}); isDuplicated || err != nil {
+	if isDuplicated, err := queryDiffTableHeaderExistence(s.db, &entity.DiffTableHeader{DataUrl: rawHeader.DataURL}); isDuplicated || err != nil {
 		if err != nil {
 			return nil, eris.Wrap(err, "failed to query duplicate data url")
 		}
 		return nil, eris.Errorf("add difficult table header failed: data_url[%s] is duplicated", url)
 	}
 
+	headerEntity := entity.NewDiffTableHeaderFromImport(&rawHeader)
+
 	// Transaction begins from here
-	headerEntity := headerVo.Entity()
 	if err := s.db.Transaction(func(tx *gorm.DB) error {
 		// (1) difficult table header
 		if err := tx.Create(headerEntity).Error; err != nil {
 			return eris.Wrap(err, "failed to insert new header")
 		}
 		// (2) difficult related course contents
-		if len(headerVo.Courses) > 0 {
-			var courseData []*entity.CourseInfo
-			for _, courseInfoVo := range headerVo.Courses {
-				courseInfo := courseInfoVo.Entity()
-				courseInfo.HeaderID = headerEntity.ID
-				courseData = append(courseData, courseInfo)
-			}
+		courses := Map(rawHeader.Courses, func(importCourse bmstable.CourseInfo, _ int) *entity.CourseInfo {
+			course := entity.NewCourseInfoFromImport(&importCourse)
+			course.HeaderID = headerEntity.ID
+			return course
+		})
+		if len(courses) > 0 {
 			if err := delCourseInfo(tx, &vo.CourseInfoVo{HeaderID: headerEntity.ID}); err != nil {
 				return eris.Wrap(err, "failed to delete previous courses")
 			}
-			if err := addBatchCourseInfo(tx, courseData); err != nil {
+			if err := addBatchCourseInfo(tx, courses); err != nil {
 				return eris.Wrap(err, "failed to insert new courses")
 			}
 		}
 		// (3) difficult table concreate contents
-		var importData []vo.ImportDiffTableDataVo
-		if err := fetchJson(headerVo.DataUrl, &importData); err != nil {
-			return eris.Wrapf(err, "cannot fetch data from %s", headerVo.DataUrl)
-		}
-		data := Map(importData, func(iv vo.ImportDiffTableDataVo, _ int) *entity.DiffTableData {
-			ret := iv.PortBack().Entity()
-			ret.HeaderID = headerEntity.ID
-			return ret
+		diffTableData := Map(rawHeader.Contents, func(importData bmstable.DifficultTableData, _ int) *entity.DiffTableData {
+			data := entity.NewDiffTableDataFromImport(&importData)
+			data.HeaderID = headerEntity.ID
+			return data
 		})
 		if err := tx.Unscoped().Where("header_id = ?", headerEntity.ID).Delete(&entity.DiffTableData{}).Error; err != nil {
 			return eris.Wrap(err, "failed to delete previous difficult table data")
 		}
-		if err := tx.CreateInBatches(&data, DEFAULT_BATCH_SIZE).Error; err != nil {
+		if err := tx.CreateInBatches(&diffTableData, DEFAULT_BATCH_SIZE).Error; err != nil {
 			return eris.Wrap(err, "failed to insert new difficult table data")
 		}
 		return nil
@@ -478,92 +468,6 @@ func queryLevelLayeredDiffTableInfoById(tx *gorm.DB, ID uint) (*dto.DiffTableHea
 	return dto.NewLevelLayeredDiffTableHeaderDto(header.Entity(), sortedLevels, levelLayeredContent), nil
 }
 
-// Fetch a difficult table from url
-//
-// NOTE: This function ensures the return value contains everything you need,
-// no more extra steps for the caller to do. There is no need to understand
-// the chaos of the difficult table specification for the client side
-//
-// TODO: The existence of ImportDiffTableHeaderVo/ImportDiffTableDataVo is
-// kind of breaking the simplicity and makes things harder to understand,
-// this function's process should be re-implmenented later.
-//
-// TODO: This part of the code might be extracted as a library in the furture
-func fetchDiffTableFromURL(url string) (*vo.DiffTableHeaderVo, error) {
-	jsonURL := ""
-	splitURL := strings.Split(url, "/")
-	splitURL[len(splitURL)-1] = ""
-	prefixURL := strings.Join(splitURL, "/")
-	if strings.HasSuffix(url, ".html") {
-		resp, err := http.Get(url)
-		if err != nil {
-			return nil, eris.Wrapf(err, "failed to get contents from %s", url)
-		}
-		defer resp.Body.Close()
-
-		scanner := bufio.NewScanner(resp.Body)
-		for scanner.Scan() {
-			if err := scanner.Err(); err != nil {
-				return nil, eris.Wrap(err, "failed to read contents")
-			}
-			line := strings.TrimSpace(scanner.Text())
-			// TODO: Any other cases?
-			// Its pattern should be <meta name="bmstable" content="xxx.json" />
-			if strings.HasPrefix(line, "<meta name=\"bmstable\"") {
-				startp := strings.Index(line, "content") + len("content=\"") - 1
-				if startp == -1 {
-					return nil, eris.Errorf("cannot find 'content' field in %s", url)
-				}
-				endp := -1
-				// Finds the end position
-				first := false
-				for i := startp; i < len(line); i++ {
-					if line[i] == '"' {
-						if !first {
-							first = true
-						} else {
-							endp = i
-							break
-						}
-					}
-				}
-				if endp == -1 {
-					return nil, eris.Errorf("cannot find 'content' field in %s", url)
-				}
-
-				content := line[startp+1 : endp]
-				if !strings.HasPrefix(content, "http") {
-					// Construct the json url path
-					jsonURL = prefixURL + "/" + line[startp+1:endp]
-				} else {
-					jsonURL = content
-				}
-
-				log.Debugf("Construct json url [%s] from [%s]", jsonURL, url)
-				break
-			}
-		}
-	} else if strings.HasSuffix(url, ".json") {
-		// Okay dokey
-		jsonURL = url
-	}
-	if jsonURL == "" {
-		return nil, eris.Errorf("cannot fetch possible json url from %s", url)
-	}
-	var rawHeader vo.ImportDiffTableHeaderVo
-	if err := fetchJson(jsonURL, &rawHeader); err != nil {
-		return nil, eris.Wrapf(err, "failed to fetch json from %s", jsonURL)
-	}
-	if !strings.HasPrefix(rawHeader.DataUrl, "http") {
-		rawHeader.DataUrl = prefixURL + "/" + rawHeader.DataUrl
-	}
-	// NOTE: We have to do an extra step to make the courses parsed correctly
-	if err := rawHeader.ParseRawCourses(); err != nil {
-		return nil, eris.Wrap(err, "cannot parse courses")
-	}
-	return rawHeader.PortBack(), nil
-}
-
 // Query one difficult table header and its related contents by header's ID
 //
 // Related contents would be attached on `Contents` field
@@ -722,28 +626,4 @@ func levelComparator(lhs string, rhs string, preSortLevels []string) int {
 		return 0
 	}
 	return inxL - inxR
-}
-
-// Simple wrapper function for:
-//  1. Fetch a json from url
-//  2. Handle pitfalls
-//  3. Unmarshall the json into v
-func fetchJson(url string, v any) error {
-	log.Debugf("Fetching json from url: %s", url)
-	resp, err := http.Get(url)
-	if err != nil {
-		return eris.Wrapf(err, "cannot get contents from %s", url)
-	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return eris.Wrapf(err, "cannot read contents from %s", url)
-	}
-	// Hack \ufeff, \r, \n out, especially for PMS tables
-	replacer := strings.NewReplacer("\r", "", "\n", "", "\ufeff", "")
-	body = []byte(replacer.Replace(string(body)))
-
-	if err := json.Unmarshal(body, v); err != nil {
-		return eris.Wrap(err, "failed to unmarshal")
-	}
-	return nil
 }

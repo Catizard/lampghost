@@ -114,22 +114,22 @@ const menuOptions: MenuOption[] = [
 {
 	"en": {
     "menuName": {
-      "home": "home",
+      "home": "Home",
       "rivals": {
-        "self": "rivals",
-        "management": "management",
-        "tags": "tags",
+        "self": "Rivals",
+        "management": "Management",
+        "tags": "Tags",
       },
       "difftable": {
-        "self": "table",
-        "management": "management",
-        "scores": "scores",
+        "self": "Table",
+        "management": "Management",
+        "scores": "Scores",
       },
-      "folder": "folder",
-      "recent": "recent",
-      "courses": "courses",
-      "goals": "goals",
-			"settings": "settings",
+      "folder": "Folder",
+      "recent": "Recent",
+      "courses": "Courses",
+      "goals": "Goals",
+			"settings": "Settings",
     },
   },
   "zh-CN": {

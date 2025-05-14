@@ -6,7 +6,9 @@
       <n-form-item :label="t('modal.labelAddress')" path="url">
         <n-input v-model:value="formData.url" :placeholder="t('modal.placeholderAddress')" />
       </n-form-item>
-      <!-- TODO: We need to refactor AddDiffTableHeader api before adding this -->
+      <n-form-item :label="t('modal.labelNoTagBuild')" path="NoTagBuild">
+        <n-select v-model:value="formData.NoTagBuild" :options="yesnoOptions"></n-select>
+      </n-form-item>
       <n-form-item :label="t('modal.labelTagColor')" path="TagColor">
         <n-color-picker v-model:value="formData.TagColor" :show-alpha="false" :modes="['hex', 'rgb']" />
       </n-form-item>
@@ -19,7 +21,7 @@
 
 <script setup lang="ts">
 import { AddDiffTableHeader } from '@wailsjs/go/main/App';
-import { FormInst, useNotification } from 'naive-ui';
+import { FormInst, SelectOption, useNotification } from 'naive-ui';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -36,6 +38,7 @@ const formData = ref({
   url: "",
   TagColor: "",
   TagTextColor: "",
+  NoTagBuild: 0,
 });
 const rules = {
   url: {
@@ -44,6 +47,17 @@ const rules = {
     trigger: ["input", "blur"],
   },
 };
+
+const yesnoOptions: Array<SelectOption> = [
+  {
+    label: t('options.yes'),
+    value: 1,
+  },
+  {
+    label: t('options.no'),
+    value: 0,
+  }
+];
 
 function handlePositiveClick(): boolean {
   formRef.value
@@ -79,6 +93,7 @@ function resetFormData() {
   formData.value.url = "";
   formData.value.TagColor = "";
   formData.value.TagTextColor = "";
+  formData.value.NoTagBuild = 0;
 }
 </script>
 

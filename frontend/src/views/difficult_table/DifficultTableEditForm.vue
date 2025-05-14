@@ -3,7 +3,10 @@
     :positive-text="t('modal.positiveText')" :negative-text="t('modal.negativeText')"
     @positive-click="handlePositiveClick" @negative-click="handleNegativeClick" :mask-closable="false">
     <n-form ref="formRef" :model="formData">
-      <n-form-item :label="t('modal.labelTagColor')" path="TagColor" >
+      <n-form-item :label="t('modal.labelNoTagBuild')" path="NoTagBuild">
+        <n-select v-model:value="formData.NoTagBuild" :options="yesnoOptions"></n-select>
+      </n-form-item>
+      <n-form-item :label="t('modal.labelTagColor')" path="TagColor">
         <n-color-picker v-model:value="formData.TagColor" :show-alpha="false" :modes="['hex', 'rgb']" />
       </n-form-item>
       <n-form-item :label="t('modal.labelTagTextColor')" path="TagTextColor">
@@ -34,6 +37,7 @@ const formData = ref({
   ID: 0,
   TagColor: "",
   TagTextColor: "",
+  NoTagBuild: 0,
 });
 
 const yesnoOptions: Array<SelectOption> = [
@@ -94,6 +98,7 @@ function open(headerId: number) {
       const data: dto.DiffTableHeaderDto = result.Data;
       formData.value.TagColor = data.TagColor;
       formData.value.TagTextColor = data.TagTextColor;
+      formData.value.NoTagBuild = data.NoTagBuild;
     }).catch(err => {
       notification.error({
         content: err,

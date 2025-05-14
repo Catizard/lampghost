@@ -191,6 +191,7 @@ func queryPrevDayScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.R
 			select dd.md5, GROUP_CONCAT(dh.symbol || dd."level") as diff_table_info
 			from difftable_data dd 
 			left join difftable_header dh on dd.header_id = dh.id
+			where dh.no_tag_build = 0
 			group by dd.md5
 		) as dt on sd.md5 = dt.md5
 	`)

@@ -20,6 +20,7 @@ type DiffTableHeaderVo struct {
 	UnjoinedLevelOrder []string `json:"level_order"`
 	TagColor           string   `json:"tagColor"`
 	TagTextColor       string   `json:"tagTextColor"`
+	NoTagBuild         *int     `json:"noTagBuild"`
 
 	Level           string
 	RivalID         uint
@@ -51,6 +52,7 @@ func (header *DiffTableHeaderVo) Entity() *entity.DiffTableHeader {
 		LevelOrders:  strings.Join(header.UnjoinedLevelOrder, ","),
 		TagColor:     header.TagColor,
 		TagTextColor: header.TagTextColor,
+		NoTagBuild:   header.NoTagBuild,
 	}
 }
 

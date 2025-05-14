@@ -17,6 +17,7 @@ type DiffTableHeaderDto struct {
 	UnjoinedLevelOrder []string
 	TagColor           string
 	TagTextColor       string
+	NoTagBuild         *int
 
 	Contents []*DiffTableDataDto
 
@@ -48,6 +49,7 @@ func NewDiffTableHeaderDto(header *entity.DiffTableHeader, contents []*DiffTable
 		LampCount:          make(map[int]int),
 		TagColor:           header.TagColor,
 		TagTextColor:       header.TagTextColor,
+		NoTagBuild:         header.NoTagBuild,
 	}
 }
 
@@ -61,6 +63,7 @@ func (header *DiffTableHeaderDto) Entity() *entity.DiffTableHeader {
 		LevelOrders:  strings.Join(header.UnjoinedLevelOrder, ","),
 		TagColor:     header.TagColor,
 		TagTextColor: header.TagTextColor,
+		NoTagBuild:   header.NoTagBuild,
 	}
 }
 

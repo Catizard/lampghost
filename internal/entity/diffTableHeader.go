@@ -19,6 +19,7 @@ type DiffTableHeader struct {
 	LevelOrders  string
 	TagColor     string
 	TagTextColor string
+	NoTagBuild   *int `gorm:"default:0"`
 }
 
 func (DiffTableHeader) TableName() string {

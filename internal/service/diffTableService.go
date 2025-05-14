@@ -60,6 +60,7 @@ func (s *DiffTableService) AddDiffTableHeader(param *vo.DiffTableHeaderVo) (*ent
 	// HACK: Inherit some fields from passing parameter
 	headerEntity.TagColor = param.TagColor
 	headerEntity.TagTextColor = param.TagTextColor
+	headerEntity.NoTagBuild = param.NoTagBuild
 
 	// Transaction begins from here
 	if err := s.db.Transaction(func(tx *gorm.DB) error {

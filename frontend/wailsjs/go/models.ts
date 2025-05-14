@@ -133,6 +133,7 @@ export namespace dto {
 	    UnjoinedLevelOrder: string[];
 	    TagColor: string;
 	    TagTextColor: string;
+	    NoTagBuild?: number;
 	    Contents: DiffTableDataDto[];
 	    SortedLevels: string[];
 	    LevelLayeredContents: Record<string, DiffTableDataDto[]>;
@@ -157,6 +158,7 @@ export namespace dto {
 	        this.UnjoinedLevelOrder = source["UnjoinedLevelOrder"];
 	        this.TagColor = source["TagColor"];
 	        this.TagTextColor = source["TagTextColor"];
+	        this.NoTagBuild = source["NoTagBuild"];
 	        this.Contents = this.convertValues(source["Contents"], DiffTableDataDto);
 	        this.SortedLevels = source["SortedLevels"];
 	        this.LevelLayeredContents = this.convertValues(source["LevelLayeredContents"], DiffTableDataDto[], true);
@@ -334,7 +336,6 @@ export namespace dto {
 	    RivalSongDataID: number;
 	    Title: string;
 	    DiffTableInfo: string;
-	    SplitDiffTableInfo: string[];
 	    Page: number;
 	    PageSize: number;
 	    PageCount: number;
@@ -365,7 +366,6 @@ export namespace dto {
 	        this.RivalSongDataID = source["RivalSongDataID"];
 	        this.Title = source["Title"];
 	        this.DiffTableInfo = source["DiffTableInfo"];
-	        this.SplitDiffTableInfo = source["SplitDiffTableInfo"];
 	        this.Page = source["Page"];
 	        this.PageSize = source["PageSize"];
 	        this.PageCount = source["PageCount"];
@@ -599,6 +599,7 @@ export namespace entity {
 	    LevelOrders: string;
 	    TagColor: string;
 	    TagTextColor: string;
+	    NoTagBuild?: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new DiffTableHeader(source);
@@ -619,6 +620,7 @@ export namespace entity {
 	        this.LevelOrders = source["LevelOrders"];
 	        this.TagColor = source["TagColor"];
 	        this.TagTextColor = source["TagTextColor"];
+	        this.NoTagBuild = source["NoTagBuild"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1043,6 +1045,7 @@ export namespace vo {
 	    level_order: string[];
 	    tagColor: string;
 	    tagTextColor: string;
+	    noTagBuild?: number;
 	    Level: string;
 	    RivalID: number;
 	    GhostRivalID: number;
@@ -1071,6 +1074,7 @@ export namespace vo {
 	        this.level_order = source["level_order"];
 	        this.tagColor = source["tagColor"];
 	        this.tagTextColor = source["tagTextColor"];
+	        this.noTagBuild = source["noTagBuild"];
 	        this.Level = source["Level"];
 	        this.RivalID = source["RivalID"];
 	        this.GhostRivalID = source["GhostRivalID"];

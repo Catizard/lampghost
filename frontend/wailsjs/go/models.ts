@@ -265,6 +265,7 @@ export namespace dto {
 	    Name: string;
 	    ScoreLogPath?: string;
 	    SongDataPath?: string;
+	    ScoreDataLogPath?: string;
 	    PlayCount: number;
 	    MainUser: boolean;
 	    DiffTableHeader?: DiffTableHeaderDto;
@@ -282,6 +283,7 @@ export namespace dto {
 	        this.Name = source["Name"];
 	        this.ScoreLogPath = source["ScoreLogPath"];
 	        this.SongDataPath = source["SongDataPath"];
+	        this.ScoreDataLogPath = source["ScoreDataLogPath"];
 	        this.PlayCount = source["PlayCount"];
 	        this.MainUser = source["MainUser"];
 	        this.DiffTableHeader = this.convertValues(source["DiffTableHeader"], DiffTableHeaderDto);
@@ -329,6 +331,8 @@ export namespace dto {
 	    Md5: string;
 	    RivalSongDataID: number;
 	    Title: string;
+	    DiffTableInfo: string;
+	    SplitDiffTableInfo: string[];
 	    Page: number;
 	    PageSize: number;
 	    PageCount: number;
@@ -358,6 +362,8 @@ export namespace dto {
 	        this.Md5 = source["Md5"];
 	        this.RivalSongDataID = source["RivalSongDataID"];
 	        this.Title = source["Title"];
+	        this.DiffTableInfo = source["DiffTableInfo"];
+	        this.SplitDiffTableInfo = source["SplitDiffTableInfo"];
 	        this.Page = source["Page"];
 	        this.PageSize = source["PageSize"];
 	        this.PageCount = source["PageCount"];
@@ -699,6 +705,7 @@ export namespace entity {
 	    Name: string;
 	    ScoreLogPath?: string;
 	    SongDataPath?: string;
+	    ScoreDataLogPath?: string;
 	    PlayCount: number;
 	    MainUser: boolean;
 	
@@ -715,6 +722,7 @@ export namespace entity {
 	        this.Name = source["Name"];
 	        this.ScoreLogPath = source["ScoreLogPath"];
 	        this.SongDataPath = source["SongDataPath"];
+	        this.ScoreDataLogPath = source["ScoreDataLogPath"];
 	        this.PlayCount = source["PlayCount"];
 	        this.MainUser = source["MainUser"];
 	    }
@@ -1199,6 +1207,7 @@ export namespace vo {
 	    Name: string;
 	    ScoreLogPath?: string;
 	    SongDataPath?: string;
+	    ScoreDataLogPath?: string;
 	    PlayCount: number;
 	    MainUser: boolean;
 	    Pagination?: entity.Page;
@@ -1217,6 +1226,7 @@ export namespace vo {
 	        this.Name = source["Name"];
 	        this.ScoreLogPath = source["ScoreLogPath"];
 	        this.SongDataPath = source["SongDataPath"];
+	        this.ScoreDataLogPath = source["ScoreDataLogPath"];
 	        this.PlayCount = source["PlayCount"];
 	        this.MainUser = source["MainUser"];
 	        this.Pagination = this.convertValues(source["Pagination"], entity.Page);

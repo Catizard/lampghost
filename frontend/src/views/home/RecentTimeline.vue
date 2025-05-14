@@ -12,6 +12,11 @@
           </template> -->
         <template #default>
           <div v-for="log in node.logs" :key="log.ID" style="margin-top: 10px;">
+            <template v-if="log.DiffTableInfo.length > 0">
+              <n-tag v-for="name in log.DiffTableInfo.split(',')" :key="name" size="small" style="margin-right: 5px">
+                {{ name }}
+              </n-tag>
+            </template>
             {{ log.Title }}
           </div>
         </template>
@@ -41,7 +46,7 @@ type Node = {
   type: string | null,
   title: string,
   color: string, // hex color
-  logs: Array<dto.RivalScoreLogDto>
+  logs: Array<dto.RivalScoreLogDto>,
 }
 
 const loading = ref(false);

@@ -180,10 +180,20 @@ func queryPrevDayScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.R
 		max(rival_score_log.clear),
 		sd.title as title,
 		sd.md5 as md5,
-		sd.ID as rival_song_data_id
+		sd.ID as rival_song_data_id,
+		dt.diff_table_info
 	`
 	// NOTE: Some filter statements should be applied to both subquery and the outer one
 	partial := tx.Model(&entity.RivalScoreLog{}).Select(fields).Joins("left join (select ID, title, sha256, md5 from rival_song_data group by sha256) as sd on rival_score_log.sha256 = sd.sha256")
+	// TODO: Allow user to remove some tables, nobody cares the sl estimate table
+	partial = partial.Joins(`
+		left join (
+			select dd.md5, GROUP_CONCAT(dh.symbol || dd."level") as diff_table_info
+			from difftable_data dd 
+			left join difftable_header dh on dd.header_id = dh.id
+			group by dd.md5
+		) as dt on sd.md5 = dt.md5
+	`)
 	// TODO: This sql is stricted with "clear >= 4", should we make this configurable?
 	maximumDateQuery := tx.Model(&entity.RivalScoreLog{}).
 		Select("date(max(rival_score_log.record_time))").

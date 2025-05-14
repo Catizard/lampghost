@@ -57,7 +57,27 @@ func (s *RivalScoreLogService) QueryRivalScoreLogPageList(filter *vo.RivalScoreL
 // NOTE: Result is unique, only the maximum clear one would be reserved. And it's ordered,
 // the higher clear one would be placed before the lower one.
 func (s *RivalScoreLogService) QueryPrevDayScoreLogList(filter *vo.RivalScoreLogVo) ([]*dto.RivalScoreLogDto, int, error) {
-	return queryPrevDayScoreLogList(s.db, filter)
+	rawLogs, _, err := queryPrevDayScoreLogList(s.db, filter)
+	if err != nil {
+		return nil, 0, err
+	}
+	logs := make([]*dto.RivalScoreLogDto, 0)
+	for i := 0; i < len(rawLogs); i++ {
+		j := i
+		for j+1 < len(rawLogs) && rawLogs[j+1].ID == rawLogs[i].ID {
+			j++
+		}
+		log := rawLogs[i]
+		if log.TableName != "" {
+			log.TableTags = make([]*dto.DiffTableTagDto, 0)
+			for k := i; k <= j; k++ {
+				log.TableTags = append(log.TableTags, dto.PushDownTag(rawLogs[k]))
+			}
+			logs = append(logs, log)
+		}
+		i = j
+	}
+	return logs, len(logs), nil
 }
 
 func findRivalScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.RivalScoreLogDto, int, error) {
@@ -174,6 +194,8 @@ func selectRivalScoreLogCount(tx *gorm.DB, filter *vo.RivalScoreLogVo) (int64, e
 	return count, nil
 }
 
+// Warning: If one play log's song is related to multiple tables, the result would be duplicated.
+// It's the caller side's job to group the same play logs and construct the tags correctly.
 func queryPrevDayScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.RivalScoreLogDto, int, error) {
 	fields := `
 		rival_score_log.*,
@@ -181,14 +203,18 @@ func queryPrevDayScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.R
 		sd.title as title,
 		sd.md5 as md5,
 		sd.ID as rival_song_data_id,
-		dt.diff_table_info
+		dt.table_name,
+		dt.table_level,
+		dt.table_symbol,
+		dt.table_tag_color,
+		dt.table_tag_text_color
 	`
 	// NOTE: Some filter statements should be applied to both subquery and the outer one
 	partial := tx.Model(&entity.RivalScoreLog{}).Select(fields).Joins("left join (select ID, title, sha256, md5 from rival_song_data group by sha256) as sd on rival_score_log.sha256 = sd.sha256")
 	// TODO: Allow user to remove some tables, nobody cares the sl estimate table
 	partial = partial.Joins(`
 		left join (
-			select dd.md5, GROUP_CONCAT(dh.symbol || dd."level") as diff_table_info
+			select dd.md5, dh.name as table_name, dh.tag_color as table_tag_color, dh.tag_text_color as table_tag_text_color, dh.symbol as table_symbol, dd."level" as table_level
 			from difftable_data dd 
 			left join difftable_header dh on dd.header_id = dh.id
 			where dh.no_tag_build = 0

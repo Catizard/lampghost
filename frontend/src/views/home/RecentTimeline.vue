@@ -12,9 +12,10 @@
           </template> -->
         <template #default>
           <div v-for="log in node.logs" :key="log.ID" style="margin-top: 10px;">
-            <template v-if="log.DiffTableInfo.length > 0">
-              <n-tag v-for="name in log.DiffTableInfo.split(',')" :key="name" size="small" style="margin-right: 5px">
-                {{ name }}
+            <template v-if="log.TableTags.length > 0">
+              <n-tag v-for="dTag in log.TableTags" :key="dTag.TableName + dTag.TableLevel" size="small"
+                style="margin-right: 5px" v-bind="dynamicDTagProps(dTag)">
+                {{ dTag.TableSymbol + dTag.TableLevel }}
               </n-tag>
             </template>
             {{ log.Title }}
@@ -81,6 +82,7 @@ async function handleLoad() {
         logs: [],
         color: "#000000",
       });
+      console.log(nextLogs);
       for (let i = 0; i < nextLogs.length; ++i) {
         let j = i;
         while (j + 1 < nextLogs.length && nextLogs[j + 1].Clear == nextLogs[i].Clear) j++;
@@ -124,6 +126,26 @@ function dynamicNodeProps(node: Node) {
     } as any // make typescript chill...
   }
   return {
+  }
+}
+
+// dynamic v-bind
+function dynamicDTagProps(dTag: dto.DiffTableTagDto) {
+  let props: any = {}
+  let hasProp = false;
+  if (dTag.TableTagColor.length > 0) {
+    props.color = dTag.TableTagColor;
+    hasProp = true;
+  }
+  if (dTag.TableTagTextColor.length > 0) {
+    props.textColor = dTag.TableTagTextColor
+    hasProp = true;
+  }
+  if (!hasProp) {
+    return {}
+  }
+  return {
+    color: props
   }
 }
 

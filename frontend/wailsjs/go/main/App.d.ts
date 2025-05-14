@@ -80,6 +80,8 @@ export function GENERATOR_TABLE_HEADER():Promise<entity.DiffTableHeader>;
 
 export function GENERATOR_TABLE_HEADER_DTO():Promise<dto.DiffTableHeaderDto>;
 
+export function GENERATOR_TABLE_TAG_DTO():Promise<dto.DiffTableTagDto>;
+
 export function InitializeMainUser(arg1:vo.RivalInfoVo):Promise<result.RtnMessage>;
 
 export function OpenFileDialog(arg1:string):Promise<result.RtnData>;

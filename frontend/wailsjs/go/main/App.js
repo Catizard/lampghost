@@ -150,6 +150,10 @@ export function GENERATOR_TABLE_HEADER_DTO() {
   return window['go']['main']['App']['GENERATOR_TABLE_HEADER_DTO']();
 }
 
+export function GENERATOR_TABLE_TAG_DTO() {
+  return window['go']['main']['App']['GENERATOR_TABLE_TAG_DTO']();
+}
+
 export function InitializeMainUser(arg1) {
   return window['go']['main']['App']['InitializeMainUser'](arg1);
 }

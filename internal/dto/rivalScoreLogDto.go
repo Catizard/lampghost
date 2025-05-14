@@ -25,9 +25,14 @@ type RivalScoreLogDto struct {
 	Md5             string
 	RivalSongDataID uint
 	Title           string
-	// A comma sperated string, storing difficult table's abbreviation
-	// E.g. SL4,P5,ST3
-	DiffTableInfo string
+	// Difficult table tag fields
+	// It's there any better way handling this?
+	TableName         string
+	TableLevel        string
+	TableSymbol       string
+	TableTagColor     string
+	TableTagTextColor string
+	TableTags         []*DiffTableTagDto `gorm:"-"`
 	// Pagination
 	Page      int
 	PageSize  int

@@ -161,3 +161,5 @@ func (ctl *DiffTableController) GENERATOR_TABLE_HEADER() *entity.DiffTableHeader
 func (ctl *DiffTableController) GENERATOR_TABLE_HEADER_DTO() *dto.DiffTableHeaderDto { return nil }
 
 func (ctl *DiffTableController) GENERATOR_TABLE_DATA() *dto.DiffTableDataDto { return nil }
+
+func (ctl *DiffTableController) GENERATOR_TABLE_TAG_DTO() *dto.DiffTableTagDto { return nil }

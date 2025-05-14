@@ -186,6 +186,26 @@ export namespace dto {
 		    return a;
 		}
 	}
+	export class DiffTableTagDto {
+	    TableName: string;
+	    TableLevel: string;
+	    TableSymbol: string;
+	    TableTagColor: string;
+	    TableTagTextColor: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new DiffTableTagDto(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.TableName = source["TableName"];
+	        this.TableLevel = source["TableLevel"];
+	        this.TableSymbol = source["TableSymbol"];
+	        this.TableTagColor = source["TableTagColor"];
+	        this.TableTagTextColor = source["TableTagTextColor"];
+	    }
+	}
 	export class FolderContentDto {
 	    ID: number;
 	    FolderID: number;
@@ -335,7 +355,12 @@ export namespace dto {
 	    Md5: string;
 	    RivalSongDataID: number;
 	    Title: string;
-	    DiffTableInfo: string;
+	    TableName: string;
+	    TableLevel: string;
+	    TableSymbol: string;
+	    TableTagColor: string;
+	    TableTagTextColor: string;
+	    TableTags: DiffTableTagDto[];
 	    Page: number;
 	    PageSize: number;
 	    PageCount: number;
@@ -365,7 +390,12 @@ export namespace dto {
 	        this.Md5 = source["Md5"];
 	        this.RivalSongDataID = source["RivalSongDataID"];
 	        this.Title = source["Title"];
-	        this.DiffTableInfo = source["DiffTableInfo"];
+	        this.TableName = source["TableName"];
+	        this.TableLevel = source["TableLevel"];
+	        this.TableSymbol = source["TableSymbol"];
+	        this.TableTagColor = source["TableTagColor"];
+	        this.TableTagTextColor = source["TableTagTextColor"];
+	        this.TableTags = this.convertValues(source["TableTags"], DiffTableTagDto);
 	        this.Page = source["Page"];
 	        this.PageSize = source["PageSize"];
 	        this.PageCount = source["PageCount"];

@@ -20,8 +20,8 @@
 </template>
 
 <script lang="ts" setup>
-import type { DropdownOption } from "naive-ui";
-import { NButton, NDataTable, NDropdown, useDialog } from "naive-ui";
+import type { DropdownOption, TagProps } from "naive-ui";
+import { NButton, NDataTable, NDropdown, NTag, useDialog } from "naive-ui";
 import { useNotification } from "naive-ui";
 import { h, Ref, ref } from "vue";
 import {
@@ -34,6 +34,7 @@ import DifficultTableAddForm from "./DifficultTableAddForm.vue";
 import DifficultTableEditForm from "./DifficultTableEditForm.vue";
 import DifficultTableSortModal from "./DifficultTableSortModal.vue";
 import DifficultTableLevelSortModal from "./DifficultTableLevelSortModal.vue";
+import { TagColor } from "naive-ui/es/tag/src/common-props";
 
 const i18n = useI18n();
 const { t } = i18n;
@@ -49,6 +50,22 @@ loadDiffTableData();
 
 const columns = [
   { title: t('column.name'), key: "Name", },
+  { title: t('column.tag'), key: "Tag",
+    render(row: dto.DiffTableHeaderDto) {
+      let tagColorProp: TagColor = {};
+      if (row.TagColor != '') {
+        tagColorProp.color = row.TagColor;
+      }
+      if (row.TagTextColor != '') {
+        tagColorProp.textColor = row.TagTextColor;
+      }
+      return h(
+        NTag,
+        { color: tagColorProp },
+        { default: () => row.Symbol == '' ? '/' : row.Symbol },
+      )
+    }
+  },
   { title: t('column.url'), key: "HeaderUrl", },
   {
     title: t('column.actions'),
@@ -174,7 +191,8 @@ function notifyError(msg: string) {
     "column": {
       "name": "Name",
       "url": "URL",
-      "actions": "Actions"
+      "actions": "Actions",
+      "tag": "Tag"
     },
     "deleteDialog": {
       "title": "Confirm to delete?",
@@ -199,7 +217,8 @@ function notifyError(msg: string) {
     "column": {
       "name": "名称",
       "url": "地址",
-      "actions": "操作"
+      "actions": "操作",
+      "tag": "标签"
     },
     "deleteDialog": {
       "title": "确定要删除吗？",

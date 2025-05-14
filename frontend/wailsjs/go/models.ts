@@ -129,9 +129,10 @@ export namespace dto {
 	    Name: string;
 	    OriginalUrl?: string;
 	    Symbol: string;
-	    EnableFallbackSort: number;
 	    LevelOrders: string;
 	    UnjoinedLevelOrder: string[];
+	    TagColor: string;
+	    TagTextColor: string;
 	    Contents: DiffTableDataDto[];
 	    SortedLevels: string[];
 	    LevelLayeredContents: Record<string, DiffTableDataDto[]>;
@@ -152,9 +153,10 @@ export namespace dto {
 	        this.Name = source["Name"];
 	        this.OriginalUrl = source["OriginalUrl"];
 	        this.Symbol = source["Symbol"];
-	        this.EnableFallbackSort = source["EnableFallbackSort"];
 	        this.LevelOrders = source["LevelOrders"];
 	        this.UnjoinedLevelOrder = source["UnjoinedLevelOrder"];
+	        this.TagColor = source["TagColor"];
+	        this.TagTextColor = source["TagTextColor"];
 	        this.Contents = this.convertValues(source["Contents"], DiffTableDataDto);
 	        this.SortedLevels = source["SortedLevels"];
 	        this.LevelLayeredContents = this.convertValues(source["LevelLayeredContents"], DiffTableDataDto[], true);
@@ -595,7 +597,8 @@ export namespace entity {
 	    Symbol: string;
 	    OrderNumber: number;
 	    LevelOrders: string;
-	    EnableFallbackSort: number;
+	    TagColor: string;
+	    TagTextColor: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new DiffTableHeader(source);
@@ -614,7 +617,8 @@ export namespace entity {
 	        this.Symbol = source["Symbol"];
 	        this.OrderNumber = source["OrderNumber"];
 	        this.LevelOrders = source["LevelOrders"];
-	        this.EnableFallbackSort = source["EnableFallbackSort"];
+	        this.TagColor = source["TagColor"];
+	        this.TagTextColor = source["TagTextColor"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1035,9 +1039,10 @@ export namespace vo {
 	    symbol: string;
 	    Courses: CourseInfoVo[];
 	    HeaderUrl: string;
-	    EnableFallbackSort: number;
 	    LevelOrders: string;
 	    level_order: string[];
+	    tagColor: string;
+	    tagTextColor: string;
 	    Level: string;
 	    RivalID: number;
 	    GhostRivalID: number;
@@ -1062,9 +1067,10 @@ export namespace vo {
 	        this.symbol = source["symbol"];
 	        this.Courses = this.convertValues(source["Courses"], CourseInfoVo);
 	        this.HeaderUrl = source["HeaderUrl"];
-	        this.EnableFallbackSort = source["EnableFallbackSort"];
 	        this.LevelOrders = source["LevelOrders"];
 	        this.level_order = source["level_order"];
+	        this.tagColor = source["tagColor"];
+	        this.tagTextColor = source["tagTextColor"];
 	        this.Level = source["Level"];
 	        this.RivalID = source["RivalID"];
 	        this.GhostRivalID = source["GhostRivalID"];

@@ -19,9 +19,9 @@ func NewDiffTableController(diffTableService *service.DiffTableService) *DiffTab
 	}
 }
 
-func (ctl *DiffTableController) AddDiffTableHeader(url string) result.RtnMessage {
+func (ctl *DiffTableController) AddDiffTableHeader(param *vo.DiffTableHeaderVo) result.RtnMessage {
 	log.Info("[Controller] calling DiffTableController.AddDiffTableHeader")
-	_, err := ctl.diffTableService.AddDiffTableHeader(url)
+	_, err := ctl.diffTableService.AddDiffTableHeader(param)
 	if err != nil {
 		log.Errorf("[DiffTableController] returning err: %v", err)
 		return result.NewErrorMessage(err)

@@ -28,8 +28,6 @@ type RivalScoreLogDto struct {
 	// A comma sperated string, storing difficult table's abbreviation
 	// E.g. SL4,P5,ST3
 	DiffTableInfo string
-	// Splitted DiffTableInfo
-	SplitDiffTableInfo []string
 	// Pagination
 	Page      int
 	PageSize  int

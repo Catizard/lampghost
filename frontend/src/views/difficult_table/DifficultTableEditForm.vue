@@ -3,8 +3,11 @@
     :positive-text="t('modal.positiveText')" :negative-text="t('modal.negativeText')"
     @positive-click="handlePositiveClick" @negative-click="handleNegativeClick" :mask-closable="false">
     <n-form ref="formRef" :model="formData">
-      <n-form-item :label="t('modal.labelEnableFallbackSort')" path="url">
-        <n-select v-model:value="formData.EnableFallbackSort" :options="yesnoOptions" />
+      <n-form-item :label="t('modal.labelTagColor')" path="TagColor" >
+        <n-color-picker v-model:value="formData.TagColor" :show-alpha="false" :modes="['hex', 'rgb']" />
+      </n-form-item>
+      <n-form-item :label="t('modal.labelTagTextColor')" path="TagTextColor">
+        <n-color-picker v-model:value="formData.TagTextColor" :show-alpha="false" :modes="['hex', 'rgb']" />
       </n-form-item>
     </n-form>
   </n-modal>
@@ -12,9 +15,9 @@
 
 <script setup lang="ts">
 import { QueryDiffTableInfoById, UpdateDiffTableHeader } from '@wailsjs/go/main/App';
-import { dto, vo } from '@wailsjs/go/models';
+import { dto } from '@wailsjs/go/models';
 import { FormInst, SelectOption, useNotification } from 'naive-ui';
-import { onMounted, ref, watch } from 'vue';
+import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -29,7 +32,8 @@ const loading = ref(false);
 const formRef = ref<FormInst | null>(null);
 const formData = ref({
   ID: 0,
-  EnableFallbackSort: 0,
+  TagColor: "",
+  TagTextColor: "",
 });
 
 const yesnoOptions: Array<SelectOption> = [
@@ -46,16 +50,14 @@ const yesnoOptions: Array<SelectOption> = [
 function handlePositiveClick(): boolean {
   formRef.value
     ?.validate()
-    .then(() => {
-      return UpdateDiffTableHeader(formData.value as any)
-        .then(result => {
-          if (result.Code != 200) {
-            return Promise.reject(result.Msg);
-          }
-          formData.value.EnableFallbackSort = 0;
-          show.value = false;
-          emit('refresh');
-        });
+    .then(async () => {
+      console.log('form:', formData.value);
+      const result = await UpdateDiffTableHeader(formData.value as any);
+      if (result.Code != 200) {
+        return Promise.reject(result.Msg);
+      }
+      show.value = false;
+      emit('refresh');
     })
     .catch((err) => {
       notification.error({
@@ -68,7 +70,6 @@ function handlePositiveClick(): boolean {
 }
 
 function handleNegativeClick() {
-  formData.value.EnableFallbackSort = 0;
 }
 
 function open(headerId: number) {
@@ -91,7 +92,8 @@ function open(headerId: number) {
         return Promise.reject(result.Msg);
       }
       const data: dto.DiffTableHeaderDto = result.Data;
-      formData.value.EnableFallbackSort = data.EnableFallbackSort;
+      formData.value.TagColor = data.TagColor;
+      formData.value.TagTextColor = data.TagTextColor;
     }).catch(err => {
       notification.error({
         content: err,
@@ -110,8 +112,7 @@ function open(headerId: number) {
     "modal": {
       "title": "Edit table",
       "positiveText": "submit",
-      "negativeText": "cancel",
-      "labelEnableFallbackSort": "Enable fallback sort strategy"
+      "negativeText": "cancel"
     },
     "options": {
       "yes": "Yes",
@@ -125,8 +126,7 @@ function open(headerId: number) {
     "modal": {
       "title": "修改难度表",
       "positiveText": "新增",
-      "negativeText": "取消",
-      "labelEnableFallbackSort": "是否启用保底排序机制"
+      "negativeText": "取消"
     },
     "options": {
       "yes": "是",

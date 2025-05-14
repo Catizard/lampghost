@@ -16,9 +16,10 @@ type DiffTableHeaderVo struct {
 	Symbol             string  `json:"symbol"`
 	Courses            []CourseInfoVo
 	HeaderUrl          string
-	EnableFallbackSort int
 	LevelOrders        string
 	UnjoinedLevelOrder []string `json:"level_order"`
+	TagColor           string   `json:"tagColor"`
+	TagTextColor       string   `json:"tagTextColor"`
 
 	Level           string
 	RivalID         uint
@@ -42,13 +43,14 @@ func (header *DiffTableHeaderVo) Entity() *entity.DiffTableHeader {
 			UpdatedAt: header.UpdatedAt,
 			DeletedAt: header.DeletedAt,
 		},
-		DataUrl:            header.DataUrl,
-		Name:               header.Name,
-		OriginalUrl:        header.OriginalUrl,
-		Symbol:             header.Symbol,
-		HeaderUrl:          header.HeaderUrl,
-		EnableFallbackSort: header.EnableFallbackSort,
-		LevelOrders:        strings.Join(header.UnjoinedLevelOrder, ","),
+		DataUrl:      header.DataUrl,
+		Name:         header.Name,
+		OriginalUrl:  header.OriginalUrl,
+		Symbol:       header.Symbol,
+		HeaderUrl:    header.HeaderUrl,
+		LevelOrders:  strings.Join(header.UnjoinedLevelOrder, ","),
+		TagColor:     header.TagColor,
+		TagTextColor: header.TagTextColor,
 	}
 }
 

@@ -6,6 +6,13 @@
       <n-form-item :label="t('modal.labelAddress')" path="url">
         <n-input v-model:value="formData.url" :placeholder="t('modal.placeholderAddress')" />
       </n-form-item>
+      <!-- TODO: We need to refactor AddDiffTableHeader api before adding this -->
+      <n-form-item :label="t('modal.labelTagColor')" path="TagColor">
+        <n-color-picker v-model:value="formData.TagColor" :show-alpha="false" :modes="['hex', 'rgb']" />
+      </n-form-item>
+      <n-form-item :label="t('modal.labelTagTextColor')" path="TagTextColor">
+        <n-color-picker v-model:value="formData.TagTextColor" :show-alpha="false" :modes="['hex', 'rgb']" />
+      </n-form-item>
     </n-form>
   </n-modal>
 </template>
@@ -27,6 +34,8 @@ const loading = ref(false);
 const formRef = ref<FormInst | null>(null);
 const formData = ref({
   url: "",
+  TagColor: "",
+  TagTextColor: "",
 });
 const rules = {
   url: {
@@ -40,34 +49,36 @@ function handlePositiveClick(): boolean {
   formRef.value
     ?.validate()
     .then(() => {
-      addDiffTableHeader(formData.value.url)
+      loading.value = true;
+      AddDiffTableHeader(formData.value as any)
+        .then(result => {
+          if (result.Code != 200) {
+            return Promise.reject(result.Msg);
+          }
+          resetFormData();
+          show.value = false;
+          emit('refresh');
+        })
+        .catch((err) => {
+          notification.error({
+            content: err,
+            duration: 3000,
+            keepAliveOnHover: true
+          })
+        }).finally(() => loading.value = false);
     })
     .catch((err) => { });
   return false;
 }
 
 function handleNegativeClick() {
-  formData.value.url = "";
+  resetFormData();
 }
 
-function addDiffTableHeader(url: string) {
-  loading.value = true;
-  AddDiffTableHeader(url)
-    .then(result => {
-      if (result.Code != 200) {
-        return Promise.reject(result.Msg);
-      }
-      formData.value.url = "";
-      show.value = false;
-      emit('refresh');
-    })
-    .catch((err) => {
-      notification.error({
-        content: err,
-        duration: 3000,
-        keepAliveOnHover: true
-      })
-    }).finally(() => loading.value = false);
+function resetFormData() {
+  formData.value.url = "";
+  formData.value.TagColor = "";
+  formData.value.TagTextColor = "";
 }
 </script>
 

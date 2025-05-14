@@ -33,8 +33,8 @@ func NewDiffTableService(db *gorm.DB) *DiffTableService {
 //
 //	1.difficult table's url must be unique
 //	2.difficult table's data_url must be unique
-func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHeader, error) {
-	url = strings.TrimSpace(url)
+func (s *DiffTableService) AddDiffTableHeader(param *vo.DiffTableHeaderVo) (*entity.DiffTableHeader, error) {
+	url := strings.TrimSpace(param.HeaderUrl)
 	log.Debugf("[DiffTableService] calling AddDiffTableHeader with url: %s", url)
 	if isDuplicated, err := queryDiffTableHeaderExistence(s.db, &entity.DiffTableHeader{HeaderUrl: url}); isDuplicated || err != nil {
 		if err != nil {
@@ -57,6 +57,9 @@ func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHead
 	}
 
 	headerEntity := entity.NewDiffTableHeaderFromImport(&rawHeader)
+	// HACK: Inherit some fields from passing parameter
+	headerEntity.TagColor = param.TagColor
+	headerEntity.TagTextColor = param.TagTextColor
 
 	// Transaction begins from here
 	if err := s.db.Transaction(func(tx *gorm.DB) error {
@@ -99,11 +102,13 @@ func (s *DiffTableService) AddDiffTableHeader(url string) (*entity.DiffTableHead
 }
 
 func (s *DiffTableService) UpdateDiffTableHeader(param *vo.DiffTableHeaderVo) error {
-	if param.ID == 0 {
-		return fmt.Errorf("UpdateDiffTableHeader: ID should > 0")
+	if param == nil {
+		return eris.Errorf("update: param cannot be nil")
 	}
-	// No, I hate this
-	return s.db.Debug().Select("enable_fallback_sort").Updates(param.Entity()).Error
+	if param.ID == 0 {
+		return eris.Errorf("update: ID cannot be 0")
+	}
+	return s.db.Debug().Updates(param.Entity()).Error
 }
 
 // Query all difficult table datas
@@ -195,11 +200,6 @@ func (s *DiffTableService) FindDiffTableHeaderTree(filter *vo.DiffTableHeaderVo)
 	}
 
 	for headerInx, header := range headers {
-		// Skip sort if no order is pre-defined and the header is not configured to use the fallback sort strategy
-		if header.LevelOrders == "" && header.EnableFallbackSort != 0 {
-			log.Debugf("[DiffTableService] no pre-defined orders & fallback is unset, skipping sort")
-			continue
-		}
 		headers[headerInx].Children = sortHeadersByLevel(header.Children, header.UnjoinedLevelOrder)
 	}
 
@@ -286,11 +286,6 @@ func (s *DiffTableService) FindDiffTableHeaderTreeWithRival(filter *vo.DiffTable
 	}
 
 	for headerInx, header := range headers {
-		// Skip sort if no order is pre-defined and the header is not configured to use the fallback sort strategy
-		if header.LevelOrders == "" && header.EnableFallbackSort != 0 {
-			log.Debugf("[DiffTableService] no pre-defined orders & fallback is unset, skipping sort")
-			continue
-		}
 		headers[headerInx].Children = sortHeadersByLevel(header.Children, header.UnjoinedLevelOrder)
 	}
 
@@ -458,13 +453,7 @@ func queryLevelLayeredDiffTableInfoById(tx *gorm.DB, ID uint) (*dto.DiffTableHea
 	for level := range levels {
 		sortedLevels = append(sortedLevels, level)
 	}
-	// Skip sort if no order is pre-defined and the header is not configured to use the fallback sort strategy
-	if header.LevelOrders == "" && header.EnableFallbackSort != 0 {
-		// do nothing...
-		log.Debugf("[DiffTableService] no pre-defined orders & fallback is unset, skipping sort")
-	} else {
-		sortedLevels = sortLevels(sortedLevels, header.UnjoinedLevelOrder)
-	}
+	sortedLevels = sortLevels(sortedLevels, header.UnjoinedLevelOrder)
 	return dto.NewLevelLayeredDiffTableHeaderDto(header.Entity(), sortedLevels, levelLayeredContent), nil
 }
 

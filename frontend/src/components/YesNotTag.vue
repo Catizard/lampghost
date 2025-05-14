@@ -28,7 +28,7 @@ const table: Array<TagDef> = [
   {
     value: true,
     text: "YES",
-    color: "#49E670",
+    color: "#17964E",
     textColor: "#ffffff",
   }
 ];

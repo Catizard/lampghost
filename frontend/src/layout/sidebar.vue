@@ -97,11 +97,11 @@ const menuOptions: MenuOption[] = [
 		key: "courses",
 		icon: renderIcon(CoursesIcon)
 	},
-	{
-		label: renderOption("/goals", t('menuName.goals')),
-		key: "goals",
-		icon: renderIcon(GoalsIcon),
-	},
+	// {
+	// 	label: renderOption("/goals", t('menuName.goals')),
+	// 	key: "goals",
+	// 	icon: renderIcon(GoalsIcon),
+	// },
 	{
 		label: renderOption("/settings", t('menuName.settings')),
 		key: "settings",

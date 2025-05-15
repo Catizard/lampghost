@@ -96,6 +96,8 @@ export function QueryDiffTableInfoWithRival(arg1:number,arg2:number):Promise<res
 
 export function QueryFolderDefinition():Promise<result.RtnDataList>;
 
+export function QueryLatestVersion():Promise<result.RtnMessage>;
+
 export function QueryLevelLayeredDiffTableInfoByID(arg1:number):Promise<result.RtnData>;
 
 export function QueryMainUser():Promise<result.RtnData>;

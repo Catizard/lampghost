@@ -182,6 +182,10 @@ export function QueryFolderDefinition() {
   return window['go']['main']['App']['QueryFolderDefinition']();
 }
 
+export function QueryLatestVersion() {
+  return window['go']['main']['App']['QueryLatestVersion']();
+}
+
 export function QueryLevelLayeredDiffTableInfoByID(arg1) {
   return window['go']['main']['App']['QueryLevelLayeredDiffTableInfoByID'](arg1);
 }

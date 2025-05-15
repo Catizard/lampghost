@@ -13,6 +13,9 @@
       <n-h2>
         {{ t('generalSettings.title') }}
         <n-p>
+          <n-button type="info" @click="checkVersion">{{ t('button.checkVersion') }}</n-button>
+        </n-p>
+        <n-p>
           <n-form-item :label="t('generalSettings.labelLanguage')">
             <n-select v-model:value="model.Locale" :options="localeOptions" style="width: 150px;" />
           </n-form-item>
@@ -37,7 +40,7 @@
           {{ t('folderSettings.title') }}
         </n-text>
         <!-- <n-p class="alert-p">
-          {{ t('folderSettings.labelInternalServerPort') }} 
+          {{ t('folderSettings.labelInternalServerPort') }}
         </n-p> -->
         <n-form-item :label="t('folderSettings.labelInternalServerPort')" path="internalServerPort">
           <n-input-number :show-button="false" v-model:value="model.InternalServerPort"
@@ -69,7 +72,7 @@ import { ref } from 'vue';
 import {
   ChatboxEllipsesOutline as HintIcon,
 } from '@vicons/ionicons5';
-import { ReadConfig, WriteConfig } from '@wailsjs/go/main/App';
+import { QueryLatestVersion, ReadConfig, WriteConfig } from '@wailsjs/go/main/App';
 import { config } from '../../../wailsjs/go/models';
 import { useI18n } from 'vue-i18n';
 
@@ -148,6 +151,25 @@ function loadSettings() {
     })
 }
 
+function checkVersion() {
+  QueryLatestVersion()
+    .then(result => {
+      if (result.Code != 200) {
+        return Promise.reject(result.Msg);
+      }
+      notification.info({
+        content: result.Msg,
+        duration: 3000,
+      });
+    }).catch(err => {
+      notification.error({
+        content: err,
+        duration: 3000,
+        keepAliveOnHover: true
+      })
+    });
+}
+
 loadSettings();
 </script>
 
@@ -171,7 +193,8 @@ loadSettings();
   "en": {
     "title": "Settings",
     "button": {
-      "save": "Save"
+      "save": "Save",
+      "checkVersion": "Check Version"
     },
     "generalSettings": {
       "title": "General Settings",
@@ -211,7 +234,8 @@ loadSettings();
   "zh-CN": {
     "title": "设置",
     "button": {
-      "save": "保存"
+      "save": "保存",
+      "checkVersion": "检查版本"
     },
     "generalSettings": {
       "title": "通用设置",

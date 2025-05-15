@@ -5,6 +5,7 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/vo"
 	"github.com/rotisserie/eris"
+	. "github.com/samber/lo"
 	"gorm.io/gorm"
 )
 
@@ -35,6 +36,23 @@ func (s *RivalScoreLogService) QueryRivalScoreLogPageList(filter *vo.RivalScoreL
 		tx.Rollback()
 		return nil, 0, err
 	}
+	tableTags, _, err := queryDiffTableTag(tx, &vo.DiffTableDataVo{
+		Md5s: Map(scoreLogs, func(log *dto.RivalScoreLogDto, _ int) string {
+			return log.Md5
+		}),
+	})
+	if err != nil {
+		tx.Rollback()
+		return nil, 0, err
+	}
+	ForEach(scoreLogs, func(log *dto.RivalScoreLogDto, _ int) {
+		log.TableTags = make([]*dto.DiffTableTagDto, 0)
+		ForEach(tableTags, func(tag *dto.DiffTableTagDto, _ int) {
+			if tag.Md5 == log.Md5 {
+				log.TableTags = append(log.TableTags, tag)
+			}
+		})
+	})
 	if err := tx.Commit().Error; err != nil {
 		return nil, 0, err
 	}
@@ -211,7 +229,7 @@ func queryPrevDayScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.R
 	`
 	// NOTE: Some filter statements should be applied to both subquery and the outer one
 	partial := tx.Model(&entity.RivalScoreLog{}).Select(fields).Joins("left join (select ID, title, sha256, md5 from rival_song_data group by sha256) as sd on rival_score_log.sha256 = sd.sha256")
-	// TODO: Allow user to remove some tables, nobody cares the sl estimate table
+	// TODO: pagination rival_score_log has another implement way of tags, should be unified in the future
 	partial = partial.Joins(`
 		left join (
 			select dd.md5, dh.name as table_name, dh.tag_color as table_tag_color, dh.tag_text_color as table_tag_text_color, dh.symbol as table_symbol, dd."level" as table_level
@@ -243,6 +261,9 @@ func scopeRivalScoreLogFilter(filter *vo.RivalScoreLogVo) func(db *gorm.DB) *gor
 		// Extra filters
 		if filter.OnlyCourseLogs {
 			moved = moved.Where("length(rival_score_log.sha256) > 64")
+		}
+		if filter.NoCourseLog {
+			moved = moved.Where("length(rival_score_log.sha256) = 64")
 		}
 		if !filter.StartRecordTime.IsZero() {
 			moved = moved.Where("rival_score_log.record_time >= ?", filter.StartRecordTime)

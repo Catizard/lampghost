@@ -187,6 +187,7 @@ export namespace dto {
 		}
 	}
 	export class DiffTableTagDto {
+	    Md5: string;
 	    TableName: string;
 	    TableLevel: string;
 	    TableSymbol: string;
@@ -199,6 +200,7 @@ export namespace dto {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Md5 = source["Md5"];
 	        this.TableName = source["TableName"];
 	        this.TableLevel = source["TableLevel"];
 	        this.TableSymbol = source["TableSymbol"];
@@ -1422,6 +1424,7 @@ export namespace vo {
 	    RecordTime: any;
 	    Pagination?: entity.Page;
 	    OnlyCourseLogs: boolean;
+	    NoCourseLog: boolean;
 	    // Go type: time
 	    StartRecordTime: any;
 	    // Go type: time
@@ -1458,6 +1461,7 @@ export namespace vo {
 	        this.RecordTime = this.convertValues(source["RecordTime"], null);
 	        this.Pagination = this.convertValues(source["Pagination"], entity.Page);
 	        this.OnlyCourseLogs = source["OnlyCourseLogs"];
+	        this.NoCourseLog = source["NoCourseLog"];
 	        this.StartRecordTime = this.convertValues(source["StartRecordTime"], null);
 	        this.EndRecordTime = this.convertValues(source["EndRecordTime"], null);
 	        this.StartRecordTimestamp = source["StartRecordTimestamp"];

@@ -20,8 +20,8 @@
 <script lang="ts" setup>
 import ClearTag from '@/components/ClearTag.vue';
 import { QueryRivalScoreLogPageList } from '@wailsjs/go/main/App';
-import { DataTableColumns, DataTableRowKey, NButton, useNotification } from 'naive-ui';
-import { h, onMounted, reactive, Ref, ref } from 'vue';
+import { DataTableColumns, DataTableRowKey, NButton, NTag, useNotification } from 'naive-ui';
+import { h, onMounted, reactive, Ref, ref, VNode } from 'vue';
 import SelectFolder from '../folder/SelectFolder.vue';
 import { BindRivalSongDataToFolder } from '@wailsjs/go/main/App';
 import { dto, vo } from '@wailsjs/go/models';
@@ -64,7 +64,36 @@ function handleSubmit(folderIds: number[]) {
 function createColumns(): DataTableColumns<dto.RivalScoreLogDto> {
   return [
     { title: t('column.name'), key: "Title", resizable: true },
-    { title: t('column.tag'), key: "Tag", minWidth: "100px", resizable: true },
+    {
+      title: t('column.tag'), key: "Tag", minWidth: "100px", resizable: true,
+      render(row: dto.RivalScoreLogDto) {
+        const nodes: Array<VNode> = [];
+        if (row.TableTags.length == 0) {
+          return nodes;
+        }
+        row.TableTags.forEach(tag => {
+          const props = {
+            size: "small",
+            style: {
+              "margin-right": "5px"
+            },
+          };
+          if (tag.TableTagColor.length > 0) {
+            (props as any).color.color = tag.TableTagColor;
+          }
+          if (tag.TableTagTextColor.length > 0) {
+            (props as any).color.textColor = tag.TableTagTextColor;
+          }
+          const node = h(
+            NTag,
+            props as any,
+            { default: () => tag.TableSymbol + tag.TableLevel }
+          )
+          nodes.push(node);
+        });
+        return nodes;
+      }
+    },
     {
       title: t('column.clear'), key: "Clear", minWidth: "100px", resizable: true,
       render(row: dto.RivalScoreLogDto) {
@@ -108,12 +137,14 @@ function loadData() {
     RivalID: 1,
     Pagination: pagination,
     SongNameLike: searchNameLike.value,
+    NoCourseLog: true,
   } as any;
   QueryRivalScoreLogPageList(arg)
     .then(result => {
       if (result.Code != 200) {
         return Promise.reject(result.Msg);
       }
+      console.log(result);
       data.value = [...result.Rows];
       pagination.pageCount = result.Pagination.pageCount;
     })

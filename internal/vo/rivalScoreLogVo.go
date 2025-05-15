@@ -26,6 +26,7 @@ type RivalScoreLogVo struct {
 	Pagination *entity.Page
 	// Extra filter field
 	OnlyCourseLogs bool
+	NoCourseLog    bool
 	// StartRecordTime <= RecordTime <= EndRecordTime
 	StartRecordTime      time.Time
 	EndRecordTime        time.Time

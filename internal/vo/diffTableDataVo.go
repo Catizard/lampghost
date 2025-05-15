@@ -34,6 +34,7 @@ type DiffTableDataVo struct {
 	GhostRivalID uint
 	// See diffTableDataService#findDiffTableDataListWithRival for usage
 	EndGhostRecordTime time.Time
+	Md5s               []string
 }
 
 func (data *DiffTableDataVo) Entity() *entity.DiffTableData {

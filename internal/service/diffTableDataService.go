@@ -79,6 +79,33 @@ func findDiffTableDataList(tx *gorm.DB, filter *vo.DiffTableDataVo) ([]*dto.Diff
 	return ret, len(ret), nil
 }
 
+// Query difficult table tags, for building tag like "SL5", "ST11" for play logs
+/*
+select dh.name as table_name, dd."level" as table_level, dh.symbol as table_symbol, dh.tag_color as table_tag_color, dh.tag_text_color as table_tag_text_color
+from difftable_data dd
+left join difftable_header dh on dd.header_id = dh.id
+where dd.md5 in ("176c2b2db4efd66cf186caae7923d477")
+*/
+func queryDiffTableTag(tx *gorm.DB, filter *vo.DiffTableDataVo) ([]*dto.DiffTableTagDto, int, error) {
+	if filter == nil {
+		return nil, 0, eris.New("queryDiffTableTag: filter cannot be nil")
+	}
+	fields := `difftable_data.md5, dh.name as table_name, difftable_data."level" as table_level, dh.symbol as table_symbol, dh.tag_color as table_tag_color, dh.tag_text_color as table_tag_text_color`
+	var out []*dto.DiffTableTagDto
+	partial := tx.Model(&entity.DiffTableData{}).
+		Select(fields).
+		Joins("left join difftable_header dh on difftable_data.header_id = dh.id").
+		Where(filter.Entity()).
+		Where("dh.no_tag_build = 0")
+	if len(filter.Md5s) > 0 {
+		partial = partial.Where("difftable_data.md5 in (?)", filter.Md5s)
+	}
+	if err := partial.Debug().Find(&out).Error; err != nil {
+		return nil, 0, err
+	}
+	return out, len(out), nil
+}
+
 // Extension method for findDiffTableDataList, returning some
 // player related fields at the same time.
 //

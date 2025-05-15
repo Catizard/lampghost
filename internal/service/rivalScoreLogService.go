@@ -86,13 +86,13 @@ func (s *RivalScoreLogService) QueryPrevDayScoreLogList(filter *vo.RivalScoreLog
 			j++
 		}
 		log := rawLogs[i]
+		log.TableTags = make([]*dto.DiffTableTagDto, 0)
 		if log.TableName != "" {
-			log.TableTags = make([]*dto.DiffTableTagDto, 0)
 			for k := i; k <= j; k++ {
 				log.TableTags = append(log.TableTags, dto.PushDownTag(rawLogs[k]))
 			}
-			logs = append(logs, log)
 		}
+		logs = append(logs, log)
 		i = j
 	}
 	return logs, len(logs), nil

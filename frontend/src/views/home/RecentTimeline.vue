@@ -70,7 +70,7 @@ async function handleLoad() {
       throw new Error(result.Msg);
     }
     const nextLogs: Array<dto.RivalScoreLogDto> = result.Rows;
-    if (result.Rows.length == 0) {
+    if (nextLogs.length == 0) {
       console.log('no more values')
       noMore.value = true;
     } else {

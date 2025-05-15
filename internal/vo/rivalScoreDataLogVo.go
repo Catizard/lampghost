@@ -32,9 +32,12 @@ type RivalScoreDataLogVo struct {
 	PlayCount  int32
 	ClearCount int32
 	Option     int32
-	Seed       int32
+	Seed       int64
 	Random     int32
 	State      int32
+
+	// year(RecordTime) == SpecifyYear
+	SpecifyYear *string
 }
 
 func (scoreDataLog *RivalScoreDataLogVo) Entity() *entity.RivalScoreDataLog {

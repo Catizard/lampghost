@@ -77,7 +77,7 @@ type ScoreDataLog struct {
 	PlayCount  int32
 	ClearCount int32
 	Option     int32
-	Seed       int32
+	Seed       int64
 	Random     int32
 	TimeStamp  int64 `gorm:"column:date"`
 	State      int32

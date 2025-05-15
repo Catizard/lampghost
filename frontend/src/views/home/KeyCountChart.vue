@@ -1,0 +1,48 @@
+<template>
+  <calendar-heatmap :values="data" :endDate="dayjs()"/>
+</template>
+
+<script setup lang="ts">
+import { QueryUserKeyCountInYear } from '@wailsjs/go/main/App';
+import { dto } from '@wailsjs/go/models';
+import { useNotification } from 'naive-ui';
+import { ref, Ref } from 'vue';
+import dayjs from 'dayjs';
+
+const props = defineProps<{
+  rivalId?: number
+}>();
+
+const notification = useNotification();
+
+const data: Ref<Array<any>> = ref([]);
+
+function loadKeyCountData() {
+  QueryUserKeyCountInYear({
+    SpecifyYear: "2025",
+    RivalId: props.rivalId,
+  } as any)
+    .then(result => {
+      if (result.Code != 200) {
+        return Promise.reject(result.Msg);
+      }
+      console.log(result);
+      data.value = [...result.Rows.map((row: dto.KeyCountDto) => {
+        return {
+          count: row.KeyCount,
+          date: row.RecordDate,
+        }
+      })];
+      console.log(data.value);
+    }).catch(err => {
+      notification.error({
+        content: err,
+        duration: 3000,
+        keepAliveOnHover: true
+      });
+    })
+}
+
+loadKeyCountData();
+
+</script>

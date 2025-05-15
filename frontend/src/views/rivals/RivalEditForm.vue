@@ -21,6 +21,14 @@
         <n-input :disabled="!formData.MainUser" v-model:value="formData.SongDataPath"
           :placeholder="t('modal.placeholderSongDataPath')" />
       </n-form-item>
+      <n-form-item :label="t('modal.labelScoreDataLogPath')" path="ScoreDataLogPath">
+        <n-button type="info" @click="chooseFile('Choose scoredatalog.db', 'scoredatalogPath')">
+          {{ t('button.chooseFile') }}
+        </n-button>
+        <n-divider vertical />
+        <n-input :disabled="!formData.MainUser" v-model:value="formData.ScoreDataLogPath"
+          :placeholder="t('modal.placeholderScoreDataLogPath')" />
+      </n-form-item>
     </n-form>
   </n-modal>
 </template>
@@ -66,6 +74,7 @@ function open(rivalID: number) {
       formData.value.Name = data.Name;
       formData.value.ScoreLogPath = data.ScoreLogPath;
       formData.value.SongDataPath = data.SongDataPath;
+      formData.value.ScoreDataLogPath = data.ScoreDataLogPath;
       formData.value.MainUser = data.MainUser;
     }).catch(err => {
       notification.error({
@@ -87,6 +96,7 @@ const formData = ref({
   Name: null,
   ScoreLogPath: null,
   SongDataPath: null,
+  ScoreDataLogPath: null,
   MainUser: false,
 });
 const rules = reactive({
@@ -100,8 +110,13 @@ const rules = reactive({
     message: t('rules.missingScoreLogPath'),
     trigger: ["input", "blur"],
   },
+  ScoreDataLogPath: {
+    required: true,
+    message: t('rules.missingScoreDataLogPath'),
+    trigger: ["input", "blur"],
+  },
   SongDataPath: {
-    required: false,
+    required: true,
     message: t('rules.missingSongDataPath'),
     trigger: ["input", "blur"],
   }
@@ -138,11 +153,11 @@ function handleNegativeClick() {
   formData.value.Name = null;
   formData.value.ScoreLogPath = null;
   formData.value.SongDataPath = null;
+  formData.value.ScoreDataLogPath = null;
   formData.value.MainUser = false;
 }
 
-// target == "scorelogPath" | "songdataPath"
-function chooseFile(title, target) {
+function chooseFile(title, target: "scorelogPath" | "songdataPath" | "scoredatalogPath") {
   OpenFileDialog(title)
     .then(result => {
       if (result.Code != 200) {
@@ -153,6 +168,8 @@ function chooseFile(title, target) {
           formData.value.ScoreLogPath = result.Data;
         } else if (target == "songdataPath") {
           formData.value.SongDataPath = result.Data;
+        } else if (target == "scoredatalogPath") {
+          formData.value.ScoreDataLogPath = result.Data;
         }
       }
     }).catch(err => {
@@ -178,9 +195,11 @@ watch(() => formData.value.MainUser, newValue => {
       "labelRivalName": "Name",
       "labelScoreLogPath": "scorelog.db file path",
       "labelSongDataPath": "songdata.db file path",
+      "labelScoreDataLogPath": "scoredatalog.db file path",
       "placeholderRivalName": "Please input rival's name",
       "placeholderScoreLogPath": "Please input scorelog.db file path",
-      "placeholderSongDataPath": "Please input songdata.db file path"
+      "placeholderSongDataPath": "Please input songdata.db file path",
+      "placeholderScoreDataLogPath": "Please input scoredatalog.db file path"
     },
     "button": {
       "chooseFile": "Choose File"
@@ -199,9 +218,11 @@ watch(() => formData.value.MainUser, newValue => {
       "labelRivalName": "名称",
       "labelScoreLogPath": "scorelog.db文件路径",
       "labelSongDataPath": "songdata.db文件路径",
+      "labelScoreDataLogPath": "scoredatalog.db文件路径",
       "placeholderRivalName": "请输入好友名称",
       "placeholderScoreLogPath": "请输入scorelog.db文件路径",
-      "placeholderSongDataPath": "请输入songdata.db文件路径"
+      "placeholderSongDataPath": "请输入songdata.db文件路径",
+      "placeholderScoreDataLogPath": "请输入scoredatalog.db文件路径"
     },
     "button": {
       "chooseFile": "选择文件"
@@ -209,7 +230,8 @@ watch(() => formData.value.MainUser, newValue => {
     "rules": {
       "missingRivalName": "好友名称不可为空",
       "missingScoreLogPath": "scorelog.db文件路径不可为空",
-      "missingSongDataPath": "songdata.db文件路径不可为空"
+      "missingSongDataPath": "songdata.db文件路径不可为空",
+      "missingScoreDataLogPath": "scoredatalog.db文件路径不可为空"
     }
   }
 }</i18n>

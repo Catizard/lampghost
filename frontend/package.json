@@ -18,6 +18,7 @@
     "vue-i18n": "^10.0.5",
     "vue-router": "^4.5.0",
     "vue3-apexcharts": "^1.8.0",
+    "vue3-calendar-heatmap": "^2.0.5",
     "vue3-perfect-scrollbar": "^2.0.0"
   },
   "devDependencies": {

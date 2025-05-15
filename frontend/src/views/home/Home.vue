@@ -23,6 +23,13 @@
 		</n-gi>
 	</n-grid>
 	<n-divider />
+	<n-h1 prefix="bar" style="text-align: start;">
+		<n-text type="primary">
+			{{ t("keyCountTitle") }}
+		</n-text>
+	</n-h1>
+	<KeyCountChart />
+	<n-divider />
 	<n-h1 prefix="bar" style="text-align: start">
 		<n-text type="primary">
 			{{ t("lampStatusTitle") }}
@@ -48,6 +55,7 @@ import LampCountChart from "./LampCountChart.vue";
 import { dto } from '@wailsjs/go/models';
 import { useRoute, useRouter } from "vue-router";
 import RecentTimeline from "./RecentTimeline.vue";
+import KeyCountChart from "./KeyCountChart.vue";
 
 const i18n = useI18n();
 const { t } = i18n;
@@ -139,6 +147,7 @@ initUser();
 			"chooseYear": "Choose Year"
 		},
 		"lampStatusTitle": "Lamp Status",
+		"keyCountTitle": "Key Count",
 		"timelineTitle": "Recent Activity",
 		"message": {
 			"noMainUserError": "Found no main user, please first load your save file in",
@@ -159,6 +168,7 @@ initUser();
 			"chooseYear": "选择年份"
 		},
 		"lampStatusTitle": "点灯情况",
+		"keyCountTitle": "按键次数",
 		"timelineTitle": "最近游玩",
 		"message": {
 			"noMainUserError": "找不到主用户信息，请先导入你自己的存档",

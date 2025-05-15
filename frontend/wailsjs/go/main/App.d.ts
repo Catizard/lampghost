@@ -70,6 +70,8 @@ export function GENERATOR_FOLDER_DEFINITION_DTO():Promise<dto.FolderDefinitionDt
 
 export function GENERATOR_FOLDER_DTO():Promise<dto.FolderDto>;
 
+export function GENERATOR_KEY_COUNT_DTO():Promise<dto.KeyCountDto>;
+
 export function GENERATOR_RIVAL_INFO():Promise<entity.RivalInfo>;
 
 export function GENERATOR_RIVAL_INFO_DTO():Promise<dto.RivalInfoDto>;
@@ -111,6 +113,8 @@ export function QueryRivalTagPageList(arg1:vo.RivalTagVo):Promise<result.RtnPage
 export function QueryUserInfoByID(arg1:number):Promise<result.RtnData>;
 
 export function QueryUserInfoWithLevelLayeredDiffTableLampStatus(arg1:number,arg2:number):Promise<result.RtnData>;
+
+export function QueryUserKeyCountInYear(arg1:vo.RivalScoreDataLogVo):Promise<result.RtnDataList>;
 
 export function QueryUserPlayCountInYear(arg1:number,arg2:string):Promise<result.RtnDataList>;
 

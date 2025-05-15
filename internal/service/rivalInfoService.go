@@ -275,7 +275,7 @@ func (s *RivalInfoService) QueryMainUser() (*entity.RivalInfo, error) {
 // Warning: You should never be able to edit `MainUser` by using update interface
 func (s *RivalInfoService) UpdateRivalInfo(rivalInfo *vo.RivalInfoVo) error {
 	if rivalInfo == nil {
-		return eris.Errorf("rivalInfo cannot be 0")
+		return eris.Errorf("rivalInfo cannot be nil")
 	}
 	if rivalInfo.ID == 0 {
 		return eris.Errorf("ID cannot be 0")
@@ -283,6 +283,7 @@ func (s *RivalInfoService) UpdateRivalInfo(rivalInfo *vo.RivalInfoVo) error {
 	// Unset crucial fields
 	rivalInfo.PlayCount = 0
 	rivalInfo.MainUser = false
+	log.Debug("before opening transaction")
 	return s.db.Transaction(func(tx *gorm.DB) error {
 		return updateRivalInfo(tx, rivalInfo.Entity())
 	})
@@ -598,8 +599,9 @@ func queryMainUser(tx *gorm.DB) (*entity.RivalInfo, error) {
 // Special Requirements:
 //  1. when updating main user, songdata.db file path cannot be empty
 func updateRivalInfo(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
+	log.Debugf("rivalInfo.ID=%d", rivalInfo.ID)
 	var prev entity.RivalInfo
-	if err := tx.First(&prev, rivalInfo.ID).Error; err != nil {
+	if err := tx.Debug().First(&prev, rivalInfo.ID).Error; err != nil {
 		return err
 	}
 
@@ -619,11 +621,12 @@ func updateRivalInfo(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
 	if rivalInfo.SongDataPath != nil && *rivalInfo.SongDataPath != *prev.SongDataPath {
 		shouldFullyReload = true
 	}
-	if rivalInfo.ScoreDataLogPath != nil && *rivalInfo.ScoreDataLogPath != *prev.ScoreDataLogPath {
+	if rivalInfo.ScoreDataLogPath != nil && (prev.ScoreDataLogPath == nil || *prev.ScoreDataLogPath != *rivalInfo.ScoreDataLogPath) {
 		shouldFullyReload = true
 	}
 
 	if shouldFullyReload {
+		log.Debugf("[RivalInfoService] trying to fully update rival info")
 		if err := syncRivalData(tx, rivalInfo); err != nil {
 			return err
 		}

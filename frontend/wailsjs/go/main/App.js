@@ -130,6 +130,10 @@ export function GENERATOR_FOLDER_DTO() {
   return window['go']['main']['App']['GENERATOR_FOLDER_DTO']();
 }
 
+export function GENERATOR_KEY_COUNT_DTO() {
+  return window['go']['main']['App']['GENERATOR_KEY_COUNT_DTO']();
+}
+
 export function GENERATOR_RIVAL_INFO() {
   return window['go']['main']['App']['GENERATOR_RIVAL_INFO']();
 }
@@ -212,6 +216,10 @@ export function QueryUserInfoByID(arg1) {
 
 export function QueryUserInfoWithLevelLayeredDiffTableLampStatus(arg1, arg2) {
   return window['go']['main']['App']['QueryUserInfoWithLevelLayeredDiffTableLampStatus'](arg1, arg2);
+}
+
+export function QueryUserKeyCountInYear(arg1) {
+  return window['go']['main']['App']['QueryUserKeyCountInYear'](arg1);
 }
 
 export function QueryUserPlayCountInYear(arg1, arg2) {

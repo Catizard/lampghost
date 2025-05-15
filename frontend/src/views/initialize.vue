@@ -31,7 +31,7 @@
 							{{ t('button.chooseFile') }}
 						</n-button>
 						<n-divider vertical />
-						<n-input v-model:value="formData.scorelogPath" :placeholder="t('form.placeholderScorelogPath')" />
+						<n-input v-model:value="formData.scoredatalogPath" :placeholder="t('form.placeholderScoredatalogPath')" />
 					</n-form-item>
 					<n-form-item>
 						<n-button :loading="loading" attr-type="button" @click="handleSubmit" type="primary">

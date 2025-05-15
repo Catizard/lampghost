@@ -48,8 +48,8 @@ function loadKeyCountData() {
 
 function tooltipFormatter(value: { date: Date | string; count: number; }): string {
   const { date, count } = value;
-  const mmdd = dayjs(date).format("MM-DD")
-  return `${count} ${mmdd}`;
+  const mmdd = dayjs(date).format("YYYY-MM-DD")
+  return `${count} notes <br> ${mmdd}`;
 }
 
 loadKeyCountData();

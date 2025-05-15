@@ -124,7 +124,9 @@ const rules = {
 		trigger: ["input", "blur"],
 	},
 	scoredatalogPath: {
-		required: false,
+		required: true,
+		message: t('rule.missingScoredatalogPath'),
+		trigger: ["input", "blur"],
 	},
 };
 
@@ -168,11 +170,11 @@ function handleSubmit(e) {
 			"labelUserName": "Your user name",
 			"labelSongdataPath": "songdata.db file path",
 			"labelScorelogPath": "scorelog.db file path",
-			"labelScoredatalogPath": "scorelog.db file path(optional)",
+			"labelScoredatalogPath": "scoredatalog.db file path",
 			"placeholderUserName": "Please input your name",
 			"placeholderSongdataPath": "Please input songdata.db file path",
 			"placeholderScorelogPath": "Please input scorelog.db file path",
-			"placeholderScoredatalogPath": "scorelog.db file path(optional)"
+			"placeholderScoredatalogPath": "Please input scoredatalog.db file path"
 		},
 		"button": {
 			"submit": "submit",
@@ -181,7 +183,8 @@ function handleSubmit(e) {
 		"rule": {
 			"missingUserName": "Name cannot be empty",
 			"missingSongdataPath": "songdata.db file path cannot be empty",
-			"missingScorelogPath": "scorelog.db file path cannot be empty"
+			"missingScorelogPath": "scorelog.db file path cannot be empty",
+			"missingScoredatalogPath": "scoredatalog.db file path cannot be empty"
 		}
 	},
 	"zh-CN": {
@@ -191,11 +194,11 @@ function handleSubmit(e) {
 			"labelUserName": "用户名称",
 			"labelSongdataPath": "songdata.db文件路径",
 			"labelScorelogPath": "scorelog.db文件路径",
-			"labelScoredatalogPath": "scorelog.db文件路径(可选)",
+			"labelScoredatalogPath": "scoredatalog.db文件路径",
 			"placeholderUserName": "请输入用户名",
 			"placeholderSongdataPath": "请输入songdata.db文件路径",
 			"placeholderScorelogPath": "请输入scorelog.db文件路径",
-			"placeholderScoredatalogPath": "scorelog.db文件路径(可选)"
+			"placeholderScoredatalogPath": "请输入scoredatalog.db文件路径"
 		},
 		"button": {
 			"submit": "提交",
@@ -204,7 +207,8 @@ function handleSubmit(e) {
 		"rule": {
 			"missingUserName": "用户名不可为空",
 			"missingSongdataPath": "songdata.db文件路径不可为空",
-			"missingScorelogPath": "scorelog.db文件路径不可为空"
+			"missingScorelogPath": "scorelog.db文件路径不可为空",
+			"missingScoredatalogPath": "scoredatalog.db文件路径不可为空"
 		}
 	}
 }</i18n>

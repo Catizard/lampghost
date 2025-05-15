@@ -14,11 +14,8 @@
         <n-input v-model:value="formData.ScoreLogPath" :placeholder="t('modal.placeholderScoreLogPath')" />
       </n-form-item>
       <n-form-item :label="t('modal.labelScoreDataLogPath')" path="ScoreDataLogPath">
-        <n-button type="info" @click="chooseFile('Choose scoredatalog.db', 'scoredatalogPath')">
-          {{ t('button.chooseFile') }}
-        </n-button>
-        <n-divider vertical />
-        <n-input v-model:value="formData.ScoreDataLogPath" :placeholder="t('modal.placeholderScoreDataLogPath')" />
+        <n-input disabled v-model:value="formData.ScoreDataLogPath"
+          :placeholder="t('modal.placeholderScoreDataLogPath')" />
       </n-form-item>
       <n-form-item :label="t('modal.labelSongDataPath')" path="SongDataPath">
         <n-input disabled v-model:value="formData.SongDataPath" :placeholder="t('modal.placeholderSongDataPath')" />

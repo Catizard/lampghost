@@ -1,5 +1,5 @@
 <template>
-  <calendar-heatmap :values="data" :endDate="dayjs()" :tooltip-formatter="tooltipFormatter" :no-data-text="' '"
+  <calendar-heatmap :values="data" :endDate="dayjs()" :tooltip-formatter="tooltipFormatter" :no-data-text="'No Play'"
     style="width: 95%;" />
 </template>
 
@@ -9,6 +9,7 @@ import { dto } from '@wailsjs/go/models';
 import { useNotification } from 'naive-ui';
 import { ref, Ref } from 'vue';
 import dayjs from 'dayjs';
+import 'vue3-calendar-heatmap/dist/style.css';
 
 const props = defineProps<{
   rivalId?: number

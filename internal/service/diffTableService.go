@@ -34,7 +34,13 @@ func NewDiffTableService(db *gorm.DB) *DiffTableService {
 //	1.difficult table's url must be unique
 //	2.difficult table's data_url must be unique
 func (s *DiffTableService) AddDiffTableHeader(param *vo.DiffTableHeaderVo) (*entity.DiffTableHeader, error) {
+	if param == nil {
+		return nil, eris.Errorf("AddDiffTableHeader: param cannot be nil")
+	}
 	url := strings.TrimSpace(param.HeaderUrl)
+	if url == "" {
+		return nil, eris.Errorf("AddDiffTableHeader: url cannot be empty")
+	}
 	log.Debugf("[DiffTableService] calling AddDiffTableHeader with url: %s", url)
 	if isDuplicated, err := queryDiffTableHeaderExistence(s.db, &entity.DiffTableHeader{HeaderUrl: url}); isDuplicated || err != nil {
 		if err != nil {
@@ -61,6 +67,8 @@ func (s *DiffTableService) AddDiffTableHeader(param *vo.DiffTableHeaderVo) (*ent
 	headerEntity.TagColor = param.TagColor
 	headerEntity.TagTextColor = param.TagTextColor
 	headerEntity.NoTagBuild = param.NoTagBuild
+	// TODO: Should be a bmstable library's bug
+	headerEntity.HeaderUrl = url
 
 	// Transaction begins from here
 	if err := s.db.Transaction(func(tx *gorm.DB) error {

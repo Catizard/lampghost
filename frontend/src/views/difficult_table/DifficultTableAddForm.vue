@@ -3,8 +3,8 @@
     :positive-text="t('modal.positiveText')" :negative-text="t('modal.negativeText')"
     @positive-click="handlePositiveClick" @negative-click="handleNegativeClick" :mask-closable="false">
     <n-form ref="formRef" :model="formData" :rules="rules">
-      <n-form-item :label="t('modal.labelAddress')" path="url">
-        <n-input v-model:value="formData.url" :placeholder="t('modal.placeholderAddress')" />
+      <n-form-item :label="t('modal.labelAddress')" path="HeaderUrl">
+        <n-input v-model:value="formData.HeaderUrl" :placeholder="t('modal.placeholderAddress')" />
       </n-form-item>
       <n-form-item :label="t('modal.labelNoTagBuild')" path="NoTagBuild">
         <n-select v-model:value="formData.NoTagBuild" :options="yesnoOptions"></n-select>
@@ -35,13 +35,13 @@ const emit = defineEmits<{
 const loading = ref(false);
 const formRef = ref<FormInst | null>(null);
 const formData = ref({
-  url: "",
+  HeaderUrl: "",
   TagColor: "",
   TagTextColor: "",
   NoTagBuild: 0,
 });
 const rules = {
-  url: {
+  HeaderUrl: {
     required: true,
     message: t('rules.missingAddress'),
     trigger: ["input", "blur"],
@@ -90,7 +90,7 @@ function handleNegativeClick() {
 }
 
 function resetFormData() {
-  formData.value.url = "";
+  formData.value.HeaderUrl = "";
   formData.value.TagColor = "";
   formData.value.TagTextColor = "";
   formData.value.NoTagBuild = 0;
@@ -101,8 +101,8 @@ function resetFormData() {
   "en": {
     "modal": {
       "title": "Add a new table",
-      "positiveText": "add",
-      "negativeText": "cancel",
+      "positiveText": "Submit",
+      "negativeText": "Cancel",
       "labelAddress": "Address",
       "placeholderAddress": "Input address"
     },
@@ -113,7 +113,7 @@ function resetFormData() {
   "zh-CN": {
     "modal": {
       "title": "新增难度表",
-      "positiveText": "新增",
+      "positiveText": "提交",
       "negativeText": "取消",
       "labelAddress": "地址",
       "placeholderAddress": "请输入地址"

@@ -18,9 +18,9 @@ type DiffTableHeaderVo struct {
 	HeaderUrl          string
 	LevelOrders        string
 	UnjoinedLevelOrder []string `json:"level_order"`
-	TagColor           string   `json:"tagColor"`
-	TagTextColor       string   `json:"tagTextColor"`
-	NoTagBuild         *int     `json:"noTagBuild"`
+	TagColor           string
+	TagTextColor       string
+	NoTagBuild         *int
 
 	Level           string
 	RivalID         uint

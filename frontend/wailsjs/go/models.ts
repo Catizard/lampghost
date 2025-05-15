@@ -1087,9 +1087,9 @@ export namespace vo {
 	    HeaderUrl: string;
 	    LevelOrders: string;
 	    level_order: string[];
-	    tagColor: string;
-	    tagTextColor: string;
-	    noTagBuild?: number;
+	    TagColor: string;
+	    TagTextColor: string;
+	    NoTagBuild?: number;
 	    Level: string;
 	    RivalID: number;
 	    GhostRivalID: number;
@@ -1116,9 +1116,9 @@ export namespace vo {
 	        this.HeaderUrl = source["HeaderUrl"];
 	        this.LevelOrders = source["LevelOrders"];
 	        this.level_order = source["level_order"];
-	        this.tagColor = source["tagColor"];
-	        this.tagTextColor = source["tagTextColor"];
-	        this.noTagBuild = source["noTagBuild"];
+	        this.TagColor = source["TagColor"];
+	        this.TagTextColor = source["TagTextColor"];
+	        this.NoTagBuild = source["NoTagBuild"];
 	        this.Level = source["Level"];
 	        this.RivalID = source["RivalID"];
 	        this.GhostRivalID = source["GhostRivalID"];

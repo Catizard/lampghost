@@ -104,10 +104,18 @@ function resetFormData() {
       "positiveText": "Submit",
       "negativeText": "Cancel",
       "labelAddress": "Address",
-      "placeholderAddress": "Input address"
+      "placeholderAddress": "Input address",
+      "labelNoTagBuild": "No tag build",
+      "placeholderNoTagBuild": "Please choose no tag build",
+      "labelTagColor": "Tag color",
+      "labelTagTextColor": "Tag text color"
     },
     "rules": {
       "missingAddress": "Please input address"
+    },
+    "options": {
+      "yes": "Yes",
+      "no": "No"
     }
   },
   "zh-CN": {
@@ -116,10 +124,18 @@ function resetFormData() {
       "positiveText": "提交",
       "negativeText": "取消",
       "labelAddress": "地址",
-      "placeholderAddress": "请输入地址"
+      "placeholderAddress": "请输入地址",
+      "labelNoTagBuild": "是否参与标签构造",
+      "placeholderNoTagBuild": "请选择是否参与标签构造",
+      "labelTagColor": "标签颜色",
+      "labelTagTextColor": "标签嵌字颜色"
     },
     "rules": {
       "missingAddress": "请输入地址"
+    },
+    "options": {
+      "yes": "是",
+      "no": "否"
     }
   }
 }</i18n>

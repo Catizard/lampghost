@@ -117,7 +117,11 @@ function open(headerId: number) {
     "modal": {
       "title": "Edit table",
       "positiveText": "submit",
-      "negativeText": "cancel"
+      "negativeText": "cancel",
+      "labelNoTagBuild": "No tag build",
+      "placeholderNoTagBuild": "Please choose no tag build",
+      "labelTagColor": "Tag color",
+      "labelTagTextColor": "Tag text color"
     },
     "options": {
       "yes": "Yes",
@@ -131,7 +135,11 @@ function open(headerId: number) {
     "modal": {
       "title": "修改难度表",
       "positiveText": "新增",
-      "negativeText": "取消"
+      "negativeText": "取消",
+      "labelNoTagBuild": "是否参与标签构造",
+      "placeholderNoTagBuild": "请选择是否参与标签构造",
+      "labelTagColor": "标签颜色",
+      "labelTagTextColor": "标签嵌字颜色"
     },
     "options": {
       "yes": "是",

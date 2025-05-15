@@ -67,9 +67,9 @@ const rules = {
   // 	message: t('rules.missingSongDataPath'),
   // 	trigger: ["input", "blur"],
   // },
-  ScoreDataLogPath: {
-    required: false,
-  },
+  // ScoreDataLogPath: {
+  //   required: false,
+  // },
 };
 
 function handlePositiveClick(): boolean {
@@ -148,7 +148,8 @@ function chooseFile(title, target: "scorelogPath" | "songdataPath" | "scoredatal
     "rules": {
       "missingRivalName": "Rival's name cannot be empty",
       "missingScoreLogPath": "scorelog.db file path cannot be empty",
-      "missingSongDataPath": "songdata.db file path cannot be empty"
+      "missingSongDataPath": "songdata.db file path cannot be empty",
+      "missingScoreDataLogPath": "scoredatalog.db file path cannot be empty"
     }
   },
   "zh-CN": {
@@ -171,7 +172,8 @@ function chooseFile(title, target: "scorelogPath" | "songdataPath" | "scoredatal
     "rules": {
       "missingRivalName": "好友名称不可为空",
       "missingScoreLogPath": "scorelog.db文件路径不可为空",
-      "missingSongDataPath": "songdata.db文件路径不可为空"
+      "missingSongDataPath": "songdata.db文件路径不可为空",
+      "missingScoreDataLogPath": "scorelog.db文件路径不可为空"
     }
   }
 }</i18n>

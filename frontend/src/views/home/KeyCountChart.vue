@@ -1,5 +1,6 @@
 <template>
-  <calendar-heatmap :values="data" :endDate="dayjs()"/>
+  <calendar-heatmap :values="data" :endDate="dayjs()" :tooltip-formatter="tooltipFormatter" :no-data-text="' '"
+    style="width: 95%;" />
 </template>
 
 <script setup lang="ts">
@@ -42,6 +43,12 @@ function loadKeyCountData() {
         keepAliveOnHover: true
       });
     })
+}
+
+function tooltipFormatter(value: { date: Date | string; count: number; }): string {
+  const { date, count } = value;
+  const mmdd = dayjs(date).format("MM-DD")
+  return `${count} ${mmdd}`;
 }
 
 loadKeyCountData();

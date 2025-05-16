@@ -20,9 +20,7 @@ const notification = useNotification();
 const data: Ref<Array<any>> = ref([]);
 
 function loadKeyCountData() {
-  // TODO: Should we use the "year" from PlayCountChart component?
   QueryUserKeyCountInYear({
-    SpecifyYear: dayjs().get('year').toString(),
     RivalId: props.rivalId,
   } as any)
     .then(result => {

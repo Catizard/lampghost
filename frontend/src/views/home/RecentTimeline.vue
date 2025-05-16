@@ -149,7 +149,7 @@ function dynamicDTagProps(dTag: dto.DiffTableTagDto) {
   }
 }
 
-watch(props.rivalId, (_, newValue) => {
+watch(() => props.rivalId, (_, newValue) => {
   handleLoad();
 }, { once: true });
 

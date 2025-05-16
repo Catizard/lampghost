@@ -1,21 +1,32 @@
 <template>
-  <calendar-heatmap :values="data" :endDate="dayjs()" :tooltip-formatter="tooltipFormatter" :no-data-text="'No Play'"
-    style="width: 95%;" />
+  <calendar-heatmap :values="data" :endDate="endDate" :tooltip-formatter="tooltipFormatter" :no-data-text="'No Play'"
+    style="width: 95%" />
 </template>
 
 <script setup lang="ts">
-import { QueryUserKeyCountInYear } from '@wailsjs/go/main/App';
-import { dto } from '@wailsjs/go/models';
-import { useNotification } from 'naive-ui';
-import { ref, Ref, watch } from 'vue';
-import dayjs from 'dayjs';
-import 'vue3-calendar-heatmap/dist/style.css';
+import { QueryUserKeyCountInYear } from "@wailsjs/go/main/App";
+import { dto } from "@wailsjs/go/models";
+import { useNotification } from "naive-ui";
+import { computed, ref, Ref, watch } from "vue";
+import dayjs from "dayjs";
+import "vue3-calendar-heatmap/dist/style.css";
+import { useSpecifyYearStore } from "@/stores/home";
 
 const props = defineProps<{
-  rivalId?: number
+  rivalId?: number;
 }>();
 
 const notification = useNotification();
+const specifyYearStore = useSpecifyYearStore();
+const endDate = computed(() => {
+  const current = dayjs();
+  const currentYear = current.get('year').toString();
+  const specifyYear = specifyYearStore.specifyYear;
+  if (currentYear == specifyYear) {
+    return current;
+  }
+  return dayjs(`${specifyYear}-12-31`);
+})
 
 const data: Ref<Array<any>> = ref([]);
 
@@ -23,35 +34,44 @@ function loadKeyCountData() {
   QueryUserKeyCountInYear({
     RivalId: props.rivalId,
   } as any)
-    .then(result => {
+    .then((result) => {
       if (result.Code != 200) {
         return Promise.reject(result.Msg);
       }
       console.log(result);
-      data.value = [...result.Rows.map((row: dto.KeyCountDto) => {
-        return {
-          count: row.KeyCount,
-          date: row.RecordDate,
-        }
-      })];
+      data.value = [
+        ...result.Rows.map((row: dto.KeyCountDto) => {
+          return {
+            count: row.KeyCount,
+            date: row.RecordDate,
+          };
+        }),
+      ];
       console.log(data.value);
-    }).catch(err => {
+    })
+    .catch((err) => {
       notification.error({
         content: err,
         duration: 3000,
-        keepAliveOnHover: true
+        keepAliveOnHover: true,
       });
-    })
+    });
 }
 
-function tooltipFormatter(value: { date: Date | string; count: number; }): string {
+function tooltipFormatter(value: {
+  date: Date | string;
+  count: number;
+}): string {
   const { date, count } = value;
-  const mmdd = dayjs(date).format("YYYY-MM-DD")
+  const mmdd = dayjs(date).format("YYYY-MM-DD");
   return `${count} notes <br> ${mmdd}`;
 }
 
-watch(props.rivalId, (_, newValue) => {
-  loadKeyCountData();
-}, { once: true })
-
+watch(
+  () => props.rivalId,
+  (_, newValue) => {
+    loadKeyCountData();
+  },
+  { once: true },
+);
 </script>

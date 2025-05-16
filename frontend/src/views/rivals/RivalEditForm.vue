@@ -13,8 +13,8 @@
         <n-divider vertical />
         <n-input v-model:value="formData.ScoreLogPath" :placeholder="t('modal.placeholderScoreLogPath')" />
       </n-form-item>
-      <n-form-item :label="t('modal.labelSongDataPath')" path="SongDataPath">
-        <n-button type="info" @click="chooseFile('Choose songdata.db', 'songdataPath')">
+      <n-form-item :disabled="!formData.MainUser" :label="t('modal.labelSongDataPath')" path="SongDataPath">
+        <n-button :disabled="!formData.MainUser" type="info" @click="chooseFile('Choose songdata.db', 'songdataPath')">
           {{ t('button.chooseFile') }}
         </n-button>
         <n-divider vertical />
@@ -22,7 +22,8 @@
           :placeholder="t('modal.placeholderSongDataPath')" />
       </n-form-item>
       <n-form-item :label="t('modal.labelScoreDataLogPath')" path="ScoreDataLogPath">
-        <n-button type="info" @click="chooseFile('Choose scoredatalog.db', 'scoredatalogPath')">
+        <n-button :disabled="!formData.MainUser" type="info"
+          @click="chooseFile('Choose scoredatalog.db', 'scoredatalogPath')">
           {{ t('button.chooseFile') }}
         </n-button>
         <n-divider vertical />
@@ -101,21 +102,25 @@ const formData = ref({
 });
 const rules = reactive({
   Name: {
+    ignored: false,
     required: true,
     message: t('rules.missingRivalName'),
     trigger: ["input", "blur"],
   },
   ScoreLogPath: {
+    ignored: false,
     required: true,
     message: t('rules.missingScoreLogPath'),
     trigger: ["input", "blur"],
   },
   ScoreDataLogPath: {
+    ignored: true,
     required: true,
     message: t('rules.missingScoreDataLogPath'),
     trigger: ["input", "blur"],
   },
   SongDataPath: {
+    ignored: true,
     required: true,
     message: t('rules.missingSongDataPath'),
     trigger: ["input", "blur"],
@@ -125,7 +130,12 @@ const rules = reactive({
 function handlePositiveClick(): boolean {
   loading.value = true;
   formRef.value
-    ?.validate()
+    ?.validate(() => { }, rule => {
+      if (formData.MainUser) {
+        return true; // Everything
+      }
+      return rule.ignored == false;
+    })
     .then(() => {
       return UpdateRivalInfo(formData.value as any)
         .then(result => {

@@ -105,7 +105,7 @@ function resetFormData() {
       "negativeText": "Cancel",
       "labelAddress": "Address",
       "placeholderAddress": "Input address",
-      "labelNoTagBuild": "No tag build",
+      "labelNoTagBuild": "No tag display",
       "placeholderNoTagBuild": "Please choose no tag build",
       "labelTagColor": "Tag color",
       "labelTagTextColor": "Tag text color"
@@ -125,7 +125,7 @@ function resetFormData() {
       "negativeText": "取消",
       "labelAddress": "地址",
       "placeholderAddress": "请输入地址",
-      "labelNoTagBuild": "是否参与标签构造",
+      "labelNoTagBuild": "不展示标签",
       "placeholderNoTagBuild": "请选择是否参与标签构造",
       "labelTagColor": "标签颜色",
       "labelTagTextColor": "标签嵌字颜色"

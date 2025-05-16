@@ -118,7 +118,7 @@ function open(headerId: number) {
       "title": "Edit table",
       "positiveText": "submit",
       "negativeText": "cancel",
-      "labelNoTagBuild": "No tag build",
+      "labelNoTagBuild": "No tag display",
       "placeholderNoTagBuild": "Please choose no tag build",
       "labelTagColor": "Tag color",
       "labelTagTextColor": "Tag text color"
@@ -136,7 +136,7 @@ function open(headerId: number) {
       "title": "修改难度表",
       "positiveText": "新增",
       "negativeText": "取消",
-      "labelNoTagBuild": "是否参与标签构造",
+      "labelNoTagBuild": "不展示标签",
       "placeholderNoTagBuild": "请选择是否参与标签构造",
       "labelTagColor": "标签颜色",
       "labelTagTextColor": "标签嵌字颜色"

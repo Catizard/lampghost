@@ -7,7 +7,7 @@
 import { QueryUserKeyCountInYear } from '@wailsjs/go/main/App';
 import { dto } from '@wailsjs/go/models';
 import { useNotification } from 'naive-ui';
-import { ref, Ref } from 'vue';
+import { ref, Ref, watch } from 'vue';
 import dayjs from 'dayjs';
 import 'vue3-calendar-heatmap/dist/style.css';
 
@@ -50,6 +50,8 @@ function tooltipFormatter(value: { date: Date | string; count: number; }): strin
   return `${count} notes <br> ${mmdd}`;
 }
 
-loadKeyCountData();
+watch(props.rivalId, (_, newValue) => {
+  loadKeyCountData();
+}, { once: true })
 
 </script>

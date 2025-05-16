@@ -34,7 +34,7 @@ import { dto } from '@wailsjs/go/models';
 import dayjs from 'dayjs';
 import { useNotification } from 'naive-ui';
 import { keysOf } from 'naive-ui/es/_utils';
-import { computed, ref, Ref } from 'vue';
+import { computed, ref, Ref, watch } from 'vue';
 
 const props = defineProps<{
   rivalId?: number;
@@ -149,7 +149,10 @@ function dynamicDTagProps(dTag: dto.DiffTableTagDto) {
   }
 }
 
-handleLoad();
+watch(props.rivalId, (_, newValue) => {
+  handleLoad();
+}, { once: true });
+
 </script>
 
 <style lang="css" scoped>

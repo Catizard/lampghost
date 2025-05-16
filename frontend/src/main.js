@@ -10,20 +10,19 @@ import VueCalendarHeatmap from 'vue3-calendar-heatmap';
 
 const app = createApp(App)
 
-app.use(naive)
-app.use(router)
-app.use(VueApexCharts);
-app.use(PerfectScrollbarPlugin, {
-	componentName: "PerfectScrollbar"
-})
-app.use(VueCalendarHeatmap);
-
 const i18n = createI18n({
-	legacy: false,
-	locale: "en",
-	fallbackLocale: "en",
+  legacy: false,
+  locale: "en",
+  fallbackLocale: "en",
 });
 
-app.use(i18n);
-
-app.mount('#app')
+app
+  .use(naive)
+  .use(router)
+  .use(VueApexCharts)
+  .use(PerfectScrollbarPlugin, {
+    componentName: "PerfectScrollbar"
+  })
+  .use(VueCalendarHeatmap)
+  .use(i18n)
+  .mount('#app')

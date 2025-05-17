@@ -218,7 +218,7 @@ onMounted(() => {
 		},
 		"column": {
 			"name": "谱面名称",
-			"tag": "标签",
+			"tag": "难度表标签",
 			"clear": "通关状态",
 			"time": "记录时间",
 			"minbp": "最小BP",

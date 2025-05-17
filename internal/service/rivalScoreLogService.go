@@ -75,27 +75,35 @@ func (s *RivalScoreLogService) QueryRivalScoreLogPageList(filter *vo.RivalScoreL
 // NOTE: Result is unique, only the maximum clear one would be reserved. And it's ordered,
 // the higher clear one would be placed before the lower one.
 func (s *RivalScoreLogService) QueryPrevDayScoreLogList(filter *vo.RivalScoreLogVo) ([]*dto.RivalScoreLogDto, int, error) {
-	rawLogs, _, err := queryPrevDayScoreLogList(s.db, filter)
-	if err != nil {
+	var out []*dto.RivalScoreLogDto
+	var err error
+	if err := s.db.Transaction(func(tx *gorm.DB) error {
+		out, _, err = queryPrevDayScoreLogList(s.db, filter)
+		if err != nil {
+			return err
+		}
+		tableTags, _, err := queryDiffTableTag(tx, &vo.DiffTableDataVo{
+			Md5s: Map(out, func(log *dto.RivalScoreLogDto, _ int) string {
+				return log.Md5
+			}),
+		})
+		if err != nil {
+			return err
+		}
+		ForEach(out, func(log *dto.RivalScoreLogDto, _ int) {
+			log.TableTags = make([]*dto.DiffTableTagDto, 0)
+			ForEach(tableTags, func(tag *dto.DiffTableTagDto, _ int) {
+				if tag.Md5 == log.Md5 {
+					log.TableTags = append(log.TableTags, tag)
+				}
+			})
+		})
+		return nil
+	}); err != nil {
 		return nil, 0, err
 	}
-	logs := make([]*dto.RivalScoreLogDto, 0)
-	for i := 0; i < len(rawLogs); i++ {
-		j := i
-		for j+1 < len(rawLogs) && rawLogs[j+1].ID == rawLogs[i].ID {
-			j++
-		}
-		log := rawLogs[i]
-		log.TableTags = make([]*dto.DiffTableTagDto, 0)
-		if log.TableName != "" {
-			for k := i; k <= j; k++ {
-				log.TableTags = append(log.TableTags, dto.PushDownTag(rawLogs[k]))
-			}
-		}
-		logs = append(logs, log)
-		i = j
-	}
-	return logs, len(logs), nil
+
+	return out, len(out), nil
 }
 
 func findRivalScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.RivalScoreLogDto, int, error) {
@@ -220,25 +228,10 @@ func queryPrevDayScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.R
 		max(rival_score_log.clear),
 		sd.title as title,
 		sd.md5 as md5,
-		sd.ID as rival_song_data_id,
-		dt.table_name,
-		dt.table_level,
-		dt.table_symbol,
-		dt.table_tag_color,
-		dt.table_tag_text_color
+		sd.ID as rival_song_data_id
 	`
 	// NOTE: Some filter statements should be applied to both subquery and the outer one
 	partial := tx.Model(&entity.RivalScoreLog{}).Select(fields).Joins("left join (select ID, title, sha256, md5 from rival_song_data group by sha256) as sd on rival_score_log.sha256 = sd.sha256")
-	// TODO: pagination rival_score_log has another implement way of tags, should be unified in the future
-	partial = partial.Joins(`
-		left join (
-			select dd.md5, dh.name as table_name, dh.tag_color as table_tag_color, dh.tag_text_color as table_tag_text_color, dh.symbol as table_symbol, dd."level" as table_level
-			from difftable_data dd
-			left join difftable_header dh on dd.header_id = dh.id
-			where dh.no_tag_build = 0
-			group by dd.md5
-		) as dt on sd.md5 = dt.md5
-	`)
 	// TODO: This sql is stricted with "clear >= 4", should we make this configurable?
 	maximumDateQuery := tx.Model(&entity.RivalScoreLog{}).
 		Select("date(max(rival_score_log.record_time))").

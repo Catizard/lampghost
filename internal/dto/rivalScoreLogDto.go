@@ -25,14 +25,7 @@ type RivalScoreLogDto struct {
 	Md5             string
 	RivalSongDataID uint
 	Title           string
-	// Difficult table tag fields
-	// It's there any better way handling this?
-	TableName         string
-	TableLevel        string
-	TableSymbol       string
-	TableTagColor     string
-	TableTagTextColor string
-	TableTags         []*DiffTableTagDto `gorm:"-"`
+	TableTags       []*DiffTableTagDto `gorm:"-"`
 	// Pagination
 	Page      int
 	PageSize  int

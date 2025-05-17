@@ -371,11 +371,6 @@ export namespace dto {
 	    Md5: string;
 	    RivalSongDataID: number;
 	    Title: string;
-	    TableName: string;
-	    TableLevel: string;
-	    TableSymbol: string;
-	    TableTagColor: string;
-	    TableTagTextColor: string;
 	    TableTags: DiffTableTagDto[];
 	    Page: number;
 	    PageSize: number;
@@ -406,11 +401,6 @@ export namespace dto {
 	        this.Md5 = source["Md5"];
 	        this.RivalSongDataID = source["RivalSongDataID"];
 	        this.Title = source["Title"];
-	        this.TableName = source["TableName"];
-	        this.TableLevel = source["TableLevel"];
-	        this.TableSymbol = source["TableSymbol"];
-	        this.TableTagColor = source["TableTagColor"];
-	        this.TableTagTextColor = source["TableTagTextColor"];
 	        this.TableTags = this.convertValues(source["TableTags"], DiffTableTagDto);
 	        this.Page = source["Page"];
 	        this.PageSize = source["PageSize"];

@@ -8,14 +8,3 @@ type DiffTableTagDto struct {
 	TableTagColor     string
 	TableTagTextColor string
 }
-
-func PushDownTag(log *RivalScoreLogDto) *DiffTableTagDto {
-	return &DiffTableTagDto{
-		Md5:               log.Md5,
-		TableName:         log.TableName,
-		TableLevel:        log.TableLevel,
-		TableSymbol:       log.TableSymbol,
-		TableTagColor:     log.TableTagColor,
-		TableTagTextColor: log.TableTagTextColor,
-	}
-}

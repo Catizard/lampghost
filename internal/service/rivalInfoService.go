@@ -652,5 +652,5 @@ func updateRivalPlayCount(tx *gorm.DB, rivalID uint) error {
 	if err != nil {
 		return err
 	}
-	return tx.Model(&entity.RivalInfo{Model: gorm.Model{ID: rivalID}}).UpdateColumn("play_count", pc).Error
+	return tx.Model(&entity.RivalInfo{Model: gorm.Model{ID: rivalID}}).Update("play_count", pc).Error
 }

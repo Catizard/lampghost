@@ -36,7 +36,7 @@ const sorter: Ref<Sorter> = ref({
 });
 const columns: DataTableColumns<dto.DiffTableDataDto> = [
 	{
-		title: t('column.songName'), key: "Title", width: "300px", ellipsis: { tooltip: true }, resizable: true, sorter: true,
+		title: t('column.songName'), key: "Title", width: "200px", ellipsis: { tooltip: true }, resizable: true, sorter: true,
 		render: (row: dto.DiffTableDataDto) => {
 			let vnodes = [];
 			if (row.DataLost) {
@@ -49,14 +49,14 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
 	{ title: t('column.artist'), key: "Artist", ellipsis: { tooltip: true }, sorter: true, },
 	{ title: t('column.count'), key: "PlayCount", width: "100px" },
 	{
-		title: t('column.clear'), key: "Lamp", width: "100px", resizable: true, sorter: true,
+		title: t('column.clear'), key: "Lamp", width: "125px", resizable: true, sorter: true,
 		render(row: dto.DiffTableDataDto) {
 			return h(ClearTag, { clear: row.Lamp },)
 		}
 	},
 	{
 		// TODO: Change sorter from false to true when user choosed ghost rival
-		title: t('column.ghost'), key: "GhostLamp", width: "100px", resizable: true, sorter: true,
+		title: t('column.ghost'), key: "GhostLamp", width: "125px", resizable: true, sorter: true,
 		render(row: dto.DiffTableDataDto) {
 			return h(ClearTag, { clear: row.GhostLamp, },)
 		}
@@ -65,7 +65,7 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
 		title: t('column.actions'),
 		key: "actions",
 		resizable: true,
-		minWidth: "150px",
+		minWidth: "100px",
 		render(row: dto.DiffTableDataDto) {
 			return h(
 				NButton,

@@ -16,8 +16,8 @@
 </template>
 
 <script setup lang="ts">
-import { h, Ref, ref, watch } from "vue";
-import { dto, vo } from "@wailsjs/go/models";
+import { h, Ref, ref } from "vue";
+import { dto } from "@wailsjs/go/models";
 import {
 	DataTableColumns,
 	NButton,

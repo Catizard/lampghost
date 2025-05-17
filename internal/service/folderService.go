@@ -9,6 +9,8 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/vo"
 	"github.com/charmbracelet/log"
 	"gorm.io/gorm"
+
+	. "github.com/samber/lo"
 )
 
 const MAX_FOLDER_COUNT = 25
@@ -268,29 +270,21 @@ func findFolderList(tx *gorm.DB, filter *vo.FolderVo) ([]*entity.Folder, int, er
 
 func findFolderTree(tx *gorm.DB, filter *vo.FolderVo) ([]*dto.FolderDto, int, error) {
 	rawFolders, _, err := findFolderList(tx, filter)
-	if err != nil {
-		return nil, 0, err
-	}
-	if len(rawFolders) == 0 {
+	if err != nil || len(rawFolders) == 0 {
 		return nil, 0, err
 	}
 
-	folderIDs := make([]uint, len(rawFolders))
-	for i, folder := range rawFolders {
-		folderIDs[i] = folder.ID
-	}
-
-	rawContents, _, err := findFolderContentList(tx, &vo.FolderContentVo{FolderIDs: folderIDs})
+	rawContents, _, err := findFolderContentList(tx, &vo.FolderContentVo{
+		FolderIDs: Map(rawFolders, func(f *entity.Folder, _ int) uint {
+			return f.ID
+		}),
+	})
 	if err != nil {
 		return nil, 0, err
 	}
-	folderIDMapsToContents := make(map[uint][]*entity.FolderContent)
-	for _, content := range rawContents {
-		if _, ok := folderIDMapsToContents[content.FolderID]; !ok {
-			folderIDMapsToContents[content.FolderID] = make([]*entity.FolderContent, 0)
-		}
-		folderIDMapsToContents[content.FolderID] = append(folderIDMapsToContents[content.FolderID], content)
-	}
+	folderIDMapsToContents := GroupBy(rawContents, func(content *entity.FolderContent) uint {
+		return content.FolderID
+	})
 
 	// Hack: If no specific rival, skip for merging score log
 	scoreLogSha256Map := make(map[string][]*dto.RivalScoreLogDto)

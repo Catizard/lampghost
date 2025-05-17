@@ -1,8 +1,6 @@
 module github.com/Catizard/lampghost_wails
 
-go 1.24.2
-
-toolchain go1.24.3
+go 1.23
 
 require (
 	github.com/charmbracelet/log v0.4.0
@@ -16,7 +14,7 @@ require (
 )
 
 require (
-	github.com/Catizard/bmstable v1.0.0
+	github.com/Catizard/bmstable v1.0.1
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/bep/debounce v1.2.1 // indirect
 	github.com/charmbracelet/lipgloss v0.12.1 // indirect

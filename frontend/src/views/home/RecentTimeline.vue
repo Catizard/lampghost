@@ -73,25 +73,12 @@ async function handleLoad() {
 			noMore.value = true;
 		} else {
 			queryDate = dayjs(nextLogs[0].RecordTime);
-			timelineNodes.value.push({
-				title: queryDate.format('YYYY-MM-DD'),
-				type: "info",
-				key: nodeId++,
-				logs: [],
-				color: "#000000",
-			});
-			console.log(nextLogs);
+			timelineNodes.value.push(buildTimelineDateNode(queryDate.format('YYYY-MM-DD')));
 			for (let i = 0; i < nextLogs.length; ++i) {
 				let j = i;
 				while (j + 1 < nextLogs.length && nextLogs[j + 1].Clear == nextLogs[i].Clear) j++;
 				const clearTypeDef: ClearTypeDef = queryClearTypeColorStyle(nextLogs[i].Clear);
-				let clearSummaryNode: Node = {
-					title: `New ${j - i + 1} ${clearTypeDef.text} Clear`,
-					key: nodeId++,
-					type: "success",
-					logs: [],
-					color: clearTypeDef.color,
-				};
+				let clearSummaryNode: Node = buildTimelineSummaryNode(j - i + 1, clearTypeDef);
 				for (let k = i; k <= j; ++k) {
 					clearSummaryNode.logs.push(nextLogs[k]);
 				}
@@ -116,6 +103,31 @@ async function handleLoad() {
 		});
 	}
 	loading.value = false;
+}
+
+// Generate a date node
+function buildTimelineDateNode(date: string): Node {
+	return {
+		title: date,
+		type: "info",
+		key: nodeId++,
+		logs: [],
+		color: "#000000",
+	}
+}
+
+// Generate a lamp clear summary node
+function buildTimelineSummaryNode(count: number, clearTypeDef: ClearTypeDef): Node {
+	const title = clearTypeDef.value == ClearType.FullCombo
+		? `New ${count} ${clearTypeDef.text}`
+		: `New ${count} ${clearTypeDef.text} Clear`
+	return {
+		title: title,
+		key: nodeId++,
+		type: "success",
+		logs: [],
+		color: clearTypeDef.color,
+	}
 }
 
 function handleFocusClearTag(node: Node, clearType: number) {

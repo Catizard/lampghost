@@ -37,7 +37,6 @@ func init() {
 	viper.SetDefault("FolderSymbol", "")
 	viper.SetDefault("IgnoreVariantCourse", 0)
 	viper.SetDefault("Locale", "en")
-	viper.SetDefault("ForceFullyReload", 0)
 	viper.SafeWriteConfig()
 }
 
@@ -46,7 +45,6 @@ type ApplicationConfig struct {
 	FolderSymbol        string
 	IgnoreVariantCourse int32
 	Locale              string
-	ForceFullyReload    int32
 }
 
 func ReadConfig() (*ApplicationConfig, error) {
@@ -58,7 +56,6 @@ func ReadConfig() (*ApplicationConfig, error) {
 		FolderSymbol:        viper.GetString("FolderSymbol"),
 		IgnoreVariantCourse: viper.GetInt32("IgnoreVariantCourse"),
 		Locale:              viper.GetString("Locale"),
-		ForceFullyReload:    viper.GetInt32("ForceFullyReload"),
 	}, nil
 }
 
@@ -67,7 +64,6 @@ func (c *ApplicationConfig) WriteConfig() error {
 	viper.Set("FolderSymbol", c.FolderSymbol)
 	viper.Set("IgnoreVariantCourse", c.IgnoreVariantCourse)
 	viper.Set("Locale", c.Locale)
-	viper.Set("ForceFullyReload", c.ForceFullyReload)
 	if err := viper.WriteConfig(); err != nil {
 		return err
 	}

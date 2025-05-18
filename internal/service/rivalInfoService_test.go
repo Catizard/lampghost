@@ -312,6 +312,9 @@ func TestUpdateUser(t *testing.T) {
 		if currState.Name != "NEWNAME" {
 			t.Error("update rival: name doesn't be modified")
 		}
+		if !currState.UpdatedAt.After(currState.CreatedAt) {
+			t.Error("update rival: last update time wasn't being updated")
+		}
 	})
 
 	// Some fields of the rival should never be updated directly through UpdateRivalInfo interface

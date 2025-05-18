@@ -77,9 +77,9 @@ func (ctl *RivalInfoController) QueryUserInfoWithLevelLayeredDiffTableLampStatus
 	return result.NewRtnData(data)
 }
 
-func (ctl *RivalInfoController) SyncRivalDataByID(rivalID uint) result.RtnMessage {
-	log.Info("[Controller] calling RivalInfoController.SyncRivalDataByID")
-	if err := ctl.rivalInfoService.SyncRivalDataByID(rivalID); err != nil {
+func (ctl *RivalInfoController) ReloadRivalData(rivalID uint, fullyReload bool) result.RtnMessage {
+	log.Info("[Controller] calling RivalInfoController.ReloadRivalData")
+	if err := ctl.rivalInfoService.ReloadRivalData(rivalID, fullyReload); err != nil {
 		return result.NewErrorMessage(err)
 	}
 	return result.SUCCESS

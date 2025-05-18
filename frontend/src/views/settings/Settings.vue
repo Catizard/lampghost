@@ -95,7 +95,6 @@ const model = ref<config.ApplicationConfig>({
   FolderSymbol: null,
   IgnoreVariantCourse: null,
   Locale: null,
-  ForceFullyReload: null,
 });
 const loading = ref(false);
 const yesnoOptions: Array<SelectOption> = [
@@ -205,8 +204,6 @@ loadSettings();
     "saveSettings": {
       "title": "Save File Settings",
       "alert": "If you changed the file path, by pressing the save button your save file would be reloaded automatically, there's no need to reload again manually",
-      "tipForceFullyReload": "When it set to YES, all save files would be reloaded by pressing sync button.While not, only part of the scorelog.db would be read, which could be faster\nWarning: when set it to NO, your songdata.db would not be updated by pressing sync button but need to press the full reload button",
-      "labelForceFullyReload": "Force Fully Reload",
       "labelUserName": "Your user name",
       "labelSongdataPath": "songdata.db file path",
       "labelScorelogPath": "scorelog.db file path",
@@ -246,8 +243,6 @@ loadSettings();
     "saveSettings": {
       "title": "存档设置",
       "alert": "如果你修改了这里的设置,保存时会自动重新加载存档信息, 不需要手动加载数据",
-      "tipForceFullyReload": "设置为是时每次同步存档都会读取完整的文件内容。关闭时同步速度会更快,因为只会读取一部分scorelog.db\n注意: 关闭该设置时同步按钮不会读取你的songdata.db文件, 如果文件发生了变化你需要在点击完整重新读取存档的按钮",
-      "labelForceFullyReload": "强制完整更新存档",
       "labelUserName": "用户名称",
       "labelSongdataPath": "songdata.db文件路径",
       "labelScorelogPath": "scorelog.db文件路径",

@@ -105,16 +105,15 @@ func (s *RivalInfoService) FindRivalInfoByID(rivalID uint) (*entity.RivalInfo, e
 	return &out, nil
 }
 
-// Wrapper method for SyncRivalData and IncrementalSyncRivalData, dispatching by config
-func (s *RivalInfoService) SyncRivalDataByID(rivalID uint) error {
+// Reload one rival's data, using different strategy based on fullyReload's value
+//
+//  1. fullyReload == 0: Incrementallay update `scorelog.db` and `scoredatalog.db` file, nothing to do with `songdata.db`
+//  2. fullyReload == 1: Fully reload every files, for now it's `scorelog.db`, `songdata.db` and `scoredatalog.db`
+func (s *RivalInfoService) ReloadRivalData(rivalID uint, fullyReload bool) error {
 	if rivalInfo, err := s.FindRivalInfoByID(rivalID); err != nil {
-		return err
+		return eris.Wrapf(err, "cannot find user")
 	} else {
-		conf, err := config.ReadConfig()
-		if err != nil {
-			return err
-		}
-		if conf.ForceFullyReload != 0 {
+		if !fullyReload {
 			log.Debug("[RivalInfoService] dispatched into fully reload")
 			return s.SyncRivalData(rivalInfo)
 		}

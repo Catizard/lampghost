@@ -234,16 +234,16 @@ export function ReadConfig() {
   return window['go']['main']['App']['ReadConfig']();
 }
 
+export function ReloadRivalData(arg1, arg2) {
+  return window['go']['main']['App']['ReloadRivalData'](arg1, arg2);
+}
+
 export function RevertRivalTagEnabledState(arg1) {
   return window['go']['main']['App']['RevertRivalTagEnabledState'](arg1);
 }
 
 export function RunServer() {
   return window['go']['main']['App']['RunServer']();
-}
-
-export function SyncRivalDataByID(arg1) {
-  return window['go']['main']['App']['SyncRivalDataByID'](arg1);
 }
 
 export function SyncRivalTag(arg1) {

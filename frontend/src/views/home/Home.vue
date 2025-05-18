@@ -46,7 +46,7 @@
 
 <script setup lang="ts">
 import { computed, reactive, ref } from "vue";
-import { SyncRivalDataByID, QueryMainUser, QueryUserInfoByID } from "@wailsjs/go/main/App";
+import { ReloadRivalData, QueryMainUser, QueryUserInfoByID } from "@wailsjs/go/main/App";
 import { useNotification } from "naive-ui";
 import dayjs from "dayjs";
 import { useI18n } from "vue-i18n";
@@ -108,7 +108,7 @@ function initUser() {
 const syncLoading = ref(false);
 function handleSyncClick() {
 	syncLoading.value = true;
-	SyncRivalDataByID(currentUser.value.ID)
+	ReloadRivalData(currentUser.value.ID, false)
 		.then(result => {
 			if (result.Code != 200) {
 				return Promise.reject();

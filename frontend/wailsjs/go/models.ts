@@ -5,7 +5,6 @@ export namespace config {
 	    FolderSymbol: string;
 	    IgnoreVariantCourse: number;
 	    Locale: string;
-	    ForceFullyReload: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new ApplicationConfig(source);
@@ -17,7 +16,6 @@ export namespace config {
 	        this.FolderSymbol = source["FolderSymbol"];
 	        this.IgnoreVariantCourse = source["IgnoreVariantCourse"];
 	        this.Locale = source["Locale"];
-	        this.ForceFullyReload = source["ForceFullyReload"];
 	    }
 	}
 

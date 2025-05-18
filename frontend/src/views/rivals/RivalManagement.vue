@@ -19,7 +19,7 @@
 
 <script lang="ts" setup>
 import router from '@/router';
-import { AddRivalInfo, DelRivalInfo, QueryRivalInfoPageList, SyncRivalDataByID } from '@wailsjs/go/main/App';
+import { AddRivalInfo, DelRivalInfo, QueryRivalInfoPageList, ReloadRivalData } from '@wailsjs/go/main/App';
 import { dto, entity } from '@wailsjs/go/models';
 import dayjs from 'dayjs';
 import { DataTableColumns, DropdownOption, FormInst, NAnchorLink, NButton, NDropdown, useDialog, useNotification } from 'naive-ui';
@@ -195,7 +195,7 @@ function loadData() {
 
 function handleSyncClick(id: number) {
 	loading.value = true;
-	SyncRivalDataByID(id)
+	ReloadRivalData(id, true)
 		.then(result => {
 			if (result.Code != 200) {
 				return Promise.reject(result.Msg)
@@ -231,7 +231,7 @@ loadData();
 			"actions": "Actions"
 		},
 		"button": {
-			"reload": "Reload",
+			"reload": "Fully Reload",
 			"add": "Add Rival",
 			"delete": "Delete",
 			"edit": "Edit"
@@ -257,7 +257,7 @@ loadData();
 			"actions": "操作"
 		},
 		"button": {
-			"reload": "同步",
+			"reload": "全量同步",
 			"add": "添加好友",
 			"delete": "删除",
 			"edit": "修改"

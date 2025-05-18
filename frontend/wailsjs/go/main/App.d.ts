@@ -122,11 +122,11 @@ export function QueryUserPlayCountInYear(arg1:number,arg2:string):Promise<result
 
 export function ReadConfig():Promise<result.RtnData>;
 
+export function ReloadRivalData(arg1:number,arg2:boolean):Promise<result.RtnMessage>;
+
 export function RevertRivalTagEnabledState(arg1:number):Promise<result.RtnMessage>;
 
 export function RunServer():Promise<void>;
-
-export function SyncRivalDataByID(arg1:number):Promise<result.RtnMessage>;
 
 export function SyncRivalTag(arg1:number):Promise<result.RtnMessage>;
 

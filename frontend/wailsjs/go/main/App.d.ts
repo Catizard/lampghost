@@ -6,6 +6,8 @@ import {dto} from '../models';
 import {entity} from '../models';
 import {config} from '../models';
 
+export function AddBatchDiffTableHeader(arg1:Array<vo.DiffTableHeaderVo>):Promise<result.RtnDataList>;
+
 export function AddDiffTableHeader(arg1:vo.DiffTableHeaderVo):Promise<result.RtnMessage>;
 
 export function AddFolder(arg1:string):Promise<result.RtnMessage>;
@@ -72,6 +74,10 @@ export function GENERATOR_FOLDER_DTO():Promise<dto.FolderDto>;
 
 export function GENERATOR_KEY_COUNT_DTO():Promise<dto.KeyCountDto>;
 
+export function GENERATOR_PREDEFINE_TABLE_HEADER():Promise<entity.PredefineTableHeader>;
+
+export function GENERATOR_PREDEFINE_TABLE_SCHEME():Promise<entity.PredefineTableScheme>;
+
 export function GENERATOR_RIVAL_INFO():Promise<entity.RivalInfo>;
 
 export function GENERATOR_RIVAL_INFO_DTO():Promise<dto.RivalInfoDto>;
@@ -101,6 +107,8 @@ export function QueryLatestVersion():Promise<result.RtnMessage>;
 export function QueryLevelLayeredDiffTableInfoByID(arg1:number):Promise<result.RtnData>;
 
 export function QueryMainUser():Promise<result.RtnData>;
+
+export function QueryPredefineTableSchemes():Promise<result.RtnDataList>;
 
 export function QueryPrevDayScoreLogList(arg1:vo.RivalScoreLogVo):Promise<result.RtnDataList>;
 

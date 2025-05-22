@@ -14,7 +14,7 @@ require (
 )
 
 require (
-	github.com/Catizard/bmstable v1.0.1
+	github.com/Catizard/bmstable v1.0.2
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/bep/debounce v1.2.1 // indirect
 	github.com/charmbracelet/lipgloss v0.12.1 // indirect

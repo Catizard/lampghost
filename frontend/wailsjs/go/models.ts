@@ -734,6 +734,60 @@ export namespace entity {
 	        this.pageCount = source["pageCount"];
 	    }
 	}
+	export class PredefineTableHeader {
+	    HeaderUrl: string;
+	    Name: string;
+	    Symbol: string;
+	    TagColor: string;
+	    TagTextColor: string;
+	    Category: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new PredefineTableHeader(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.HeaderUrl = source["HeaderUrl"];
+	        this.Name = source["Name"];
+	        this.Symbol = source["Symbol"];
+	        this.TagColor = source["TagColor"];
+	        this.TagTextColor = source["TagTextColor"];
+	        this.Category = source["Category"];
+	    }
+	}
+	export class PredefineTableScheme {
+	    Headers: PredefineTableHeader[];
+	    Name: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new PredefineTableScheme(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Headers = this.convertValues(source["Headers"], PredefineTableHeader);
+	        this.Name = source["Name"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	export class RivalInfo {
 	    ID: number;
 	    // Go type: time

@@ -57,7 +57,7 @@ const routes: RouteRecordRaw[] = [
   {
     name: "initialize",
     path: "/initialize",
-    component: () => import("../views/initialize.vue"),
+    component: () => import("../views/initialize/initialize.vue"),
   },
   {
     name: "not-found",

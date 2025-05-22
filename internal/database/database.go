@@ -53,6 +53,10 @@ func migrates(db *gorm.DB) error {
 		return err
 	}
 
+	if err := db.Table("predefine_table_header").AutoMigrate(&entity.PredefineTableHeader{}); err != nil {
+		return err
+	}
+
 	return nil
 }
 

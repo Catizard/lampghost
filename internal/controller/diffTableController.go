@@ -29,6 +29,16 @@ func (ctl *DiffTableController) AddDiffTableHeader(param *vo.DiffTableHeaderVo) 
 	return result.SUCCESS
 }
 
+func (ctl *DiffTableController) AddBatchDiffTableHeader(candidates []*vo.DiffTableHeaderVo) result.RtnDataList {
+	log.Info("[Controller] calling DiffTableController.AddBatchDiffTableHeader")
+	rows, _, err := ctl.diffTableService.AddBatchDiffTableHeader(candidates)
+	if err != nil {
+		log.Errorf("[DiffTableController] returning err: %v", err)
+		return result.NewErrorDataList(err)
+	}
+	return result.NewRtnDataList(rows)
+}
+
 func (ctl *DiffTableController) DelDiffTableHeader(ID uint) result.RtnMessage {
 	log.Info("[Controller] calling DiffTableController.DelDiffTableHeader")
 	err := ctl.diffTableService.DelDiffTableHeader(ID)
@@ -156,6 +166,15 @@ func (ctl *DiffTableController) UpdateHeaderLevelOrders(updateParam *vo.DiffTabl
 	return result.SUCCESS
 }
 
+func (ctl *DiffTableController) QueryPredefineTableSchemes() result.RtnDataList {
+	log.Info("[Controller] Calling DiffTableController.QueryPredefineTableSchemes")
+	schemes := make([]entity.PredefineTableScheme, 0)
+	for _, scheme := range entity.PredefineTableSchemes {
+		schemes = append(schemes, scheme)
+	}
+	return result.NewRtnDataList(schemes)
+}
+
 func (ctl *DiffTableController) GENERATOR_TABLE_HEADER() *entity.DiffTableHeader { return nil }
 
 func (ctl *DiffTableController) GENERATOR_TABLE_HEADER_DTO() *dto.DiffTableHeaderDto { return nil }
@@ -163,3 +182,11 @@ func (ctl *DiffTableController) GENERATOR_TABLE_HEADER_DTO() *dto.DiffTableHeade
 func (ctl *DiffTableController) GENERATOR_TABLE_DATA() *dto.DiffTableDataDto { return nil }
 
 func (ctl *DiffTableController) GENERATOR_TABLE_TAG_DTO() *dto.DiffTableTagDto { return nil }
+
+func (ctl *DiffTableController) GENERATOR_PREDEFINE_TABLE_HEADER() *entity.PredefineTableHeader {
+	return nil
+}
+
+func (ctl *DiffTableController) GENERATOR_PREDEFINE_TABLE_SCHEME() *entity.PredefineTableScheme {
+	return nil
+}

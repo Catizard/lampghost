@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"slices"
 	"strconv"
@@ -62,13 +63,7 @@ func (s *DiffTableService) AddDiffTableHeader(param *vo.DiffTableHeaderVo) (*ent
 		return nil, eris.Errorf("add difficult table header failed: data_url[%s] is duplicated", url)
 	}
 
-	headerEntity := entity.NewDiffTableHeaderFromImport(&rawHeader)
-	// HACK: Inherit some fields from passing parameter
-	headerEntity.TagColor = param.TagColor
-	headerEntity.TagTextColor = param.TagTextColor
-	headerEntity.NoTagBuild = param.NoTagBuild
-	// TODO: Should be a bmstable library's bug
-	headerEntity.HeaderUrl = url
+	headerEntity := entity.NewDiffTableHeaderFromImport(&rawHeader, param.Entity())
 
 	// Transaction begins from here
 	if err := s.db.Transaction(func(tx *gorm.DB) error {
@@ -108,6 +103,103 @@ func (s *DiffTableService) AddDiffTableHeader(param *vo.DiffTableHeaderVo) (*ent
 	}
 
 	return headerEntity, nil
+}
+
+// Add multiple difficult tables, return failed tables
+//
+// Requirements:
+//
+//	1.difficult table's url must be unique
+//	2.difficult table's data_url must be unique
+func (s *DiffTableService) AddBatchDiffTableHeader(candidates []*vo.DiffTableHeaderVo) ([]*vo.DiffTableHeaderVo, int, error) {
+	if len(candidates) == 0 {
+		return make([]*vo.DiffTableHeaderVo, 0), 0, nil
+	}
+
+	// Remove already added table
+	// NOTE: We don't mention duplicate as an error in this function,
+	// it's obviously unuseful
+	prevHeaders, _, err := findDiffTableHeaderList(s.db, nil)
+	if err != nil {
+		return nil, 0, err
+	}
+	duplicatedURLs := make([]string, 0)
+	for _, candidate := range candidates {
+		duplicated := false
+		for _, prevHeader := range prevHeaders {
+			if prevHeader.HeaderUrl == candidate.HeaderUrl {
+				duplicated = true
+				break
+			}
+		}
+		if duplicated {
+			duplicatedURLs = append(duplicatedURLs, candidate.HeaderUrl)
+		}
+	}
+	headerURLMapsToCandidate := SliceToMap(candidates, func(candidate *vo.DiffTableHeaderVo) (string, *vo.DiffTableHeaderVo) {
+		return candidate.HeaderUrl, candidate
+	})
+
+	timeout := 15 * time.Second
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	submit := make(chan bmstable.DifficultTable)
+	for _, candidate := range candidates {
+		if slices.Index(duplicatedURLs, candidate.HeaderUrl) != -1 {
+			continue
+		}
+		go func() {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+				rawHeader, err := bmstable.ParseFromURL(candidate.HeaderUrl)
+				if err != nil {
+					log.Errorf("bmstable: %s", err)
+					return
+				}
+				log.Debugf("rawHeader.HeaderURL: %s", rawHeader.HeaderURL)
+				submit <- rawHeader
+			}
+		}()
+	}
+	hand := make(map[string]bmstable.DifficultTable)
+FOR:
+	for {
+		// Early exit
+		if len(hand) == len(candidates)-len(duplicatedURLs) {
+			break
+		}
+		select {
+		case <-ctx.Done():
+			break FOR
+		case rawHeader := <-submit:
+			hand[rawHeader.HeaderURL] = rawHeader
+		}
+	}
+
+	successedURLs := make([]string, 0)
+	for headerURL, importHeader := range hand {
+		if headerURL == "" {
+			continue // WHAT???
+		}
+		// The easist way to isolate multiple inserts and report which fails is
+		// doing the insert one-by-one transaction
+		if err := s.db.Transaction(func(tx *gorm.DB) error {
+			return addDiffTableHeaderFromImportHeader(tx, &importHeader, headerURLMapsToCandidate[headerURL])
+		}); err != nil {
+			log.Errorf("add difficult table %s failed: %s", headerURL, err)
+		} else {
+			successedURLs = append(successedURLs, headerURL)
+		}
+	}
+
+	// Build the failed tables here:
+	failedCandidates := Filter(candidates, func(candidate *vo.DiffTableHeaderVo, _ int) bool {
+		return slices.Index(successedURLs, candidate.HeaderUrl) == -1
+	})
+	return failedCandidates, len(failedCandidates), nil
 }
 
 func (s *DiffTableService) UpdateDiffTableHeader(param *vo.DiffTableHeaderVo) error {
@@ -464,6 +556,45 @@ func queryLevelLayeredDiffTableInfoById(tx *gorm.DB, ID uint) (*dto.DiffTableHea
 	}
 	sortedLevels = sortLevels(sortedLevels, header.UnjoinedLevelOrder)
 	return dto.NewLevelLayeredDiffTableHeaderDto(header.Entity(), sortedLevels, levelLayeredContent), nil
+}
+
+// Add one difficult table's header, contents, courses from result parsed from library bmstable
+//
+// extraParam could be nil, when not, header may inherit some extra fields from it,
+// see implementation for details
+func addDiffTableHeaderFromImportHeader(tx *gorm.DB, importHeader *bmstable.DifficultTable, extraParam *vo.DiffTableHeaderVo) error {
+	headerEntity := entity.NewDiffTableHeaderFromImport(importHeader, extraParam.Entity())
+	// (1) difficult table header
+	if err := tx.Create(headerEntity).Error; err != nil {
+		return eris.Wrap(err, "failed to insert new header")
+	}
+	// (2) difficult related course contents
+	courses := Map(importHeader.Courses, func(importCourse bmstable.CourseInfo, _ int) *entity.CourseInfo {
+		course := entity.NewCourseInfoFromImport(&importCourse)
+		course.HeaderID = headerEntity.ID
+		return course
+	})
+	if len(courses) > 0 {
+		if err := delCourseInfo(tx, &vo.CourseInfoVo{HeaderID: headerEntity.ID}); err != nil {
+			return eris.Wrap(err, "failed to delete previous courses")
+		}
+		if err := addBatchCourseInfo(tx, courses); err != nil {
+			return eris.Wrap(err, "failed to insert new courses")
+		}
+	}
+	// (3) difficult table concreate contents
+	diffTableData := Map(importHeader.Contents, func(importData bmstable.DifficultTableData, _ int) *entity.DiffTableData {
+		data := entity.NewDiffTableDataFromImport(&importData)
+		data.HeaderID = headerEntity.ID
+		return data
+	})
+	if err := tx.Unscoped().Where("header_id = ?", headerEntity.ID).Delete(&entity.DiffTableData{}).Error; err != nil {
+		return eris.Wrap(err, "failed to delete previous difficult table data")
+	}
+	if err := tx.CreateInBatches(&diffTableData, DEFAULT_BATCH_SIZE).Error; err != nil {
+		return eris.Wrap(err, "failed to insert new difficult table data")
+	}
+	return nil
 }
 
 // Query one difficult table header and its related contents by header's ID

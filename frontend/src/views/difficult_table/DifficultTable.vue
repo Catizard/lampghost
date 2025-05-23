@@ -5,8 +5,10 @@
 				<n-text type="primary">{{ t('title') }}</n-text>
 			</n-h1>
 			<n-flex justify="flex-end">
-				<n-button :loading="loading" type="info" @click="showSortModal = true"> {{ t('button.sort') }}</n-button>
-				<n-button :loading="loading" type="primary" @click="showAddModal = true">{{ t('button.add') }}</n-button>
+				<n-button :loading="loading" type="info" @click="showSortModal = true"> {{ t('button.sort')
+					}}</n-button>
+				<n-button :loading="loading" type="primary" @click="showAddModal = true">{{ t('button.add')
+					}}</n-button>
 			</n-flex>
 		</n-flex>
 		<n-data-table :loading="loading" :columns="columns" :data="data" :pagination="pagination" :bordered="false"
@@ -26,7 +28,8 @@ import { useNotification } from "naive-ui";
 import { h, Ref, ref } from "vue";
 import {
 	DelDiffTableHeader,
-	FindDiffTableHeaderTree
+	FindDiffTableHeaderTree,
+	ReloadDiffTableHeader
 } from "@wailsjs/go/main/App";
 import { dto } from "@wailsjs/go/models";
 import { useI18n } from "vue-i18n";
@@ -96,6 +99,10 @@ const pagination = false as const;
 
 const otherActionOptions: Array<DropdownOption> = [
 	{
+		label: t('button.reload'),
+		key: "Reload"
+	},
+	{
 		label: t('button.edit'),
 		key: "Edit",
 	},
@@ -112,6 +119,9 @@ const otherActionOptions: Array<DropdownOption> = [
 	}
 ];
 function handleSelectOtherAction(row: dto.DiffTableHeaderDto, key: string) {
+	if ("Reload" === key) {
+		reloadTableHeader(row.ID);
+	}
 	if ("Delete" === key) {
 		dialog.warning({
 			title: t('deleteDialog.title'),
@@ -128,6 +138,19 @@ function handleSelectOtherAction(row: dto.DiffTableHeaderDto, key: string) {
 	if ("SortLevels" === key) {
 		levelSortModalRef.value.open(row.ID);
 	}
+}
+
+function reloadTableHeader(id: number) {
+	loading.value = true;
+	ReloadDiffTableHeader(id)
+		.then(result => {
+			if (result.Code != 200) {
+				return Promise.reject(result.Msg);
+			}
+			loadDiffTableData();
+		}).catch(err => {
+			notifyError(err);
+		}).finally(() => loading.value = false);
 }
 
 function delDiffTableHeader(id: number) {

@@ -202,6 +202,26 @@ FOR:
 	return failedCandidates, len(failedCandidates), nil
 }
 
+func (s *DiffTableService) ReloadDiffTableHeader(ID uint) error {
+	if ID == 0 {
+		return eris.New("ReloadDiffTableHeader: ID cannot be 0")
+	}
+	if err := s.db.Transaction(func(tx *gorm.DB) error {
+		var header entity.DiffTableHeader
+		if err := tx.First(&header, ID).Error; err != nil {
+			return err
+		}
+		importHeader, err := bmstable.ParseFromURL(header.HeaderUrl)
+		if err != nil {
+			return err
+		}
+		return reloadDiffTableHeader(tx, ID, &importHeader)
+	}); err != nil {
+		return eris.Wrap(err, "cannot reload table: ")
+	}
+	return nil
+}
+
 func (s *DiffTableService) UpdateDiffTableHeader(param *vo.DiffTableHeaderVo) error {
 	if param == nil {
 		return eris.Errorf("update: param cannot be nil")
@@ -568,27 +588,40 @@ func addDiffTableHeaderFromImportHeader(tx *gorm.DB, importHeader *bmstable.Diff
 	if err := tx.Create(headerEntity).Error; err != nil {
 		return eris.Wrap(err, "failed to insert new header")
 	}
-	// (2) difficult related course contents
+	return reloadDiffTableHeader(tx, headerEntity.ID, importHeader)
+}
+
+// Reload one difficult table's data
+//
+// For now, these data would be rebuilt:
+//  1. courses
+//  2. difficult table data
+//
+// However, difficult table header would be untouched, therefore, you can't use this function
+// to update one table's url field. This design is intended, to reuse below code in `insert`,
+// `update` and `reload`.
+func reloadDiffTableHeader(tx *gorm.DB, ID uint, importHeader *bmstable.DifficultTable) error {
+	// (1) difficult related course contents
 	courses := Map(importHeader.Courses, func(importCourse bmstable.CourseInfo, _ int) *entity.CourseInfo {
 		course := entity.NewCourseInfoFromImport(&importCourse)
-		course.HeaderID = headerEntity.ID
+		course.HeaderID = ID
 		return course
 	})
 	if len(courses) > 0 {
-		if err := delCourseInfo(tx, &vo.CourseInfoVo{HeaderID: headerEntity.ID}); err != nil {
+		if err := delCourseInfo(tx, &vo.CourseInfoVo{HeaderID: ID}); err != nil {
 			return eris.Wrap(err, "failed to delete previous courses")
 		}
 		if err := addBatchCourseInfo(tx, courses); err != nil {
 			return eris.Wrap(err, "failed to insert new courses")
 		}
 	}
-	// (3) difficult table concreate contents
+	// (2) difficult table concreate contents
 	diffTableData := Map(importHeader.Contents, func(importData bmstable.DifficultTableData, _ int) *entity.DiffTableData {
 		data := entity.NewDiffTableDataFromImport(&importData)
-		data.HeaderID = headerEntity.ID
+		data.HeaderID = ID
 		return data
 	})
-	if err := tx.Unscoped().Where("header_id = ?", headerEntity.ID).Delete(&entity.DiffTableData{}).Error; err != nil {
+	if err := tx.Unscoped().Where("header_id = ?", ID).Delete(&entity.DiffTableData{}).Error; err != nil {
 		return eris.Wrap(err, "failed to delete previous difficult table data")
 	}
 	if err := tx.CreateInBatches(&diffTableData, DEFAULT_BATCH_SIZE).Error; err != nil {

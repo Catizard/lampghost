@@ -130,6 +130,8 @@ export function QueryUserPlayCountInYear(arg1:number,arg2:string):Promise<result
 
 export function ReadConfig():Promise<result.RtnData>;
 
+export function ReloadDiffTableHeader(arg1:number):Promise<result.RtnMessage>;
+
 export function ReloadRivalData(arg1:number,arg2:boolean):Promise<result.RtnMessage>;
 
 export function RevertRivalTagEnabledState(arg1:number):Promise<result.RtnMessage>;

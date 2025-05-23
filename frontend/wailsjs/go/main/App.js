@@ -250,6 +250,10 @@ export function ReadConfig() {
   return window['go']['main']['App']['ReadConfig']();
 }
 
+export function ReloadDiffTableHeader(arg1) {
+  return window['go']['main']['App']['ReloadDiffTableHeader'](arg1);
+}
+
 export function ReloadRivalData(arg1, arg2) {
   return window['go']['main']['App']['ReloadRivalData'](arg1, arg2);
 }

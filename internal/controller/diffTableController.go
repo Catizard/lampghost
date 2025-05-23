@@ -39,6 +39,15 @@ func (ctl *DiffTableController) AddBatchDiffTableHeader(candidates []*vo.DiffTab
 	return result.NewRtnDataList(rows)
 }
 
+func (ctl *DiffTableController) ReloadDiffTableHeader(ID uint) result.RtnMessage {
+	log.Info("[Controller] calling DiffTableController.ReloadDiffTableHeader")
+	if err := ctl.diffTableService.ReloadDiffTableHeader(ID); err != nil {
+		log.Errorf("[DiffTableController] returning err: %v", err)
+		return result.NewErrorMessage(err)
+	}
+	return result.SUCCESS
+}
+
 func (ctl *DiffTableController) DelDiffTableHeader(ID uint) result.RtnMessage {
 	log.Info("[Controller] calling DiffTableController.DelDiffTableHeader")
 	err := ctl.diffTableService.DelDiffTableHeader(ID)

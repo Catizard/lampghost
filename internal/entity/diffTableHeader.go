@@ -78,8 +78,8 @@ func init() {
 		Name:         "Stardust",
 		Symbol:       "ξ",
 		Category:     "Starter",
-		TagColor:     "#CCFFF1",
-		TagTextColor: "#1C6652",
+		TagColor:     "#E5F4D3",
+		TagTextColor: "#2B410D",
 		headerUrls: []string{
 			"https://mqppppp.neocities.org/StardustTable.html",
 		},
@@ -88,8 +88,8 @@ func init() {
 		Name:         "Starlight",
 		Symbol:       "sr",
 		Category:     "Starter",
-		TagColor:     "#CAEB9F",
-		TagTextColor: "#1C6652",
+		TagColor:     "#E8EDFF",
+		TagTextColor: "#121D52",
 		headerUrls: []string{
 			"https://djkuroakari.github.io/starlighttable.html",
 		},

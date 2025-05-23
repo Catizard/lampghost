@@ -42,11 +42,11 @@ const formData = ref({
 
 const yesnoOptions: Array<SelectOption> = [
   {
-    label: t('options.yes'),
+    label: t('options.noDisplay'),
     value: 1,
   },
   {
-    label: t('options.no'),
+    label: t('options.display'),
     value: 0,
   }
 ];
@@ -118,14 +118,14 @@ function open(headerId: number) {
       "title": "Edit table",
       "positiveText": "submit",
       "negativeText": "cancel",
-      "labelNoTagBuild": "No tag display",
+      "labelNoTagBuild": "Display table tag or not",
       "placeholderNoTagBuild": "Please choose no tag build",
       "labelTagColor": "Tag color",
       "labelTagTextColor": "Tag text color"
     },
     "options": {
-      "yes": "Yes",
-      "no": "No"
+      "noDisplay": "Don't display",
+      "display": "Display"
     },
     "message": {
       "noChosenHeaderError": "No header was chosed currently"
@@ -136,14 +136,14 @@ function open(headerId: number) {
       "title": "修改难度表",
       "positiveText": "新增",
       "negativeText": "取消",
-      "labelNoTagBuild": "不展示标签",
+      "labelNoTagBuild": "是否展示标签",
       "placeholderNoTagBuild": "请选择是否参与标签构造",
       "labelTagColor": "标签颜色",
       "labelTagTextColor": "标签嵌字颜色"
     },
     "options": {
-      "yes": "是",
-      "no": "否"
+      "noDisplay": "不展示",
+      "display": "展示"
     },
     "message": {
       "noChosenHeaderError": "当前没有选择任何难度表"

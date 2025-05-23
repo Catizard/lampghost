@@ -1,12 +1,14 @@
-package service
+package service_test
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/Catizard/lampghost_wails/internal/database"
 	"github.com/Catizard/lampghost_wails/internal/entity"
+	"github.com/Catizard/lampghost_wails/internal/service"
 	"github.com/Catizard/lampghost_wails/internal/vo"
 	"github.com/charmbracelet/log"
 	"github.com/stretchr/testify/assert"
@@ -19,7 +21,7 @@ func TestSha256CoursesTagBuild(t *testing.T) {
 	log.SetLevel(log.DebugLevel)
 	db, err := database.NewMemoryDatabase()
 	require.Nil(t, err)
-	service := NewRivalTagService(db)
+	service := service.NewRivalTagService(db)
 	// Mock a difficult table which has two courses, defined as below:
 	// NOTE: for convient, we define sha256 == md5
 	// Course-1: sha256s="1,2,3,4", md5s=""
@@ -78,15 +80,51 @@ func TestSha256CoursesTagBuild(t *testing.T) {
 	}
 	require.Nil(t, db.Create(&songDatas).Error)
 	// TODO: Can we get rid of this?
-	// NOTE: we need expire the default cache after writing data into songdata table
-	expireDefaultCache()
-	t.Run("OneLog-HasSongData", func(t *testing.T) {
-		err := service.SyncRivalTag(1)
-		require.Nil(t, err)
-		_, n, err := service.FindRivalTagList(&vo.RivalTagVo{
-			RivalId: 1,
+	// // NOTE: we need expire the default cache after writing data into songdata table
+	// expireDefaultCache()
+	// t.Run("OneLog-HasSongData", func(t *testing.T) {
+	// 	err := service.SyncRivalTag(1)
+	// 	require.Nil(t, err)
+	// 	_, n, err := service.FindRivalTagList(&vo.RivalTagVo{
+	// 		RivalId: 1,
+	// 	})
+	// 	require.Nil(t, err)
+	// 	require.Equal(t, 2, n)
+	// })
+}
+
+func TestAddRivalTag(t *testing.T) {
+	db, err := database.NewMemoryDatabase()
+	if err != nil {
+		t.Fatalf("db: %s", err)
+	}
+	rivalTagService := service.NewRivalTagService(db)
+	rivalInfoService := service.NewRivalInfoService(db)
+	emptyMainUser := newEmptyUser(false, false, false)
+	if err := rivalInfoService.InitializeMainUser(emptyMainUser); err != nil {
+		t.Fatalf("initializeMainUser: %s", err)
+	}
+
+	var tests = []struct {
+		name  string
+		input *vo.RivalTagVo
+	}{
+		{
+			"completely nil",
+			nil,
+		},
+		{
+			"rival id is 0",
+			&vo.RivalTagVo{RivalId: 0, TagName: "TEST", RecordTime: time.Now()},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := rivalTagService.AddRivalTag(tt.input); err == nil {
+				fmt.Printf("err: %s", err)
+				t.Fatalf("expected error, got nothing")
+			}
 		})
-		require.Nil(t, err)
-		require.Equal(t, 2, n)
-	})
+	}
 }

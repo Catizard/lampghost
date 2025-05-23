@@ -118,6 +118,7 @@ const otherActionOptions: Array<DropdownOption> = [
 		}
 	}
 ];
+
 function handleSelectOtherAction(row: dto.DiffTableHeaderDto, key: string) {
 	if ("Reload" === key) {
 		reloadTableHeader(row.ID);

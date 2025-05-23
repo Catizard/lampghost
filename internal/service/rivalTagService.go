@@ -42,6 +42,9 @@ func (s *RivalTagService) AddRivalTag(rivalTag *vo.RivalTagVo) error {
 	if rivalTag == nil {
 		return fmt.Errorf("AddRivalTag: rivalTag cannot be nil")
 	}
+	if rivalTag.RivalId == 0 {
+		return fmt.Errorf("AddRivalTag: rivalID cannot be 0")
+	}
 	// if you don't provide the tag name, it would be supplyed with tag time
 	if rivalTag.TagName == "" {
 		rivalTag.TagName = rivalTag.RecordTime.Format("2006-01-02 15:04:05")
@@ -258,6 +261,9 @@ func findRivalTagList(tx *gorm.DB, filter *vo.RivalTagVo) ([]*entity.RivalTag, i
 	partial := tx.Model(&entity.RivalTag{})
 	if filter != nil {
 		partial = partial.Where(filter.Entity())
+		if !filter.NoIgnoreEnabled {
+			partial = partial.Where("Enabled = true")
+		}
 	}
 	var out []*entity.RivalTag
 	if err := partial.Scopes(

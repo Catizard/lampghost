@@ -1548,6 +1548,7 @@ export namespace vo {
 	    // Go type: time
 	    RecordTime: any;
 	    Pagination?: entity.Page;
+	    NoIgnoreEnabled: boolean;
 	    RecordTimestamp?: number;
 	
 	    static createFrom(source: any = {}) {
@@ -1566,6 +1567,7 @@ export namespace vo {
 	        this.Enabled = source["Enabled"];
 	        this.RecordTime = this.convertValues(source["RecordTime"], null);
 	        this.Pagination = this.convertValues(source["Pagination"], entity.Page);
+	        this.NoIgnoreEnabled = source["NoIgnoreEnabled"];
 	        this.RecordTimestamp = source["RecordTimestamp"];
 	    }
 	

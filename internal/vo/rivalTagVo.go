@@ -17,6 +17,10 @@ type RivalTagVo struct {
 	RecordTime time.Time
 	Pagination *entity.Page
 
+	// When flagged, ignore 'Enabled' field in filter statement
+	// Defaults to false
+	NoIgnoreEnabled bool
+
 	RecordTimestamp *int64 // overwrites to RecordTime
 }
 

@@ -240,7 +240,8 @@ function notifyError(msg: string) {
 		},
 		"contentColumn": {
 			"name": "谱名",
-			"actions": "操作"
+			"actions": "操作",
+			"clear": "通关状态"
 		},
 		"message": {
 			"deleteSuccess": "删除成功",

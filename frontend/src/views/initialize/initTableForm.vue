@@ -143,7 +143,7 @@ function handleSubmit() {
   if (candidates.length == 0) {
     createSkipModal();
     loading.value = false;
-    return ;
+    return;
   }
   AddBatchDiffTableHeader(candidates)
     .then(result => {
@@ -161,7 +161,7 @@ function handleSubmit() {
           type: "error",
           title: t('failedModal.title'),
           preset: "dialog",
-          content: t('failedModal.content', { tables: failedMessage}),
+          content: t('failedModal.content', { tables: failedMessage }),
           closable: true,
         });
       }
@@ -246,5 +246,26 @@ loadSchemes();
       "title": "Failed",
       "content": "Some tables are failed to add, you could try adding them manually: {tables}"
     }
+  },
+  "zh-CN": {
+    "column": {
+      "name": "名称",
+      "tag": "难度表标签",
+      "url": "地址"
+    },
+    "button": {
+      "skip": "跳过",
+      "submit": "提交",
+      "positive": "确定",
+      "negative": "取消"
+    },
+    "skipModal": {
+      "title": "跳过难度表新增",
+      "content": "Lampghost在一个难度表都没有的时候可能产生一些奇怪的现象。你确定要跳过新增步骤吗?"
+    },
+    "failedModal": {
+      "title": "失败",
+      "content": "部分难度表新增失败,你可以稍后手动添加他们: {tables}"
+    }
   }
-} </i18n>
+}</i18n>

@@ -210,7 +210,8 @@ function notifyError(msg: string) {
 			"delete": "Delete",
 			"edit": "Edit",
 			"sort": "Sort",
-			"sortLevels": "Sort Levels"
+			"sortLevels": "Sort Levels",
+			"reload": "Reload"
 		},
 		"column": {
 			"name": "Name",
@@ -236,7 +237,8 @@ function notifyError(msg: string) {
 			"delete": "删除",
 			"edit": "修改",
 			"sort": "排序",
-			"sortLevels": "设定难度排序"
+			"sortLevels": "设定难度排序",
+			"reload": "重新导入"
 		},
 		"column": {
 			"name": "名称",

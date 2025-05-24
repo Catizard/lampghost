@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { DataTableColumns, DataTableSortState, NButton, NIcon, NText, NTooltip, useNotification } from 'naive-ui';
 import { dto } from '@wailsjs/go/models';
-import { h, reactive, ref, Ref, watch } from 'vue';
+import { h, reactive, ref, Ref, VNode, watch } from 'vue';
 import { BindDiffTableDataToFolder, QueryDiffTableDataWithRival } from '@wailsjs/go/main/App';
 import SelectFolder from '@/views/folder/SelectFolder.vue';
 import ClearTag from '@/components/ClearTag.vue';
@@ -67,7 +67,20 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
 		resizable: true,
 		minWidth: "100px",
 		render(row: dto.DiffTableDataDto) {
-			return h(
+			const nodes: Array<VNode> = [];
+			if (row.DataLost) {
+				nodes.push(h(
+					NButton,
+					{
+						stronge: true,
+						tertiary: true,
+						size: "small",
+						onClick: () => console.log('todo'),
+					},
+					{ default: () => t('button.download') }
+				))
+			}
+			nodes.push(h(
 				NButton,
 				{
 					strong: true,
@@ -76,7 +89,8 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
 					onClick: () => handleAddToFolder(row),
 				},
 				{ default: () => t('button.addToFolder') }
-			)
+			));
+			return nodes;
 		}
 	}
 ];
@@ -189,7 +203,8 @@ loadData();
 			"actions": "Actions"
 		},
 		"button": {
-			"addToFolder": "Add to Folder"
+			"addToFolder": "Add to Folder",
+			"download": "Download"
 		},
 		"message": {
 			"bindSuccess": "Bind successfully",
@@ -206,7 +221,8 @@ loadData();
 			"actions": "操作"
 		},
 		"button": {
-			"addToFolder": "添加至收藏夹"
+			"addToFolder": "添加至收藏夹",
+			"download": "下载"
 		},
 		"message": {
 			"bindSucess": "绑定成功",

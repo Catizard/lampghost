@@ -113,3 +113,13 @@ func (a *App) OpenFileDialog(title string) result.RtnData {
 	}
 	return result.NewRtnData(fp)
 }
+
+func (a *App) OpenDirectoryDialog(title string) result.RtnData {
+	fp, err := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{
+		Title: title,
+	})
+	if err != nil {
+		return result.NewErrorData(err)
+	}
+	return result.NewRtnData(fp)
+}

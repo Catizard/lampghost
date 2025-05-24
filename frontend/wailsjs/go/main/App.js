@@ -174,6 +174,10 @@ export function InitializeMainUser(arg1) {
   return window['go']['main']['App']['InitializeMainUser'](arg1);
 }
 
+export function OpenDirectoryDialog(arg1) {
+  return window['go']['main']['App']['OpenDirectoryDialog'](arg1);
+}
+
 export function OpenFileDialog(arg1) {
   return window['go']['main']['App']['OpenFileDialog'](arg1);
 }

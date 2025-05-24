@@ -92,6 +92,8 @@ export function GENERATOR_TABLE_TAG_DTO():Promise<dto.DiffTableTagDto>;
 
 export function InitializeMainUser(arg1:vo.RivalInfoVo):Promise<result.RtnMessage>;
 
+export function OpenDirectoryDialog(arg1:string):Promise<result.RtnData>;
+
 export function OpenFileDialog(arg1:string):Promise<result.RtnData>;
 
 export function QueryDiffTableDataWithRival(arg1:vo.DiffTableHeaderVo):Promise<result.RtnPage>;

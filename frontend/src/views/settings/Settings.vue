@@ -62,6 +62,26 @@
           </n-input>
         </n-form-item>
       </n-h2>
+			<n-h2>
+				<n-text>
+					{{ t('downloadSettings.title') }}
+				</n-text>
+				<n-form-item :label="t('downloadSettings.labelDownloadSite')" path="downloadSite">
+					<n-select v-model:value="model.DownloadSite" :options="downloadSiteOptions" style="width: 150px;" />
+				</n-form-item>
+				<n-form-item :label="t('downloadSettings.labelSeparateDownloadMD5')" path="separateDownloadMD5">
+					<n-input v-model:value="model.SeparateDownloadMD5" :placeholder="t('downloadSettings.placeholderSeparateDownloadMD5')"
+						style="width: 500px;" :loading="loading" />
+				</n-form-item>
+				<n-form-item :label="t('form.labelScorelogPath')" path="scorelogPath">
+        	<n-button type="info" @click="chooseDownloadDirectory()">
+          	{{ t('button.chooseDownloadDirectory') }}
+        </n-button>
+        <n-divider vertical />
+        <n-input v-model:value="model.DownloadDirectory" :placeholder="t('downloadSettings.placeholderDownloadDirectory')" 
+						style="width: 500px;"/>
+      	</n-form-item>
+			</n-h2>
     </n-form>
   </div>
 </template>
@@ -72,7 +92,7 @@ import { ref } from 'vue';
 import {
   ChatboxEllipsesOutline as HintIcon,
 } from '@vicons/ionicons5';
-import { QueryLatestVersion, ReadConfig, WriteConfig } from '@wailsjs/go/main/App';
+import { QueryLatestVersion, ReadConfig, WriteConfig, OpenDirectoryDialog } from '@wailsjs/go/main/App';
 import { config } from '../../../wailsjs/go/models';
 import { useI18n } from 'vue-i18n';
 
@@ -95,6 +115,9 @@ const model = ref<config.ApplicationConfig>({
   FolderSymbol: null,
   IgnoreVariantCourse: null,
   Locale: null,
+	DownloadSite: null,
+	SeparateDownloadMD5: null,
+	DownloadDirectory: null,
 });
 const loading = ref(false);
 const yesnoOptions: Array<SelectOption> = [
@@ -106,6 +129,13 @@ const yesnoOptions: Array<SelectOption> = [
     label: t('options.no'),
     value: 0,
   }
+];
+
+const downloadSiteOptions: Array<SelectOption> = [
+	{
+		label: "wriggle",
+		value: "wriggle"
+	},
 ];
 
 function handleSaveSettings() {
@@ -129,6 +159,24 @@ function handleSaveSettings() {
     }).finally(() => {
       loading.value = false;
     })
+}
+
+function chooseDownloadDirectory() {
+	OpenDirectoryDialog("Choose Download Directory")
+		.then(result => {
+			if (result.Code != 200) {
+				return Promise.reject(result.Msg);
+			}
+			if (result.Data != null && result.Data != undefined && result.Data != '') {
+				model.value.DownloadDirectory = result.Data;
+			}
+		}).catch(err => {
+			notification.error({
+				content: err,
+				duration: 3000,
+				keepAliveOnHover: true
+			})
+		})
 }
 
 function loadSettings() {
@@ -193,7 +241,8 @@ loadSettings();
     "title": "Settings",
     "button": {
       "save": "Save",
-      "checkVersion": "Check Version"
+      "checkVersion": "Check Version",
+			"chooseDownloadDirectory": "Choose Directory"
     },
     "generalSettings": {
       "title": "General Settings",
@@ -220,6 +269,14 @@ loadSettings();
       "tipSymbol": "Equals to the sl/st from Satellite, recommend to leave empty",
       "placeholderSymbol": "Defaults to empty"
     },
+		"downloadSettings": {
+			"title": "Download Settings",
+			"labelDownloadSite": "Download Source Site",			
+			"labelSeparateDownloadMD5": "Download URL Pattern",
+			"labelDownloadDirectory": "Download Directory",
+			"placeholderSeparateDownloadMD5": "Please input download url",
+			"placeholderDownloadDirectory": "Please input download directory"
+		},
     "options": {
       "yes": "Yes",
       "no": "No"
@@ -232,7 +289,8 @@ loadSettings();
     "title": "设置",
     "button": {
       "save": "保存",
-      "checkVersion": "检查版本"
+      "checkVersion": "检查版本",
+			"chooseDownloadDirectory": "选择文件夹"
     },
     "generalSettings": {
       "title": "通用设置",
@@ -258,6 +316,14 @@ loadSettings();
       "tipSymbol": "标志即satellite表的sl/st等, 如果你不知道这是什么, 建议留空",
       "placeholderSymbol": "默认为空"
     },
+		"downloadSettings": {
+			"title": "下载设置",
+			"labelDownloadSite": "下载源",
+			"labelSeparateDownloadMD5": "下载地址",
+			"labelDownloadDirectory": "下载路径",
+			"placeholderSeparateDownloadMD5": "请输入下载地址",
+			"placeholderDownloadDirectory": "请输入下载路径"
+		},
     "options": {
       "yes": "是",
       "no": "否"

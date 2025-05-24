@@ -5,6 +5,9 @@ export namespace config {
 	    FolderSymbol: string;
 	    IgnoreVariantCourse: number;
 	    Locale: string;
+	    DownloadSite: string;
+	    SeparateDownloadMD5: string;
+	    DownloadDirectory: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new ApplicationConfig(source);
@@ -16,6 +19,9 @@ export namespace config {
 	        this.FolderSymbol = source["FolderSymbol"];
 	        this.IgnoreVariantCourse = source["IgnoreVariantCourse"];
 	        this.Locale = source["Locale"];
+	        this.DownloadSite = source["DownloadSite"];
+	        this.SeparateDownloadMD5 = source["SeparateDownloadMD5"];
+	        this.DownloadDirectory = source["DownloadDirectory"];
 	    }
 	}
 

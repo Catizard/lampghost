@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/rotisserie/eris"
 	"github.com/spf13/viper"
 )
 
@@ -37,6 +38,8 @@ func init() {
 	viper.SetDefault("FolderSymbol", "")
 	viper.SetDefault("IgnoreVariantCourse", 0)
 	viper.SetDefault("Locale", "en")
+	viper.SetDefault("DownloadSite", "wriggle")
+	viper.SetDefault("SeparateDownloadMD5", "https://bms.wrigglebug.xyz/download/package/md5hash/%s")
 	viper.SafeWriteConfig()
 }
 
@@ -45,6 +48,12 @@ type ApplicationConfig struct {
 	FolderSymbol        string
 	IgnoreVariantCourse int32
 	Locale              string
+	// Constants, currently the only option is wriggle
+	DownloadSite string
+	// Related to DownloadSite
+	SeparateDownloadMD5 string
+	// Download directory
+	DownloadDirectory string
 }
 
 func ReadConfig() (*ApplicationConfig, error) {
@@ -56,6 +65,9 @@ func ReadConfig() (*ApplicationConfig, error) {
 		FolderSymbol:        viper.GetString("FolderSymbol"),
 		IgnoreVariantCourse: viper.GetInt32("IgnoreVariantCourse"),
 		Locale:              viper.GetString("Locale"),
+		DownloadSite:        viper.GetString("DownloadSite"),
+		SeparateDownloadMD5: viper.GetString("SeparateDownloadMD5"),
+		DownloadDirectory:   viper.GetString("DownloadDirectory"),
 	}, nil
 }
 
@@ -64,8 +76,22 @@ func (c *ApplicationConfig) WriteConfig() error {
 	viper.Set("FolderSymbol", c.FolderSymbol)
 	viper.Set("IgnoreVariantCourse", c.IgnoreVariantCourse)
 	viper.Set("Locale", c.Locale)
+	viper.Set("DownloadSite", c.DownloadSite)
+	viper.Set("SeparateDownloadMD5", c.SeparateDownloadMD5)
+	viper.Set("DownloadDirectory", c.DownloadDirectory)
 	if err := viper.WriteConfig(); err != nil {
 		return err
+	}
+	return nil
+}
+
+// Query if download related config options are well setted
+func (c *ApplicationConfig) EnableDownload() error {
+	if c.DownloadDirectory == "" {
+		return eris.New("cannot download: download directory hasn't been set yet")
+	}
+	if c.SeparateDownloadMD5 == "" {
+		return eris.New("cannot download: download url hasn't been set yet")
 	}
 	return nil
 }

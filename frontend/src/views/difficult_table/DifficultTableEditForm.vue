@@ -4,7 +4,7 @@
     @positive-click="handlePositiveClick" @negative-click="handleNegativeClick" :mask-closable="false">
     <n-form ref="formRef" :model="formData">
       <n-form-item :label="t('modal.labelNoTagBuild')" path="NoTagBuild">
-        <n-select v-model:value="formData.NoTagBuild" :options="yesnoOptions"></n-select>
+        <n-select v-model:value="formData.NoTagBuild" :options="tableTagOptions" />
       </n-form-item>
       <n-form-item :label="t('modal.labelTagColor')" path="TagColor">
         <n-color-picker v-model:value="formData.TagColor" :show-alpha="false" :modes="['hex', 'rgb']" />
@@ -40,7 +40,7 @@ const formData = ref({
   NoTagBuild: 0,
 });
 
-const yesnoOptions: Array<SelectOption> = [
+const tableTagOptions: Array<SelectOption> = [
   {
     label: t('options.noDisplay'),
     value: 1,
@@ -119,7 +119,6 @@ function open(headerId: number) {
       "positiveText": "submit",
       "negativeText": "cancel",
       "labelNoTagBuild": "Display table tag or not",
-      "placeholderNoTagBuild": "Please choose no tag build",
       "labelTagColor": "Tag color",
       "labelTagTextColor": "Tag text color"
     },
@@ -137,7 +136,6 @@ function open(headerId: number) {
       "positiveText": "新增",
       "negativeText": "取消",
       "labelNoTagBuild": "是否展示标签",
-      "placeholderNoTagBuild": "请选择是否参与标签构造",
       "labelTagColor": "标签颜色",
       "labelTagTextColor": "标签嵌字颜色"
     },

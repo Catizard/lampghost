@@ -7,7 +7,7 @@
         <n-input v-model:value="formData.HeaderUrl" :placeholder="t('modal.placeholderAddress')" />
       </n-form-item>
       <n-form-item :label="t('modal.labelNoTagBuild')" path="NoTagBuild">
-        <n-select v-model:value="formData.NoTagBuild" :options="yesnoOptions"></n-select>
+        <n-select v-model:value="formData.NoTagBuild" :options="tableTagOptions" />
       </n-form-item>
       <n-form-item :label="t('modal.labelTagColor')" path="TagColor">
         <n-color-picker v-model:value="formData.TagColor" :show-alpha="false" :modes="['hex', 'rgb']" />
@@ -48,13 +48,13 @@ const rules = {
   },
 };
 
-const yesnoOptions: Array<SelectOption> = [
+const tableTagOptions: Array<SelectOption> = [
   {
-    label: t('options.yes'),
+    label: t('options.noDisplay'),
     value: 1,
   },
   {
-    label: t('options.no'),
+    label: t('options.display'),
     value: 0,
   }
 ];
@@ -105,8 +105,7 @@ function resetFormData() {
       "negativeText": "Cancel",
       "labelAddress": "Address",
       "placeholderAddress": "Input address",
-      "labelNoTagBuild": "No tag display",
-      "placeholderNoTagBuild": "Please choose no tag build",
+      "labelNoTagBuild": "Display table tag or not",
       "labelTagColor": "Tag color",
       "labelTagTextColor": "Tag text color"
     },
@@ -114,8 +113,8 @@ function resetFormData() {
       "missingAddress": "Please input address"
     },
     "options": {
-      "yes": "Yes",
-      "no": "No"
+      "noDisplay": "Don't display",
+			"display": "Display"
     }
   },
   "zh-CN": {
@@ -125,8 +124,7 @@ function resetFormData() {
       "negativeText": "取消",
       "labelAddress": "地址",
       "placeholderAddress": "请输入地址",
-      "labelNoTagBuild": "不展示标签",
-      "placeholderNoTagBuild": "请选择是否参与标签构造",
+      "labelNoTagBuild": "是否展示标签",
       "labelTagColor": "标签颜色",
       "labelTagTextColor": "标签嵌字颜色"
     },
@@ -134,8 +132,8 @@ function resetFormData() {
       "missingAddress": "请输入地址"
     },
     "options": {
-      "yes": "是",
-      "no": "否"
+			"noDisplay": "不展示",
+			"display": "展示"
     }
   }
 }</i18n>

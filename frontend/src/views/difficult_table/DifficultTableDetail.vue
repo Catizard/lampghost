@@ -69,28 +69,27 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
 		render(row: dto.DiffTableDataDto) {
 			const nodes: Array<VNode> = [];
 			if (row.DataLost) {
-				nodes.push(h(
+				return h(
 					NButton,
 					{
-						stronge: true,
-						tertiary: true,
+						type: "error",
 						size: "small",
 						onClick: () => console.log('todo'),
 					},
 					{ default: () => t('button.download') }
-				))
+				);
+			} else {
+				return h(
+					NButton,
+					{
+						strong: true,
+						tertiary: true,
+						size: "small",
+						onClick: () => handleAddToFolder(row),
+					},
+					{ default: () => t('button.addToFolder') }
+				);
 			}
-			nodes.push(h(
-				NButton,
-				{
-					strong: true,
-					tertiary: true,
-					size: "small",
-					onClick: () => handleAddToFolder(row),
-				},
-				{ default: () => t('button.addToFolder') }
-			));
-			return nodes;
 		}
 	}
 ];

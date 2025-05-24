@@ -65,18 +65,17 @@ func (data *DiffTableDataDto) RepairHash(cache *entity.SongHashCache) bool {
 			data.Sha256 = sha256
 		}
 	}
-
 	if data.Sha256 != "" {
-		if _, ok := cache.GetMD5(data.Sha256); ok {
-			return true
+		if _, ok := cache.GetMD5(data.Sha256); !ok {
+			return false
 		}
 	}
 	if data.Md5 != "" {
-		if _, ok := cache.GetSHA256(data.Md5); ok {
-			return true
+		if _, ok := cache.GetSHA256(data.Md5); !ok {
+			return false
 		}
 	}
-	return false
+	return true
 }
 
 // For exporting usage (i.e imported by beatoraja)

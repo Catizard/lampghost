@@ -143,7 +143,7 @@ func findDiffTableDataListWithRival(tx *gorm.DB, filter *vo.DiffTableDataVo) ([]
 		partial.Order(fmt.Sprintf("%s %s", *filter.SortBy, filter.GetOrder()))
 	}
 
-	partial = partial.Joins("left join (select sha256, md5 from rival_song_data group by md5) rsd on difftable_data.md5 = rsd.md5")
+	partial = partial.Joins("left join (select id, sha256, md5 from rival_song_data group by md5) rsd on difftable_data.md5 = rsd.md5")
 	partial = partial.Joins(`left join (
 		select max(clear) as Lamp, count(1) as PlayCount, rsl.sha256
 		from rival_score_log rsl
@@ -171,7 +171,8 @@ func findDiffTableDataListWithRival(tx *gorm.DB, filter *vo.DiffTableDataVo) ([]
 
 	fields := `
 		difftable_data.*,
-		rsl.Lamp as Lamp, rsl.PlayCount as PlayCount
+		rsl.Lamp as Lamp, rsl.PlayCount as PlayCount,
+		(rsd.id is null) as data_lost
 	`
 	if filter.GhostRivalID > 0 {
 		fields = fields + ", ghost_rsl.Lamp as GhostLamp, ghost_rsl.PlayCount as GhostPlayCount"

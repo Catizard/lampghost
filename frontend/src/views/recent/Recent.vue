@@ -7,7 +7,7 @@
 		</n-flex>
 		<n-flex justify="start">
 			<n-input :placeholder="t('searchNamePlaceholder')" v-model:value="searchNameLike" @keyup.enter="loadData()"
-				style="width: 150px;" />
+				style="width: 350px;" />
 			<!-- <n-button>{{ t('button.chooseClearType') }}</n-button>
       <n-button>{{ t('button.minimumClearType') }}</n-button> -->
 		</n-flex>
@@ -188,7 +188,7 @@ onMounted(() => {
 
 <i18n lang="json">{
 	"en": {
-		"title": "Recent Record",
+		"title": "Recent Play",
 		"button": {
 			"chooseClearType": "Choose Clear Type",
 			"minimumClearType": "Minimum Clear Type",
@@ -207,7 +207,7 @@ onMounted(() => {
 			"bindSuccess": "Bind successfully",
 			"bindFailedPrefix": "Failed to bind song to folder, error message: "
 		},
-		"searchNamePlaceholder": "Search Song"
+		"searchNamePlaceholder": "Search Song/Sabun Name"
 	},
 	"zh-CN": {
 		"title": "最近游玩",
@@ -229,6 +229,6 @@ onMounted(() => {
 			"bindSucess": "绑定成功",
 			"bindFailedPrefix": "绑定失败, 错误信息: "
 		},
-		"searchNamePlaceholder": "搜索歌曲"
+		"searchNamePlaceholder": "搜索歌曲/差分名称"
 	}
 }</i18n>

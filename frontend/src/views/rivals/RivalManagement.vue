@@ -221,7 +221,7 @@ loadData();
 
 <i18n lang="json">{
 	"en": {
-		"title": "Rivals",
+		"title": "Rival Management",
 		"column": {
 			"name": "Name",
 			"count": "Play Count",
@@ -247,7 +247,7 @@ loadData();
 		}
 	},
 	"zh-CN": {
-		"title": "好友管理",
+		"title": "玩家管理",
 		"column": {
 			"name": "名称",
 			"count": "游玩次数",

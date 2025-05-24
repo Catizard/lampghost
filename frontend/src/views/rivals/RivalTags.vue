@@ -253,7 +253,7 @@ watch(currentRivalID, () => {
 
 <i18n lang="json">{
 	"en": {
-		"title": "Rival Tags",
+		"title": "Player Tags",
 		"column": {
 			"tagName": "Tag Name",
 			"enabled": "Enabled",

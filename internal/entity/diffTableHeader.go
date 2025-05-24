@@ -119,7 +119,7 @@ func init() {
 	// Insane category
 	urlJoinedHeaders = append(urlJoinedHeaders, PredefineTableHeader{
 		Name:         "Satellite",
-		Symbol:       "SL",
+		Symbol:       "sl",
 		Category:     "Insane",
 		TagColor:     "#B6EAD2",
 		TagTextColor: "#0A4D2F",

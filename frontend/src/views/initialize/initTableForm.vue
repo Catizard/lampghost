@@ -71,9 +71,10 @@ const checkedHeaderKey: Reactive<Map<String, DataTableRowKey[]>> = reactive(new 
 
 const headerColumns: Array<DataTableColumn<entity.PredefineTableHeader>> = [
   { type: "selection" },
-  { title: t('column.name'), key: "Name", },
+  { title: t('column.name'), key: "Name", width: "200px" },
   {
     title: t('column.tag'), key: "Tag",
+		width: "75px",
     render(row: entity.PredefineTableHeader) {
       let tagColorProp: TagColor = {};
       if (row.TagColor != '') {
@@ -89,7 +90,7 @@ const headerColumns: Array<DataTableColumn<entity.PredefineTableHeader>> = [
       )
     }
   },
-  { title: t('column.url'), key: "HeaderUrl", },
+  { title: t('column.url'), key: "HeaderUrl" },
 ];
 let schemeData: Array<entity.PredefineTableScheme> = [];
 

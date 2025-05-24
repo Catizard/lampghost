@@ -57,7 +57,7 @@ const menuOptions: MenuOption[] = [
 			{
 				label: renderOption("/rivals/management", t('menuName.rivals.management')),
 				key: "rival_management",
-				icon: renderIcon(SearchIcon),
+				icon: renderIcon(ListIcon),
 			},
 			{
 				label: renderOption("/rivals/tags", t('menuName.rivals.tags')),
@@ -124,7 +124,7 @@ const menuOptions: MenuOption[] = [
       "difftable": {
         "self": "Table",
         "management": "Management",
-        "scores": "Scores",
+        "scores": "Statistics",
       },
       "folder": "Folder",
       "recent": "Recent",
@@ -138,12 +138,12 @@ const menuOptions: MenuOption[] = [
       "home": "个人主页",
       "rivals": {
         "self": "玩家",
-        "management": "玩家管理",
-        "tags": "玩家标签",
+        "management": "管理",
+        "tags": "标签",
       },
       "difftable": {
         "self": "难度表",
-        "management": "难度表管理",
+        "management": "管理",
         "scores": "统计信息",
       },
       "folder": "收藏夹",

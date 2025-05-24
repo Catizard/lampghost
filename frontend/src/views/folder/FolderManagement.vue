@@ -87,7 +87,7 @@ function createColumns({
 				});
 			},
 		},
-		{ title: t('column.name'), key: "FolderName" },
+		{ title: t('column.name'), key: "FolderName", minWidth: "150px" },
 		{
 			title: t('column.actions'),
 			key: "actions",
@@ -115,8 +115,13 @@ function createContentColumns({
 }): DataTableColumns<dto.FolderContentDto> {
 	return [
 		{ title: t('contentColumn.name'), key: "Title" },
+		{ 
+			title: t('contentColumn.tag'), key: "Tag",
+			width: "200px",
+		},
 		{
 			title: t('contentColumn.clear'), key: "Clear",
+			width: "125px",
 			render: (row: dto.FolderContentDto) => {
 				return h(ClearTag, { clear: row.Lamp },)
 			}
@@ -124,6 +129,7 @@ function createContentColumns({
 		{
 			title: t('contentColumn.actions'),
 			key: "actions",
+			width: "150px",
 			render(row) {
 				return h(
 					NButton,
@@ -216,7 +222,8 @@ function notifyError(msg: string) {
 		"contentColumn": {
 			"name": "Title",
 			"actions": "Actions",
-			"clear": "Clear"
+			"clear": "Clear",
+			"tag": "Tag"
 		},
 		"message": {
 			"deleteSuccess": "Delete successfully",
@@ -241,7 +248,8 @@ function notifyError(msg: string) {
 		"contentColumn": {
 			"name": "谱名",
 			"actions": "操作",
-			"clear": "通关状态"
+			"clear": "通关状态",
+			"tag": "难度表标签"
 		},
 		"message": {
 			"deleteSuccess": "删除成功",

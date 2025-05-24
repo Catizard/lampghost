@@ -246,7 +246,7 @@ watch(currentRivalID, (newID: number) => {
 
 <i18n lang="json">{
   "en": {
-    "title": "Table Scores",
+    "title": "Table Statistics",
     "column": {
       "songName": "Song Name",
       "artist": "Artist",
@@ -268,7 +268,7 @@ watch(currentRivalID, (newID: number) => {
     "placeHolderRivalTag": "Choose Rival Tag"
   },
   "zh-CN": {
-    "title": "难度表得分",
+    "title": "难度表统计信息",
     "column": {
       "songName": "谱名",
       "artist": "作者",

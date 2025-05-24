@@ -204,7 +204,7 @@ function notifyError(msg: string) {
 
 <i18n lang="json">{
 	"en": {
-		"title": "Folder Management",
+		"title": "Folder",
 		"button": {
 			"addFolder": "Add Folder",
 			"delete": "Delete"
@@ -229,7 +229,7 @@ function notifyError(msg: string) {
 		}
 	},
 	"zh-CN": {
-		"title": "收藏夹管理",
+		"title": "收藏夹",
 		"button": {
 			"addFolder": "新增收藏夹",
 			"delete": "删除"

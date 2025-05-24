@@ -14,12 +14,13 @@ import {
 	Bookmarks as BookmarksIcon,
 	TimeOutline as TimeIcon,
 	SettingsOutline as SettingsIcon,
-	FishOutline as RivalIcon,
 	SchoolOutline as CoursesIcon,
 	ListOutline as GoalsIcon,
 	Search as SearchIcon,
 	BalloonOutline as BalloonIcon,
 	MedalOutline as MedalIcon,
+	People as RivalIcon,
+	List as ListIcon
 } from '@vicons/ionicons5'
 import { MenuOption, NIcon } from 'naive-ui'
 import { computed, h, ref, watchEffect } from 'vue'
@@ -73,7 +74,7 @@ const menuOptions: MenuOption[] = [
 			{
 				label: renderOption("/difftable/management", t('menuName.difftable.management')),
 				key: "difftable_management",
-				icon: renderIcon(SearchIcon),
+				icon: renderIcon(ListIcon),
 			},
 			{
 				label: renderOption("/difftable/scores", t('menuName.difftable.scores')),
@@ -116,9 +117,9 @@ const menuOptions: MenuOption[] = [
     "menuName": {
       "home": "Home",
       "rivals": {
-        "self": "Rivals",
+        "self": "Player",
         "management": "Management",
-        "tags": "Tags",
+        "tags": "Player Tags",
       },
       "difftable": {
         "self": "Table",
@@ -136,18 +137,18 @@ const menuOptions: MenuOption[] = [
     "menuName": {
       "home": "个人主页",
       "rivals": {
-        "self": "好友列表",
-        "management": "管理",
-        "tags": "标签",
+        "self": "玩家",
+        "management": "玩家管理",
+        "tags": "玩家标签",
       },
       "difftable": {
         "self": "难度表",
-        "management": "管理",
-        "scores": "得分",
+        "management": "难度表管理",
+        "scores": "统计信息",
       },
       "folder": "收藏夹",
       "recent": "最近游玩",
-      "courses": "段位列表",
+      "courses": "段位",
       "goals": "目标列表",
 			"settings": "设置",
     },

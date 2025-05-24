@@ -210,7 +210,7 @@ onMounted(() => {
 		"searchNamePlaceholder": "Search Song"
 	},
 	"zh-CN": {
-		"title": "最近游玩记录",
+		"title": "最近游玩",
 		"button": {
 			"chooseClearType": "筛选点灯记录",
 			"minimumClearType": "筛选最小灯记录",

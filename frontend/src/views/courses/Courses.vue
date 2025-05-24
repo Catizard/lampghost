@@ -89,7 +89,7 @@ loadData();
     "column": {
       "name": "名称",
       "constraints": "限制",
-      "clear": "点灯",
+      "clear": "通关状态",
       "firstClearTime": "首次过段"
     }
   }

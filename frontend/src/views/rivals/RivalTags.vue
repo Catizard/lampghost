@@ -76,6 +76,11 @@ loadRivalOptions();
 const columns: DataTableColumns<dto.RivalTagDto> = [
 	{ title: t('column.tagName'), key: "TagName", width: "200px", ellipsis: { tooltip: true } },
 	{
+		title: t('column.tagTime'),
+		key: "RecordTime",
+		render: (row: dto.RivalTagDto) => dayjs(row.RecordTime).format('YYYY-MM-DD HH:mm:ss')
+	},
+	{
 		title: t('column.enabled'), key: "Enabled",
 		render: (row: dto.RivalTagDto) => {
 			return h(
@@ -85,12 +90,8 @@ const columns: DataTableColumns<dto.RivalTagDto> = [
 		}
 	},
 	{
-		title: t('column.tagTime'),
-		key: "RecordTime",
-		render: (row: dto.RivalTagDto) => dayjs(row.RecordTime).format('YYYY-MM-DD HH:mm:ss')
-	},
-	{
 		title: t('column.actions'), key: "Actions",
+		width: "100px",
 		render: (row: dto.RivalTagDto) => {
 			const deleteTagButton = row.Generated == false ? h(
 				NButton,

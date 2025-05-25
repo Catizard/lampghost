@@ -221,7 +221,7 @@ loadData();
 
 <i18n lang="json">{
 	"en": {
-		"title": "Rival Management",
+		"title": "Player Management",
 		"column": {
 			"name": "Name",
 			"count": "Play Count",
@@ -232,7 +232,7 @@ loadData();
 		},
 		"button": {
 			"reload": "Fully Reload",
-			"add": "Add Rival",
+			"add": "Add Player",
 			"delete": "Delete",
 			"edit": "Edit"
 		},
@@ -258,7 +258,7 @@ loadData();
 		},
 		"button": {
 			"reload": "全量同步",
-			"add": "添加好友",
+			"add": "添加玩家",
 			"delete": "删除",
 			"edit": "修改"
 		},

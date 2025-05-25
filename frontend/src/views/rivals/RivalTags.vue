@@ -77,11 +77,13 @@ const columns: DataTableColumns<dto.RivalTagDto> = [
 	{ title: t('column.tagName'), key: "TagName", width: "200px", ellipsis: { tooltip: true } },
 	{
 		title: t('column.tagTime'),
+		width: "125px",
 		key: "RecordTime",
 		render: (row: dto.RivalTagDto) => dayjs(row.RecordTime).format('YYYY-MM-DD HH:mm:ss')
 	},
 	{
 		title: t('column.enabled'), key: "Enabled",
+		width: "75px",
 		render: (row: dto.RivalTagDto) => {
 			return h(
 				YesNotTag,

@@ -85,6 +85,7 @@ func (a *App) startup(ctx context.Context) {
 		log.Fatalf("cannot start internal server: %s", err)
 	}
 	a.ctx = ctx
+	a.RivalInfoController.InjectContext(ctx)
 }
 
 // domReady is called after front-end resources have been loaded

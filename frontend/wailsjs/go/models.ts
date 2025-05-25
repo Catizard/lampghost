@@ -23,6 +23,20 @@ export namespace config {
 
 export namespace dto {
 	
+	export class BeatorajaDirectoryMeta {
+	    BeatorajaDirectoryPath: string;
+	    PlayerDirectories: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new BeatorajaDirectoryMeta(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.BeatorajaDirectoryPath = source["BeatorajaDirectoryPath"];
+	        this.PlayerDirectories = source["PlayerDirectories"];
+	    }
+	}
 	export class CourseInfoDto {
 	    ID: number;
 	    HeaderID: number;
@@ -1293,6 +1307,32 @@ export namespace vo {
 		    }
 		    return a;
 		}
+	}
+	export class InitializeRivalInfoVo {
+	    Name: string;
+	    Locale?: string;
+	    ImportStrategy: string;
+	    BeatorajaDirectoryPath: string;
+	    PlayerDirectory: string;
+	    ScoreLogPath?: string;
+	    SongDataPath?: string;
+	    ScoreDataLogPath?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new InitializeRivalInfoVo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Name = source["Name"];
+	        this.Locale = source["Locale"];
+	        this.ImportStrategy = source["ImportStrategy"];
+	        this.BeatorajaDirectoryPath = source["BeatorajaDirectoryPath"];
+	        this.PlayerDirectory = source["PlayerDirectory"];
+	        this.ScoreLogPath = source["ScoreLogPath"];
+	        this.SongDataPath = source["SongDataPath"];
+	        this.ScoreDataLogPath = source["ScoreDataLogPath"];
+	    }
 	}
 	export class RivalInfoVo {
 	    ID: number;

@@ -4,6 +4,7 @@ import {vo} from '../models';
 import {result} from '../models';
 import {dto} from '../models';
 import {entity} from '../models';
+import {context} from '../models';
 import {config} from '../models';
 
 export function AddBatchDiffTableHeader(arg1:Array<vo.DiffTableHeaderVo>):Promise<result.RtnDataList>;
@@ -19,6 +20,8 @@ export function AddRivalTag(arg1:vo.RivalTagVo):Promise<result.RtnMessage>;
 export function BindDiffTableDataToFolder(arg1:number,arg2:Array<number>):Promise<result.RtnMessage>;
 
 export function BindRivalSongDataToFolder(arg1:number,arg2:Array<number>):Promise<result.RtnMessage>;
+
+export function ChooseBeatorajaDirectory():Promise<result.RtnData>;
 
 export function DelDiffTableHeader(arg1:number):Promise<result.RtnMessage>;
 
@@ -60,6 +63,8 @@ export function GENERATE_RIVAL_TAG():Promise<entity.RivalTag>;
 
 export function GENERATE_RIVAL_TAG_DTO():Promise<dto.RivalTagDto>;
 
+export function GENERATOR_BEATORAJA_DIRECTORY_META():Promise<dto.BeatorajaDirectoryMeta>;
+
 export function GENERATOR_COURSE_INFO():Promise<entity.CourseInfo>;
 
 export function GENERATOR_COURSE_INFO_DTO():Promise<dto.CourseInfoDto>;
@@ -90,7 +95,9 @@ export function GENERATOR_TABLE_HEADER_DTO():Promise<dto.DiffTableHeaderDto>;
 
 export function GENERATOR_TABLE_TAG_DTO():Promise<dto.DiffTableTagDto>;
 
-export function InitializeMainUser(arg1:vo.RivalInfoVo):Promise<result.RtnMessage>;
+export function InitializeMainUser(arg1:vo.InitializeRivalInfoVo):Promise<result.RtnMessage>;
+
+export function InjectContext(arg1:context.Context):Promise<void>;
 
 export function OpenFileDialog(arg1:string):Promise<result.RtnData>;
 

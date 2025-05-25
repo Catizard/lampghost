@@ -51,3 +51,8 @@ func NewRivalInfoDtoWithDiffTable(rival *entity.RivalInfo, header *DiffTableHead
 	ret.DiffTableHeader = header
 	return ret
 }
+
+type BeatorajaDirectoryMeta struct {
+	BeatorajaDirectoryPath string
+	PlayerDirectories      []string
+}

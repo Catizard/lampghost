@@ -30,6 +30,10 @@ export function BindRivalSongDataToFolder(arg1, arg2) {
   return window['go']['main']['App']['BindRivalSongDataToFolder'](arg1, arg2);
 }
 
+export function ChooseBeatorajaDirectory() {
+  return window['go']['main']['App']['ChooseBeatorajaDirectory']();
+}
+
 export function DelDiffTableHeader(arg1) {
   return window['go']['main']['App']['DelDiffTableHeader'](arg1);
 }
@@ -110,6 +114,10 @@ export function GENERATE_RIVAL_TAG_DTO() {
   return window['go']['main']['App']['GENERATE_RIVAL_TAG_DTO']();
 }
 
+export function GENERATOR_BEATORAJA_DIRECTORY_META() {
+  return window['go']['main']['App']['GENERATOR_BEATORAJA_DIRECTORY_META']();
+}
+
 export function GENERATOR_COURSE_INFO() {
   return window['go']['main']['App']['GENERATOR_COURSE_INFO']();
 }
@@ -172,6 +180,10 @@ export function GENERATOR_TABLE_TAG_DTO() {
 
 export function InitializeMainUser(arg1) {
   return window['go']['main']['App']['InitializeMainUser'](arg1);
+}
+
+export function InjectContext(arg1) {
+  return window['go']['main']['App']['InjectContext'](arg1);
 }
 
 export function OpenFileDialog(arg1) {

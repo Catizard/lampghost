@@ -1,7 +1,10 @@
 package service
 
 import (
+	"context"
 	"fmt"
+	"os"
+	"path"
 
 	"github.com/Catizard/lampghost_wails/internal/config"
 	"github.com/Catizard/lampghost_wails/internal/database"
@@ -12,13 +15,15 @@ import (
 	"github.com/glebarez/sqlite"
 	"github.com/rotisserie/eris"
 	. "github.com/samber/lo"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"gorm.io/gorm"
 )
 
 const READONLY_PARAMETER = "?open_mode=1"
 
 type RivalInfoService struct {
-	db *gorm.DB
+	db  *gorm.DB
+	ctx context.Context
 }
 
 func NewRivalInfoService(db *gorm.DB) *RivalInfoService {
@@ -27,13 +32,11 @@ func NewRivalInfoService(db *gorm.DB) *RivalInfoService {
 	}
 }
 
-func (s *RivalInfoService) InitializeMainUser(rivalInfo *vo.RivalInfoVo) error {
-	if rivalInfo.SongDataPath == nil || *rivalInfo.SongDataPath == "" {
-		return fmt.Errorf("songdata.db path cannot be empty")
-	}
-	if rivalInfo.ScoreLogPath == nil || *rivalInfo.ScoreLogPath == "" {
-		return fmt.Errorf("scorelog.db path cannot be empty")
-	}
+func (s *RivalInfoService) InjectContext(ctx context.Context) {
+	s.ctx = ctx
+}
+
+func (s *RivalInfoService) InitializeMainUser(rivalInfo *vo.InitializeRivalInfoVo) error {
 	if rivalInfo.Locale != nil && *rivalInfo.Locale != "" {
 		conf, err := config.ReadConfig()
 		if err != nil {
@@ -52,15 +55,82 @@ func (s *RivalInfoService) InitializeMainUser(rivalInfo *vo.RivalInfoVo) error {
 		return fmt.Errorf("cannot have two main user, what are you doing?")
 	}
 	// Initialize the config
+	// TODO: Wtf is this, does it do anything?
 	config, err := config.ReadConfig()
 	if err != nil {
 		return err
 	}
 	config.WriteConfig()
-	rivalInfo.MainUser = true
+	insertRivalInfo := rivalInfo.Into()
+	insertRivalInfo.MainUser = true
+	// Prechecks
+	if insertRivalInfo.SongDataPath == nil || *insertRivalInfo.SongDataPath == "" {
+		return eris.New("songdata.db path cannot be empty")
+	}
+	if insertRivalInfo.ScoreLogPath == nil || *insertRivalInfo.ScoreLogPath == "" {
+		return eris.New("scorelog.db path cannot be empty")
+	}
+	if insertRivalInfo.ScoreDataLogPath == nil || *insertRivalInfo.ScoreDataLogPath == "" {
+		return eris.New("scoredatalog.db path cannot be empty")
+	}
 	return s.db.Transaction(func(tx *gorm.DB) error {
-		return addRivalInfo(tx, rivalInfo.Entity())
+		return addRivalInfo(tx, insertRivalInfo)
 	})
+}
+
+// Open a choose directory dialog and verify whether it's a valid
+// beatoraja directory or not. Returning error if it's not.
+//
+// A valid beatoraja directory is defined as follow:
+//  1. contains a 'songdata.db'
+//  2. contains a directory called 'player'
+//  3. 'playder' directory is not empty
+//
+// Returns directory names which is located under 'player' and
+// beatoraja directory path chosen by user
+func (s *RivalInfoService) ChooseBeatorajaDirectory() (*dto.BeatorajaDirectoryMeta, error) {
+	dir, err := runtime.OpenDirectoryDialog(s.ctx, runtime.OpenDialogOptions{
+		Title: "Choose Beatoraja Directory",
+	})
+	if err != nil {
+		return nil, err
+	}
+	if dir == "" {
+		return nil, eris.New("choose directory: directory cannot be empty")
+	}
+
+	// 1. contains a 'songdata.db'
+	songdataPath := path.Join(dir, "songdata.db")
+	if err := database.VerifyLocalDatabaseFilePath(songdataPath); err != nil {
+		return nil, eris.Wrap(err, "not a valid songdata.db file path")
+	}
+	// 2. contains a directory called 'player'
+	playerDirectoryPath := path.Join(dir, "player")
+	if stat, err := os.Stat(playerDirectoryPath); err != nil {
+		return nil, eris.Wrap(err, "cannot stat player directory")
+	} else if !stat.Mode().IsDir() {
+		return nil, eris.Wrap(err, "player is not a directory")
+	} else {
+		// Okay, it's a valid directory
+		entries, err := os.ReadDir(playerDirectoryPath)
+		if err != nil {
+			return nil, eris.Wrap(err, "cannot read player directory")
+		}
+		// 3. 'player' directory is not empty
+		if len(entries) == 0 {
+			return nil, eris.New("player directory is empty")
+		}
+		possibleSaveDirectories := make([]string, 0)
+		for _, entry := range entries {
+			if entry.IsDir() {
+				possibleSaveDirectories = append(possibleSaveDirectories, entry.Name())
+			}
+		}
+		return &dto.BeatorajaDirectoryMeta{
+			BeatorajaDirectoryPath: dir,
+			PlayerDirectories:      possibleSaveDirectories,
+		}, nil
+	}
 }
 
 // Add one non-main user

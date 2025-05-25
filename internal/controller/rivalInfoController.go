@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"context"
+
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/result"
@@ -19,7 +21,11 @@ func NewRivalInfoController(rivalInfoService *service.RivalInfoService) *RivalIn
 	}
 }
 
-func (ctl *RivalInfoController) InitializeMainUser(rivalInfo *vo.RivalInfoVo) result.RtnMessage {
+func (ctl *RivalInfoController) InjectContext(ctx context.Context) {
+	ctl.rivalInfoService.InjectContext(ctx)
+}
+
+func (ctl *RivalInfoController) InitializeMainUser(rivalInfo *vo.InitializeRivalInfoVo) result.RtnMessage {
 	log.Info("[Controller] calling RivalInfoController.InitializeMainUser")
 	err := ctl.rivalInfoService.InitializeMainUser(rivalInfo)
 	if err != nil {
@@ -27,6 +33,16 @@ func (ctl *RivalInfoController) InitializeMainUser(rivalInfo *vo.RivalInfoVo) re
 		return result.NewErrorMessage(err)
 	}
 	return result.SUCCESS
+}
+
+func (ctl *RivalInfoController) ChooseBeatorajaDirectory() result.RtnData {
+	log.Info("[Controller] calling RivalInfoController.ChooseBeatorajaDirectory")
+	meta, err := ctl.rivalInfoService.ChooseBeatorajaDirectory()
+	if err != nil {
+		log.Errorf("[RivalInfoController] returning err: %v", err)
+		return result.NewErrorData(err)
+	}
+	return result.NewRtnData(meta)
 }
 
 // TODO: Seperate songdata.db file feature doesn't implement yet, this function would
@@ -137,3 +153,6 @@ func (ctl *RivalInfoController) UpdateRivalInfo(updateParam *vo.RivalInfoVo) res
 
 func (ctl *RivalInfoController) GENERATOR_RIVAL_INFO() *entity.RivalInfo     { return nil }
 func (ctl *RivalInfoController) GENERATOR_RIVAL_INFO_DTO() *dto.RivalInfoDto { return nil }
+func (ctl *RivalInfoController) GENERATOR_BEATORAJA_DIRECTORY_META() *dto.BeatorajaDirectoryMeta {
+	return nil
+}

@@ -40,8 +40,33 @@ func newNamedEmptyUser(name string, noScoreLog, noSongData, noScoreDataLog bool)
 	}
 }
 
+func newNamedInitializeEmptyUser(name string, noScoreLog, noSongData, noScoreDataLog bool) *vo.InitializeRivalInfoVo {
+	scoreLogPath := &EmptyScoreLogPath
+	if noScoreLog {
+		scoreLogPath = nil
+	}
+	songDataPath := &EmptySongDataPath
+	if noSongData {
+		songDataPath = nil
+	}
+	scoreDataLogPath := &EmptyScoreDataLogPath
+	if noScoreDataLog {
+		scoreDataLogPath = nil
+	}
+	return &vo.InitializeRivalInfoVo{
+		Name:             name,
+		ScoreLogPath:     scoreLogPath,
+		SongDataPath:     songDataPath,
+		ScoreDataLogPath: scoreDataLogPath,
+	}
+}
+
 func newEmptyUser(noScoreLog, noSongData, noScoreDataLog bool) *vo.RivalInfoVo {
 	return newNamedEmptyUser("test", noScoreLog, noSongData, noScoreDataLog)
+}
+
+func newEmptyInitializeUser(nosScoreLog, noSongData, noScoreDataLog bool) *vo.InitializeRivalInfoVo {
+	return newNamedInitializeEmptyUser("test", nosScoreLog, noSongData, noScoreDataLog)
 }
 
 func newNamedRealUser(name string, noScoreLog, noSongData, noScoreDataLog bool) *vo.RivalInfoVo {
@@ -65,8 +90,33 @@ func newNamedRealUser(name string, noScoreLog, noSongData, noScoreDataLog bool) 
 	}
 }
 
+func newNamedRealInitializeUser(name string, noScoreLog, noSongData, noScoreDataLog bool) *vo.InitializeRivalInfoVo {
+	scoreLogPath := &RealScoreLogPath
+	if noScoreLog {
+		scoreLogPath = nil
+	}
+	songDataPath := &RealSongDataPath
+	if noSongData {
+		songDataPath = nil
+	}
+	scoreDataLogPath := &RealScoreDataLogPath
+	if noScoreDataLog {
+		scoreDataLogPath = nil
+	}
+	return &vo.InitializeRivalInfoVo{
+		Name:             name,
+		ScoreLogPath:     scoreLogPath,
+		SongDataPath:     songDataPath,
+		ScoreDataLogPath: scoreDataLogPath,
+	}
+}
+
 func newRealUser(noScoreLog, noSongData, noScoreDataLog bool) *vo.RivalInfoVo {
 	return newNamedRealUser("test", noScoreLog, noSongData, noScoreDataLog)
+}
+
+func newRealInitializeUser(noScoreLog, noSongData, noScoreDataLog bool) *vo.InitializeRivalInfoVo {
+	return newNamedRealInitializeUser("test", noScoreLog, noSongData, noScoreDataLog)
 }
 
 func skipRealFileTest(noScoreLog, noSongData, noScoreDataLog bool) error {
@@ -89,11 +139,11 @@ func TestInitializeMainUser(t *testing.T) {
 			t.Fatalf("db: %s", err)
 		}
 		rivalInfoService := service.NewRivalInfoService(db)
-		missingSongDataPath := newEmptyUser(false, true, true)
+		missingSongDataPath := newEmptyInitializeUser(false, true, true)
 		if err := rivalInfoService.InitializeMainUser(missingSongDataPath); err == nil {
 			t.Fatalf("should fail on missing songdata file path, but not")
 		}
-		missingScoreLogPath := newEmptyUser(true, false, false)
+		missingScoreLogPath := newEmptyInitializeUser(true, false, false)
 		if err := rivalInfoService.InitializeMainUser(missingScoreLogPath); err == nil {
 			t.Fatalf("should fail on missing scorelog file path, but not")
 		}
@@ -104,7 +154,7 @@ func TestInitializeMainUser(t *testing.T) {
 			t.Fatalf("db: %s", err)
 		}
 		rivalInfoService := service.NewRivalInfoService(db)
-		emptyFilesWithoutScoreDataLog := newEmptyUser(false, false, true)
+		emptyFilesWithoutScoreDataLog := newEmptyInitializeUser(false, false, true)
 		if err := rivalInfoService.InitializeMainUser(emptyFilesWithoutScoreDataLog); err != nil {
 			t.Fatalf("failed to initialize main user with empty files(no scoredatalog.db): %s", err)
 		}
@@ -131,7 +181,7 @@ func TestInitializeMainUser(t *testing.T) {
 			t.Fatalf("db: %s", err)
 		}
 		rivalInfoService := service.NewRivalInfoService(db)
-		emptyFilesWithoutScoreDataLog := newEmptyUser(false, false, false)
+		emptyFilesWithoutScoreDataLog := newEmptyInitializeUser(false, false, false)
 		if err := rivalInfoService.InitializeMainUser(emptyFilesWithoutScoreDataLog); err != nil {
 			t.Fatalf("failed to initialize main user with empty files(with scoredatalog.db): %s", err)
 		}
@@ -155,17 +205,17 @@ func TestInitializeMainUser(t *testing.T) {
 	t.Run("RealFiles", func(t *testing.T) {
 		var tests = []struct {
 			name  string
-			input *vo.RivalInfoVo
+			input *vo.InitializeRivalInfoVo
 			skip  error
 		}{
 			{
 				"no scoredatalog.db",
-				newRealUser(false, false, true),
+				newRealInitializeUser(false, false, true),
 				skipRealFileTest(false, false, true),
 			},
 			{
 				"with scoredatalog.db",
-				newRealUser(false, false, false),
+				newRealInitializeUser(false, false, false),
 				skipRealFileTest(false, false, false),
 			},
 		}
@@ -292,7 +342,7 @@ func TestUpdateUser(t *testing.T) {
 			t.Fatalf("db: %s", err)
 		}
 		rivalInfoService := service.NewRivalInfoService(db)
-		emptyMainUser := newEmptyUser(false, false, false)
+		emptyMainUser := newEmptyInitializeUser(false, false, false)
 		if err := rivalInfoService.InitializeMainUser(emptyMainUser); err != nil {
 			t.Fatalf("initialize main user: %s", err)
 		}

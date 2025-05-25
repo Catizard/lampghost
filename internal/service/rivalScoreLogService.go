@@ -235,9 +235,9 @@ func queryPrevDayScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.R
 	// TODO: This sql is stricted with "clear >= 4", should we make this configurable?
 	maximumDateQuery := tx.Model(&entity.RivalScoreLog{}).
 		Select("date(max(rival_score_log.record_time))").
-		Where("length(rival_score_log.sha256) = 64 and rival_score_log.clear >= 4 and date(record_time) < date(?) and rival_id = ?", filter.EndRecordTime, filter.RivalId)
+		Where("length(rival_score_log.sha256) = 64 and rival_score_log.clear >= 4 and date(record_time) < date(?) and rival_id = ? and clear != old_clear", filter.EndRecordTime, filter.RivalId)
 	var out []*dto.RivalScoreLogDto
-	partial = partial.Where("length(rival_score_log.sha256) = 64 and rival_score_log.clear >= 4 and rival_id = ?", filter.RivalId).Order("rival_score_log.clear desc")
+	partial = partial.Where("length(rival_score_log.sha256) = 64 and rival_score_log.clear >= 4 and rival_id = ? and clear != old_clear", filter.RivalId).Order("rival_score_log.clear desc")
 	if err := partial.Debug().Where("date(rival_score_log.record_time) = (?)", maximumDateQuery).Group("rival_score_log.sha256").Find(&out).Error; err != nil {
 		return nil, 0, eris.Wrap(err, "failed to query prev day score log")
 	}

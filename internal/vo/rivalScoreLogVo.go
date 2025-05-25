@@ -56,7 +56,7 @@ func (rivalScoreLog *RivalScoreLogVo) Entity() *entity.RivalScoreLog {
 		Sha256:     rivalScoreLog.Sha256,
 		Mode:       rivalScoreLog.Mode,
 		Clear:      rivalScoreLog.Clear,
-		OldClear:   rivalScoreLog.Clear,
+		OldClear:   rivalScoreLog.OldClear,
 		Score:      rivalScoreLog.Score,
 		OldScore:   rivalScoreLog.OldScore,
 		Combo:      rivalScoreLog.Combo,

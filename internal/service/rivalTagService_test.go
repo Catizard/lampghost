@@ -100,7 +100,7 @@ func TestAddRivalTag(t *testing.T) {
 	}
 	rivalTagService := service.NewRivalTagService(db)
 	rivalInfoService := service.NewRivalInfoService(db)
-	emptyMainUser := newEmptyUser(false, false, false)
+	emptyMainUser := newEmptyInitializeUser(false, false, false)
 	if err := rivalInfoService.InitializeMainUser(emptyMainUser); err != nil {
 		t.Fatalf("initializeMainUser: %s", err)
 	}

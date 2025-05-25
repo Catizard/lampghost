@@ -31,7 +31,7 @@ func FromRawScoreLogToRivalScoreLog(scorelog *ScoreLog) RivalScoreLog {
 		Sha256:     scorelog.Sha256,
 		Mode:       scorelog.Mode,
 		Clear:      scorelog.Clear,
-		OldClear:   scorelog.Clear,
+		OldClear:   scorelog.OldClear,
 		Score:      scorelog.Score,
 		OldScore:   scorelog.OldScore,
 		Combo:      scorelog.Combo,

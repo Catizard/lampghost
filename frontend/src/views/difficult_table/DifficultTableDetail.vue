@@ -76,14 +76,20 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
 						{ label: t('button.addToFolder'), key: "AddToFolder" },
 						{ label: t('button.download'), key: "Download" },
 						{ label: t('button.gotoURL'), key: "GotoURL", disabled: row.Url == "" },
-						{ label: t('button.gotoURLDiff'), key: "GotoURLDiff", disabled: row.UrlDiff == "" }
+						{ label: t('button.gotoURLDiff'), key: "GotoURLDiff", disabled: row.UrlDiff == "" },
+						{ label: t('button.gotoLR2IR'), key: "GotoLR2IR", disabled: row.Md5 == "" },
+						{ label: t('button.gotoMochaIR'), key: "GotoMochaIR", disabled: row.Sha256 == "" },
 					],
 					onSelect: (key: string) => {
+						const md5 = row.Md5;
+						const sha256 = row.Sha256;
 						switch (key) {
 							case 'AddToFolder': handleAddToFolder(row); break;
 							case 'Download': handleSubmitSingleMD5DownloadTask(row); break;
 							case "GotoURL": BrowserOpenURL(row.Url); break;
 							case "GotoURLDiff": BrowserOpenURL(row.UrlDiff); break;
+							case "GotoLR2IR": BrowserOpenURL(`https://www.dream-pro.info/~lavalse/LR2IR/search.cgi?mode=ranking&bmsmd5=${md5}`); break;
+							case "GotoMochaIR": BrowserOpenURL(`https://mocha-repository.info/song.php?sha256=${sha256}`); break;
 						}
 					}
 				},
@@ -225,7 +231,10 @@ loadData();
 			"addToFolder": "Add to folder",
 			"download": "Download",
 			"gotoURL": "Open song url in browser",
-			"gotoURLDiff": "Open sabun url in browser"
+			"gotoURLDiff": "Open sabun url in browser",
+			"gotoLR2IR": "Open LR2IR in broswer",
+			"gotoMochaIR": "Open MochaIR in broswer",
+			"gotoBMSScoreViewer": "Open BMS Score Viewer in browser"
 		},
 		"message": {
 			"bindSuccess": "Bind successfully",
@@ -246,7 +255,10 @@ loadData();
 			"addToFolder": "添加至收藏夹",
 			"download": "下载",
 			"gotoURL": "在浏览器中打开单曲URL",
-			"gotoURLDiff": "在浏览器中打开差分URL"
+			"gotoURLDiff": "在浏览器中打开差分URL",
+			"gotoLR2IR": "Open LR2IR in broswer",
+			"gotoMochaIR": "Open MochaIR in broswer",
+			"gotoBMSScoreViewer": "Open BMS Score Viewer in browser"
 		},
 		"message": {
 			"bindSucess": "绑定成功",

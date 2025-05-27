@@ -171,6 +171,7 @@ func findDiffTableDataListWithRival(tx *gorm.DB, filter *vo.DiffTableDataVo) ([]
 
 	fields := `
 		difftable_data.*,
+		rsd.sha256,
 		rsl.Lamp as Lamp, rsl.PlayCount as PlayCount,
 		(rsd.id is null) as data_lost
 	`

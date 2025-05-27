@@ -53,5 +53,6 @@ This project is made by my own(at least for now), so it's still very simple and 
 
 - [@Yuntian](https://www.github.com/Yuntian52s): Providing ui design advices, without his selfless work `LampGhost` would still a be a very unfriendly tool
 - [@Wriggle](https://www.github.com/wrigglebug): Providing bms download site [The Big Sister BMS Project](https://bms.wrigglebug.xyz/) and separate bms sabun download api.
+- [@Sayaka](https://github.com/SayakaIsBaka): Providing bms preview site [BMS Score Viewer](https://github.com/SayakaIsBaka/bms-score-viewer)
 - [@Chuang](https://github.com/chuang1213), yzy, yf and other early version testers
 - [Wails](https://github.com/wailsapp/wails): This project is based on `wails` framework, and benefits a lot from its amazing hot reload time and easy mind model

@@ -79,6 +79,7 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
 						{ label: t('button.gotoURLDiff'), key: "GotoURLDiff", disabled: row.UrlDiff == "" },
 						{ label: t('button.gotoLR2IR'), key: "GotoLR2IR", disabled: row.Md5 == "" },
 						{ label: t('button.gotoMochaIR'), key: "GotoMochaIR", disabled: row.Sha256 == "" },
+						{ label: t('button.gotoPreview'), key: "GotoPreview", disabled: row.Md5 == "" },
 					],
 					onSelect: (key: string) => {
 						const md5 = row.Md5;
@@ -90,6 +91,7 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
 							case "GotoURLDiff": BrowserOpenURL(row.UrlDiff); break;
 							case "GotoLR2IR": BrowserOpenURL(`https://www.dream-pro.info/~lavalse/LR2IR/search.cgi?mode=ranking&bmsmd5=${md5}`); break;
 							case "GotoMochaIR": BrowserOpenURL(`https://mocha-repository.info/song.php?sha256=${sha256}`); break;
+							case "GotoPreview": BrowserOpenURL(`https://bms-score-viewer.pages.dev/view?md5=${md5}`); break;
 						}
 					}
 				},
@@ -234,7 +236,7 @@ loadData();
 			"gotoURLDiff": "Open sabun url in browser",
 			"gotoLR2IR": "Open LR2IR in broswer",
 			"gotoMochaIR": "Open MochaIR in broswer",
-			"gotoBMSScoreViewer": "Open BMS Score Viewer in browser"
+			"gotoPreview": "Open BMS Preview in browser"
 		},
 		"message": {
 			"bindSuccess": "Bind successfully",
@@ -256,9 +258,9 @@ loadData();
 			"download": "下载",
 			"gotoURL": "在浏览器中打开单曲URL",
 			"gotoURLDiff": "在浏览器中打开差分URL",
-			"gotoLR2IR": "Open LR2IR in broswer",
-			"gotoMochaIR": "Open MochaIR in broswer",
-			"gotoBMSScoreViewer": "Open BMS Score Viewer in browser"
+			"gotoLR2IR": "在浏览器中打开LR2IR",
+			"gotoMochaIR": "在浏览器中打开MochaIR",
+			"gotoPreview": "在浏览器中打开BMS预览"
 		},
 		"message": {
 			"bindSucess": "绑定成功",

@@ -13,6 +13,7 @@ import SelectFolder from '@/views/folder/SelectFolder.vue';
 import ClearTag from '@/components/ClearTag.vue';
 import { useI18n } from 'vue-i18n';
 import { WarningOutline } from '@vicons/ionicons5';
+import { BrowserOpenURL } from '@wailsjs/runtime/runtime';
 
 defineExpose({
 	loadData,
@@ -34,19 +35,15 @@ const sorter: Ref<Sorter> = ref({
 	SortBy: null,
 	SortOrder: null,
 });
-const otherActionOptions: Array<DropdownOption> = [
-	{ label: t('button.addToFolder'), key: "AddToFolder" },
-	{ label: t('button.download'), key: "Download" },
-];
 const columns: DataTableColumns<dto.DiffTableDataDto> = [
 	{
 		title: t('column.songName'), key: "Title", ellipsis: { tooltip: true }, resizable: true, sorter: true,
 		render: (row: dto.DiffTableDataDto) => {
 			let vnodes = [];
-			if (row.DataLost) {
-				vnodes.push(h(NIcon, { component: WarningOutline, color: "red" }));
-			}
-			vnodes.push(h(NText, {}, () => row.Title));
+			// if (row.DataLost) {
+			// 	vnodes.push(h(NIcon, { component: WarningOutline, color: "red" }));
+			// }
+			vnodes.push(h(NText, {}, { default: () => row.Title }));
 			return vnodes;
 		}
 	},
@@ -75,11 +72,18 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
 				NDropdown,
 				{
 					trigger: "hover",
-					options: otherActionOptions,
-					onSelect: (key: "AddToFolder" | "Download") => {
+					options: [
+						{ label: t('button.addToFolder'), key: "AddToFolder" },
+						{ label: t('button.download'), key: "Download" },
+						{ label: t('button.gotoURL'), key: "GotoURL", disabled: row.Url == "" },
+						{ label: t('button.gotoURLDiff'), key: "GotoURLDiff", disabled: row.UrlDiff == "" }
+					],
+					onSelect: (key: string) => {
 						switch (key) {
 							case 'AddToFolder': handleAddToFolder(row); break;
 							case 'Download': handleSubmitSingleMD5DownloadTask(row); break;
+							case "GotoURL": BrowserOpenURL(row.Url); break;
+							case "GotoURLDiff": BrowserOpenURL(row.UrlDiff); break;
 						}
 					}
 				},
@@ -218,8 +222,10 @@ loadData();
 			"actions": "Actions"
 		},
 		"button": {
-			"addToFolder": "Add to Folder",
-			"download": "Download"
+			"addToFolder": "Add to folder",
+			"download": "Download",
+			"gotoURL": "Open song url in browser",
+			"gotoURLDiff": "Open sabun url in browser"
 		},
 		"message": {
 			"bindSuccess": "Bind successfully",
@@ -238,7 +244,9 @@ loadData();
 		},
 		"button": {
 			"addToFolder": "添加至收藏夹",
-			"download": "下载"
+			"download": "下载",
+			"gotoURL": "在浏览器中打开单曲URL",
+			"gotoURLDiff": "在浏览器中打开差分URL"
 		},
 		"message": {
 			"bindSucess": "绑定成功",

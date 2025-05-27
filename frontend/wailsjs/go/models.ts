@@ -5,6 +5,11 @@ export namespace config {
 	    FolderSymbol: string;
 	    IgnoreVariantCourse: number;
 	    Locale: string;
+	    DownloadSite: string;
+	    SeparateDownloadMD5: string;
+	    DownloadDirectory: string;
+	    MaximumDownloadCount: number;
+	    EnableDownloadFeature: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new ApplicationConfig(source);
@@ -16,6 +21,11 @@ export namespace config {
 	        this.FolderSymbol = source["FolderSymbol"];
 	        this.IgnoreVariantCourse = source["IgnoreVariantCourse"];
 	        this.Locale = source["Locale"];
+	        this.DownloadSite = source["DownloadSite"];
+	        this.SeparateDownloadMD5 = source["SeparateDownloadMD5"];
+	        this.DownloadDirectory = source["DownloadDirectory"];
+	        this.MaximumDownloadCount = source["MaximumDownloadCount"];
+	        this.EnableDownloadFeature = source["EnableDownloadFeature"];
 	    }
 	}
 
@@ -669,6 +679,59 @@ export namespace entity {
 	        this.TagColor = source["TagColor"];
 	        this.TagTextColor = source["TagTextColor"];
 	        this.NoTagBuild = source["NoTagBuild"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class DownloadTask {
+	    ID: number;
+	    // Go type: time
+	    CreatedAt: any;
+	    // Go type: time
+	    UpdatedAt: any;
+	    // Go type: gorm
+	    DeletedAt: any;
+	    URL: string;
+	    Status?: number;
+	    IntermediateFilePath: string;
+	    TaskName?: string;
+	    DownloadSize: number;
+	    ContentLength: number;
+	    ErrorMessage: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new DownloadTask(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.ID = source["ID"];
+	        this.CreatedAt = this.convertValues(source["CreatedAt"], null);
+	        this.UpdatedAt = this.convertValues(source["UpdatedAt"], null);
+	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
+	        this.URL = source["URL"];
+	        this.Status = source["Status"];
+	        this.IntermediateFilePath = source["IntermediateFilePath"];
+	        this.TaskName = source["TaskName"];
+	        this.DownloadSize = source["DownloadSize"];
+	        this.ContentLength = source["ContentLength"];
+	        this.ErrorMessage = source["ErrorMessage"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

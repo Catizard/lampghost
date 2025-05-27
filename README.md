@@ -49,8 +49,9 @@ This project doesn't support load LR2 save file currently, although its precesso
 
 This project is made by my own(at least for now), so it's still very simple and biased. Any bug reports and advices are very welcomed!
 
-## Thanks
+## Special Thanks
 
-- [@Yuntian](https://www.github.com/Yuntian52s) Providing ui design advices, without his selfless work `LampGhost` would still a be a very unfriendly tool
+- [@Yuntian](https://www.github.com/Yuntian52s): Providing ui design advices, without his selfless work `LampGhost` would still a be a very unfriendly tool
+- [@Wriggle](https://www.github.com/wrigglebug): Providing bms download site [The Big Sister BMS Project](https://bms.wrigglebug.xyz/) and separate bms sabun download api.
 - [@Chuang](https://github.com/chuang1213), yzy, yf and other early version testers
 - [Wails](https://github.com/wailsapp/wails): This project is based on `wails` framework, and benefits a lot from its amazing hot reload time and easy mind model

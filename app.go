@@ -25,6 +25,7 @@ type App struct {
 	*controller.DiffTableController
 	*controller.CourseInfoController
 	*controller.FolderController
+	*controller.DownloadTaskController
 	*server.InternalServer
 }
 
@@ -63,6 +64,14 @@ func NewApp() *App {
 	folderController := controller.NewFolderController(folderService)
 	folderInternalServer := server.NewInternalServer(folderService)
 
+	// download task module
+	conf, err := config.ReadConfig()
+	if err != nil {
+		log.Fatalf("config: %s", err)
+	}
+	downloadTaskService := service.NewDownloadTaskService(db, conf)
+	downloadTaskController := controller.NewDownloadTaskController(downloadTaskService)
+
 	return &App{
 		nil,
 		configController,
@@ -74,6 +83,7 @@ func NewApp() *App {
 		diffTableController,
 		courseInfoController,
 		folderController,
+		downloadTaskController,
 		folderInternalServer,
 	}
 }
@@ -86,6 +96,7 @@ func (a *App) startup(ctx context.Context) {
 	}
 	a.ctx = ctx
 	a.RivalInfoController.InjectContext(ctx)
+	a.DownloadTaskController.InjectContext(ctx)
 }
 
 // domReady is called after front-end resources have been loaded
@@ -107,6 +118,16 @@ func (a *App) shutdown(ctx context.Context) {
 
 func (a *App) OpenFileDialog(title string) result.RtnData {
 	fp, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
+		Title: title,
+	})
+	if err != nil {
+		return result.NewErrorData(err)
+	}
+	return result.NewRtnData(fp)
+}
+
+func (a *App) OpenDirectoryDialog(title string) result.RtnData {
+	fp, err := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{
 		Title: title,
 	})
 	if err != nil {

@@ -52,5 +52,6 @@
 ## 致谢
 
 - [@Yuntian](https://www.github.com/Yuntian52s): 提供ui设计以及交互意见, 没有他的帮助`LampGhost`可能仍然是一个非常不友好的工具
+- [@Wriggle](https://www.github.com/wrigglebug): 提供BMS下载网站 [The Big Sister BMS Project](https://bms.wrigglebug.xyz/) 以及差分下载接口
 - [@Chuang](https://github.com/chuang1213), yzy, yf等早期测试用户
 - [Wails](https://github.com/wailsapp/wails): 这个项目基于`wails`框架开发，并且从其提供的非常快速的热加载和优秀的开发心智模型中收益

@@ -5,10 +5,10 @@
 </template>
 
 <script setup lang="ts">
-import { DataTableColumns, DataTableSortState, NButton, NIcon, NText, NTooltip, useNotification } from 'naive-ui';
+import { DataTableColumns, DataTableSortState, DropdownOption, NButton, NDropdown, NIcon, NText, NTooltip, useNotification } from 'naive-ui';
 import { dto } from '@wailsjs/go/models';
-import { h, reactive, ref, Ref, watch } from 'vue';
-import { BindDiffTableDataToFolder, QueryDiffTableDataWithRival } from '@wailsjs/go/main/App';
+import { h, reactive, ref, Ref, VNode, watch } from 'vue';
+import { BindDiffTableDataToFolder, QueryDiffTableDataWithRival, SubmitSingleMD5DownloadTask } from '@wailsjs/go/main/App';
 import SelectFolder from '@/views/folder/SelectFolder.vue';
 import ClearTag from '@/components/ClearTag.vue';
 import { useI18n } from 'vue-i18n';
@@ -34,9 +34,13 @@ const sorter: Ref<Sorter> = ref({
 	SortBy: null,
 	SortOrder: null,
 });
+const otherActionOptions: Array<DropdownOption> = [
+	{ label: t('button.addToFolder'), key: "AddToFolder" },
+	{ label: t('button.download'), key: "Download" },
+];
 const columns: DataTableColumns<dto.DiffTableDataDto> = [
 	{
-		title: t('column.songName'), key: "Title", width: "200px", ellipsis: { tooltip: true }, resizable: true, sorter: true,
+		title: t('column.songName'), key: "Title", ellipsis: { tooltip: true }, resizable: true, sorter: true,
 		render: (row: dto.DiffTableDataDto) => {
 			let vnodes = [];
 			if (row.DataLost) {
@@ -46,7 +50,7 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
 			return vnodes;
 		}
 	},
-	{ title: t('column.artist'), key: "Artist", ellipsis: { tooltip: true }, sorter: true, },
+	{ title: t('column.artist'), key: "Artist", ellipsis: { tooltip: true }, sorter: true, width: "125px" },
 	{ title: t('column.count'), key: "PlayCount", width: "100px" },
 	{
 		title: t('column.clear'), key: "Lamp", width: "125px", resizable: true, sorter: true,
@@ -65,18 +69,22 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
 		title: t('column.actions'),
 		key: "actions",
 		resizable: true,
-		minWidth: "100px",
+		width: "90px",
 		render(row: dto.DiffTableDataDto) {
 			return h(
-				NButton,
+				NDropdown,
 				{
-					strong: true,
-					tertiary: true,
-					size: "small",
-					onClick: () => handleAddToFolder(row),
+					trigger: "hover",
+					options: otherActionOptions,
+					onSelect: (key: "AddToFolder" | "Download") => {
+						switch (key) {
+							case 'AddToFolder': handleAddToFolder(row); break;
+							case 'Download': handleSubmitSingleMD5DownloadTask(row); break;
+						}
+					}
 				},
-				{ default: () => t('button.addToFolder') }
-			)
+				{ default: () => h(NButton, null, { default: () => '...' }) }
+			);
 		}
 	}
 ];
@@ -175,6 +183,27 @@ function handleUpdateSorter(option: DataTableSortState | null) {
 	loadData();
 }
 
+function handleSubmitSingleMD5DownloadTask(row: dto.DiffTableDataDto) {
+	loading.value = true;
+	SubmitSingleMD5DownloadTask(row.Md5, row.Title)
+		.then(result => {
+			if (result.Code != 200) {
+				return Promise.reject(result.Msg);
+			}
+			notification.success({
+				content: t('message.submitSuccess'),
+				duration: 3000,
+				keepAliveOnHover: true
+			});
+		}).catch(err => {
+			notification.error({
+				content: err,
+				duration: 3000,
+				keepAliveOnHover: true
+			});
+		}).finally(() => loading.value = false);
+}
+
 loadData();
 </script>
 
@@ -189,11 +218,13 @@ loadData();
 			"actions": "Actions"
 		},
 		"button": {
-			"addToFolder": "Add to Folder"
+			"addToFolder": "Add to Folder",
+			"download": "Download"
 		},
 		"message": {
 			"bindSuccess": "Bind successfully",
-			"bindFailedPrefix": "Failed to bind song to folder, error message: "
+			"bindFailedPrefix": "Failed to bind song to folder, error message: ",
+			"submitSuccess": "Submit successfully"
 		}
 	},
 	"zh-CN": {
@@ -206,11 +237,13 @@ loadData();
 			"actions": "操作"
 		},
 		"button": {
-			"addToFolder": "添加至收藏夹"
+			"addToFolder": "添加至收藏夹",
+			"download": "下载"
 		},
 		"message": {
 			"bindSucess": "绑定成功",
-			"bindFailedPrefix": "绑定失败, 错误信息: "
+			"bindFailedPrefix": "绑定失败, 错误信息: ",
+			"submitSuccess": "提交成功"
 		}
 	}
 }</i18n>

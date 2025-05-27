@@ -4,7 +4,6 @@ import {vo} from '../models';
 import {result} from '../models';
 import {dto} from '../models';
 import {entity} from '../models';
-import {context} from '../models';
 import {config} from '../models';
 
 export function AddBatchDiffTableHeader(arg1:Array<vo.DiffTableHeaderVo>):Promise<result.RtnDataList>;
@@ -45,6 +44,8 @@ export function FindDiffTableHeaderTree(arg1:vo.DiffTableHeaderVo):Promise<resul
 
 export function FindDiffTableHeaderTreeWithRival(arg1:vo.DiffTableHeaderVo):Promise<result.RtnDataList>;
 
+export function FindDownloadTaskList():Promise<result.RtnDataList>;
+
 export function FindFolderContentList(arg1:vo.FolderContentVo):Promise<result.RtnDataList>;
 
 export function FindFolderList(arg1:vo.FolderVo):Promise<result.RtnDataList>;
@@ -68,6 +69,8 @@ export function GENERATOR_BEATORAJA_DIRECTORY_META():Promise<dto.BeatorajaDirect
 export function GENERATOR_COURSE_INFO():Promise<entity.CourseInfo>;
 
 export function GENERATOR_COURSE_INFO_DTO():Promise<dto.CourseInfoDto>;
+
+export function GENERATOR_DOWNLOAD_TASK():Promise<entity.DownloadTask>;
 
 export function GENERATOR_FOLDER():Promise<entity.Folder>;
 
@@ -97,7 +100,7 @@ export function GENERATOR_TABLE_TAG_DTO():Promise<dto.DiffTableTagDto>;
 
 export function InitializeMainUser(arg1:vo.InitializeRivalInfoVo):Promise<result.RtnMessage>;
 
-export function InjectContext(arg1:context.Context):Promise<void>;
+export function OpenDirectoryDialog(arg1:string):Promise<result.RtnData>;
 
 export function OpenFileDialog(arg1:string):Promise<result.RtnData>;
 
@@ -144,6 +147,10 @@ export function ReloadRivalData(arg1:number,arg2:boolean):Promise<result.RtnMess
 export function RevertRivalTagEnabledState(arg1:number):Promise<result.RtnMessage>;
 
 export function RunServer():Promise<void>;
+
+export function SubmitDownloadTask(arg1:string,arg2:any):Promise<result.RtnMessage>;
+
+export function SubmitSingleMD5DownloadTask(arg1:string,arg2:any):Promise<result.RtnMessage>;
 
 export function SyncRivalTag(arg1:number):Promise<result.RtnMessage>;
 

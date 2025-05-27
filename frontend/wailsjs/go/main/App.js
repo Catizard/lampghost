@@ -78,6 +78,10 @@ export function FindDiffTableHeaderTreeWithRival(arg1) {
   return window['go']['main']['App']['FindDiffTableHeaderTreeWithRival'](arg1);
 }
 
+export function FindDownloadTaskList() {
+  return window['go']['main']['App']['FindDownloadTaskList']();
+}
+
 export function FindFolderContentList(arg1) {
   return window['go']['main']['App']['FindFolderContentList'](arg1);
 }
@@ -124,6 +128,10 @@ export function GENERATOR_COURSE_INFO() {
 
 export function GENERATOR_COURSE_INFO_DTO() {
   return window['go']['main']['App']['GENERATOR_COURSE_INFO_DTO']();
+}
+
+export function GENERATOR_DOWNLOAD_TASK() {
+  return window['go']['main']['App']['GENERATOR_DOWNLOAD_TASK']();
 }
 
 export function GENERATOR_FOLDER() {
@@ -182,8 +190,8 @@ export function InitializeMainUser(arg1) {
   return window['go']['main']['App']['InitializeMainUser'](arg1);
 }
 
-export function InjectContext(arg1) {
-  return window['go']['main']['App']['InjectContext'](arg1);
+export function OpenDirectoryDialog(arg1) {
+  return window['go']['main']['App']['OpenDirectoryDialog'](arg1);
 }
 
 export function OpenFileDialog(arg1) {
@@ -276,6 +284,14 @@ export function RevertRivalTagEnabledState(arg1) {
 
 export function RunServer() {
   return window['go']['main']['App']['RunServer']();
+}
+
+export function SubmitDownloadTask(arg1, arg2) {
+  return window['go']['main']['App']['SubmitDownloadTask'](arg1, arg2);
+}
+
+export function SubmitSingleMD5DownloadTask(arg1, arg2) {
+  return window['go']['main']['App']['SubmitSingleMD5DownloadTask'](arg1, arg2);
 }
 
 export function SyncRivalTag(arg1) {

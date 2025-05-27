@@ -20,7 +20,8 @@ import {
 	BalloonOutline as BalloonIcon,
 	MedalOutline as MedalIcon,
 	People as RivalIcon,
-	List as ListIcon
+	List as ListIcon,
+	DownloadOutline as DownloadIcon
 } from '@vicons/ionicons5'
 import { MenuOption, NIcon } from 'naive-ui'
 import { computed, h, ref, watchEffect } from 'vue'
@@ -104,6 +105,11 @@ const menuOptions: MenuOption[] = [
 	// 	icon: renderIcon(GoalsIcon),
 	// },
 	{
+		label: renderOption("/download", t('menuName.download')),
+		key: "download",
+		icon: renderIcon(DownloadIcon)
+	},
+	{
 		label: renderOption("/settings", t('menuName.settings')),
 		key: "settings",
 		icon: renderIcon(SettingsIcon),
@@ -129,6 +135,7 @@ const menuOptions: MenuOption[] = [
       "folder": "Folder",
       "recent": "Recent",
       "courses": "Courses",
+			"download": "Download",
       "goals": "Goals",
 			"settings": "Settings",
     },
@@ -149,6 +156,7 @@ const menuOptions: MenuOption[] = [
       "folder": "收藏夹",
       "recent": "最近游玩",
       "courses": "段位",
+			"download": "下载",
       "goals": "目标列表",
 			"settings": "设置",
     },

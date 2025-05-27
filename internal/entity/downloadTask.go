@@ -1,12 +1,17 @@
 package entity
 
-import "gorm.io/gorm"
+import (
+	"context"
+
+	"gorm.io/gorm"
+)
 
 const (
 	TASK_PREPARE = iota
 	TASK_DOWNLOAD
 	TASK_SUCCESS
 	TASK_ERROR
+	TASK_CANCEL
 )
 
 type DownloadTask struct {
@@ -19,4 +24,5 @@ type DownloadTask struct {
 	DownloadSize         int64
 	ContentLength        int64
 	ErrorMessage         string
+	Cancel               context.CancelFunc `json:"-" gorm:"-"`
 }

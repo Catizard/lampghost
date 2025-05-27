@@ -20,6 +20,8 @@ export function BindDiffTableDataToFolder(arg1:number,arg2:Array<number>):Promis
 
 export function BindRivalSongDataToFolder(arg1:number,arg2:Array<number>):Promise<result.RtnMessage>;
 
+export function CancelDownloadTask(arg1:number):Promise<result.RtnMessage>;
+
 export function ChooseBeatorajaDirectory():Promise<result.RtnData>;
 
 export function DelDiffTableHeader(arg1:number):Promise<result.RtnMessage>;
@@ -143,6 +145,8 @@ export function ReadConfig():Promise<result.RtnData>;
 export function ReloadDiffTableHeader(arg1:number):Promise<result.RtnMessage>;
 
 export function ReloadRivalData(arg1:number,arg2:boolean):Promise<result.RtnMessage>;
+
+export function RestartDownloadTask(arg1:number):Promise<result.RtnMessage>;
 
 export function RevertRivalTagEnabledState(arg1:number):Promise<result.RtnMessage>;
 

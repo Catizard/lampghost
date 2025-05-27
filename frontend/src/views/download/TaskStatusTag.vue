@@ -25,9 +25,12 @@ const props = defineProps<{
   errorMsg?: string,
 }>();
 
-function intoType(): "info" | "error" {
+function intoType(): "info" | "error" | "warning" {
   if (props.status == DownloadTaskStatus.ERROR) {
     return "error";
+  }
+  if (props.status == DownloadTaskStatus.CANCEL) {
+    return "warning";
   }
   return "info"
 }

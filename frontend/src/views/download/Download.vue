@@ -9,12 +9,13 @@
 
 <script lang="ts" setup>
 import { entity } from '@wailsjs/go/models';
-import { EventsOn } from '@wailsjs/runtime/runtime';
-import { DataTableColumns, NEllipsis, tooltipProps } from 'naive-ui';
+import { ClipboardSetText, EventsOn } from '@wailsjs/runtime/runtime';
+import { DataTableColumns, NButton, NDropdown, NEllipsis, tooltipProps } from 'naive-ui';
 import { h, onMounted, onUnmounted, ref, Ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import TaskStatusTag from './TaskStatusTag.vue';
 import { DownloadTaskStatus } from '@/constants/downloadTaskStatus';
+import { CancelDownloadTask, RestartDownloadTask } from '@wailsjs/go/main/App';
 
 const { t } = useI18n();
 
@@ -45,8 +46,7 @@ const columns: DataTableColumns<entity.DownloadTask> = [
         'div',
         {
           onClick: () => {
-            navigator.clipboard.writeText(row.URL);
-            console.log('wow, your url is: ', row.URL)
+            ClipboardSetText(row.URL);
           },
         },
         [
@@ -71,6 +71,28 @@ const columns: DataTableColumns<entity.DownloadTask> = [
       return h(
         TaskStatusTag,
         { status: DownloadTaskStatus.from(row.Status), errorMsg: row.ErrorMessage },
+      )
+    }
+  },
+  {
+    title: t('column.actions'), key: "actions",
+    render(row: entity.DownloadTask) {
+      return h(
+        NDropdown,
+        {
+          trigger: "hover",
+          options: [
+            { label: t('button.cancel'), key: "cancel", disabled: DownloadTaskStatus.from(row.Status) !== DownloadTaskStatus.DOWNLOAD },
+            { label: t('button.restart'), key: "restart", disabled: DownloadTaskStatus.from(row.Status) !== DownloadTaskStatus.CANCEL },
+          ],
+          onSelect: (key: "cancel" | "restart") => {
+            switch (key) {
+              case "restart": RestartDownloadTask(row.ID);  break;
+              case 'cancel': CancelDownloadTask(row.ID); break;
+            }
+          }
+        },
+        { default: () => h(NButton, null, { default: () => "..." }) }
       )
     }
   }
@@ -116,7 +138,13 @@ function humanFileSize(bytes, si = false, dp = 1) {
     "column": {
       "url": "URL",
       "taskName": "Task Name(Click to Copy)",
-      "progress": "Progress"
+      "progress": "Progress",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "button": {
+      "restart": "Restart",
+      "cancel": "Cancel"
     }
   },
   "zh-CN": {
@@ -124,7 +152,13 @@ function humanFileSize(bytes, si = false, dp = 1) {
     "column": {
       "url": "URL",
       "taskName": "任务名称",
-      "progress": "当前进度"
+      "progress": "当前进度",
+      "status": "状态",
+      "actions": "操作"
+    },
+    "button": {
+      "restart": "重新开始任务",
+      "cancel": "取消任务"
     }
   }
 }</i18n>

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/rotisserie/eris"
 	"github.com/spf13/viper"
@@ -13,7 +14,10 @@ const (
 	DBFileName = "lampghost.db"
 )
 
-var WorkingDirectory string
+var (
+	WorkingDirectory string
+	lock             sync.Mutex
+)
 
 func init() {
 	homeDir, err := os.UserHomeDir()
@@ -61,6 +65,8 @@ type ApplicationConfig struct {
 }
 
 func ReadConfig() (*ApplicationConfig, error) {
+	lock.Lock()
+	defer lock.Unlock()
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, err
 	}
@@ -79,6 +85,8 @@ func ReadConfig() (*ApplicationConfig, error) {
 }
 
 func (c *ApplicationConfig) WriteConfig() error {
+	lock.Lock()
+	defer lock.Unlock()
 	viper.Set("InternalServerPort", c.InternalServerPort)
 	viper.Set("FolderSymbol", c.FolderSymbol)
 	viper.Set("IgnoreVariantCourse", c.IgnoreVariantCourse)

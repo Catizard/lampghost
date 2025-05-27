@@ -30,6 +30,10 @@ export function BindRivalSongDataToFolder(arg1, arg2) {
   return window['go']['main']['App']['BindRivalSongDataToFolder'](arg1, arg2);
 }
 
+export function CancelDownloadTask(arg1) {
+  return window['go']['main']['App']['CancelDownloadTask'](arg1);
+}
+
 export function ChooseBeatorajaDirectory() {
   return window['go']['main']['App']['ChooseBeatorajaDirectory']();
 }
@@ -276,6 +280,10 @@ export function ReloadDiffTableHeader(arg1) {
 
 export function ReloadRivalData(arg1, arg2) {
   return window['go']['main']['App']['ReloadRivalData'](arg1, arg2);
+}
+
+export function RestartDownloadTask(arg1) {
+  return window['go']['main']['App']['RestartDownloadTask'](arg1);
 }
 
 export function RevertRivalTagEnabledState(arg1) {

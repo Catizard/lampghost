@@ -158,7 +158,7 @@ func (s *DownloadTaskService) handleUpdateTask(msg *taskUpdMsg) error {
 			task.ContentLength = msg.contentLength
 		}
 	} else {
-		log.Warn("[DownloadTaskService] discard update msg: %v", *msg)
+		log.Warnf("[DownloadTaskService] discard updte msg: %v", *msg)
 	}
 	return nil
 }
@@ -178,13 +178,20 @@ func (s *DownloadTaskService) tryKickingWaitTask() {
 		return
 	}
 	next := s.waitTasks[0]
-	log.Debugf("[DownloadTaskService] try kicking task %d(%s)", next.ID, next.URL)
+	taskID := next.ID
+	log.Debugf("[DownloadTaskService] try kicking task %d(%s)", taskID, next.URL)
 	s.waitTasks = s.waitTasks[1:]
-	s.runningTasks[next.ID] = next
+	s.runningTasks[taskID] = next
 	go func() {
-		// Open a no timeout client
+		// Open a no timeout, cancelable client
 		client := req.C().SetTimeout(0)
-		resp, err := client.R().
+		// Prevent a very rare race condition?
+		s.lock()
+		ctx, cancel := context.WithCancel(context.Background())
+		s.runningTasks[taskID].Cancel = cancel
+		contextLockedReq := client.R().SetContext(ctx)
+		s.unlock()
+		resp, err := contextLockedReq.
 			SetOutputFile(next.IntermediateFilePath).
 			SetDownloadCallbackWithInterval(func(info req.DownloadInfo) {
 				s.updMsgReceiver <- taskUpdMsg{
@@ -329,4 +336,37 @@ func (s *DownloadTaskService) FindDownloadTaskList() ([]*entity.DownloadTask, in
 	copy(ret, s.tasks)
 	slices.Reverse(ret)
 	return ret, len(ret), nil
+}
+
+func (s *DownloadTaskService) CancelDownloadTask(taskID uint) error {
+	s.lock()
+	defer s.unlock()
+	if task, ok := s.runningTasks[taskID]; ok {
+		if task.Cancel != nil {
+			*task.Status = entity.TASK_CANCEL
+			task.Cancel()
+			delete(s.runningTasks, taskID)
+			// NOTE: Now, the canceld task is not in wait queue nor running queue
+			// It's only referenced in all task list, requring a 'Restart' command
+			// to rejoin the party
+		}
+	}
+	return nil
+}
+
+func (s *DownloadTaskService) RestartDownloadTask(taskID uint) error {
+	s.lock()
+	defer s.unlock()
+	// Won't be a problem for now
+	for _, task := range s.tasks {
+		if task.ID == taskID {
+			if *task.Status != entity.TASK_CANCEL {
+				return eris.New("assert: cannot restart a task is not canceled")
+			}
+			*task.Status = entity.TASK_PREPARE
+			s.waitTasks = append(s.waitTasks, task)
+			break
+		}
+	}
+	return nil
 }

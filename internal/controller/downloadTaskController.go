@@ -26,7 +26,7 @@ func (ctl *DownloadTaskController) InjectContext(ctx context.Context) {
 func (ctl *DownloadTaskController) SubmitDownloadTask(url string, taskName *string) result.RtnMessage {
 	log.Info("[Controller] calling DownloadTaskController.SubmitDownloadTask")
 	if err := ctl.downloadTaskService.SubmitDownloadTask(url, nil); err != nil {
-		log.Error("[DownloadTaskController] returning err: %v", err)
+		log.Errorf("[DownloadTaskController] returning err: %v", err)
 		return result.NewErrorMessage(err)
 	}
 	return result.SUCCESS
@@ -35,7 +35,7 @@ func (ctl *DownloadTaskController) SubmitDownloadTask(url string, taskName *stri
 func (ctl *DownloadTaskController) SubmitSingleMD5DownloadTask(md5 string, taskName *string) result.RtnMessage {
 	log.Info("[Controller] calling DownloadTaskController.SubmitSingleMD5DownloadTask")
 	if err := ctl.downloadTaskService.SubmitSingleMD5DownloadTask(md5, taskName); err != nil {
-		log.Error("[DownloadTaskController] returning err: %v", err)
+		log.Errorf("[DownloadTaskController] returning err: %v", err)
 		return result.NewErrorMessage(err)
 	}
 	return result.SUCCESS
@@ -49,6 +49,24 @@ func (ctl *DownloadTaskController) FindDownloadTaskList() result.RtnDataList {
 		return result.NewErrorDataList(err)
 	}
 	return result.NewRtnDataList(rows)
+}
+
+func (ctl *DownloadTaskController) CancelDownloadTask(taskID uint) result.RtnMessage {
+	log.Info("[Controller] calling DownloadTaskController.CancelDownloadTask")
+	if err := ctl.downloadTaskService.CancelDownloadTask(taskID); err != nil {
+		log.Errorf("[DownloadTaskController] returning err: %v", err)
+		return result.NewErrorMessage(err)
+	}
+	return result.SUCCESS
+}
+
+func (ctl *DownloadTaskController) RestartDownloadTask(taskID uint) result.RtnMessage {
+	log.Info("[Controller] calling DownloadTaskController.RestartDownloadTask")
+	if err := ctl.downloadTaskService.RestartDownloadTask(taskID); err != nil {
+		log.Errorf("[DownloadTaskController] returning err: %v", err)
+		return result.NewErrorMessage(err)
+	}
+	return result.SUCCESS
 }
 
 func (*DownloadTaskController) GENERATOR_DOWNLOAD_TASK() *entity.DownloadTask { return nil }

@@ -2,7 +2,8 @@ export enum DownloadTaskStatus {
   PREPARE = "Prepare",
   DOWNLOAD = "Download",
   SUCCESS = "Success",
-  ERROR = "Error"
+  ERROR = "Error",
+  CANCEL = "Cancel"
 }
 
 export namespace DownloadTaskStatus {
@@ -12,6 +13,7 @@ export namespace DownloadTaskStatus {
       case 1: return DownloadTaskStatus.DOWNLOAD;
       case 2: return DownloadTaskStatus.SUCCESS;
       case 3: return DownloadTaskStatus.ERROR;
+      case 4: return DownloadTaskStatus.CANCEL;
     }
   }
 }

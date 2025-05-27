@@ -2,8 +2,6 @@ module github.com/Catizard/lampghost_wails
 
 go 1.23.0
 
-toolchain go1.24.2
-
 require (
 	github.com/charmbracelet/log v0.4.0
 	github.com/glebarez/sqlite v1.11.0

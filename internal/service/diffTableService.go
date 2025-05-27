@@ -140,7 +140,7 @@ func (s *DiffTableService) AddBatchDiffTableHeader(candidates []*vo.DiffTableHea
 		return candidate.HeaderUrl, candidate
 	})
 
-	timeout := 15 * time.Second
+	timeout := 60 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 

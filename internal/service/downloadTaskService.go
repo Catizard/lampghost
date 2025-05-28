@@ -46,7 +46,7 @@ type taskUpdMsg struct {
 	contentLength int64
 }
 
-func NewDownloadTaskService(db *gorm.DB, config *config.ApplicationConfig) *DownloadTaskService {
+func NewDownloadTaskService(db *gorm.DB, config *config.ApplicationConfig, configNotify chan any) *DownloadTaskService {
 	service := &DownloadTaskService{
 		db:             db,
 		tasks:          make([]*entity.DownloadTask, 0),
@@ -59,6 +59,7 @@ func NewDownloadTaskService(db *gorm.DB, config *config.ApplicationConfig) *Down
 	go service.receive()
 	// go service.debugProgress()
 	go service.pushupState()
+	go service.updateConfig()
 	return service
 }
 
@@ -118,6 +119,22 @@ func (s *DownloadTaskService) debugProgress() {
 		s.unlock()
 		time.Sleep(1 * time.Second)
 	}
+}
+
+// Update the config of DownloadTaskService
+//
+// NOTE: This function should be called only when there is no running task,
+// if not, it's not lampghost's job to handle tasks correctly
+func (s *DownloadTaskService) updateConfig() {
+	s.lock()
+	defer s.unlock()
+	config, err := config.ReadConfig()
+	if err != nil {
+		// TODO: emit a message to frontend here
+		log.Errorf("cannot read config: %s", err)
+		return
+	}
+	s.config = config
 }
 
 func (s *DownloadTaskService) handleUpdateTask(msg *taskUpdMsg) error {

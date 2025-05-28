@@ -6,20 +6,21 @@ import (
 )
 
 type ConfigService struct {
-	db *gorm.DB
+	db      *gorm.DB
+	publish chan any
 }
 
-func NewConfigService(db *gorm.DB) *ConfigService {
+func NewConfigService(db *gorm.DB, configPublishChannel chan any) *ConfigService {
 	return &ConfigService{
-		db: db,
+		db:      db,
+		publish: configPublishChannel,
 	}
 }
 
 func (s *ConfigService) WriteConfig(conf *config.ApplicationConfig) error {
-	return s.db.Transaction(func(tx *gorm.DB) error {
-		if err := conf.WriteConfig(); err != nil {
-			return err
-		}
-		return nil
-	})
+	if err := conf.WriteConfig(); err != nil {
+		return err
+	}
+	s.publish <- 1
+	return nil
 }

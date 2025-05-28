@@ -34,7 +34,7 @@ func TestSubmitDownloadTask(t *testing.T) {
 		if err != nil {
 			t.Fatalf("config: %s", err)
 		}
-		downloadTaskService := service.NewDownloadTaskService(db, config)
+		downloadTaskService := service.NewDownloadTaskService(db, config, nil)
 		if err := downloadTaskService.SubmitDownloadTask("https://bms.wrigglebug.xyz/download/package/d837d90c1eeef5efbb5422dacbd3b76e", nil); err != nil {
 			t.Fatalf("download: %s", err)
 		}
@@ -55,7 +55,7 @@ func TestSubmitSingleMD5DownloadTask(t *testing.T) {
 		if err != nil {
 			t.Fatalf("config: %s", err)
 		}
-		downloadTaskService := service.NewDownloadTaskService(db, config)
+		downloadTaskService := service.NewDownloadTaskService(db, config, nil)
 
 		md5s := []string{
 			"552467f149f79e72e783f863eebef7b3",

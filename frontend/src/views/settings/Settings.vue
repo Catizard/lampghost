@@ -277,7 +277,7 @@ loadSettings();
       "placeholderSymbol": "Defaults to empty"
     },
     "downloadSettings": {
-      "title": "Download Settings(Below options need to be restarted to take effect)",
+      "title": "Download Settings",
       "labelDownloadSite": "Download Source Site",
       "labelSeparateDownloadMD5": "Download URL Pattern",
       "labelDownloadDirectory": "Download Directory",
@@ -325,7 +325,7 @@ loadSettings();
       "placeholderSymbol": "默认为空"
     },
     "downloadSettings": {
-      "title": "下载设置(以下所有配置都需要重启生效)",
+      "title": "下载设置",
       "labelDownloadSite": "下载源",
       "labelSeparateDownloadMD5": "下载地址",
       "labelDownloadDirectory": "下载路径",

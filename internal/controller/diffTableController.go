@@ -184,6 +184,14 @@ func (ctl *DiffTableController) QueryPredefineTableSchemes() result.RtnDataList 
 	return result.NewRtnDataList(schemes)
 }
 
+func (ctl *DiffTableController) SupplyMissingBMSFromTable(ID uint) result.RtnMessage {
+	log.Info("[Controller] Calling DiffTableController.SupplyMissingBMSFromTable")
+	if err := ctl.diffTableService.SupplyMissingBMSFromTable(ID); err != nil {
+		return result.NewErrorMessage(err)
+	}
+	return result.SUCCESS
+}
+
 func (ctl *DiffTableController) GENERATOR_TABLE_HEADER() *entity.DiffTableHeader { return nil }
 
 func (ctl *DiffTableController) GENERATOR_TABLE_HEADER_DTO() *dto.DiffTableHeaderDto { return nil }

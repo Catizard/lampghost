@@ -306,6 +306,10 @@ export function SubmitSingleMD5DownloadTask(arg1, arg2) {
   return window['go']['main']['App']['SubmitSingleMD5DownloadTask'](arg1, arg2);
 }
 
+export function SupplyMissingBMSFromTable(arg1) {
+  return window['go']['main']['App']['SupplyMissingBMSFromTable'](arg1);
+}
+
 export function SyncRivalTag(arg1) {
   return window['go']['main']['App']['SyncRivalTag'](arg1);
 }

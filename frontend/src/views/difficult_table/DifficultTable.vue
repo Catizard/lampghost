@@ -5,10 +5,12 @@
 				<n-text type="primary">{{ t('title') }}</n-text>
 			</n-h1>
 			<n-flex justify="flex-end">
-				<n-button :loading="loading" type="info" @click="showSortModal = true"> {{ t('button.sort')
-					}}</n-button>
-				<n-button :loading="loading" type="primary" @click="showAddModal = true">{{ t('button.add')
-					}}</n-button>
+				<n-button :loading="loading" type="info" @click="showSortModal = true">
+					{{ t('button.sort') }}
+				</n-button>
+				<n-button :loading="loading" type="primary" @click="showAddModal = true">
+					{{ t('button.add') }}
+				</n-button>
 			</n-flex>
 		</n-flex>
 		<n-data-table :loading="loading" :columns="columns" :data="data" :pagination="pagination" :bordered="false"
@@ -29,7 +31,8 @@ import { h, Ref, ref } from "vue";
 import {
 	DelDiffTableHeader,
 	FindDiffTableHeaderTree,
-	ReloadDiffTableHeader
+	ReloadDiffTableHeader,
+	SupplyMissingBMSFromTable
 } from "@wailsjs/go/main/App";
 import { dto } from "@wailsjs/go/models";
 import { useI18n } from "vue-i18n";
@@ -98,18 +101,10 @@ let data: Ref<Array<any>> = ref([]);
 const pagination = false as const;
 
 const otherActionOptions: Array<DropdownOption> = [
-	{
-		label: t('button.reload'),
-		key: "Reload"
-	},
-	{
-		label: t('button.edit'),
-		key: "Edit",
-	},
-	{
-		label: t('button.sortLevels'),
-		key: "SortLevels",
-	},
+	{ label: t('button.reload'), key: "Reload" },
+	{ label: t('button.edit'), key: "Edit", },
+	{ label: t('button.supply'), key: "Supply" },
+	{ label: t('button.sortLevels'), key: "SortLevels", },
 	{
 		label: t('button.delete'),
 		key: "Delete",
@@ -122,6 +117,24 @@ const otherActionOptions: Array<DropdownOption> = [
 function handleSelectOtherAction(row: dto.DiffTableHeaderDto, key: string) {
 	if ("Reload" === key) {
 		reloadTableHeader(row.ID);
+	}
+	if ("Supply" === key) {
+		dialog.warning({
+			title: t('supplyDialog.title'),
+			positiveText: t('supplyDialog.positiveText'),
+			negativeText: t('supplyDialog.negativeText'),
+			onPositiveClick: () => {
+				loading.value = true;
+				SupplyMissingBMSFromTable(row.ID)
+					.then(result => {
+						if (result.Code != 200) {
+							return Promise.reject(result.Msg);
+						}
+					}).catch(err => {
+						window.$notifyError(err);
+					}).finally(() => loading.value = false);
+			}
+		})
 	}
 	if ("Delete" === key) {
 		dialog.warning({
@@ -212,7 +225,8 @@ function notifyError(msg: string) {
 			"edit": "Edit",
 			"sort": "Sort",
 			"sortLevels": "Sort Levels",
-			"reload": "Reload"
+			"reload": "Reload",
+			"supply": "Supply all missing bms"
 		},
 		"column": {
 			"name": "Name",
@@ -222,6 +236,11 @@ function notifyError(msg: string) {
 		},
 		"deleteDialog": {
 			"title": "Confirm to delete?",
+			"positiveText": "Yes",
+			"negativeText": "No"
+		},
+		"supplyDialog": {
+			"title": "Do you really want to supply all missing bms?",
 			"positiveText": "Yes",
 			"negativeText": "No"
 		},
@@ -239,7 +258,8 @@ function notifyError(msg: string) {
 			"edit": "修改",
 			"sort": "排序",
 			"sortLevels": "设定难度排序",
-			"reload": "重新导入"
+			"reload": "重新导入",
+			"supply": "补充所有缺少的BMS"
 		},
 		"column": {
 			"name": "名称",
@@ -249,6 +269,11 @@ function notifyError(msg: string) {
 		},
 		"deleteDialog": {
 			"title": "确定要删除吗？",
+			"positiveText": "是",
+			"negativeText": "否"
+		},
+		"supplyDialog": {
+			"title": "确定要添加所有缺少的BMS吗？",
 			"positiveText": "是",
 			"negativeText": "否"
 		},

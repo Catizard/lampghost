@@ -19,12 +19,14 @@ import (
 )
 
 type DiffTableService struct {
-	db *gorm.DB
+	db                  *gorm.DB
+	downloadTaskService *DownloadTaskService
 }
 
-func NewDiffTableService(db *gorm.DB) *DiffTableService {
+func NewDiffTableService(db *gorm.DB, downloadTaskService *DownloadTaskService) *DiffTableService {
 	return &DiffTableService{
-		db: db,
+		db:                  db,
+		downloadTaskService: downloadTaskService,
 	}
 }
 
@@ -542,6 +544,28 @@ func (s *DiffTableService) UpdateHeaderLevelOrders(updateParam *vo.DiffTableHead
 	return s.db.Transaction(func(tx *gorm.DB) error {
 		return updateHeaderLevelOrders(tx, updateParam.ID, updateParam.LevelOrders)
 	})
+}
+
+func (s *DiffTableService) SupplyMissingBMSFromTable(ID uint) error {
+	data, _, err := findDiffTableDataList(s.db, &vo.DiffTableDataVo{HeaderID: ID})
+	if err != nil {
+		return err
+	}
+	for _, song := range data {
+		if !song.DataLost {
+			continue
+		}
+		// There is a rare case that the data doesn't have md5, this would lead to an incomplete
+		// url and we don't have a good way to handle this special case other than filter it
+		if song.Md5 == "" {
+			log.Errorf("supply mising song: skip %s due to no md5 provided", song.Title)
+			continue
+		}
+		if err := s.downloadTaskService.SubmitSingleMD5DownloadTask(song.Md5, &song.Title); err != nil {
+			log.Errorf("submit download task: %s", err)
+		}
+	}
+	return nil
 }
 
 // Query if there exists a header that satisfies the condition

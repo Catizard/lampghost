@@ -78,8 +78,12 @@ func NewApp() *App {
 	rivalScoreDataLogController := controller.NewRivalScoreDataLogController(rivalScoreDataLogService)
 	rivalSongDataController := controller.NewRivalSongDataController(rivalSongDataService)
 
+	// download task module
+	downloadTaskService := service.NewDownloadTaskService(db, conf, configSubscribeChannel[0])
+	downloadTaskController := controller.NewDownloadTaskController(downloadTaskService)
+
 	// difficult table module
-	diffTableService := service.NewDiffTableService(db)
+	diffTableService := service.NewDiffTableService(db, downloadTaskService)
 	diffTableController := controller.NewDiffTableController(diffTableService)
 	courseInfoService := service.NewCourseInfoSerivce(db)
 	courseInfoController := controller.NewCourseInfoController(courseInfoService)
@@ -88,10 +92,6 @@ func NewApp() *App {
 	folderService := service.NewFolderService(db)
 	folderController := controller.NewFolderController(folderService)
 	folderInternalServer := server.NewInternalServer(folderService)
-
-	// download task module
-	downloadTaskService := service.NewDownloadTaskService(db, conf, configSubscribeChannel[0])
-	downloadTaskController := controller.NewDownloadTaskController(downloadTaskService)
 
 	return &App{
 		nil,

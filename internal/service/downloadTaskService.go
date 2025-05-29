@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/Catizard/lampghost_wails/internal/config"
+	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/charmbracelet/log"
 	"github.com/imroc/req/v3"
@@ -282,6 +283,10 @@ func (s *DownloadTaskService) tryKickingWaitTask() {
 			final:  true,
 			err:    nil,
 		}
+		runtime.EventsEmit(s.ctx, "global:notify", dto.NotificationDto{
+			Type:    "success",
+			Content: fmt.Sprintf("%s download successfully", filename),
+		})
 	}()
 }
 

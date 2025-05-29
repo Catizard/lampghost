@@ -6,6 +6,7 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/config"
 	"github.com/Catizard/lampghost_wails/internal/controller"
 	"github.com/Catizard/lampghost_wails/internal/database"
+	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/result"
 	"github.com/Catizard/lampghost_wails/internal/server"
 	"github.com/Catizard/lampghost_wails/internal/service"
@@ -155,3 +156,5 @@ func (a *App) OpenDirectoryDialog(title string) result.RtnData {
 	}
 	return result.NewRtnData(fp)
 }
+
+func (a *App) GENERATOR_NOTIFICATION_DTO() *dto.NotificationDto { return nil }

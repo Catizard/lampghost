@@ -59,7 +59,6 @@ import KeyCountChart from "./KeyCountChart.vue";
 
 const i18n = useI18n();
 const { t } = i18n;
-const notification = useNotification();
 const router = useRouter();
 const route = useRoute();
 
@@ -98,10 +97,7 @@ function initUser() {
 			playerData.playCount = data.PlayCount;
 			playerData.lastUpdate = dayjs(data.UpdatedAt).format("YYYY-MM-DD HH:mm:ss");
 		}).catch(err => {
-			notification.error({
-				content: err,
-				duration: 3000,
-			});
+			window.$notifyError(err);
 		});
 }
 
@@ -114,19 +110,12 @@ function handleSyncClick() {
 				return Promise.reject();
 			}
 			syncLoading.value = false;
-			notification.success({
-				content: t("message.reloadSuccess"),
-				duration: 3000,
-			});
+			window.$notifySuccess(t("message.reloadSuccess"));
 			// Reload data by simply reloading this page
 			window.location.reload();
 		})
 		.catch((err) => {
-			notification.error({
-				content: t("message.reloadFailedPrefix") + err,
-				duration: 3000,
-				keepAliveOnHover: true,
-			});
+			window.$notifyError(t("message.reloadFailedPrefix") + err);
 			syncLoading.value = false;
 		});
 }

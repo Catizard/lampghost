@@ -316,6 +316,20 @@ export namespace dto {
 	        this.KeyCount = source["KeyCount"];
 	    }
 	}
+	export class NotificationDto {
+	    type: string;
+	    content: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new NotificationDto(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.type = source["type"];
+	        this.content = source["content"];
+	    }
+	}
 	export class RivalInfoDto {
 	    ID: number;
 	    // Go type: time

@@ -84,6 +84,8 @@ export function GENERATOR_FOLDER_DTO():Promise<dto.FolderDto>;
 
 export function GENERATOR_KEY_COUNT_DTO():Promise<dto.KeyCountDto>;
 
+export function GENERATOR_NOTIFICATION_DTO():Promise<dto.NotificationDto>;
+
 export function GENERATOR_PREDEFINE_TABLE_HEADER():Promise<entity.PredefineTableHeader>;
 
 export function GENERATOR_PREDEFINE_TABLE_SCHEME():Promise<entity.PredefineTableScheme>;

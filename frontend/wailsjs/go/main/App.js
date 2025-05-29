@@ -158,6 +158,10 @@ export function GENERATOR_KEY_COUNT_DTO() {
   return window['go']['main']['App']['GENERATOR_KEY_COUNT_DTO']();
 }
 
+export function GENERATOR_NOTIFICATION_DTO() {
+  return window['go']['main']['App']['GENERATOR_NOTIFICATION_DTO']();
+}
+
 export function GENERATOR_PREDEFINE_TABLE_HEADER() {
   return window['go']['main']['App']['GENERATOR_PREDEFINE_TABLE_HEADER']();
 }

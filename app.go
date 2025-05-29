@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 
 	"github.com/Catizard/lampghost_wails/internal/config"
 	"github.com/Catizard/lampghost_wails/internal/controller"
@@ -10,6 +9,7 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/result"
 	"github.com/Catizard/lampghost_wails/internal/server"
 	"github.com/Catizard/lampghost_wails/internal/service"
+	"github.com/charmbracelet/log"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 

@@ -23,17 +23,15 @@ import (
 )
 
 type DownloadTaskService struct {
-	db             *gorm.DB
-	ctx            context.Context
-	mutex          sync.Mutex
-	tasks          []*entity.DownloadTask
-	waitTasks      []*entity.DownloadTask
-	runningTasks   map[uint]*entity.DownloadTask
-	updMsgReceiver chan taskUpdMsg
-	// NOTE: DownloadTaskService holds a snapshot of config instance. This might be
-	// considered as a design failure but it makes the code easier to write
-	// Therefore, the download related settings are all requiring restart to take effect
-	config *config.ApplicationConfig
+	db                    *gorm.DB
+	ctx                   context.Context
+	mutex                 sync.Mutex
+	tasks                 []*entity.DownloadTask
+	waitTasks             []*entity.DownloadTask
+	runningTasks          map[uint]*entity.DownloadTask
+	updMsgReceiver        chan taskUpdMsg
+	subscribeConfigChange chan any
+	config                *config.ApplicationConfig
 	// Exeprimental, only for test case
 	taskID uint
 }
@@ -48,18 +46,19 @@ type taskUpdMsg struct {
 
 func NewDownloadTaskService(db *gorm.DB, config *config.ApplicationConfig, configNotify chan any) *DownloadTaskService {
 	service := &DownloadTaskService{
-		db:             db,
-		tasks:          make([]*entity.DownloadTask, 0),
-		waitTasks:      make([]*entity.DownloadTask, 0),
-		runningTasks:   make(map[uint]*entity.DownloadTask),
-		taskID:         1,
-		updMsgReceiver: make(chan taskUpdMsg),
-		config:         config,
+		db:                    db,
+		tasks:                 make([]*entity.DownloadTask, 0),
+		waitTasks:             make([]*entity.DownloadTask, 0),
+		runningTasks:          make(map[uint]*entity.DownloadTask),
+		taskID:                1,
+		updMsgReceiver:        make(chan taskUpdMsg),
+		config:                config,
+		subscribeConfigChange: configNotify,
 	}
 	go service.receive()
 	// go service.debugProgress()
 	go service.pushupState()
-	go service.updateConfig()
+	go service.listenUpdateConfig()
 	return service
 }
 
@@ -125,16 +124,21 @@ func (s *DownloadTaskService) debugProgress() {
 //
 // NOTE: This function should be called only when there is no running task,
 // if not, it's not lampghost's job to handle tasks correctly
-func (s *DownloadTaskService) updateConfig() {
-	s.lock()
-	defer s.unlock()
-	config, err := config.ReadConfig()
-	if err != nil {
-		// TODO: emit a message to frontend here
-		log.Errorf("cannot read config: %s", err)
-		return
+func (s *DownloadTaskService) listenUpdateConfig() {
+	for {
+		<-s.subscribeConfigChange
+		go func() {
+			s.lock()
+			log.Debugf("[DownloadTaskService] updating config")
+			if config, err := config.ReadConfig(); err != nil {
+				// TODO: emit a message to frontend here
+				log.Errorf("cannot read config: %s", err)
+			} else {
+				s.config = config
+			}
+			s.unlock()
+		}()
 	}
-	s.config = config
 }
 
 func (s *DownloadTaskService) handleUpdateTask(msg *taskUpdMsg) error {

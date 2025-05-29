@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { DataTableColumns, DataTableSortState, DropdownOption, NButton, NDropdown, NIcon, NText, NTooltip, useNotification } from 'naive-ui';
+import { DataTableColumns, DataTableSortState, DropdownOption, NButton, NDropdown, NEllipsis, NIcon, NText, NTooltip, useNotification } from 'naive-ui';
 import { dto } from '@wailsjs/go/models';
 import { h, reactive, ref, Ref, VNode, watch } from 'vue';
 import { BindDiffTableDataToFolder, QueryDiffTableDataWithRival, SubmitSingleMD5DownloadTask } from '@wailsjs/go/main/App';
@@ -37,13 +37,13 @@ const sorter: Ref<Sorter> = ref({
 });
 const columns: DataTableColumns<dto.DiffTableDataDto> = [
 	{
-		title: t('column.songName'), key: "Title", ellipsis: { tooltip: true }, resizable: true, sorter: true,
+		title: t('column.songName'), key: "Title", resizable: true, sorter: true,
 		render: (row: dto.DiffTableDataDto) => {
 			let vnodes = [];
-			// if (row.DataLost) {
-			// 	vnodes.push(h(NIcon, { component: WarningOutline, color: "red" }));
-			// }
-			vnodes.push(h(NText, {}, { default: () => row.Title }));
+			if (row.DataLost) {
+				vnodes.push(h(NIcon, { component: WarningOutline, color: "red" }));
+			}
+			vnodes.push(h(NEllipsis, { tooltip: true, style: { "max-width": "calc(100% - 26px)"} }, { default: () => row.Title }));
 			return vnodes;
 		}
 	},

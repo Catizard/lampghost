@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/Catizard/lampghost_wails/internal/config"
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/service"
 	"github.com/charmbracelet/log"
@@ -36,7 +37,13 @@ func (s *InternalServer) RunServer() error {
 }
 
 func (s *InternalServer) tableHandler(w http.ResponseWriter, r *http.Request) {
-	header := dto.NewDiffTableHeaderExportDto("lampghost", fmt.Sprintf("http://127.0.0.1:%d/table/content.json", port))
+	config, err := config.ReadConfig()
+	if err != nil {
+		log.Errorf("failed to read config: %v", err)
+		http.Error(w, "failed to read config", 500)
+		return
+	}
+	header := dto.NewDiffTableHeaderExportDto("lampghost", config.FolderSymbol, fmt.Sprintf("http://127.0.0.1:%d/table/content.json", port))
 	data, err := json.Marshal(&header)
 	if err != nil {
 		log.Errorf("failed to marshal json: %v", err)

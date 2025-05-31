@@ -202,38 +202,6 @@ func generateFolderDefinition(tx *gorm.DB) ([]dto.FolderDefinitionDto, int, erro
 	return folderDefinitions, len(folderDefinitions), nil
 }
 
-// Generate content definition for each contents within folder
-func generateContentDefinition(tx *gorm.DB) ([]dto.FolderContentDefinitionDto, int, error) {
-	rawFolders, _, err := findFolderList(tx, nil)
-	if err != nil {
-		return nil, 0, err
-	}
-	folderIDMapsToBit := make(map[uint]int)
-	for _, rawFolder := range rawFolders {
-		folderIDMapsToBit[rawFolder.ID] = rawFolder.BitIndex
-	}
-	rawContents, _, err := findFolderContentList(tx, nil)
-	if err != nil {
-		return nil, 0, err
-	}
-	sha256MapsToMask := make(map[string]int)
-	for _, rawContent := range rawContents {
-		if _, ok := sha256MapsToMask[rawContent.Sha256]; !ok {
-			sha256MapsToMask[rawContent.Sha256] = 0
-		}
-		sha256MapsToMask[rawContent.Sha256] |= 1 << folderIDMapsToBit[rawContent.FolderID]
-	}
-
-	definition := make([]dto.FolderContentDefinitionDto, 0)
-	for sha256, mask := range sha256MapsToMask {
-		definition = append(definition, dto.FolderContentDefinitionDto{
-			Sha256: sha256,
-			Mask:   mask,
-		})
-	}
-	return definition, len(definition), nil
-}
-
 func checkDuplicateFolderName(tx *gorm.DB, folderName string) error {
 	var dupCount int64
 	if err := tx.Model(&entity.Folder{}).Where(&entity.Folder{FolderName: folderName}).Count(&dupCount).Error; err != nil {
@@ -325,28 +293,6 @@ func findFolderTree(tx *gorm.DB, filter *vo.FolderVo) ([]*dto.FolderDto, int, er
 		folders[i] = dto.NewFolderDto(rawFolder, contents)
 	}
 	return folders, len(folders), nil
-}
-
-// Query if there exists a folder that satisfies the condition
-func queryFolderExistence(tx *gorm.DB, filter *vo.FolderVo) (bool, error) {
-	if filter == nil {
-		var dupCount int64
-		if err := tx.Model(&entity.Folder{}).Count(&dupCount).Error; err != nil {
-			return false, err
-		}
-		return dupCount > 0, nil
-	}
-
-	rawFilter := filter.Entity()
-	var dupCount int64
-	basicFiltered := tx.Where(rawFilter)
-	if len(filter.IDs) > 0 {
-		basicFiltered.Scopes(scopeInIDs(filter.IDs))
-	}
-	if err := basicFiltered.Count(&dupCount).Error; err != nil {
-		return false, nil
-	}
-	return dupCount > 0, nil
 }
 
 func findFolderBitIndex(folders []*entity.Folder) int {

@@ -94,10 +94,10 @@ type DiffTableHeaderExportDto struct {
 	DataUrl string `json:"data_url"`
 }
 
-func NewDiffTableHeaderExportDto(name string, dataUrl string) *DiffTableHeaderExportDto {
+func NewDiffTableHeaderExportDto(name string, symbol string, dataUrl string) *DiffTableHeaderExportDto {
 	return &DiffTableHeaderExportDto{
 		Name:    name,
-		Symbol:  "",
+		Symbol:  symbol,
 		DataUrl: dataUrl,
 	}
 }

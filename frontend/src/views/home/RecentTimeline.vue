@@ -18,7 +18,13 @@
 								{{ dTag.TableSymbol + dTag.TableLevel }}
 							</n-tag>
 						</template>
-						{{ log.Title }}
+						<template v-if="log.Title == ''">
+							<n-icon :component="WarningOutline" color="red"/>
+							Missing Song
+						</template>
+						<template v-else>
+							{{ log.Title }}
+						</template>
 					</div>
 				</template>
 			</n-timeline-item>
@@ -32,7 +38,8 @@ import { QueryPrevDayScoreLogList } from '@wailsjs/go/main/App';
 import { dto } from '@wailsjs/go/models';
 import dayjs from 'dayjs';
 import { useNotification } from 'naive-ui';
-import { computed, ref, Ref, watch, nextTick } from 'vue';
+import { ref, Ref, watch, nextTick } from 'vue';
+import { WarningOutline } from '@vicons/ionicons5';
 
 const props = defineProps<{
 	rivalId?: number;
@@ -72,6 +79,7 @@ async function handleLoad() {
 			console.log('no more values')
 			noMore.value = true;
 		} else {
+			console.log('next logs: ', nextLogs);
 			queryDate = dayjs(nextLogs[0].RecordTime);
 			timelineNodes.value.push(buildTimelineDateNode(queryDate.format('YYYY-MM-DD')));
 			for (let i = 0; i < nextLogs.length; ++i) {

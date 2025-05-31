@@ -102,19 +102,6 @@ function createColumns(): DataTableColumns<dto.RivalInfoDto> {
 	]
 }
 
-const otherActionOptions: Array<DropdownOption> = [
-	{
-		label: t('button.edit'),
-		key: "Edit",
-	},
-	{
-		label: t('button.delete'),
-		key: "Delete",
-		props: {
-			style: "color: red"
-		}
-	}
-];
 function handleSelectOtherAction(row: dto.RivalInfoDto, key: string) {
 	if ("Delete" === key) {
 		if (row.MainUser) {

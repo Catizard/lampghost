@@ -183,7 +183,7 @@ func (s *RivalInfoService) ReloadRivalData(rivalID uint, fullyReload bool) error
 	if rivalInfo, err := s.FindRivalInfoByID(rivalID); err != nil {
 		return eris.Wrapf(err, "cannot find user")
 	} else {
-		if !fullyReload {
+		if fullyReload {
 			log.Debug("[RivalInfoService] dispatched into fully reload")
 			return s.SyncRivalData(rivalInfo)
 		}

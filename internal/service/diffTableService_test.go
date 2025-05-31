@@ -52,7 +52,7 @@ var realTableDefintion = [...]diffTableDefinition{
 func TestAddDiffTableHeader(t *testing.T) {
 	db, err := database.NewMemoryDatabase()
 	require.Nil(t, err)
-	diffTableService := NewDiffTableService(db)
+	diffTableService := NewDiffTableService(db, nil)
 	for _, tt := range realTableDefintion {
 		t.Run(tt.name, func(t *testing.T) {
 			header, err := diffTableService.AddDiffTableHeader(&vo.DiffTableHeaderVo{

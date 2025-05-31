@@ -103,7 +103,7 @@ const pagination = false as const;
 const otherActionOptions: Array<DropdownOption> = [
 	{ label: t('button.reload'), key: "Reload" },
 	{ label: t('button.edit'), key: "Edit", },
-	{ label: t('button.supply'), key: "Supply" },
+	{ label: t('button.supply'), key: "Supply", disabled: true },
 	{ label: t('button.sortLevels'), key: "SortLevels", },
 	{
 		label: t('button.delete'),

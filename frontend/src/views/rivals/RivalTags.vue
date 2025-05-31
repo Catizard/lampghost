@@ -171,6 +171,7 @@ function loadData() {
 const showAddModal = ref(false);
 const formRef = ref<FormInst | null>(null);
 const formData = ref({
+	RivalID: null,
 	TagName: null,
 	RecordTimestamp: null
 });
@@ -186,7 +187,10 @@ function handlePositiveClick(): boolean {
 	formRef.value
 		?.validate()
 		.then(() => {
-			AddRivalTag(formData.value as any)
+			AddRivalTag({
+				RivalId: currentRivalID.value,
+				...formData.value
+			} as any)
 				.then(result => {
 					if (result.Code != 200) {
 						return Promise.reject(result.Msg);
@@ -198,7 +202,7 @@ function handlePositiveClick(): boolean {
 						duration: 3000,
 						keepAliveOnHover: true
 					});
-				});
+				}).finally(() => loadData());
 		})
 		.catch((err) => { });
 	return false;

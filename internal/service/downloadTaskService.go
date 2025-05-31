@@ -369,8 +369,8 @@ func (s *DownloadTaskService) RestartDownloadTask(taskID uint) error {
 	// Won't be a problem for now
 	for _, task := range s.tasks {
 		if task.ID == taskID {
-			if *task.Status != entity.TASK_CANCEL {
-				return eris.New("assert: cannot restart a task is not canceled")
+			if *task.Status != entity.TASK_CANCEL && *task.Status != entity.TASK_ERROR {
+				return eris.New("assert: cannot restart a task is not canceled or failed")
 			}
 			*task.Status = entity.TASK_PREPARE
 			s.waitTasks = append(s.waitTasks, task)

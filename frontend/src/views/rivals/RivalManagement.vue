@@ -19,10 +19,10 @@
 
 <script lang="ts" setup>
 import router from '@/router';
-import { AddRivalInfo, DelRivalInfo, QueryRivalInfoPageList, ReloadRivalData } from '@wailsjs/go/main/App';
-import { dto, entity } from '@wailsjs/go/models';
+import { DelRivalInfo, QueryRivalInfoPageList, ReloadRivalData } from '@wailsjs/go/main/App';
+import { dto } from '@wailsjs/go/models';
 import dayjs from 'dayjs';
-import { DataTableColumns, DropdownOption, FormInst, NAnchorLink, NButton, NDropdown, useDialog, useNotification } from 'naive-ui';
+import { DataTableColumns, DropdownOption, NButton, NDropdown, NFlex, useDialog, useNotification } from 'naive-ui';
 import { h, reactive, ref, VNode } from 'vue';
 import { useI18n } from 'vue-i18n';
 import RivalAddForm from './RivalAddForm.vue';
@@ -59,7 +59,7 @@ const loading = ref<boolean>(false);
 function createColumns(): DataTableColumns<dto.RivalInfoDto> {
 	return [
 		{
-			title: t('column.name'), key: "Name", width: "100px", ellipsis: { tooltip: true },
+			title: t('column.name'), key: "Name", ellipsis: { tooltip: true },
 			render: (row: dto.RivalInfoDto) => {
 				return h(
 					NButton,
@@ -73,11 +73,12 @@ function createColumns(): DataTableColumns<dto.RivalInfoDto> {
 			}
 		},
 		{ title: t('column.count'), key: "PlayCount", width: "100px", ellipsis: { tooltip: true } },
-		{ title: t('column.scoreLogFilePath'), key: "ScoreLogPath", maxWidth: "150px", ellipsis: { tooltip: true } },
-		{ title: t('column.songdataFilePath'), key: "SongDataPath", maxWidth: "150px", ellipsis: { tooltip: true } },
+		{ title: t('column.scoreLogFilePath'), key: "ScoreLogPath", width: "75px", ellipsis: { tooltip: true } },
+		{ title: t('column.songdataFilePath'), key: "SongDataPath", width: "75px", ellipsis: { tooltip: true } },
 		{
 			title: t('column.lastSyncTime'),
 			key: "UpdateAt",
+			width: "125px",
 			render: (row: dto.RivalInfoDto) => {
 				return dayjs(row.UpdatedAt).format('YYYY-MM-DD HH:mm:ss')
 			}
@@ -85,36 +86,17 @@ function createColumns(): DataTableColumns<dto.RivalInfoDto> {
 		{
 			title: t('column.actions'),
 			key: "action",
+			width: "300px",
 			render: (row: dto.RivalInfoDto) => {
-				const reloadBubutton = h(
-					NButton,
-					{
-						strong: true,
-						tertiary: true,
-						type: 'primary',
-						size: "small",
-						style: "margin-right: 5px",
-						onClick: () => { handleSyncClick(row.ID) }
-					},
-					{ default: () => t('button.reload') }
+				return h(
+					NFlex,
+					{},
+					[
+						h(NButton, { type: 'primary', size: 'small', onClick: () => handleSyncClick(row.ID) }, { default: () => t('button.reload') }),
+						h(NButton, { type: 'info', size: 'small', onClick: () => handleSelectOtherAction(row, "Edit") }, { default: () => t('button.edit') }),
+						h(NButton, { type: 'error', size: 'small', onClick: () => handleSelectOtherAction(row, "Delete") }, { default: () => t('button.delete') }),
+					]
 				);
-				const otherActions: VNode = h(
-					NDropdown,
-					{
-						trigger: "hover",
-						options: otherActionOptions,
-						size: "small",
-						onSelect: (key: string) => handleSelectOtherAction(row, key)
-					},
-					{
-						default: () => h(
-							NButton,
-							null,
-							{ default: () => '...' }
-						)
-					},
-				);
-				return [reloadBubutton, otherActions];
 			}
 		}
 	]
@@ -265,17 +247,6 @@ loadData();
 		"message": {
 			"reloadSuccess": "同步成功",
 			"cannotDeleteMainUser": "不能删除主用户"
-		},
-		"modal": {
-			"title": "新增好友",
-			"positiveText": "提交",
-			"negativeText": "取消",
-			"labelRivalName": "名称",
-			"labelScoreLogPath": "scorelog.db文件路径",
-			"labelSongDataPath": "songdata.db文件路径",
-			"placeholderRivalName": "请输入好友名称",
-			"placeholderScoreLogPath": "请输入scorelog.db文件路径",
-			"placeholderSongDataPath": "请输入songdata.db文件路径"
 		},
 		"deleteDialog": {
 			"title": "确定要删除吗？",

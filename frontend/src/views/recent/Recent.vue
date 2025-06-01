@@ -27,6 +27,7 @@ import { BindRivalSongDataToFolder } from '@wailsjs/go/main/App';
 import { dto, vo } from '@wailsjs/go/models';
 import { useI18n } from 'vue-i18n';
 import dayjs from 'dayjs';
+import TableTags from '@/components/TableTags.vue';
 
 const i18n = useI18n();
 const { t } = i18n;
@@ -67,34 +68,7 @@ function createColumns(): DataTableColumns<dto.RivalScoreLogDto> {
 		{
 			title: t('column.tag'), key: "Tag", minWidth: "100px", resizable: true,
 			render(row: dto.RivalScoreLogDto) {
-				const nodes: Array<VNode> = [];
-				if (row.TableTags.length == 0) {
-					return nodes;
-				}
-				row.TableTags.forEach(tag => {
-					const props = {
-						size: "small",
-						style: {
-							"margin-right": "5px"
-						},
-						color: {
-
-						},
-					};
-					if (tag.TableTagColor.length > 0) {
-						(props as any).color.color = tag.TableTagColor;
-					}
-					if (tag.TableTagTextColor.length > 0) {
-						(props as any).color.textColor = tag.TableTagTextColor;
-					}
-					const node = h(
-						NTag,
-						props as any,
-						{ default: () => tag.TableSymbol + tag.TableLevel }
-					)
-					nodes.push(node);
-				});
-				return nodes;
+				return h(TableTags, { tableTags: row.TableTags })	
 			}
 		},
 		{

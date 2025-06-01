@@ -1,21 +1,19 @@
 <template>
-	<perfect-scrollbar>
-		<n-flex justify="space-between">
-			<n-h1 prefix="bar" style="text-align: start">
-				<n-text type="primary">{{ t('title') }}</n-text>
-			</n-h1>
-			<n-flex justify="flex-end">
-				<n-button :loading="loading" type="info" @click="showSortModal = true">
-					{{ t('button.sort') }}
-				</n-button>
-				<n-button :loading="loading" type="primary" @click="showAddModal = true">
-					{{ t('button.add') }}
-				</n-button>
-			</n-flex>
+	<n-flex justify="space-between">
+		<n-h1 prefix="bar" style="text-align: start">
+			<n-text type="primary">{{ t('title') }}</n-text>
+		</n-h1>
+		<n-flex justify="flex-end">
+			<n-button :loading="loading" type="info" @click="showSortModal = true">
+				{{ t('button.sort') }}
+			</n-button>
+			<n-button :loading="loading" type="primary" @click="showAddModal = true">
+				{{ t('button.add') }}
+			</n-button>
 		</n-flex>
-		<n-data-table :loading="loading" :columns="columns" :data="data" :pagination="pagination" :bordered="false"
-			:row-key="(row: dto.DiffTableHeaderDto) => row.ID" />
-	</perfect-scrollbar>
+	</n-flex>
+	<n-data-table :loading="loading" :columns="columns" :data="data" :pagination="pagination" :bordered="false"
+		:row-key="(row: dto.DiffTableHeaderDto) => row.ID" />
 
 	<DifficultTableSortModal v-model:show="showSortModal" @refresh="loadDiffTableData()" />
 	<DifficultTableAddForm v-model:show="showAddModal" @refresh="loadDiffTableData()" />
@@ -130,9 +128,9 @@ function handleSelectOtherAction(row: dto.DiffTableHeaderDto, key: string) {
 						if (result.Code != 200) {
 							return Promise.reject(result.Msg);
 						}
-					}).catch(err => {
-						window.$notifyError(err);
-					}).finally(() => loading.value = false);
+					})
+					.catch(err => window.$notifyError(err))
+					.finally(() => loading.value = false);
 			}
 		})
 	}

@@ -15,13 +15,12 @@ import {
 	TimeOutline as TimeIcon,
 	SettingsOutline as SettingsIcon,
 	SchoolOutline as CoursesIcon,
-	ListOutline as GoalsIcon,
-	Search as SearchIcon,
-	BalloonOutline as BalloonIcon,
+	StatsChart as StatisticIcon,
 	MedalOutline as MedalIcon,
 	People as RivalIcon,
 	List as ListIcon,
-	DownloadOutline as DownloadIcon
+	DownloadOutline as DownloadIcon,
+	ColorWand as CustomTableIcon
 } from '@vicons/ionicons5'
 import { MenuOption, NIcon } from 'naive-ui'
 import { computed, h, ref, watchEffect } from 'vue'
@@ -80,7 +79,12 @@ const menuOptions: MenuOption[] = [
 			{
 				label: renderOption("/difftable/scores", t('menuName.difftable.scores')),
 				key: "difftable_scores",
-				icon: renderIcon(BalloonIcon)
+				icon: renderIcon(StatisticIcon)
+			},
+			{
+				label: renderOption("/difftable/custom", t('menuName.difftable.custom')),
+				key: "difftable_custom",
+				icon: renderIcon(CustomTableIcon)
 			}
 		]
 	},
@@ -131,6 +135,7 @@ const menuOptions: MenuOption[] = [
         "self": "Table",
         "management": "Management",
         "scores": "Statistics",
+				"custom": "Custom Table"
       },
       "folder": "Folder",
       "recent": "Recent",
@@ -152,6 +157,7 @@ const menuOptions: MenuOption[] = [
         "self": "难度表",
         "management": "管理",
         "scores": "统计信息",
+				"custom": "自定义难度表"
       },
       "folder": "收藏夹",
       "recent": "最近游玩",

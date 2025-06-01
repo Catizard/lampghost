@@ -1,42 +1,34 @@
 <template>
-	<perfect-scrollbar>
-		<n-flex justify="space-between">
-			<n-h1 prefix="bar" style="text-align: left">
-				<n-text type="primary">{{ t('title') }}</n-text>
-			</n-h1>
-			<n-flex justify="end">
-				<n-button type="primary" @click="showAddModal = true">{{ t('button.addFolder') }}</n-button>
-			</n-flex>
+	<n-flex justify="space-between">
+		<n-h1 prefix="bar" style="text-align: left">
+			<n-text type="primary">{{ t('title') }}</n-text>
+		</n-h1>
+		<n-flex justify="end">
+			<n-button type="primary" @click="showAddModal = true">{{ t('button.addFolder') }}</n-button>
 		</n-flex>
-		<n-data-table :loading="loading" :columns="columns" :data="data" :pagination="pagination" :bordered="false"
-			:row-key="(row: dto.FolderDto) => row.ID" />
-	</perfect-scrollbar>
+	</n-flex>
+	<n-data-table :loading="loading" :columns="columns" :data="data" :pagination="pagination" :bordered="false"
+		:row-key="(row: dto.FolderDto) => row.ID" />
 
 	<FolderAddForm v-model:show="showAddModal" @refresh="loadFolderData" />
 </template>
 
 <script setup lang="ts">
-import { h, Ref, ref, watch } from "vue";
-import { dto, vo } from "@wailsjs/go/models";
+import { h, Ref, ref } from "vue";
+import { dto } from "@wailsjs/go/models";
 import {
 	DataTableColumns,
 	NButton,
 	NDataTable,
 	useDialog,
-	useNotification,
 } from "naive-ui";
-import {
-	DelFolder,
-	DelFolderContent,
-	FindFolderTree,
-} from "@wailsjs/go/main/App";
+import { DelFolder, FindFolderList, FindFolderTree } from "@wailsjs/go/main/App";
 import { useI18n } from "vue-i18n";
 import FolderAddForm from "./FolderAddForm.vue";
-import ClearTag from "@/components/ClearTag.vue";
+import FolderDetail from "./FolderDetail.vue";
 
 const i18n = useI18n();
 const { t } = i18n;
-const notification = useNotification();
 const dialog = useDialog();
 
 const showAddModal = ref(false);
@@ -55,18 +47,6 @@ const columns = createColumns({
 		});
 	},
 });
-const folderContentColumns = createContentColumns({
-	deleteFolderContent(row: any) {
-		dialog.warning({
-			title: t('message.confirmToDelete'),
-			positiveText: t('dialog.positiveText'),
-			negativeText: t('dialog.negativeText'),
-			onPositiveClick: () => {
-				deleteFolderContent(row.ID);
-			},
-		});
-	},
-});
 
 loadFolderData();
 
@@ -78,20 +58,16 @@ function createColumns({
 	return [
 		{
 			type: "expand",
-			renderExpand: (rowData) => {
-				return h(NDataTable, {
-					columns: folderContentColumns,
-					data: rowData.Contents,
-					pagination: pagination,
-					bordered: false,
-				});
+			renderExpand: (row: dto.FolderDto) => {
+				// TODO: remove rivalId = 1 limitation
+				return h(FolderDetail, { folderId: row.ID });
 			},
 		},
 		{ title: t('column.name'), key: "FolderName", minWidth: "150px" },
 		{
 			title: t('column.actions'),
 			key: "actions",
-			render(row) {
+			render(row: dto.FolderDto) {
 				return h(
 					NButton,
 					{
@@ -108,71 +84,17 @@ function createColumns({
 	];
 }
 
-function createContentColumns({
-	deleteFolderContent,
-}: {
-	deleteFolderContent: (row: dto.FolderContentDto) => void;
-}): DataTableColumns<dto.FolderContentDto> {
-	return [
-		{ title: t('contentColumn.name'), key: "Title" },
-		{ 
-			title: t('contentColumn.tag'), key: "Tag",
-			width: "200px",
-		},
-		{
-			title: t('contentColumn.clear'), key: "Clear",
-			width: "125px",
-			render: (row: dto.FolderContentDto) => {
-				return h(ClearTag, { clear: row.Lamp },)
-			}
-		},
-		{
-			title: t('contentColumn.actions'),
-			key: "actions",
-			width: "150px",
-			render(row) {
-				return h(
-					NButton,
-					{
-						strong: true,
-						tertiary: true,
-						size: "small",
-						type: "error",
-						onClick: () => deleteFolderContent(row),
-					},
-					{ default: () => t('button.delete') },
-				);
-			},
-		},
-	];
-}
-
 function deleteFolder(id: number) {
 	DelFolder(id)
 		.then((result) => {
 			if (result.Code != 200) {
 				return Promise.reject(result.Msg);
 			}
-			notifySuccess(t('message.deleteSuccess'));
+			window.$notifySuccess(t('message.deleteSuccess'));
 			loadFolderData();
 		})
 		.catch((err) => {
-			notifyError(err);
-			loadFolderData();
-		});
-}
-
-function deleteFolderContent(id: number) {
-	DelFolderContent(id)
-		.then((result) => {
-			if (result.Code != 200) {
-				return Promise.reject(result.Msg);
-			}
-			notifySuccess(t('message.deleteSuccess'));
-			loadFolderData();
-		})
-		.catch((err) => {
-			notifyError(err);
+			window.$notifyError(err);
 			loadFolderData();
 		});
 }
@@ -180,31 +102,15 @@ function deleteFolderContent(id: number) {
 function loadFolderData() {
 	// TODO: remove magical 1
 	loading.value = true;
-	FindFolderTree({ RivalID: 1 } as any)
+	FindFolderList({ RivalID: 1 } as any)
 		.then((result) => {
 			if (result.Code != 200) {
 				return Promise.reject(result.Msg);
 			}
 			data.value = [...result.Rows];
-		}).catch((err) => {
-			notifyError(t('message.loadFolderDataFailedPrefix') + err);
-		}).finally(() => loading.value = false);
-}
-
-function notifySuccess(msg: string) {
-	notification.success({
-		content: msg,
-		duration: 5000,
-		keepAliveOnHover: true,
-	});
-}
-
-function notifyError(msg: string) {
-	notification.error({
-		content: msg,
-		duration: 5000,
-		keepAliveOnHover: true,
-	});
+		})
+		.catch((err) => window.$notifyError(t('message.loadFolderDataFailed', { msg: err })))
+		.finally(() => loading.value = false);
 }
 </script>
 
@@ -228,7 +134,7 @@ function notifyError(msg: string) {
 		"message": {
 			"deleteSuccess": "Delete successfully",
 			"confirmToDelete": "Do you really want to delete this content?",
-			"loadFolderDataFailedPrefix": "Failed to load folder data, error message: "
+			"loadFolderDataFailed": "Failed to load folder data, error message: {msg}"
 		},
 		"dialog": {
 			"positiveText": "Yes",
@@ -254,7 +160,7 @@ function notifyError(msg: string) {
 		"message": {
 			"deleteSuccess": "删除成功",
 			"confirmToDelete": "确定删除吗？",
-			"loadFolderDataFailedPrefix": "读取收藏夹信息失败，错误信息: "
+			"loadFolderDataFailed": "读取收藏夹信息失败，错误信息: {msg}"
 		},
 		"dialog": {
 			"positiveText": "确定",

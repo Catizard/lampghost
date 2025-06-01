@@ -66,6 +66,14 @@ export function FindCourseInfoListWithRival(arg1) {
   return window['go']['main']['App']['FindCourseInfoListWithRival'](arg1);
 }
 
+export function FindCustomDiffTableByID(arg1) {
+  return window['go']['main']['App']['FindCustomDiffTableByID'](arg1);
+}
+
+export function FindCustomDiffTableList(arg1) {
+  return window['go']['main']['App']['FindCustomDiffTableList'](arg1);
+}
+
 export function FindDiffTableHeaderList() {
   return window['go']['main']['App']['FindDiffTableHeaderList']();
 }
@@ -134,6 +142,10 @@ export function GENERATOR_COURSE_INFO_DTO() {
   return window['go']['main']['App']['GENERATOR_COURSE_INFO_DTO']();
 }
 
+export function GENERATOR_CUSTOM_DIFF_TABLE_DTO() {
+  return window['go']['main']['App']['GENERATOR_CUSTOM_DIFF_TABLE_DTO']();
+}
+
 export function GENERATOR_DOWNLOAD_TASK() {
   return window['go']['main']['App']['GENERATOR_DOWNLOAD_TASK']();
 }
@@ -144,10 +156,6 @@ export function GENERATOR_FOLDER() {
 
 export function GENERATOR_FOLDER_CONTENT_DTO() {
   return window['go']['main']['App']['GENERATOR_FOLDER_CONTENT_DTO']();
-}
-
-export function GENERATOR_FOLDER_DEFINITION_DTO() {
-  return window['go']['main']['App']['GENERATOR_FOLDER_DEFINITION_DTO']();
 }
 
 export function GENERATOR_FOLDER_DTO() {
@@ -206,6 +214,10 @@ export function OpenFileDialog(arg1) {
   return window['go']['main']['App']['OpenFileDialog'](arg1);
 }
 
+export function QueryCustomDiffTablePageList(arg1) {
+  return window['go']['main']['App']['QueryCustomDiffTablePageList'](arg1);
+}
+
 export function QueryDiffTableDataWithRival(arg1) {
   return window['go']['main']['App']['QueryDiffTableDataWithRival'](arg1);
 }
@@ -218,8 +230,8 @@ export function QueryDiffTableInfoWithRival(arg1, arg2) {
   return window['go']['main']['App']['QueryDiffTableInfoWithRival'](arg1, arg2);
 }
 
-export function QueryFolderDefinition() {
-  return window['go']['main']['App']['QueryFolderDefinition']();
+export function QueryFolderContentWithRival(arg1) {
+  return window['go']['main']['App']['QueryFolderContentWithRival'](arg1);
 }
 
 export function QueryLatestVersion() {
@@ -312,6 +324,10 @@ export function SupplyMissingBMSFromTable(arg1) {
 
 export function SyncRivalTag(arg1) {
   return window['go']['main']['App']['SyncRivalTag'](arg1);
+}
+
+export function UpdateCustomDiffTable(arg1) {
+  return window['go']['main']['App']['UpdateCustomDiffTable'](arg1);
 }
 
 export function UpdateDiffTableHeader(arg1) {

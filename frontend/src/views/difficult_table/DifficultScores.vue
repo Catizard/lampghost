@@ -1,21 +1,19 @@
 <template>
-  <perfect-scrollbar>
-    <n-flex justify="space-between">
-      <n-h1 prefix="bar" style="text-align: start;">
-        <n-text type="primary">{{ t('title') }}</n-text>
-      </n-h1>
-    </n-flex>
-    <n-flex justify="flex-start">
-      <n-select :loading="levelTableLoading" v-model:value="currentDiffTableID" :options="difftableOptions"
-        style="width: 200px;" />
-      <n-select :loading="loadingRivalData" v-model:value="currentRivalID" :options="rivalOptions" style="width: 200px;"
-        :placeholder="t('placeHolderRival')" />
-      <n-select :loading="loadingRivalData" v-model:value="currentRivalTagID" :options="rivalTagOptions"
-        style="width: 200px;" :placeholder="t('placeHolderRivalTag')" :render-option="renderRivalTagOption" />
-    </n-flex>
-    <n-data-table :columns="columns" :data="data" :pagination="pagination" :loading="levelTableLoading"
-      :row-key="(row: dto.DiffTableHeaderDto) => row.Level" :row-class-name="rowClassName" />
-  </perfect-scrollbar>
+  <n-flex justify="space-between">
+    <n-h1 prefix="bar" style="text-align: start;">
+      <n-text type="primary">{{ t('title') }}</n-text>
+    </n-h1>
+  </n-flex>
+  <n-flex justify="flex-start">
+    <n-select :loading="levelTableLoading" v-model:value="currentDiffTableID" :options="difftableOptions"
+      style="width: 200px;" />
+    <n-select :loading="loadingRivalData" v-model:value="currentRivalID" :options="rivalOptions" style="width: 200px;"
+      :placeholder="t('placeHolderRival')" />
+    <n-select :loading="loadingRivalData" v-model:value="currentRivalTagID" :options="rivalTagOptions"
+      style="width: 200px;" :placeholder="t('placeHolderRivalTag')" :render-option="renderRivalTagOption" />
+  </n-flex>
+  <n-data-table :columns="columns" :data="data" :pagination="pagination" :loading="levelTableLoading"
+    :row-key="(row: dto.DiffTableHeaderDto) => row.Level" :row-class-name="rowClassName" />
 </template>
 
 <script setup lang="ts">

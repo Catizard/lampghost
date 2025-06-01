@@ -10,8 +10,9 @@ type FolderContent struct {
 	FolderID   uint
 	FolderName string
 	Sha256     string
-	Md5        string
+	Md5        string `gorm:"index"`
 	Title      string
+	Comment    string
 }
 
 func (FolderContent) TableName() string {

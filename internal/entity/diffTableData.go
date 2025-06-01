@@ -12,7 +12,7 @@ type DiffTableData struct {
 	Comment  string
 	Level    string
 	Lr2BmsId string `json:"lr2_bmdid"`
-	Md5      string
+	Md5      string `gorm:"index"`
 	NameDiff string
 	Title    string
 	Url      string `json:"url"`

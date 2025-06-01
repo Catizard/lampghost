@@ -39,7 +39,6 @@ func init() {
 	viper.AddConfigPath(WorkingDirectory[:len(WorkingDirectory)-1])
 	// Setup defaults
 	viper.SetDefault("InternalServerPort", 7391)
-	viper.SetDefault("FolderSymbol", "")
 	viper.SetDefault("IgnoreVariantCourse", 0)
 	viper.SetDefault("Locale", "en")
 	viper.SetDefault("DownloadSite", "wriggle")
@@ -50,7 +49,6 @@ func init() {
 
 type ApplicationConfig struct {
 	InternalServerPort  int32
-	FolderSymbol        string
 	IgnoreVariantCourse int32
 	Locale              string
 	// Constants, currently the only option is wriggle
@@ -72,7 +70,6 @@ func ReadConfig() (*ApplicationConfig, error) {
 	}
 	conf := &ApplicationConfig{
 		InternalServerPort:   viper.GetInt32("InternalServerPort"),
-		FolderSymbol:         viper.GetString("FolderSymbol"),
 		IgnoreVariantCourse:  viper.GetInt32("IgnoreVariantCourse"),
 		Locale:               viper.GetString("Locale"),
 		DownloadSite:         viper.GetString("DownloadSite"),
@@ -88,7 +85,6 @@ func (c *ApplicationConfig) WriteConfig() error {
 	lock.Lock()
 	defer lock.Unlock()
 	viper.Set("InternalServerPort", c.InternalServerPort)
-	viper.Set("FolderSymbol", c.FolderSymbol)
 	viper.Set("IgnoreVariantCourse", c.IgnoreVariantCourse)
 	viper.Set("Locale", c.Locale)
 	viper.Set("DownloadSite", c.DownloadSite)

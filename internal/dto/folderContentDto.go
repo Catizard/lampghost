@@ -12,8 +12,14 @@ type FolderContentDto struct {
 	Sha256     string
 	Md5        string
 	Title      string
+	Comment    string
 
-	Lamp int
+	Lamp      int
+	TableTags []*DiffTableTagDto
+	// Pagination
+	Page      int
+	PageSize  int
+	PageCount int
 }
 
 func NewFolderContentDto(folderContent *entity.FolderContent) *FolderContentDto {
@@ -24,6 +30,7 @@ func NewFolderContentDto(folderContent *entity.FolderContent) *FolderContentDto 
 		Sha256:     folderContent.Sha256,
 		Md5:        folderContent.Md5,
 		Title:      folderContent.Title,
+		Comment:    folderContent.Comment,
 	}
 }
 
@@ -34,6 +41,7 @@ func (folderContent *FolderContentDto) Entity() *entity.FolderContent {
 		Sha256:     folderContent.Sha256,
 		Md5:        folderContent.Md5,
 		Title:      folderContent.Title,
+		Comment:    folderContent.Comment,
 	}
 }
 

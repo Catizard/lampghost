@@ -38,6 +38,10 @@ export function FindCourseInfoList():Promise<result.RtnDataList>;
 
 export function FindCourseInfoListWithRival(arg1:number):Promise<result.RtnDataList>;
 
+export function FindCustomDiffTableByID(arg1:number):Promise<result.RtnData>;
+
+export function FindCustomDiffTableList(arg1:vo.CustomDiffTableVo):Promise<result.RtnDataList>;
+
 export function FindDiffTableHeaderList():Promise<result.RtnDataList>;
 
 export function FindDiffTableHeaderListWithRival(arg1:number):Promise<result.RtnDataList>;
@@ -72,13 +76,13 @@ export function GENERATOR_COURSE_INFO():Promise<entity.CourseInfo>;
 
 export function GENERATOR_COURSE_INFO_DTO():Promise<dto.CourseInfoDto>;
 
+export function GENERATOR_CUSTOM_DIFF_TABLE_DTO():Promise<dto.CustomDiffTableDto>;
+
 export function GENERATOR_DOWNLOAD_TASK():Promise<entity.DownloadTask>;
 
 export function GENERATOR_FOLDER():Promise<entity.Folder>;
 
 export function GENERATOR_FOLDER_CONTENT_DTO():Promise<dto.FolderContentDto>;
-
-export function GENERATOR_FOLDER_DEFINITION_DTO():Promise<dto.FolderDefinitionDto>;
 
 export function GENERATOR_FOLDER_DTO():Promise<dto.FolderDto>;
 
@@ -108,13 +112,15 @@ export function OpenDirectoryDialog(arg1:string):Promise<result.RtnData>;
 
 export function OpenFileDialog(arg1:string):Promise<result.RtnData>;
 
+export function QueryCustomDiffTablePageList(arg1:vo.CustomDiffTableVo):Promise<result.RtnPage>;
+
 export function QueryDiffTableDataWithRival(arg1:vo.DiffTableHeaderVo):Promise<result.RtnPage>;
 
 export function QueryDiffTableInfoById(arg1:number):Promise<result.RtnData>;
 
 export function QueryDiffTableInfoWithRival(arg1:number,arg2:number):Promise<result.RtnData>;
 
-export function QueryFolderDefinition():Promise<result.RtnDataList>;
+export function QueryFolderContentWithRival(arg1:vo.FolderContentVo):Promise<result.RtnPage>;
 
 export function QueryLatestVersion():Promise<result.RtnMessage>;
 
@@ -161,6 +167,8 @@ export function SubmitSingleMD5DownloadTask(arg1:string,arg2:any):Promise<result
 export function SupplyMissingBMSFromTable(arg1:number):Promise<result.RtnMessage>;
 
 export function SyncRivalTag(arg1:number):Promise<result.RtnMessage>;
+
+export function UpdateCustomDiffTable(arg1:vo.CustomDiffTableVo):Promise<result.RtnMessage>;
 
 export function UpdateDiffTableHeader(arg1:vo.DiffTableHeaderVo):Promise<result.RtnMessage>;
 

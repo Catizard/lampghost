@@ -71,7 +71,7 @@ func (ctl *FolderController) FindFolderList(filter *vo.FolderVo) result.RtnDataL
 
 func (ctl *FolderController) FindFolderContentList(filter *vo.FolderContentVo) result.RtnDataList {
 	log.Info("[Controller] Calling FolderController.FindFolderContentList")
-	rows, _, err := ctl.folderService.FindFolderContentList(nil)
+	rows, _, err := ctl.folderService.FindFolderContentList(filter)
 	if err != nil {
 		log.Errorf("[FolderController] returning err: %v", err)
 		return result.NewErrorDataList(err)
@@ -79,17 +79,16 @@ func (ctl *FolderController) FindFolderContentList(filter *vo.FolderContentVo) r
 	return result.NewRtnDataList(rows)
 }
 
-func (ctl *FolderController) QueryFolderDefinition() result.RtnDataList {
-	log.Info("[Controller] Calling FolderController.GenerateJson")
-	rows, _, err := ctl.folderService.GenerateFolderDefinition()
+func (ctl *FolderController) QueryFolderContentWithRival(filter *vo.FolderContentVo) result.RtnPage {
+	log.Info("[Controller] Calling FolderController.QueryFolderContentWithRival")
+	rows, _, err := ctl.folderService.QueryFolderContentWithRival(filter)
 	if err != nil {
 		log.Errorf("[FolderController] returning err: %v", err)
-		return result.NewErrorDataList(err)
+		return result.NewErrorPage(err)
 	}
-	return result.NewRtnDataList(rows)
+	return result.NewRtnPage(*filter.Pagination, rows)
 }
 
-func (FolderController) GENERATOR_FOLDER() *entity.Folder                          { return nil }
-func (FolderController) GENERATOR_FOLDER_DTO() *dto.FolderDto                      { return nil }
-func (FolderController) GENERATOR_FOLDER_CONTENT_DTO() *dto.FolderContentDto       { return nil }
-func (FolderController) GENERATOR_FOLDER_DEFINITION_DTO() *dto.FolderDefinitionDto { return nil }
+func (FolderController) GENERATOR_FOLDER() *entity.Folder                    { return nil }
+func (FolderController) GENERATOR_FOLDER_DTO() *dto.FolderDto                { return nil }
+func (FolderController) GENERATOR_FOLDER_CONTENT_DTO() *dto.FolderContentDto { return nil }

@@ -8,10 +8,12 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/vo"
 	"github.com/charmbracelet/log"
+	"github.com/rotisserie/eris"
 	"gorm.io/gorm"
+
+	. "github.com/samber/lo"
 )
 
-const MAX_FOLDER_COUNT = 25
 const BEGIN_FOLDER_INDEX = 5
 
 type FolderService struct {
@@ -37,18 +39,7 @@ func (s *FolderService) AddFolder(folderName string) (*entity.Folder, error) {
 		return nil, err
 	}
 
-	prevFolders, prevFoldersLen, err := findFolderList(tx, nil)
-	if err != nil {
-		tx.Rollback()
-		return nil, err
-	}
-	if prevFoldersLen > MAX_FOLDER_COUNT {
-		tx.Rollback()
-		return nil, fmt.Errorf("cannot add new folder: folder count exceeds to %d", MAX_FOLDER_COUNT)
-	}
-
-	nextBitIndex := findFolderBitIndex(prevFolders)
-	newFolder := entity.NewFolder(folderName, nextBitIndex)
+	newFolder := entity.NewFolder(folderName)
 	if err := tx.Create(&newFolder).Error; err != nil {
 		tx.Rollback()
 		return nil, err
@@ -86,6 +77,46 @@ func (s *FolderService) DelFolderContent(contentID uint) error {
 		return err
 	}
 	return nil
+}
+
+// Similar function to QueryDiffTableDataWithRival, query one folder contents
+// with player related fields (e.g lamp, play count) and difficult table tags
+//
+// Also the difficult table tags are built in memory not sql, since
+// one content could be related to multiple difficult tables, which is
+// obviously conflict with pagination
+//
+// Requirements:
+//  1. FolderID & RivalID should not be empty
+func (s *FolderService) QueryFolderContentWithRival(filter *vo.FolderContentVo) ([]*dto.FolderContentDto, int, error) {
+	if filter.FolderID <= 0 {
+		return nil, 0, eris.New("QueryFolderContentWithRival: FolderID should > 0")
+	}
+	if filter.RivalID <= 0 {
+		return nil, 0, eris.New("QueryFolderContentWithRival: RivalID should > 0")
+	}
+
+	contents, _, err := findFolderContentListWithRival(s.db, filter)
+	if err != nil {
+		return nil, 0, eris.Wrap(err, "query folder_content")
+	}
+	tableTags, _, err := queryDiffTableTag(s.db, &vo.DiffTableDataVo{
+		Md5s: Map(contents, func(content *dto.FolderContentDto, _ int) string {
+			return content.Md5
+		}),
+	})
+	if err != nil {
+		return nil, 0, err
+	}
+	ForEach(contents, func(content *dto.FolderContentDto, _ int) {
+		content.TableTags = make([]*dto.DiffTableTagDto, 0)
+		ForEach(tableTags, func(tag *dto.DiffTableTagDto, _ int) {
+			if tag.Md5 == content.Md5 {
+				content.TableTags = append(content.TableTags, tag)
+			}
+		})
+	})
+	return contents, len(contents), nil
 }
 
 // Bind one song to multiple folders
@@ -185,23 +216,6 @@ func (s *FolderService) FindFolderContentList(filter *vo.FolderContentVo) ([]*en
 	return findFolderContentList(s.db, filter)
 }
 
-func (s *FolderService) GenerateFolderDefinition() ([]dto.FolderDefinitionDto, int, error) {
-	return generateFolderDefinition(s.db)
-}
-
-// Generate folder definition for each folder
-func generateFolderDefinition(tx *gorm.DB) ([]dto.FolderDefinitionDto, int, error) {
-	rawFolders, _, err := findFolderList(tx, nil)
-	if err != nil {
-		return nil, 0, err
-	}
-	folderDefinitions := make([]dto.FolderDefinitionDto, len(rawFolders))
-	for i, rawFolder := range rawFolders {
-		folderDefinitions[i] = *dto.NewFolderDefinitionDto(rawFolder)
-	}
-	return folderDefinitions, len(folderDefinitions), nil
-}
-
 func checkDuplicateFolderName(tx *gorm.DB, folderName string) error {
 	var dupCount int64
 	if err := tx.Model(&entity.Folder{}).Where(&entity.Folder{FolderName: folderName}).Count(&dupCount).Error; err != nil {
@@ -293,22 +307,4 @@ func findFolderTree(tx *gorm.DB, filter *vo.FolderVo) ([]*dto.FolderDto, int, er
 		folders[i] = dto.NewFolderDto(rawFolder, contents)
 	}
 	return folders, len(folders), nil
-}
-
-func findFolderBitIndex(folders []*entity.Folder) int {
-	mex := BEGIN_FOLDER_INDEX
-	for {
-		noProgess := true
-		for _, folder := range folders {
-			if folder.BitIndex == mex {
-				mex++
-				noProgess = false
-				break
-			}
-		}
-		if noProgess {
-			break
-		}
-	}
-	return mex
 }

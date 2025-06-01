@@ -57,6 +57,24 @@ func migrates(db *gorm.DB) error {
 		return err
 	}
 
+	if err := db.Table("custom_diff_table").AutoMigrate(&entity.CustomDiffTable{}); err != nil {
+		return err
+	}
+
+	// I cannot find a better solution
+	var defaultCustomTable entity.CustomDiffTable
+	defaultCustomTable.ID = 1
+	if err := db.FirstOrCreate(&defaultCustomTable, entity.CustomDiffTable{
+		Model: gorm.Model{
+			ID: 1,
+		},
+		Name:        "lampghost",
+		Symbol:      "",
+		LevelOrders: "",
+	}).Error; err != nil {
+		panic(err)
+	}
+
 	return nil
 }
 

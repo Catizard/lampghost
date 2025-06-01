@@ -8,8 +8,8 @@ import (
 type FolderVo struct {
 	gorm.Model
 
-	FolderName string
-	BitIndex   int
+	FolderName    string
+	CustomTableID uint
 
 	// Extra filter fields
 	IDs []uint
@@ -30,6 +30,5 @@ func (folder *FolderVo) Entity() *entity.Folder {
 			DeletedAt: folder.DeletedAt,
 		},
 		FolderName: folder.FolderName,
-		BitIndex:   folder.BitIndex,
 	}
 }

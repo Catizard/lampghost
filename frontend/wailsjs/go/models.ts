@@ -2,7 +2,6 @@ export namespace config {
 	
 	export class ApplicationConfig {
 	    InternalServerPort: number;
-	    FolderSymbol: string;
 	    IgnoreVariantCourse: number;
 	    Locale: string;
 	    DownloadSite: string;
@@ -18,7 +17,6 @@ export namespace config {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.InternalServerPort = source["InternalServerPort"];
-	        this.FolderSymbol = source["FolderSymbol"];
 	        this.IgnoreVariantCourse = source["IgnoreVariantCourse"];
 	        this.Locale = source["Locale"];
 	        this.DownloadSite = source["DownloadSite"];
@@ -80,6 +78,51 @@ export namespace dto {
 	        this.Clear = source["Clear"];
 	        this.FirstClearTimestamp = this.convertValues(source["FirstClearTimestamp"], null);
 	        this.Constraint = source["Constraint"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class CustomDiffTableDto {
+	    ID: number;
+	    // Go type: time
+	    CreatedAt: any;
+	    // Go type: time
+	    UpdatedAt: any;
+	    // Go type: gorm
+	    DeletedAt: any;
+	    Name: string;
+	    Symbol: string;
+	    LevelOrders: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new CustomDiffTableDto(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.ID = source["ID"];
+	        this.CreatedAt = this.convertValues(source["CreatedAt"], null);
+	        this.UpdatedAt = this.convertValues(source["UpdatedAt"], null);
+	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
+	        this.Name = source["Name"];
+	        this.Symbol = source["Symbol"];
+	        this.LevelOrders = source["LevelOrders"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -237,7 +280,12 @@ export namespace dto {
 	    Sha256: string;
 	    Md5: string;
 	    Title: string;
+	    Comment: string;
 	    Lamp: number;
+	    TableTags: DiffTableTagDto[];
+	    Page: number;
+	    PageSize: number;
+	    PageCount: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new FolderContentDto(source);
@@ -251,26 +299,36 @@ export namespace dto {
 	        this.Sha256 = source["Sha256"];
 	        this.Md5 = source["Md5"];
 	        this.Title = source["Title"];
+	        this.Comment = source["Comment"];
 	        this.Lamp = source["Lamp"];
-	    }
-	}
-	export class FolderDefinitionDto {
-	    name: string;
-	    sql: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new FolderDefinitionDto(source);
+	        this.TableTags = this.convertValues(source["TableTags"], DiffTableTagDto);
+	        this.Page = source["Page"];
+	        this.PageSize = source["PageSize"];
+	        this.PageCount = source["PageCount"];
 	    }
 	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.name = source["name"];
-	        this.sql = source["sql"];
-	    }
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
 	}
 	export class FolderDto {
 	    ID: number;
 	    FolderName: string;
+	    CustomTableID: number;
 	    Contents: FolderContentDto[];
 	
 	    static createFrom(source: any = {}) {
@@ -281,6 +339,7 @@ export namespace dto {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.ID = source["ID"];
 	        this.FolderName = source["FolderName"];
+	        this.CustomTableID = source["CustomTableID"];
 	        this.Contents = this.convertValues(source["Contents"], FolderContentDto);
 	    }
 	
@@ -775,7 +834,7 @@ export namespace entity {
 	    // Go type: gorm
 	    DeletedAt: any;
 	    FolderName: string;
-	    BitIndex: number;
+	    CustomTableID: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new Folder(source);
@@ -788,7 +847,7 @@ export namespace entity {
 	        this.UpdatedAt = this.convertValues(source["UpdatedAt"], null);
 	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
 	        this.FolderName = source["FolderName"];
-	        this.BitIndex = source["BitIndex"];
+	        this.CustomTableID = source["CustomTableID"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1206,6 +1265,55 @@ export namespace vo {
 		    return a;
 		}
 	}
+	export class CustomDiffTableVo {
+	    ID: number;
+	    // Go type: time
+	    CreatedAt: any;
+	    // Go type: time
+	    UpdatedAt: any;
+	    // Go type: gorm
+	    DeletedAt: any;
+	    Name: string;
+	    Symbol: string;
+	    LevelOrders: string;
+	    Pagination?: entity.Page;
+	    level_order: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new CustomDiffTableVo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.ID = source["ID"];
+	        this.CreatedAt = this.convertValues(source["CreatedAt"], null);
+	        this.UpdatedAt = this.convertValues(source["UpdatedAt"], null);
+	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
+	        this.Name = source["Name"];
+	        this.Symbol = source["Symbol"];
+	        this.LevelOrders = source["LevelOrders"];
+	        this.Pagination = this.convertValues(source["Pagination"], entity.Page);
+	        this.level_order = source["level_order"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	export class DiffTableHeaderVo {
 	    ID: number;
 	    // Go type: time
@@ -1294,8 +1402,11 @@ export namespace vo {
 	    Sha256: string;
 	    Md5: string;
 	    Title: string;
+	    Comment: string;
+	    Pagination?: entity.Page;
 	    IDs: number[];
 	    FolderIDs: number[];
+	    RivalID: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new FolderContentVo(source);
@@ -1312,8 +1423,11 @@ export namespace vo {
 	        this.Sha256 = source["Sha256"];
 	        this.Md5 = source["Md5"];
 	        this.Title = source["Title"];
+	        this.Comment = source["Comment"];
+	        this.Pagination = this.convertValues(source["Pagination"], entity.Page);
 	        this.IDs = source["IDs"];
 	        this.FolderIDs = source["FolderIDs"];
+	        this.RivalID = source["RivalID"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1343,7 +1457,7 @@ export namespace vo {
 	    // Go type: gorm
 	    DeletedAt: any;
 	    FolderName: string;
-	    BitIndex: number;
+	    CustomTableID: number;
 	    IDs: number[];
 	    IgnoreSha256?: string;
 	    IgnoreRivalSongDataID?: number;
@@ -1360,7 +1474,7 @@ export namespace vo {
 	        this.UpdatedAt = this.convertValues(source["UpdatedAt"], null);
 	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
 	        this.FolderName = source["FolderName"];
-	        this.BitIndex = source["BitIndex"];
+	        this.CustomTableID = source["CustomTableID"];
 	        this.IDs = source["IDs"];
 	        this.IgnoreSha256 = source["IgnoreSha256"];
 	        this.IgnoreRivalSongDataID = source["IgnoreRivalSongDataID"];

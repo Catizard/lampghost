@@ -27,6 +27,7 @@ type App struct {
 	*controller.CourseInfoController
 	*controller.FolderController
 	*controller.DownloadTaskController
+	*controller.CustomDiffTableController
 	*server.InternalServer
 }
 
@@ -88,10 +89,12 @@ func NewApp() *App {
 	courseInfoService := service.NewCourseInfoSerivce(db)
 	courseInfoController := controller.NewCourseInfoController(courseInfoService)
 
-	// folder module
+	// custom difficult table module
+	customDiffTableService := service.NewCustomDiffTableService(db)
+	customDiffTableController := controller.NewCustomDiffTableController(customDiffTableService)
 	folderService := service.NewFolderService(db)
 	folderController := controller.NewFolderController(folderService)
-	folderInternalServer := server.NewInternalServer(folderService)
+	folderInternalServer := server.NewInternalServer(customDiffTableService, folderService)
 
 	return &App{
 		nil,
@@ -105,6 +108,7 @@ func NewApp() *App {
 		courseInfoController,
 		folderController,
 		downloadTaskController,
+		customDiffTableController,
 		folderInternalServer,
 	}
 }

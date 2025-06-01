@@ -15,10 +15,6 @@ import { useI18n } from 'vue-i18n';
 import { WarningOutline } from '@vicons/ionicons5';
 import { BrowserOpenURL } from '@wailsjs/runtime/runtime';
 
-defineExpose({
-	loadData,
-});
-
 const i18n = useI18n();
 const { t } = i18n;
 const notification = useNotification();

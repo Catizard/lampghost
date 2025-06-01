@@ -1,17 +1,15 @@
 <template>
-	<perfect-scrollbar>
-		<n-flex justify="space-between">
-			<n-h1 prefix="bar" style="text-align: start;">
-				<n-text type="primary">{{ t('title') }}</n-text>
-			</n-h1>
-			<!-- <n-flex justify="end">
+	<n-flex justify="space-between">
+		<n-h1 prefix="bar" style="text-align: start;">
+			<n-text type="primary">{{ t('title') }}</n-text>
+		</n-h1>
+		<!-- <n-flex justify="end">
 				<n-button>Reload All</n-button>
 			</n-flex> -->
-			<n-button type="primary" @click="showAddModal = true">{{ t('button.add') }}</n-button>
-		</n-flex>
-		<n-data-table :columns="columns" :data="data" :pagination="pagination" :bordered="false" :row-key="row => row.ID"
-			:loading="loading" />
-	</perfect-scrollbar>
+		<n-button type="primary" @click="showAddModal = true">{{ t('button.add') }}</n-button>
+	</n-flex>
+	<n-data-table :columns="columns" :data="data" :pagination="pagination" :bordered="false" :row-key="row => row.ID"
+		:loading="loading" />
 
 	<RivalAddForm v-model:show="showAddModal" @refresh="loadData()" />
 	<RivalEditForm ref="editFormRef" @refresh="loadData()" />

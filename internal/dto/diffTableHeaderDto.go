@@ -89,15 +89,8 @@ func NewLevelChildNode(id uint, name string, level string) *DiffTableHeaderDto {
 // For exporting usage (i.e imported by beatoraja)
 // TODO: Allow user to identify the table's symbol
 type DiffTableHeaderExportDto struct {
-	Name    string `json:"name"`
-	Symbol  string `json:"symbol"`
-	DataUrl string `json:"data_url"`
-}
-
-func NewDiffTableHeaderExportDto(name string, symbol string, dataUrl string) *DiffTableHeaderExportDto {
-	return &DiffTableHeaderExportDto{
-		Name:    name,
-		Symbol:  symbol,
-		DataUrl: dataUrl,
-	}
+	Name      string `json:"name"`
+	Symbol    string `json:"symbol"`
+	HeaderUrl string `json:"header_url"`
+	DataUrl   string `json:"data_url"`
 }

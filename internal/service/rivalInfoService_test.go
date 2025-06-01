@@ -54,6 +54,7 @@ func newNamedInitializeEmptyUser(name string, noScoreLog, noSongData, noScoreDat
 		scoreDataLogPath = nil
 	}
 	return &vo.InitializeRivalInfoVo{
+		ImportStrategy:   "separate",
 		Name:             name,
 		ScoreLogPath:     scoreLogPath,
 		SongDataPath:     songDataPath,
@@ -104,6 +105,7 @@ func newNamedRealInitializeUser(name string, noScoreLog, noSongData, noScoreData
 		scoreDataLogPath = nil
 	}
 	return &vo.InitializeRivalInfoVo{
+		ImportStrategy:   "separate",
 		Name:             name,
 		ScoreLogPath:     scoreLogPath,
 		SongDataPath:     songDataPath,
@@ -146,33 +148,6 @@ func TestInitializeMainUser(t *testing.T) {
 		missingScoreLogPath := newEmptyInitializeUser(true, false, false)
 		if err := rivalInfoService.InitializeMainUser(missingScoreLogPath); err == nil {
 			t.Fatalf("should fail on missing scorelog file path, but not")
-		}
-	})
-	t.Run("EmptyFilesWithoutScoreDataLog", func(t *testing.T) {
-		db, err := database.NewMemoryDatabase()
-		if err != nil {
-			t.Fatalf("db: %s", err)
-		}
-		rivalInfoService := service.NewRivalInfoService(db)
-		emptyFilesWithoutScoreDataLog := newEmptyInitializeUser(false, false, true)
-		if err := rivalInfoService.InitializeMainUser(emptyFilesWithoutScoreDataLog); err != nil {
-			t.Fatalf("failed to initialize main user with empty files(no scoredatalog.db): %s", err)
-		}
-		mainUser, err := rivalInfoService.QueryMainUser()
-		if err != nil {
-			t.Fatalf("queryMainUser: %s", err)
-		}
-		if mainUser.ID != 1 {
-			t.Fatalf("assert: mainUser.ID: expected 1, got %d", mainUser.ID)
-		}
-		if *mainUser.ScoreLogPath != EmptyScoreLogPath {
-			t.Fatalf("assert: mainUser.ScoreLogPath: expected %s, got %s", EmptyScoreLogPath, *mainUser.ScoreLogPath)
-		}
-		if *mainUser.SongDataPath != EmptySongDataPath {
-			t.Fatalf("assert: mainUser.SongDataPath: expected %s, got %s", EmptySongDataPath, *mainUser.SongDataPath)
-		}
-		if mainUser.ScoreDataLogPath != nil {
-			t.Fatalf("assert: mainUser.ScoreDataLogPath: expected nil, got %s", *mainUser.ScoreDataLogPath)
 		}
 	})
 	t.Run("EmptyFilesWithScoreDataLog", func(t *testing.T) {

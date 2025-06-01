@@ -10,6 +10,11 @@ import (
 	"github.com/charmbracelet/log"
 )
 
+// NOTE: This task requires config has been setted and wouldn't clean
+// the downloaded files automatically. So I left this flag to skip the tests
+// here entirely
+const SKIP_DOWNLOAD_FLAG = true
+
 func untilTaskFinished(service *service.DownloadTaskService, ch chan<- int) {
 	// Ensure every tasks has been submitted, should be a very quick step
 	time.Sleep(2 * time.Second)
@@ -26,6 +31,9 @@ func untilTaskFinished(service *service.DownloadTaskService, ch chan<- int) {
 func TestSubmitDownloadTask(t *testing.T) {
 	log.SetLevel(log.DebugLevel)
 	t.Run("SmokeTest", func(t *testing.T) {
+		if SKIP_DOWNLOAD_FLAG {
+			t.SkipNow()
+		}
 		db, err := database.NewMemoryDatabase()
 		if err != nil {
 			t.Fatalf("db: %s", err)
@@ -47,6 +55,9 @@ func TestSubmitDownloadTask(t *testing.T) {
 func TestSubmitSingleMD5DownloadTask(t *testing.T) {
 	log.SetLevel(log.DebugLevel)
 	t.Run("SmokeTest", func(t *testing.T) {
+		if SKIP_DOWNLOAD_FLAG {
+			t.SkipNow()
+		}
 		db, err := database.NewMemoryDatabase()
 		if err != nil {
 			t.Fatalf("db: %s", err)

@@ -62,6 +62,9 @@ func (s *CustomDiffTableService) DeleteCustomDiffTable(ID uint) error {
 	return nil
 }
 
+// Update one custom difficult table
+//
+// NOTE: param must contains all fields or unmentioned fields would be overwritten by zero value
 func (s *CustomDiffTableService) UpdateCustomDiffTable(param *vo.CustomDiffTableVo) error {
 	if param == nil {
 		return eris.New("UpdateCustomDiffTable: param cannot be nil")

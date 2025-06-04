@@ -147,3 +147,69 @@ func TestFindCustomDiffTableList(t *testing.T) {
 		}
 	})
 }
+
+func TestUpdateCustomDiffTable(t *testing.T) {
+	t.Run("SmokeTest", func(t *testing.T) {
+		db, err := database.NewMemoryDatabase()
+		if err != nil {
+			t.Fatalf("db: %s", err)
+		}
+		customDiffTableService := NewCustomDiffTableService(db)
+		t.Run("update symbol as plain string", func(t *testing.T) {
+			if err := customDiffTableService.UpdateCustomDiffTable(&vo.CustomDiffTableVo{
+				Model: gorm.Model{
+					ID: 1,
+				},
+				Symbol: "#",
+				Name:   "lampghost",
+			}); err != nil {
+				t.Fatalf("update: %s", err)
+			}
+			defaultTable, err := customDiffTableService.FindCustomDiffTableByID(1)
+			if err != nil {
+				t.Fatalf("find: %s", err)
+			}
+			if defaultTable.Symbol != "#" {
+				t.Fatalf("expected table symbol: #, got %s", defaultTable.Symbol)
+			}
+		})
+		t.Run("remove symbol", func(t *testing.T) {
+			if err := customDiffTableService.UpdateCustomDiffTable(&vo.CustomDiffTableVo{
+				Model: gorm.Model{
+					ID: 1,
+				},
+				Symbol: "",
+				Name:   "lampghost",
+			}); err != nil {
+				t.Fatalf("update: %s", err)
+			}
+			defaultTable, err := customDiffTableService.FindCustomDiffTableByID(1)
+			if err != nil {
+				t.Fatalf("find: %s", err)
+			}
+			if defaultTable.Symbol != "" {
+				t.Fatalf("expected table symbol to be empty, got %s", defaultTable.Symbol)
+			}
+		})
+	})
+}
+
+func TestFindCustomDiffTableByID(t *testing.T) {
+	t.Run("SmokeTest", func(t *testing.T) {
+		db, err := database.NewMemoryDatabase()
+		if err != nil {
+			t.Fatalf("db: %s", err)
+		}
+		customDiffTableService := NewCustomDiffTableService(db)
+		defaultTable, err := customDiffTableService.FindCustomDiffTableByID(1)
+		if err != nil {
+			t.Fatalf("find: %s", err)
+		}
+		if defaultTable.Name != "lampghost" {
+			t.Errorf("expected name: lampghost, got %s", defaultTable.Name)
+		}
+		if defaultTable.Symbol != "" {
+			t.Errorf("expected symbol to be empty, got %s", defaultTable.Symbol)
+		}
+	})
+}

@@ -20,8 +20,8 @@
 <script lang="ts" setup>
 import ClearTag from '@/components/ClearTag.vue';
 import { QueryRivalScoreLogPageList } from '@wailsjs/go/main/App';
-import { DataTableColumns, DataTableRowKey, NButton, NTag, useNotification } from 'naive-ui';
-import { h, onMounted, reactive, Ref, ref, VNode } from 'vue';
+import { DataTableColumns, NButton } from 'naive-ui';
+import { h, onMounted, reactive, Ref, ref } from 'vue';
 import SelectFolder from '../folder/SelectFolder.vue';
 import { BindRivalSongDataToFolder } from '@wailsjs/go/main/App';
 import { dto, vo } from '@wailsjs/go/models';
@@ -31,7 +31,6 @@ import TableTags from '@/components/TableTags.vue';
 
 const i18n = useI18n();
 const { t } = i18n;
-const notification = useNotification();
 const loading = ref<boolean>(false);
 const showFolderSelection = ref<boolean>(false);
 const candidateSongDataID = ref<number>(null);
@@ -48,18 +47,8 @@ function handleSubmit(folderIds: number[]) {
 			if (result.Code != 200) {
 				return Promise.reject(result.Msg);
 			}
-			notification.success({
-				content: t('message.bindSuccess'),
-				duration: 3000,
-				keepAliveOnHover: true
-			});
-		}).catch((err) => {
-			notification.error({
-				content: t('message.bindFailedPrefix') + err,
-				duration: 3000,
-				keepAliveOnHover: true
-			});
-		});
+			window.$notifySuccess(t('message.bindSuccess'));
+		}).catch(err => window.$notifyError(err));
 }
 
 function createColumns(): DataTableColumns<dto.RivalScoreLogDto> {
@@ -125,15 +114,8 @@ function loadData() {
 			data.value = [...result.Rows];
 			pagination.pageCount = result.Pagination.pageCount;
 		})
-		.catch(err => {
-			notification.error({
-				content: t('message.loadRecentRecordFailedPrefix') + err,
-				duration: 3000,
-				keepAliveOnHover: true
-			});
-		}).finally(() => {
-			loading.value = false;
-		});
+		.catch(err => window.$notifyError(err))
+		.finally(() => loading.value = false);
 }
 
 const columns = createColumns();

@@ -15,7 +15,7 @@ import { ClearType } from "@/constants/cleartype";
 import { FindDiffTableHeaderList } from "@wailsjs/go/main/App";
 import { QueryUserInfoWithLevelLayeredDiffTableLampStatus } from "@wailsjs/go/main/App";
 import { dto } from "@wailsjs/go/models";
-import { DataTableColumns, SelectOption, useNotification } from "naive-ui";
+import { DataTableColumns, SelectOption } from "naive-ui";
 import { computed, reactive, ref, Ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import VueApexCharts from "vue3-apexcharts";
@@ -25,7 +25,6 @@ const props = defineProps<{
 }>();
 
 const { t } = useI18n();
-const notification = useNotification();
 
 // TODO: I need a better solution, eh
 const LAMPS = [1, 4, 5, 6, 7, 8, 9, 10, 0];
@@ -96,13 +95,7 @@ function loadTableData() {
       });
       currentTableId.value = tableOptions.value[0].value as number;
     })
-    .catch((err) => {
-      notification.error({
-        content: err,
-        duration: 3000,
-        keepAliveOnHover: true,
-      });
-    });
+    .catch(err => window.$notifyError(err));
 }
 loadTableData();
 
@@ -152,13 +145,7 @@ function loadLampData() {
       }
       currentHeader.value = result.Data.DiffTableHeader;
     })
-    .catch((err) => {
-      notification.error({
-        content: err,
-        duration: 3000,
-        keepAliveOnHover: true,
-      });
-    });
+    .catch(err => window.$notifyError(err));
 }
 
 function buildSeries() {

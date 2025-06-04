@@ -12,7 +12,7 @@ import { nextTick, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { dto } from '@wailsjs/go/models';
 import { FindDiffTableHeaderTree, UpdateHeaderLevelOrders } from '@wailsjs/go/main/App';
-import { NDataTable, useNotification } from 'naive-ui';
+import { NDataTable } from 'naive-ui';
 import Sortable from "sortablejs";
 
 const show = defineModel<boolean>("show");
@@ -22,7 +22,6 @@ const emit = defineEmits<{
 defineExpose({ open });
 
 const { t } = useI18n();
-const notification = useNotification();
 const loading = ref(false);
 
 const columns = [
@@ -40,11 +39,7 @@ let data = reactive([]);
 const currentHeaderId = ref(null);
 function open(headerId: number) {
   if (headerId == null || headerId == 0) {
-    notification.error({
-      content: t('message.noChosenHeaderError'),
-      duration: 3000,
-      keepAliveOnHover: true
-    });
+    window.$notifyError(t('message.noChosenHeaderError'));
     show.value = false;
     return;
   }
@@ -57,7 +52,6 @@ function open(headerId: number) {
       if (result.Code != 200) {
         return Promise.reject(result.Msg);
       }
-      console.log(result);
       const { Children } = result.Rows[0] as dto.DiffTableHeaderDto;
       data = [...Children];
       // when data.length == 0, hookSortable would make whole application stall
@@ -66,13 +60,9 @@ function open(headerId: number) {
         // Here goes the magic
         hookSortable();
       }
-    }).catch((err) => {
-      notification.error({
-        content: err,
-        duration: 5000,
-        keepAliveOnHover: true
-      })
-    }).finally(() => loading.value = false);
+    })
+    .catch(err => window.$notifyError(err))
+    .finally(() => loading.value = false);
 }
 
 function hookSortable() {
@@ -98,11 +88,7 @@ function hookSortable() {
 function handlePositiveClick(): boolean {
   loading.value = true;
   if (currentHeaderId.value == null) {
-    notification.error({
-      content: t('message.noChosenHeaderError'),
-      duration: 3000,
-      keepAliveOnHover: true,
-    });
+    window.$notifyError(t('message.noChosenHeaderError'));
     return;
   }
   const updateParam: dto.DiffTableHeaderDto = {
@@ -116,13 +102,7 @@ function handlePositiveClick(): boolean {
       }
       show.value = false;
       emit('refresh');
-    }).catch(err => {
-      notification.error({
-        content: err,
-        duration: 3000,
-        keepAliveOnHover: true
-      });
-    }).finally(() => loading.value = false);
+    }).catch(err => window.$notifyError(err)).finally(() => loading.value = false);
   return false
 }
 

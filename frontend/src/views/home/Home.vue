@@ -45,9 +45,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { reactive, ref } from "vue";
 import { ReloadRivalData, QueryMainUser, QueryUserInfoByID } from "@wailsjs/go/main/App";
-import { useNotification } from "naive-ui";
 import dayjs from "dayjs";
 import { useI18n } from "vue-i18n";
 import PlayCountChart from "./PlayCountChart.vue";

@@ -12,7 +12,7 @@ import { nextTick, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { dto } from '@wailsjs/go/models';
 import { FindDiffTableHeaderTree, UpdateHeaderOrder } from '@wailsjs/go/main/App';
-import { NDataTable, useNotification } from 'naive-ui';
+import { NDataTable } from 'naive-ui';
 import Sortable from "sortablejs";
 
 const show = defineModel<boolean>("show");
@@ -21,7 +21,6 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n();
-const notification = useNotification();
 const loading = ref(false);
 
 const columns = [
@@ -50,13 +49,9 @@ function loadDiffTableData() {
 				// Here goes the magic
 				hookSortable();
 			}
-		}).catch((err) => {
-			notification.error({
-				content: err,
-				duration: 5000,
-				keepAliveOnHover: true
-			})
-		}).finally(() => loading.value = false);
+		})
+		.catch(err => window.$notifyError(err))
+		.finally(() => loading.value = false);
 }
 
 function hookSortable() {
@@ -88,13 +83,7 @@ function handlePositiveClick(): boolean {
 			}
 			show.value = false;
 			emit('refresh');
-		}).catch(err => {
-			notification.error({
-				content: err,
-				duration: 3000,
-				keepAliveOnHover: true
-			});
-		}).finally(() => loading.value = false);
+		}).catch(err => window.$notifyError(err)).finally(() => loading.value = false);
 	return false
 }
 

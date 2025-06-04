@@ -92,7 +92,7 @@
 </template>
 
 <script setup lang="ts">
-import { FormInst, SelectOption, useNotification } from 'naive-ui';
+import { FormInst, SelectOption } from 'naive-ui';
 import { ref } from 'vue';
 import {
   ChatboxEllipsesOutline as HintIcon,
@@ -103,7 +103,6 @@ import { useI18n } from 'vue-i18n';
 
 const i18n = useI18n();
 const { t } = i18n;
-const notification = useNotification();
 const localeOptions: Array<SelectOption> = [
   {
     label: "English",
@@ -152,20 +151,10 @@ function handleSaveSettings() {
       if (result.Code != 200) {
         return Promise.reject(result.Msg)
       }
-      notification.success({
-        content: t('message.saveSuccess'),
-        duration: 3000,
-        keepAliveOnHover: false
-      });
-    }).catch(err => {
-      notification.error({
-        content: err,
-        duration: 3000,
-        keepAliveOnHover: true
-      })
-    }).finally(() => {
-      loading.value = false;
+      window.$notifySuccess(t('message.saveSuccess'));
     })
+    .catch(err => window.$notifyError(err))
+    .finally(() => loading.value = false);
 }
 
 function chooseDownloadDirectory() {
@@ -177,13 +166,7 @@ function chooseDownloadDirectory() {
       if (result.Data != null && result.Data != undefined && result.Data != '') {
         model.value.DownloadDirectory = result.Data;
       }
-    }).catch(err => {
-      notification.error({
-        content: err,
-        duration: 3000,
-        keepAliveOnHover: true
-      })
-    })
+    }).catch(err => window.$notifyError(err))
 }
 
 function loadSettings() {
@@ -194,15 +177,9 @@ function loadSettings() {
         return Promise.reject(result.Msg)
       }
       model.value = result.Data;
-    }).catch(err => {
-      notification.error({
-        content: err,
-        duration: 3000,
-        keepAliveOnHover: true
-      })
-    }).finally(() => {
-      loading.value = false;
     })
+    .catch(err => window.$notifyError(err))
+    .finally(() => loading.value = false);
 }
 
 function checkVersion() {
@@ -211,17 +188,8 @@ function checkVersion() {
       if (result.Code != 200) {
         return Promise.reject(result.Msg);
       }
-      notification.info({
-        content: result.Msg,
-        duration: 3000,
-      });
-    }).catch(err => {
-      notification.error({
-        content: err,
-        duration: 3000,
-        keepAliveOnHover: true
-      })
-    });
+      window.$notifyInfo(result.Msg);
+    }).catch(err => window.$notifyError(err));
 }
 
 loadSettings();

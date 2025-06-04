@@ -20,8 +20,8 @@ import router from '@/router';
 import { DelRivalInfo, QueryRivalInfoPageList, ReloadRivalData } from '@wailsjs/go/main/App';
 import { dto } from '@wailsjs/go/models';
 import dayjs from 'dayjs';
-import { DataTableColumns, DropdownOption, NButton, NDropdown, NFlex, useDialog, useNotification } from 'naive-ui';
-import { h, reactive, ref, VNode } from 'vue';
+import { DataTableColumns, NButton, NFlex, useDialog } from 'naive-ui';
+import { h, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import RivalAddForm from './RivalAddForm.vue';
 import RivalEditForm from './RivalEditForm.vue';
@@ -31,7 +31,6 @@ const editFormRef = ref<InstanceType<typeof RivalEditForm>>(null);
 
 const i18n = useI18n();
 const { t } = i18n;
-const notification = useNotification();
 const dialog = useDialog();
 
 const pagination = reactive({
@@ -103,11 +102,7 @@ function createColumns(): DataTableColumns<dto.RivalInfoDto> {
 function handleSelectOtherAction(row: dto.RivalInfoDto, key: string) {
 	if ("Delete" === key) {
 		if (row.MainUser) {
-			notification.error({
-				content: t('message.cannotDeleteMainUser'),
-				duration: 3000,
-				keepAliveOnHover: true
-			});
+			window.$notifyError(t('message.cannotDeleteMainUser'));
 			return;
 		}
 		dialog.warning({
@@ -121,13 +116,9 @@ function handleSelectOtherAction(row: dto.RivalInfoDto, key: string) {
 						if (result.Code != 200) {
 							return Promise.reject(result.Msg);
 						}
-					}).catch(err => {
-						notification.error({
-							content: err,
-							duration: 3000,
-							keepAliveOnHover: true
-						});
-					}).finally(() => {
+					})
+					.catch(err => window.$notifyError(err))
+					.finally(() => {
 						loadData();
 						loading.value = false;
 					});
@@ -149,15 +140,9 @@ function loadData() {
 				return Promise.reject(result.Msg)
 			}
 			data.value = [...result.Rows];
-		}).catch(err => {
-			notification.error({
-				content: err,
-				duration: 3000,
-				keepAliveOnHover: true
-			})
-		}).finally(() => {
-			loading.value = false;
-		});
+		})
+		.catch(err => window.$notifyError(err))
+		.finally(() => loading.value = false);
 }
 
 function handleSyncClick(id: number) {
@@ -167,20 +152,10 @@ function handleSyncClick(id: number) {
 			if (result.Code != 200) {
 				return Promise.reject(result.Msg)
 			}
-			notification.success({
-				content: t('message.reloadSuccess'),
-				duration: 3000,
-				keepAliveOnHover: false,
-			});
-		}).catch(err => {
-			notification.error({
-				content: err,
-				duration: 3000,
-				keepAliveOnHover: true,
-			});
-		}).finally(() => {
-			loading.value = false;
+			window.$notifySuccess(t('message.reloadSuccess'));
 		})
+		.catch(err => window.$notifyError(err))
+		.finally(() => loading.value = false);
 }
 
 loadData();

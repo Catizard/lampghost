@@ -24,7 +24,6 @@
 <script lang="ts" setup>
 import type { DropdownOption, TagProps } from "naive-ui";
 import { NButton, NDataTable, NDropdown, NTag, useDialog } from "naive-ui";
-import { useNotification } from "naive-ui";
 import { h, Ref, ref } from "vue";
 import {
 	DelDiffTableHeader,
@@ -47,7 +46,6 @@ const showAddModal = ref(false);
 const editFormRef = ref<InstanceType<typeof DifficultTableEditForm>>(null);
 const levelSortModalRef = ref<InstanceType<typeof DifficultTableLevelSortModal>>(null);
 
-const notification = useNotification();
 const dialog = useDialog();
 const loading = ref(false);
 loadDiffTableData();
@@ -160,9 +158,9 @@ function reloadTableHeader(id: number) {
 				return Promise.reject(result.Msg);
 			}
 			loadDiffTableData();
-		}).catch(err => {
-			notifyError(err);
-		}).finally(() => loading.value = false);
+		})
+		.catch(err => window.$notifyError(err))
+		.finally(() => loading.value = false);
 }
 
 function delDiffTableHeader(id: number) {
@@ -172,10 +170,10 @@ function delDiffTableHeader(id: number) {
 			if (result.Code != 200) {
 				return Promise.reject(result.Msg)
 			}
-			notifySuccess(t('message.deleteSuccess'))
+			window.$notifySuccess(t('message.deleteSuccess'));
 			loadDiffTableData();
 		}).catch(err => {
-			notifyError(err)
+			window.$notifyError(err);
 			loadDiffTableData();
 		}).finally(() => loading.value = false);
 }
@@ -188,30 +186,11 @@ function loadDiffTableData() {
 				return Promise.reject(result.Msg);
 			}
 			data.value = [...result.Rows]
-		}).catch((err) => {
-			notification.error({
-				content: t('message.loadTableDataFailedPrefix') + err,
-				duration: 5000,
-				keepAliveOnHover: true
-			})
-		}).finally(() => loading.value = false);
+		})
+		.catch((err) => window.$notifyError(t('message.loadTableDataFailed', { msg: err })))
+		.finally(() => loading.value = false);
 }
 
-function notifySuccess(msg: string) {
-	notification.success({
-		content: msg,
-		duration: 5000,
-		keepAliveOnHover: true
-	})
-}
-
-function notifyError(msg: string) {
-	notification.error({
-		content: msg,
-		duration: 5000,
-		keepAliveOnHover: true
-	})
-}
 </script>
 
 <i18n lang="json">{
@@ -243,9 +222,8 @@ function notifyError(msg: string) {
 			"negativeText": "No"
 		},
 		"message": {
-			"addTableFailedPrefix": "Failed to add table, error message: ",
 			"deleteSuccess": "Deleted successfully",
-			"loadTableDataFailedPrefix": "Failed to load table, error message: "
+			"loadTableDataFailed": "Failed to load table, error message: {msg}"
 		}
 	},
 	"zh-CN": {
@@ -271,14 +249,13 @@ function notifyError(msg: string) {
 			"negativeText": "否"
 		},
 		"supplyDialog": {
-			"title": "确定要添加所有缺少的BMS吗？",
+			"title": "确定要添加所有缺少的BMS吗?",
 			"positiveText": "是",
 			"negativeText": "否"
 		},
 		"message": {
-			"addTableFailedPrefix": "新增难度表失败，错误信息: ",
 			"deleteSuccess": "删除成功",
-			"loadTableDataFailedPrefix": "读取难度表信息失败, 错误信息: "
+			"loadTableDataFailed": "读取难度表信息失败, 错误信息: {msg}"
 		}
 	}
 }</i18n>

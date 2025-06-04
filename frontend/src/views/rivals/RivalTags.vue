@@ -30,7 +30,7 @@
 import { FindRivalInfoList } from '@wailsjs/go/main/App';
 import { AddRivalTag, DeleteRivalTagByID, QueryRivalTagPageList, RevertRivalTagEnabledState } from '@wailsjs/go/main/App';
 import { dto } from '@wailsjs/go/models';
-import { DataTableColumns, FormInst, FormRules, NButton, SelectOption, useDialog, useNotification } from 'naive-ui';
+import { DataTableColumns, FormInst, FormRules, NButton, SelectOption, useDialog } from 'naive-ui';
 import { h, reactive, Ref, ref, watch } from 'vue';
 import dayjs from 'dayjs';
 import { useI18n } from 'vue-i18n';
@@ -39,7 +39,6 @@ import YesNotTag from '@/components/YesNotTag.vue';
 const i18n = useI18n();
 const { t } = i18n;
 const dialog = useDialog();
-const notification = useNotification();
 
 const tableLoading = ref(false);
 const currentRivalID: Ref<number | null> = ref(null);
@@ -61,15 +60,9 @@ function loadRivalOptions() {
 				} as SelectOption
 			});
 			currentRivalID.value = rivalOptions.value[0].value as number;
-		}).catch(err => {
-			notification.error({
-				content: err,
-				duration: 3000,
-				keepAliveOnHover: true,
-			})
-		}).finally(() => {
-			tableLoading.value = false;
-		});
+		})
+		.catch(err => window.$notifyError(err))
+		.finally(() => tableLoading.value = false);
 }
 loadRivalOptions();
 
@@ -157,15 +150,9 @@ function loadData() {
 			}
 			data.value = [...result.Rows];
 			pagination.pageCount = result.Pagination.pageCount;
-		}).catch(err => {
-			notification.error({
-				content: err,
-				duration: 3000,
-				keepAliveOnHover: true,
-			});
-		}).finally(() => {
-			tableLoading.value = false;
-		});
+		})
+		.catch(err => window.$notifyError(err))
+		.finally(() => tableLoading.value = false);
 }
 
 const showAddModal = ref(false);
@@ -196,13 +183,9 @@ function handlePositiveClick(): boolean {
 						return Promise.reject(result.Msg);
 					}
 					showAddModal.value = false;
-				}).catch(err => {
-					notification.error({
-						content: err,
-						duration: 3000,
-						keepAliveOnHover: true
-					});
-				}).finally(() => loadData());
+				})
+				.catch(err => window.$notifyError(err))
+				.finally(() => loadData());
 		})
 		.catch((err) => { });
 	return false;
@@ -224,13 +207,7 @@ function deleteTag(tag: dto.RivalTagDto) {
 						return Promise.reject(result.Msg);
 					}
 					loadData();
-				}).catch(err => {
-					notification.error({
-						content: err,
-						duration: 3000,
-						keepAliveOnHover: true,
-					});
-				});
+				}).catch(err => window.$notifyError(err));
 		}
 	})
 }
@@ -242,13 +219,8 @@ function revertTagEnabledState(tag: dto.RivalTagDto) {
 				return Promise.reject(result.Msg);
 			}
 			loadData();
-		}).catch(err => {
-			notification.error({
-				content: err,
-				duration: 3000,
-				keepAliveOnHover: true
-			});
-		});
+		}).catch(err => window.$notifyError(err));
+;
 }
 
 // Watch: Whenever changing current rival, reset current page to the first one

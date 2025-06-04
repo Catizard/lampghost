@@ -38,12 +38,11 @@
 import { QueryUserInfoByID, UpdateRivalInfo } from '@wailsjs/go/main/App';
 import { OpenFileDialog } from '@wailsjs/go/main/App';
 import { dto } from '@wailsjs/go/models';
-import { FormInst, useNotification } from 'naive-ui';
+import { FormInst } from 'naive-ui';
 import { reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
-const notification = useNotification();
 const emit = defineEmits<{
 	(e: 'refresh'): void
 }>();
@@ -53,11 +52,7 @@ const show = ref(false);
 
 function open(rivalID: number) {
 	if (rivalID == null || rivalID == 0) {
-		notification.error({
-			content: t('message.noChosenRivalError'),
-			duration: 3000,
-			keepAliveOnHover: true
-		});
+		window.$notifyError(t('message.noChosenRivalError'));
 		show.value = false;
 		return
 	}
@@ -78,11 +73,7 @@ function open(rivalID: number) {
 			formData.value.ScoreDataLogPath = data.ScoreDataLogPath;
 			formData.value.MainUser = data.MainUser;
 		}).catch(err => {
-			notification.error({
-				content: err,
-				duration: 3000,
-				keepAliveOnHover: true,
-			});
+			window.$notifyError(err);
 			show.value = false;
 		}).finally(() => {
 			loading.value = false;
@@ -144,15 +135,8 @@ function handlePositiveClick(): boolean {
 			show.value = false;
 			emit('refresh');
 		})
-		.catch((err) => {
-			notification.error({
-				content: err,
-				duration: 3000,
-				keepAliveOnHover: true
-			});
-		}).finally(() => {
-			loading.value = false;
-		});
+		.catch(err => window.$notifyError(err))
+		.finally(() => loading.value = false);
 	return false;
 }
 
@@ -180,13 +164,7 @@ function chooseFile(title: string, target: "scorelogPath" | "songdataPath" | "sc
 					formData.value.ScoreDataLogPath = result.Data;
 				}
 			}
-		}).catch(err => {
-			notification.error({
-				content: err,
-				duration: 3000,
-				keepAliveOnHover: true
-			})
-		});
+		}).catch(err => window.$notifyError(err));
 }
 
 watch(() => formData.value.MainUser, newValue => {

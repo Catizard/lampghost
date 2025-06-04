@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import { FindDiffTableHeaderList, FindDiffTableHeaderTreeWithRival, FindRivalInfoList, FindRivalTagList } from '@wailsjs/go/main/App';
 import { dto } from '@wailsjs/go/models';
-import { DataTableColumns, NDataTable, NTooltip, SelectOption, useNotification } from 'naive-ui';
+import { DataTableColumns, NDataTable, NTooltip, SelectOption } from 'naive-ui';
 import { h, Ref, ref, VNode, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import DifficultTableDetail from './DifficultTableDetail.vue';
@@ -27,7 +27,6 @@ import { ClearType, ClearTypeDef, DefaultClearTypeColorStyle } from '@/constants
 
 const i18n = useI18n();
 const { t } = i18n;
-const notification = useNotification();
 
 const loadingDifftableOptions = ref<boolean>(false);
 const currentDiffTableID: Ref<number | null> = ref(null);
@@ -49,15 +48,9 @@ function loadDifftableOptions() {
         } as SelectOption
       });
       currentDiffTableID.value = difftableOptions.value[0].value as number;
-    }).catch(err => {
-      notification.error({
-        content: err,
-        duration: 3000,
-        keepAliveOnHover: true,
-      });
-    }).finally(() => {
-      loadingDifftableOptions.value = false;
-    });
+    })
+    .catch(err => window.$notifyError(err))
+    .finally(() => loadingDifftableOptions.value = false);
 }
 loadDifftableOptions();
 
@@ -155,15 +148,9 @@ function loadLevelTableData(difftableID: string | number) {
       }
       data.value = [...result.Rows[0].Children];
       levelData.clear();
-    }).catch(err => {
-      notification.error({
-        content: err,
-        duration: 3000,
-        keepAliveOnHover: true,
-      });
-    }).finally(() => {
-      levelTableLoading.value = false;
-    });
+    })
+    .catch(err => window.$notifyError(err))
+    .finally(() => levelTableLoading.value = false);
 }
 
 const loadingRivalData = ref(false);
@@ -195,15 +182,9 @@ function loadRivalOptions() {
           value: row.ID,
         } as SelectOption
       });
-    }).catch(err => {
-      notification.error({
-        content: err,
-        duration: 3000,
-        keepAliveOnHover: true,
-      })
-    }).finally(() => {
-      loadingRivalData.value = false;
-    });
+    })
+    .catch(err => window.$notifyError(err))
+    .finally(() => loadingRivalData.value = false);
 }
 function loadRivalTagOptions(rivalID: number) {
   // TODO: same logic, and should be handled together
@@ -219,15 +200,9 @@ function loadRivalTagOptions(rivalID: number) {
           value: row.ID,
         } as SelectOption
       });
-    }).catch(err => {
-      notification.error({
-        content: err,
-        duration: 3000,
-        keepAliveOnHover: true,
-      })
-    }).finally(() => {
-      loadingRivalData.value = false;
-    });
+    })
+    .catch(err => window.$notifyError(err))
+    .finally(() => loadingRivalData.value = false);
 }
 loadRivalOptions();
 

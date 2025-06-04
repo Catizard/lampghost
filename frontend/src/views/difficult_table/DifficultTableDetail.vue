@@ -5,9 +5,9 @@
 </template>
 
 <script setup lang="ts">
-import { DataTableColumns, DataTableSortState, DropdownOption, NButton, NDropdown, NEllipsis, NIcon, NText, NTooltip, useNotification } from 'naive-ui';
+import { DataTableColumns, DataTableSortState, NButton, NDropdown, NEllipsis, NIcon } from 'naive-ui';
 import { dto } from '@wailsjs/go/models';
-import { h, reactive, ref, Ref, VNode, watch } from 'vue';
+import { h, reactive, ref, Ref, watch } from 'vue';
 import { BindDiffTableDataToFolder, QueryDiffTableDataWithRival, SubmitSingleMD5DownloadTask } from '@wailsjs/go/main/App';
 import SelectFolder from '@/views/folder/SelectFolder.vue';
 import ClearTag from '@/components/ClearTag.vue';
@@ -17,7 +17,6 @@ import { BrowserOpenURL } from '@wailsjs/runtime/runtime';
 
 const i18n = useI18n();
 const { t } = i18n;
-const notification = useNotification();
 const loading = ref<boolean>(false);
 
 const props = defineProps<{
@@ -39,7 +38,7 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
 			if (row.DataLost) {
 				vnodes.push(h(NIcon, { component: WarningOutline, color: "red" }));
 			}
-			vnodes.push(h(NEllipsis, { tooltip: true, style: { "max-width": "calc(100% - 26px)"} }, { default: () => row.Title }));
+			vnodes.push(h(NEllipsis, { tooltip: true, style: { "max-width": "calc(100% - 26px)" } }, { default: () => row.Title }));
 			return vnodes;
 		}
 	},
@@ -117,15 +116,9 @@ function loadData() {
 			}
 			data.value = [...result.Rows];
 			pagination.pageCount = result.Pagination.pageCount;
-		}).catch(err => {
-			notification.error({
-				content: err,
-				duration: 3000,
-				keepAliveOnHover: true,
-			});
-		}).finally(() => {
-			loading.value = false;
-		});
+		})
+		.catch(err => window.$notifyError(err))
+		.finally(() => loading.value = false);
 }
 
 const pagination = reactive({
@@ -164,18 +157,8 @@ function handleSubmit(selected: [any]) {
 			if (result.Code != 200) {
 				return Promise.reject(result.Msg);
 			}
-			notification.success({
-				content: t('message.bindSuccess'),
-				duration: 3000,
-				keepAliveOnHover: true
-			});
-		}).catch((err) => {
-			notification.error({
-				content: t('message.bindFailedPrefix') + err,
-				duration: 3000,
-				keepAliveOnHover: true
-			});
-		});
+			window.$notifySuccess(t('message.bindSuccess'));
+		}).catch(err => window.$notifyError(err));
 }
 
 function handleUpdateSorter(option: DataTableSortState | null) {
@@ -198,18 +181,10 @@ function handleSubmitSingleMD5DownloadTask(row: dto.DiffTableDataDto) {
 			if (result.Code != 200) {
 				return Promise.reject(result.Msg);
 			}
-			notification.success({
-				content: t('message.submitSuccess'),
-				duration: 3000,
-				keepAliveOnHover: true
-			});
-		}).catch(err => {
-			notification.error({
-				content: err,
-				duration: 3000,
-				keepAliveOnHover: true
-			});
-		}).finally(() => loading.value = false);
+			window.$notifySuccess(t('message.submitSuccess'));
+		})
+		.catch(err => window.$notifyError(err))
+		.finally(() => loading.value = false);
 }
 
 loadData();

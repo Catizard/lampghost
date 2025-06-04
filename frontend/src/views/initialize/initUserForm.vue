@@ -60,11 +60,10 @@
 import { useI18n } from 'vue-i18n';
 import { ref, watch, reactive, Ref } from "vue";
 import { ChooseBeatorajaDirectory, InitializeMainUser, OpenFileDialog } from "@wailsjs/go/main/App";
-import { SelectOption, useNotification } from 'naive-ui';
+import { SelectOption } from 'naive-ui';
 import { dto } from '@wailsjs/go/models';
 
 const { t } = useI18n();
-const notification = useNotification();
 const globalI18n = useI18n({ useScope: 'global' });
 
 const props = defineProps<{
@@ -89,13 +88,7 @@ function chooseFile(title: string, target: "scorelogPath" | "songdataPath" | "sc
 					formData.scoredatalogPath = result.Data;
 				}
 			}
-		}).catch(err => {
-			notification.error({
-				content: err,
-				duration: 3000,
-				keepAliveOnHover: true
-			})
-		});
+		}).catch(err => window.$notifyError(err));
 }
 
 const playerDirectories: Ref<SelectOption[]> = ref([]);
@@ -114,13 +107,7 @@ function chooseBeatorajaDirectory() {
 			});
 			formData.beatorajaDirectoryPath = data.BeatorajaDirectoryPath;
 			formData.playerDirectory = playerDirectories.value[0].value as string;
-		}).catch(err => {
-			notification.error({
-				content: err,
-				duration: 3000,
-				keepAliveOnHover: true
-			});
-		})
+		}).catch(err => window.$notifyError(err));
 }
 
 const loading = ref(false);
@@ -189,7 +176,7 @@ function handleSubmit(e) {
 				ScoreDataLogPath: formData.scoredatalogPath,
 				BeatorajaDirectoryPath: formData.beatorajaDirectoryPath,
 				PlayerDirectory: formData.playerDirectory,
-				ImportStrategy: formData.importStrategy,
+				ImportStrategy: importStrategy.value,
 				Locale: globalI18n.locale.value,
 			};
 			InitializeMainUser(rivalInfo as any)
@@ -199,12 +186,8 @@ function handleSubmit(e) {
 					}
 					props.moveOn();
 				})
-				.catch((err) => {
-					notification.error({
-						content: err,
-						duration: 3000,
-					});
-				}).finally(() => loading.value = false);
+				.catch(err => window.$notifyError(err))
+				.finally(() => loading.value = false);
 		}
 	});
 }

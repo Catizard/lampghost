@@ -16,9 +16,7 @@
 <script setup lang="ts">
 import { AddBatchDiffTableHeader, QueryPredefineTableSchemes } from '@wailsjs/go/main/App';
 import { entity, vo } from '@wailsjs/go/models';
-import { DataTableColumn, DataTableRowKey, NDataTable, NTag, useModal, useNotification } from 'naive-ui';
-import { error } from 'naive-ui/es/_utils/naive/warn';
-import { dualCalendarValidation } from 'naive-ui/es/date-picker/src/validation-utils';
+import { DataTableColumn, DataTableRowKey, NDataTable, NTag, useModal } from 'naive-ui';
 import { TagColor } from 'naive-ui/es/tag/src/common-props';
 import { h, reactive, Reactive, Ref, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -28,7 +26,6 @@ const props = defineProps<{
 }>();
 
 const { t } = useI18n();
-const notification = useNotification();
 const modal = useModal();
 const loading = ref(false);
 
@@ -74,7 +71,7 @@ const headerColumns: Array<DataTableColumn<entity.PredefineTableHeader>> = [
   { title: t('column.name'), key: "Name", width: "200px" },
   {
     title: t('column.tag'), key: "Tag",
-		width: "75px",
+    width: "75px",
     render(row: entity.PredefineTableHeader) {
       let tagColorProp: TagColor = {};
       if (row.TagColor != '') {
@@ -111,15 +108,9 @@ function loadSchemes() {
         };
       })];
       currentScheme.value = schemeOptions.value[0].value;
-    }).catch(err => {
-      notification.error({
-        content: err,
-        duration: 3000,
-        keepAliveOnHover: true
-      });
-    }).finally(() => {
-      loading.value = false;
-    });
+    })
+    .catch(err => window.$notifyError(err))
+    .finally(() => loading.value = false);
 }
 
 function handleSubmit() {
@@ -167,13 +158,9 @@ function handleSubmit() {
         });
       }
       props.moveOn();
-    }).catch(err => {
-      notification.error({
-        content: err,
-        duration: 3000,
-        keepAliveOnHover: true
-      });
-    }).finally(() => loading.value = false);
+    })
+    .catch(err => window.$notifyError(err))
+    .finally(() => loading.value = false);
 }
 
 function handleSkip() {

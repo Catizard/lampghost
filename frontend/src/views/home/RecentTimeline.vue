@@ -37,7 +37,6 @@ import { ClearType, ClearTypeDef, queryClearTypeColorStyle } from '@/constants/c
 import { QueryPrevDayScoreLogList } from '@wailsjs/go/main/App';
 import { dto } from '@wailsjs/go/models';
 import dayjs from 'dayjs';
-import { useNotification } from 'naive-ui';
 import { ref, Ref, watch, nextTick } from 'vue';
 import { WarningOutline } from '@vicons/ionicons5';
 
@@ -45,7 +44,6 @@ const props = defineProps<{
 	rivalId?: number;
 }>();
 
-const notification = useNotification();
 
 type Node = {
 	key: number, // unique id, required by vue's v-for
@@ -103,13 +101,8 @@ async function handleLoad() {
 			}
 		}
 	} catch (err) {
-		notification.error({
-			// wut??
-			content: "" + err,
-			duration: 3000,
-			keepAliveOnHover: true
-		});
-	}
+		window.$notifyError(err);
+	} 
 	loading.value = false;
 }
 

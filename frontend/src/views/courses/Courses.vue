@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import { DataTableColumns, useNotification } from 'naive-ui';
+import { DataTableColumns } from 'naive-ui';
 import { dto } from '@wailsjs/go/models';
 import { ref, h } from 'vue';
 import { FindCourseInfoListWithRival } from '@wailsjs/go/main/App';
@@ -18,7 +18,6 @@ import { useI18n } from 'vue-i18n';
 
 const i18n = useI18n();
 const { t } = i18n;
-const notification = useNotification();
 
 const columns = createColumns();
 const pagination = false as const;
@@ -62,13 +61,7 @@ function loadData() {
         return Promise.reject(result.Msg)
       }
       data.value = [...result.Rows]
-    }).catch(err => {
-      notification.error({
-        content: err,
-        duration: 3000,
-        keepAliveOnHover: true,
-      })
-    })
+    }).catch(err => window.$notifyError(err));
 }
 
 loadData();

@@ -19,12 +19,11 @@
 <script setup lang="ts">
 import { QueryDiffTableInfoById, UpdateDiffTableHeader } from '@wailsjs/go/main/App';
 import { dto } from '@wailsjs/go/models';
-import { FormInst, SelectOption, useNotification } from 'naive-ui';
+import { FormInst, SelectOption } from 'naive-ui';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
-const notification = useNotification();
 const emit = defineEmits<{
   (e: 'refresh'): void
 }>();
@@ -63,13 +62,8 @@ function handlePositiveClick(): boolean {
       show.value = false;
       emit('refresh');
     })
-    .catch((err) => {
-      notification.error({
-        content: err,
-        duration: 3000,
-        keepAliveOnHover: true
-      })
-    }).finally(() => loading.value = false);
+    .catch(err => window.$notifyError(err))
+    .finally(() => loading.value = false);
   return false;
 }
 
@@ -78,11 +72,7 @@ function handleNegativeClick() {
 
 function open(headerId: number) {
   if (headerId == null || headerId == 0) {
-    notification.error({
-      content: t('message.noChosenHeaderError'),
-      duration: 3000,
-      keepAliveOnHover: true
-    });
+    window.$notifyError(t('message.noChosenHeaderError'));
     show.value = false;
     return;
   }
@@ -100,11 +90,7 @@ function open(headerId: number) {
       formData.value.TagTextColor = data.TagTextColor;
       formData.value.NoTagBuild = data.NoTagBuild;
     }).catch(err => {
-      notification.error({
-        content: err,
-        duration: 3000,
-        keepAliveOnHover: true,
-      });
+      window.$notifyError(err);
       show.value = false;
     }).finally(() => {
       loading.value = false;

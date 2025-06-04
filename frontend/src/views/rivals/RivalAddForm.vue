@@ -28,7 +28,7 @@
 import { AddRivalInfo } from '@wailsjs/go/main/App';
 import { OpenFileDialog } from '@wailsjs/go/main/App';
 import { entity } from '@wailsjs/go/models';
-import { FormInst, useNotification } from 'naive-ui';
+import { FormInst } from 'naive-ui';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -38,7 +38,6 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n();
-const notification = useNotification();
 const loading = ref(false);
 
 const formRef = ref<FormInst | null>(null);
@@ -83,13 +82,8 @@ function handlePositiveClick(): boolean {
 					emit('refresh')
 				});
 		})
-		.catch((err) => {
-			notification.error({
-				content: err,
-				duration: 3000,
-				keepAliveOnHover: true
-			});
-		}).finally(() => loading.value = false);
+		.catch(err => window.$notifyError(err))
+		.finally(() => loading.value = false);
 	return false;
 }
 
@@ -114,13 +108,7 @@ function chooseFile(title, target: "scorelogPath" | "songdataPath" | "scoredatal
 					case "scoredatalogPath": formData.value.ScoreDataLogPath = result.Data; break;
 				}
 			}
-		}).catch(err => {
-			notification.error({
-				content: err,
-				duration: 3000,
-				keepAliveOnHover: true
-			})
-		});
+		}).catch(err => window.$notifyError(err));
 }
 </script>
 

@@ -6,7 +6,7 @@
 <script setup lang="ts">
 import VueApexCharts from "vue3-apexcharts";
 import { QueryRivalPlayedYears, QueryUserPlayCountInYear } from "@wailsjs/go/main/App";
-import { SelectOption, useNotification } from "naive-ui";
+import { SelectOption } from "naive-ui";
 import { reactive, Ref, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useSpecifyYearStore } from "@/stores/home";
@@ -16,7 +16,6 @@ const props = defineProps<{
 }>();
 
 const { t } = useI18n();
-const notification = useNotification();
 
 const currentYear: Ref<string | null> = ref(null);
 const yearOptions: Ref<Array<SelectOption>> = ref([
@@ -84,13 +83,7 @@ function loadPlayedYears() {
         return Promise.reject(t('message.noRecordError'));
       }
       currentYear.value = yearOptions.value[yearOptions.value.length - 1].value as string;
-    }).catch(err => {
-      notification.error({
-        content: err,
-        duration: 3000,
-        keepAliveOnHover: true
-      });
-    })
+    }).catch(err => window.$notifyError(err))
 }
 
 function loadPlayCountData() {
@@ -100,13 +93,7 @@ function loadPlayCountData() {
         return Promise.reject(result.Msg);
       }
       chartOptions.series[0].data = [...result.Rows];
-    }).catch(err => {
-      notification.error({
-        content: err,
-        duration: 3000,
-        keepAliveOnHover: true
-      });
-    })
+    }).catch(err => window.$notifyError(err))
 }
 
 watch(() => props.rivalId, (newId) => {

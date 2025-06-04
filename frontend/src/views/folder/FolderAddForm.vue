@@ -12,7 +12,7 @@
 
 <script lang="ts" setup>
 import { AddFolder } from '@wailsjs/go/main/App';
-import { FormInst, useNotification } from 'naive-ui';
+import { FormInst } from 'naive-ui';
 import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -22,7 +22,6 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n();
-const notification = useNotification();
 
 const loading = ref(false);
 const formRef = ref<FormInst | null>(null);
@@ -53,13 +52,8 @@ function handlePositiveClick(): boolean {
           emit('refresh');
         });
     })
-    .catch((err) => {
-      notification.error({
-        content: t('message.addFolderFailedPrefix') + err,
-        duration: 5000,
-        keepAliveOnHover: true,
-      });
-    }).finally(() => loading.value = false);
+    .catch(err => window.$notifyError(err))
+    .finally(() => loading.value = false);
   return false;
 }
 
@@ -84,7 +78,6 @@ watch(show, newValue => {
       "placeholderName": "Input name"
     },
     "message": {
-      "addFolderFailedPrefix": "Failed to add folder, error message: ",
       "missingName": "Please input name"
     }
   },
@@ -99,7 +92,6 @@ watch(show, newValue => {
       "placeholderName": "请输入名称"
     },
     "message": {
-      "addFolderFailedPrefix": "新增收藏夹失败，错误信息: ",
       "missingName": "请输入名称"
     }
   }

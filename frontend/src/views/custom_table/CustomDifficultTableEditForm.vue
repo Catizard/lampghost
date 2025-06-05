@@ -11,10 +11,10 @@
 </template>
 
 <script setup lang="ts">
-import { FindCustomDiffTableByID, UpdateDiffTableHeader } from '@wailsjs/go/main/App';
+import { FindCustomDiffTableByID, UpdateCustomDiffTable, UpdateDiffTableHeader } from '@wailsjs/go/main/App';
 import { dto } from '@wailsjs/go/models';
 import { FormInst } from 'naive-ui';
-import { ref } from 'vue';
+import { reactive, Ref, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -26,8 +26,9 @@ defineExpose({ open });
 const show = ref(false);
 const loading = ref(false);
 const formRef = ref<FormInst | null>(null);
-const formData = ref({
+const formData = reactive({
   ID: 0,
+  Name: "",
   Symbol: "",
 });
 
@@ -35,7 +36,7 @@ function handlePositiveClick(): boolean {
   formRef.value
     ?.validate()
     .then(async () => {
-      const result = await UpdateDiffTableHeader(formData.value as any);
+      const result = await UpdateCustomDiffTable(formData as any);
       if (result.Code != 200) {
         return Promise.reject(result.Msg);
       }
@@ -57,7 +58,7 @@ function open(customTableID: number) {
     return;
   }
 
-  formData.value.ID = customTableID;
+  formData.ID = customTableID;
   show.value = true;
   loading.value = true;
   FindCustomDiffTableByID(customTableID)
@@ -66,7 +67,8 @@ function open(customTableID: number) {
         return Promise.reject(result.Msg);
       }
       const data: dto.DiffTableHeaderDto = result.Data;
-      data.Symbol = data.Symbol;
+      formData.Symbol = data.Symbol;
+      formData.Name = data.Name;
     }).catch(err => {
       window.$notifyError(err)
       show.value = false;

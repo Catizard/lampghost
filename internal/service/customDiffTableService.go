@@ -74,7 +74,7 @@ func (s *CustomDiffTableService) UpdateCustomDiffTable(param *vo.CustomDiffTable
 	}
 
 	if err := s.db.Transaction(func(tx *gorm.DB) error {
-		return tx.Select("*").Updates(param.Entity()).Error
+		return tx.Debug().Select("*").Where("ID = ?", param.ID).Updates(param.Entity()).Error
 	}); err != nil {
 		return eris.Wrap(err, "transaction")
 	}

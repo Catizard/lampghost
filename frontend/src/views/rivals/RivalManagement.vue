@@ -21,7 +21,7 @@ import { DelRivalInfo, QueryRivalInfoPageList, ReloadRivalData } from '@wailsjs/
 import { dto } from '@wailsjs/go/models';
 import dayjs from 'dayjs';
 import { DataTableColumns, NButton, NFlex, useDialog } from 'naive-ui';
-import { h, reactive, ref } from 'vue';
+import { h, reactive, ref, VNode } from 'vue';
 import { useI18n } from 'vue-i18n';
 import RivalAddForm from './RivalAddForm.vue';
 import RivalEditForm from './RivalEditForm.vue';
@@ -84,15 +84,19 @@ function createColumns(): DataTableColumns<dto.RivalInfoDto> {
 			title: t('column.actions'),
 			key: "action",
 			width: "300px",
-			render: (row: dto.RivalInfoDto) => {
+			render(row: dto.RivalInfoDto): VNode {
 				return h(
 					NFlex,
 					{},
-					[
-						h(NButton, { type: 'primary', size: 'small', onClick: () => handleSyncClick(row.ID) }, { default: () => t('button.reload') }),
-						h(NButton, { type: 'info', size: 'small', onClick: () => handleSelectOtherAction(row, "Edit") }, { default: () => t('button.edit') }),
-						h(NButton, { type: 'error', size: 'small', onClick: () => handleSelectOtherAction(row, "Delete") }, { default: () => t('button.delete') }),
-					]
+					{
+						default: () => {
+							return [
+								h(NButton, { type: 'primary', size: 'small', onClick: () => handleSyncClick(row.ID) }, { default: () => t('button.reload') }),
+								h(NButton, { type: 'info', size: 'small', onClick: () => handleSelectOtherAction(row, "Edit") }, { default: () => t('button.edit') }),
+								h(NButton, { type: 'error', size: 'small', onClick: () => handleSelectOtherAction(row, "Delete") }, { default: () => t('button.delete') }),
+							]
+						}
+					}
 				);
 			}
 		}

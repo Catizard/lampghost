@@ -10,7 +10,7 @@ export function AddBatchDiffTableHeader(arg1:Array<vo.DiffTableHeaderVo>):Promis
 
 export function AddDiffTableHeader(arg1:vo.DiffTableHeaderVo):Promise<result.RtnMessage>;
 
-export function AddFolder(arg1:string):Promise<result.RtnMessage>;
+export function AddFolder(arg1:vo.FolderVo):Promise<result.RtnMessage>;
 
 export function AddRivalInfo(arg1:vo.RivalInfoVo):Promise<result.RtnMessage>;
 

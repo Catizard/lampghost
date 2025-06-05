@@ -290,6 +290,7 @@ watch(currentRivalID, () => {
 		},
 		"button": {
 			"add": "添加自定义标签",
+			"delete": "删除",
 			"enable": "启用",
 			"disable": "禁用"
 		},

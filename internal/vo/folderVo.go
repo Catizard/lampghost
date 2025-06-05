@@ -29,6 +29,7 @@ func (folder *FolderVo) Entity() *entity.Folder {
 			UpdatedAt: folder.UpdatedAt,
 			DeletedAt: folder.DeletedAt,
 		},
-		FolderName: folder.FolderName,
+		FolderName:    folder.FolderName,
+		CustomTableID: folder.CustomTableID,
 	}
 }

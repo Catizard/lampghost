@@ -82,7 +82,7 @@ loadData();
       "actions": "Actions"
     },
     "button": {
-      "update": "Update"
+      "update": "Edit"
     }
   },
   "zh-CN": {

@@ -1,6 +1,9 @@
 package entity
 
-import "gorm.io/gorm"
+import (
+	"github.com/rotisserie/eris"
+	"gorm.io/gorm"
+)
 
 type Folder struct {
 	gorm.Model
@@ -18,8 +21,9 @@ func (Folder) TableName() string {
 	return "folder"
 }
 
-func NewFolder(folderName string) Folder {
-	return Folder{
-		FolderName: folderName,
+func (folder *Folder) BeforeCreate(tx *gorm.DB) error {
+	if folder.CustomTableID == 0 {
+		return eris.New("assert: folder.CustomTableID cannot be 0")
 	}
+	return nil
 }

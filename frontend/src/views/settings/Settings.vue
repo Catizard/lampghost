@@ -47,20 +47,6 @@
             <n-input-number :show-button="false" v-model:value="model.InternalServerPort"
               :placeholder="t('folderSettings.placeholderInternalServerPort')" :maxlength="5" style="width: 150px;" />
           </n-form-item>
-          <n-form-item path="folderSymbol">
-            <template #label>
-              <n-tooltip trigger="hover" style="max-width: 400px; text-align: left; white-space: pre-line;">
-                <template #trigger>
-                  <n-icon :component="HintIcon" />
-                </template>
-                {{ t('folderSettings.tipSymbol') }}
-              </n-tooltip>
-              {{ t('folderSettings.labelSymbol') }}
-            </template>
-            <n-input v-model:value="model.FolderSymbol" :placeholder="t('folderSettings.placeholderSymbol')"
-              :maxlength="5" style="width: 200px;">
-            </n-input>
-          </n-form-item>
         </n-h2>
         <n-h2>
           <n-text>
@@ -116,7 +102,6 @@ const localeOptions: Array<SelectOption> = [
 const formRef = ref<FormInst | null>(null);
 const model = ref<config.ApplicationConfig>({
   InternalServerPort: null,
-  FolderSymbol: null,
   IgnoreVariantCourse: null,
   Locale: null,
   DownloadSite: null,

@@ -27,28 +27,31 @@ func NewFolderService(db *gorm.DB) *FolderService {
 }
 
 // Add a new folder
-func (s *FolderService) AddFolder(folderName string) (*entity.Folder, error) {
-	tx := s.db.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
+func (s *FolderService) AddFolder(param *vo.FolderVo) (*entity.Folder, error) {
+	if param == nil {
+		return nil, eris.New("AddFolder: param cannot be nil")
+	}
+	if param.FolderName == "" {
+		return nil, eris.New("AddFolder: FolderName cannot be empty")
+	}
+	if param.CustomTableID == 0 {
+		return nil, eris.New("AddFolder: CustomTableID cannot be 0")
+	}
+	var ret *entity.Folder
+	if err := s.db.Transaction(func(tx *gorm.DB) error {
+		if err := checkDuplicateFolderName(tx, param.FolderName); err != nil {
+			return eris.Wrap(err, "query folder")
 		}
-	}()
-	if err := checkDuplicateFolderName(tx, folderName); err != nil {
-		tx.Rollback()
-		return nil, err
+		ret = param.Entity()
+		if err := tx.Create(ret).Error; err != nil {
+			return eris.Wrap(err, "create folder")
+		}
+		return nil
+	}); err != nil {
+		return nil, eris.Wrap(err, "transaction")
 	}
 
-	newFolder := entity.NewFolder(folderName)
-	if err := tx.Create(&newFolder).Error; err != nil {
-		tx.Rollback()
-		return nil, err
-	}
-	if err := tx.Commit().Error; err != nil {
-		tx.Rollback()
-		return nil, err
-	}
-	return &newFolder, nil
+	return ret, nil
 }
 
 // Delete a folder, and its contents

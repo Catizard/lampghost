@@ -102,7 +102,10 @@ function deleteFolder(id: number) {
 function loadFolderData() {
 	// TODO: remove magical 1
 	loading.value = true;
-	FindFolderList({ RivalID: 1 } as any)
+	FindFolderList({
+		RivalID: 1,
+		CustomTableID: 1,
+	} as any)
 		.then((result) => {
 			if (result.Code != 200) {
 				return Promise.reject(result.Msg);

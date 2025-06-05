@@ -41,7 +41,12 @@ function handlePositiveClick(): boolean {
   formRef.value
     ?.validate()
     .then(() => {
-      AddFolder(formData.value.name)
+      // TODO: Remove the magic 1 here, we don't allow add folder into
+      // custom difficult table now
+      return AddFolder({
+        FolderName: formData.value.name,
+        CustomTableID: 1
+      } as any)
         .then((result) => {
           if (result.Code != 200) {
             return Promise.reject(result.Msg);
@@ -50,7 +55,7 @@ function handlePositiveClick(): boolean {
           show.value = false;
           formData.value.name = null;
           emit('refresh');
-        });
+        })
     })
     .catch(err => window.$notifyError(err))
     .finally(() => loading.value = false);

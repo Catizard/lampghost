@@ -19,10 +19,9 @@ func NewFolderController(folderService *service.FolderService) *FolderController
 	}
 }
 
-func (ctl *FolderController) AddFolder(name string) result.RtnMessage {
+func (ctl *FolderController) AddFolder(param *vo.FolderVo) result.RtnMessage {
 	log.Info("[Controller] Calling FolderController.AddFolder")
-	_, err := ctl.folderService.AddFolder(name)
-	if err != nil {
+	if _, err := ctl.folderService.AddFolder(param); err != nil {
 		log.Errorf("[FolderController] returning err: %v", err)
 		return result.NewErrorMessage(err)
 	}

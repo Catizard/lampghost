@@ -22,20 +22,20 @@ const props = defineProps<{
 
 let data: Ref<dto.FolderContentDto[]> = ref([]);
 const pagination = reactive({
-	page: 1,
-	pageSize: 10,
-	pageCount: 0,
-	showSizePicker: true,
-	pageSizes: [10, 20, 50],
-	onChange: (page: number) => {
-		pagination.page = page;
-		loadData();
-	},
-	onUpdatePageSize: (pageSize: number) => {
-		pagination.pageSize = pageSize;
-		pagination.page = 1;
-		loadData();
-	}
+  page: 1,
+  pageSize: 10,
+  pageCount: 0,
+  showSizePicker: true,
+  pageSizes: [10, 20, 50],
+  onChange: (page: number) => {
+    pagination.page = page;
+    loadData();
+  },
+  onUpdatePageSize: (pageSize: number) => {
+    pagination.pageSize = pageSize;
+    pagination.page = 1;
+    loadData();
+  }
 });
 const columns: DataTableColumns<dto.FolderContentDto> = [
   { title: t('column.name'), key: "Title" },
@@ -73,8 +73,6 @@ const columns: DataTableColumns<dto.FolderContentDto> = [
 ];
 
 function loadData() {
-  console.log(props.folderId);
-  console.log('here')
   loading.value = true;
   // TODO: remove magic 1
   QueryFolderContentWithRival({
@@ -87,26 +85,51 @@ function loadData() {
     }
     data.value = [...result.Rows];
     pagination.pageCount = result.Pagination.pageCount;
-  }).catch(err => {
-    window.$notifyError(err);
-  }).finally(() => loading.value = false)
+  })
+    .catch(err => window.$notifyError(err))
+    .finally(() => loading.value = false)
 }
 
 function deleteFolderContent(id: number) {
-	DelFolderContent(id)
-		.then((result) => {
-			if (result.Code != 200) {
-				return Promise.reject(result.Msg);
-			}
-			window.$notifySuccess(t('message.deleteSuccess'));
+  DelFolderContent(id)
+    .then((result) => {
+      if (result.Code != 200) {
+        return Promise.reject(result.Msg);
+      }
+      window.$notifySuccess(t('message.deleteSuccess'));
       loadData();
-		})
-		.catch((err) => {
+    })
+    .catch((err) => {
       window.$notifyError(err);
-			loadData();
-		});
+      loadData();
+    });
 }
 
 watch(props, () => loadData());
 loadData();
 </script>
+
+<i18n lang="json">{
+  "en": {
+    "column": {
+      "name": "Name",
+      "tag": "Tag",
+      "clear": "Clear",
+      "actions": "Actions"
+    },
+    "button": {
+      "delete": "Delete"
+    }
+  },
+  "zh-CN": {
+    "column": {
+      "name": "谱面名称",
+      "tag": "难度表标签",
+      "clear": "通关状态",
+      "actions": "操作"
+    },
+    "button": {
+      "delete": "删除"
+    }
+  }
+}</i18n>

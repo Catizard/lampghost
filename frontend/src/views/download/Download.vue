@@ -166,9 +166,9 @@ function humanFileSize(bytes, si = false, dp = 1) {
 		}
 	},
 	"zh-CN": {
-		"title": "下载任务(点击复制)",
+		"title": "下载任务",
 		"column": {
-			"url": "URL",
+			"url": "下载链接(点击复制)",
 			"taskName": "任务名称",
 			"progress": "当前进度",
 			"status": "状态",

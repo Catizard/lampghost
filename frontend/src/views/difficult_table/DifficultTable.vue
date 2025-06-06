@@ -3,7 +3,7 @@
 		<n-h1 prefix="bar" style="text-align: start">
 			<n-text type="primary">{{ t('title') }}</n-text>
 		</n-h1>
-		<n-flex justify="flex-end">
+		<n-flex justify="end">
 			<n-button :loading="loading" type="info" @click="showSortModal = true">
 				{{ t('button.sort') }}
 			</n-button>

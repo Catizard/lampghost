@@ -8,6 +8,8 @@ import {config} from '../models';
 
 export function AddBatchDiffTableHeader(arg1:Array<vo.DiffTableHeaderVo>):Promise<result.RtnDataList>;
 
+export function AddCustomDiffTable(arg1:vo.CustomDiffTableVo):Promise<result.RtnMessage>;
+
 export function AddDiffTableHeader(arg1:vo.DiffTableHeaderVo):Promise<result.RtnMessage>;
 
 export function AddFolder(arg1:vo.FolderVo):Promise<result.RtnMessage>;
@@ -31,6 +33,8 @@ export function DelFolder(arg1:number):Promise<result.RtnMessage>;
 export function DelFolderContent(arg1:number):Promise<result.RtnMessage>;
 
 export function DelRivalInfo(arg1:number):Promise<result.RtnMessage>;
+
+export function DeleteCustomDiffTable(arg1:number):Promise<result.RtnMessage>;
 
 export function DeleteRivalTagByID(arg1:number):Promise<result.RtnMessage>;
 

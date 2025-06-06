@@ -146,6 +146,23 @@ func TestFindCustomDiffTableList(t *testing.T) {
 			})
 		}
 	})
+
+	t.Run("IgnoreDefault", func(t *testing.T) {
+		db, err := database.NewMemoryDatabase()
+		if err != nil {
+			t.Fatalf("db: %s", err)
+		}
+		customDiffTableService := NewCustomDiffTableService(db)
+		_, n, err := customDiffTableService.FindCustomDiffTableList(&vo.CustomDiffTableVo{
+			IgnoreDefaultTable: true,
+		})
+		if err != nil {
+			t.Fatalf("findlist: %s", err)
+		}
+		if n != 0 {
+			t.Fatalf("expected empty table array, got %d value(s)", n)
+		}
+	})
 }
 
 func TestUpdateCustomDiffTable(t *testing.T) {

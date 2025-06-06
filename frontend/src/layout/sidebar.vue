@@ -20,7 +20,8 @@ import {
 	People as RivalIcon,
 	List as ListIcon,
 	DownloadOutline as DownloadIcon,
-	ColorWand as CustomTableIcon
+	ColorWand as CustomTableIcon,
+	Pencil as PencilIcon
 } from '@vicons/ionicons5'
 import { MenuOption, NIcon } from 'naive-ui'
 import { computed, h, ref, watchEffect } from 'vue'
@@ -81,11 +82,7 @@ const menuOptions: MenuOption[] = [
 				key: "difftable_scores",
 				icon: renderIcon(StatisticIcon)
 			},
-			{
-				label: renderOption("/difftable/custom", t('menuName.difftable.custom')),
-				key: "difftable_custom",
-				icon: renderIcon(CustomTableIcon)
-			}
+
 		]
 	},
 	{
@@ -114,6 +111,23 @@ const menuOptions: MenuOption[] = [
 		icon: renderIcon(DownloadIcon)
 	},
 	{
+		label: t('menuName.customtable.self'),
+		key: "customtable",
+		icon: renderIcon(CustomTableIcon),
+		children: [
+			{
+				label: renderOption("/customtable/management", t('menuName.customtable.management')),
+				key: "customtable_management",
+				icon: renderIcon(ListIcon)
+			},
+			{
+				label: renderOption("/customtable/design", t('menuName.customtable.design')),
+				key: "customtable_design",
+				icon: renderIcon(PencilIcon)
+			}
+		]
+	},
+	{
 		label: renderOption("/settings", t('menuName.settings')),
 		key: "settings",
 		icon: renderIcon(SettingsIcon),
@@ -121,54 +135,60 @@ const menuOptions: MenuOption[] = [
 ]
 </script>
 
-<i18n>
-{
+<i18n lang="json">{
 	"en": {
-    "menuName": {
-      "home": "Home",
-      "rivals": {
-        "self": "Player",
-        "management": "Management",
-        "tags": "Player Tags",
-      },
-      "difftable": {
-        "self": "Table",
-        "management": "Management",
-        "scores": "Statistics",
-				"custom": "Custom Table"
-      },
-      "folder": "Folder",
-      "recent": "Recent",
-      "courses": "Courses",
+		"menuName": {
+			"home": "Home",
+			"rivals": {
+				"self": "Player",
+				"management": "Management",
+				"tags": "Player Tags"
+			},
+			"difftable": {
+				"self": "Table",
+				"management": "Management",
+				"scores": "Statistics"
+			},
+			"customtable": {
+				"self": "Custom Table",
+				"management": "Management",
+				"design": "Design"
+			},
+			"folder": "Folder",
+			"recent": "Recent",
+			"courses": "Courses",
 			"download": "Download",
-      "goals": "Goals",
-			"settings": "Settings",
-    },
-  },
-  "zh-CN": {
-    "menuName": {
-      "home": "个人主页",
-      "rivals": {
-        "self": "玩家",
-        "management": "管理",
-        "tags": "标签",
-      },
-      "difftable": {
-        "self": "难度表",
-        "management": "管理",
-        "scores": "统计信息",
-				"custom": "自定义难度表"
-      },
-      "folder": "收藏夹",
-      "recent": "最近游玩",
-      "courses": "段位",
+			"goals": "Goals",
+			"settings": "Settings"
+		}
+	},
+	"zh-CN": {
+		"menuName": {
+			"home": "个人主页",
+			"rivals": {
+				"self": "玩家",
+				"management": "管理",
+				"tags": "标签"
+			},
+			"difftable": {
+				"self": "难度表",
+				"management": "管理",
+				"scores": "统计信息"
+			},
+			"customtable": {
+				"self": "自定义难度表",
+				"management": "管理",
+				"design": "设计"
+			},
+			"folder": "收藏夹",
+			"recent": "最近游玩",
+			"courses": "段位",
 			"download": "下载",
-      "goals": "目标列表",
-			"settings": "设置",
-    },
-  },
-}
-</i18n>
+			"goals": "目标列表",
+			"settings": "设置"
+		}
+	}
+}</i18n>
 
 <style scoped>
 .logo {

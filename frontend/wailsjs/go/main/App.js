@@ -6,6 +6,10 @@ export function AddBatchDiffTableHeader(arg1) {
   return window['go']['main']['App']['AddBatchDiffTableHeader'](arg1);
 }
 
+export function AddCustomDiffTable(arg1) {
+  return window['go']['main']['App']['AddCustomDiffTable'](arg1);
+}
+
 export function AddDiffTableHeader(arg1) {
   return window['go']['main']['App']['AddDiffTableHeader'](arg1);
 }
@@ -52,6 +56,10 @@ export function DelFolderContent(arg1) {
 
 export function DelRivalInfo(arg1) {
   return window['go']['main']['App']['DelRivalInfo'](arg1);
+}
+
+export function DeleteCustomDiffTable(arg1) {
+  return window['go']['main']['App']['DeleteCustomDiffTable'](arg1);
 }
 
 export function DeleteRivalTagByID(arg1) {

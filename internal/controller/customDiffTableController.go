@@ -18,6 +18,24 @@ func NewCustomDiffTableController(customDiffTableService *service.CustomDiffTabl
 	}
 }
 
+func (ctl *CustomDiffTableController) AddCustomDiffTable(param *vo.CustomDiffTableVo) result.RtnMessage {
+	log.Info("[Controller] Calling CustomDiffTableController.AddCustomDiffTable")
+	if err := ctl.customDiffTableService.AddCustomDiffTable(param); err != nil {
+		log.Errorf("[CustomDiffTableController] returning err: %s", err)
+		return result.NewErrorMessage(err)
+	}
+	return result.SUCCESS
+}
+
+func (ctl *CustomDiffTableController) DeleteCustomDiffTable(ID uint) result.RtnMessage {
+	log.Info("[Controller] Calling CustomDiffTableController.DeleteCustomDiffTable")
+	if err := ctl.customDiffTableService.DeleteCustomDiffTable(ID); err != nil {
+		log.Errorf("[CustomDiffTableController] returning err: %s", err)
+		return result.NewErrorMessage(err)
+	}
+	return result.SUCCESS
+}
+
 func (ctl *CustomDiffTableController) FindCustomDiffTableList(filter *vo.CustomDiffTableVo) result.RtnDataList {
 	log.Info("[Controller] Calling CustomDiffTableController.FindCustomDiffTableList")
 	rows, _, err := ctl.customDiffTableService.FindCustomDiffTableList(filter)

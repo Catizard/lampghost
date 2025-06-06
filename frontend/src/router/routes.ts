@@ -23,8 +23,12 @@ const mainRoutes: RouteRecordRaw[] = [
     component: () => import("../views/difficult_table/DifficultScores.vue"),
   },
   {
-    path: "/difftable/custom",
-    component: () => import("../views/custom_table/CustomDifficultTable.vue"),
+    path: "/customtable/management",
+    component: () => import("../views/custom_table/CustomTableManagement.vue"),
+  },
+  {
+    path: "/customtable/design",
+    component: () => import("../views/custom_table/CustomTableDesign.vue"),
   },
   {
     name: "folder",

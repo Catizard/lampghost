@@ -1,5 +1,5 @@
 <template>
-  <n-flex justify="flex-start">
+  <n-flex justify="start">
     <n-select v-model:value="currentTableId" :options="tableOptions" style="width: 150px" />
     <n-radio-group v-model:value="currentLampOrder">
       <n-radio-button :key="'reverse'" :value="'reverse'" :label="t('radio.reverse')" />

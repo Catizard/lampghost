@@ -26,6 +26,7 @@ const show = defineModel<boolean>("show");
 const props = defineProps<{
 	songDataId?: number,
 	sha256?: string
+	customTableId?: number
 }>();
 const emit = defineEmits<{
 	(e: 'submit', selected: Array<any>): void
@@ -44,7 +45,8 @@ function reload() {
 	loading.value = true;
 	FindFolderList({
 		IgnoreRivalSongDataID: props.songDataId,
-		IgnoreSha256: props.sha256
+		IgnoreSha256: props.sha256,
+		CustomTableID: props.customTableId ?? 1
 	} as any).then(result => {
 		if (result.Code != 200) {
 			return Promise.reject(result.Msg);

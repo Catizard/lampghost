@@ -3,8 +3,8 @@
     :positive-text="t('modal.positiveText')" :negative-text="t('modal.negativeText')"
     @positive-click="handlePositiveClick" @negative-click="handleNegativeClick" :mask-closable="false">
     <n-form ref="formRef" :model="formData" :rules="rules">
-      <n-form-item :label="t('form.labelName')" path="name">
-        <n-input v-model:value="formData.name" :placeholder="t('form.placeholderName')" />
+      <n-form-item :label="t('form.labelName')" path="FolderName">
+        <n-input v-model:value="formData.FolderName" :placeholder="t('form.placeholderName')" />
       </n-form-item>
     </n-form>
   </n-modal>
@@ -13,10 +13,13 @@
 <script lang="ts" setup>
 import { AddFolder } from '@wailsjs/go/main/App';
 import { FormInst } from 'naive-ui';
-import { ref, watch } from 'vue';
+import { reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const show = defineModel<boolean>("show");
+const props = defineProps<{
+  customTableId?: number
+}>();
 const emit = defineEmits<{
   (e: 'refresh'): void
 }>();
@@ -25,8 +28,8 @@ const { t } = useI18n();
 
 const loading = ref(false);
 const formRef = ref<FormInst | null>(null);
-const formData = ref({
-  name: "",
+const formData = reactive({
+  FolderName: "",
 });
 const rules = {
   name: {
@@ -41,11 +44,9 @@ function handlePositiveClick(): boolean {
   formRef.value
     ?.validate()
     .then(() => {
-      // TODO: Remove the magic 1 here, we don't allow add folder into
-      // custom difficult table now
       return AddFolder({
-        FolderName: formData.value.name,
-        CustomTableID: 1
+        ...formData,
+        CustomTableID: props.customTableId ?? 1
       } as any)
         .then((result) => {
           if (result.Code != 200) {
@@ -53,7 +54,7 @@ function handlePositiveClick(): boolean {
           }
           console.log('reset')
           show.value = false;
-          formData.value.name = null;
+          formData.FolderName = null;
           emit('refresh');
         })
     })
@@ -63,12 +64,9 @@ function handlePositiveClick(): boolean {
 }
 
 function handleNegativeClick() {
-  formData.value.name = "";
+  formData.FolderName = "";
+  show.value = false;
 }
-
-watch(show, newValue => {
-  console.log("show =>", newValue);
-})
 </script>
 
 <i18n lang="json">{

@@ -4,7 +4,7 @@
       <n-text type="primary">{{ t('title') }}</n-text>
     </n-h1>
   </n-flex>
-  <n-flex justify="flex-start">
+  <n-flex justify="start">
     <n-select :loading="levelTableLoading" v-model:value="currentDiffTableID" :options="difftableOptions"
       style="width: 200px;" />
     <n-select :loading="loadingRivalData" v-model:value="currentRivalID" :options="rivalOptions" style="width: 200px;"
@@ -39,13 +39,13 @@ function loadDifftableOptions() {
         return Promise.reject(result.Msg)
       }
       if (result.Rows.length == 0) {
-        return Promise.reject(t('message.noTableerror'))
+        return Promise.reject(t('message.noTableError'))
       }
-      difftableOptions.value = result.Rows.map((row: dto.DiffTableHeaderDto) => {
+      difftableOptions.value = result.Rows.map((row: dto.DiffTableHeaderDto): SelectOption => {
         return {
           label: row.Name,
           value: row.ID,
-        } as SelectOption
+        }
       });
       currentDiffTableID.value = difftableOptions.value[0].value as number;
     })

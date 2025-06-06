@@ -1,13 +1,11 @@
 package service
 
 import (
-	"fmt"
 	"slices"
 
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/vo"
-	"github.com/charmbracelet/log"
 	"github.com/rotisserie/eris"
 	"gorm.io/gorm"
 
@@ -39,8 +37,13 @@ func (s *FolderService) AddFolder(param *vo.FolderVo) (*entity.Folder, error) {
 	}
 	var ret *entity.Folder
 	if err := s.db.Transaction(func(tx *gorm.DB) error {
-		if err := checkDuplicateFolderName(tx, param.FolderName); err != nil {
+		if count, err := selectFolderCount(tx, &vo.FolderVo{
+			FolderName:    param.FolderName,
+			CustomTableID: param.CustomTableID,
+		}); err != nil {
 			return eris.Wrap(err, "query folder")
+		} else if count > 0 {
+			return eris.Errorf("AddFolder: folder name %s is duplicated", param.FolderName)
 		}
 		ret = param.Entity()
 		if err := tx.Create(ret).Error; err != nil {
@@ -186,31 +189,9 @@ func (s *FolderService) FindFolderList(filter *vo.FolderVo) ([]*dto.FolderDto, i
 	if err != nil {
 		return nil, 0, err
 	}
-	queryBoundSha256 := filter.IgnoreSha256
-	boundFolderIDs := make(map[uint]interface{})
-	if filter != nil && filter.IgnoreRivalSongDataID != nil {
-		songData, err := findRivalSongDataByID(s.db, *filter.IgnoreRivalSongDataID)
-		if err != nil {
-			return nil, 0, err
-		}
-		queryBoundSha256 = &songData.Sha256
-	}
-	if queryBoundSha256 != nil && *queryBoundSha256 != "" {
-		contents, _, err := findFolderContentList(s.db, &vo.FolderContentVo{Sha256: *queryBoundSha256})
-		if err != nil {
-			return nil, 0, err
-		}
-		for _, content := range contents {
-			boundFolderIDs[content.FolderID] = new(interface{})
-		}
-	}
-	log.Debugf("boundFolderIDs: %v", boundFolderIDs)
-	ret := make([]*dto.FolderDto, 0)
+	ret := make([]*dto.FolderDto, len(rawFolders))
 	for i := range rawFolders {
-		if _, ok := boundFolderIDs[rawFolders[i].ID]; ok {
-			continue
-		}
-		ret = append(ret, dto.NewFolderDto(rawFolders[i], nil))
+		ret[i] = dto.NewFolderDto(rawFolders[i], nil)
 	}
 	return ret, len(ret), nil
 }
@@ -219,36 +200,20 @@ func (s *FolderService) FindFolderContentList(filter *vo.FolderContentVo) ([]*en
 	return findFolderContentList(s.db, filter)
 }
 
-func checkDuplicateFolderName(tx *gorm.DB, folderName string) error {
-	var dupCount int64
-	if err := tx.Model(&entity.Folder{}).Where(&entity.Folder{FolderName: folderName}).Count(&dupCount).Error; err != nil {
-		return err
-	}
-	if dupCount > 0 {
-		return fmt.Errorf("folder name: %s is duplicated", folderName)
-	}
-	return nil
-}
-
 func findFolderList(tx *gorm.DB, filter *vo.FolderVo) ([]*entity.Folder, int, error) {
-	if filter == nil {
-		var folders []*entity.Folder
-		if err := tx.Find(&folders).Error; err != nil {
-			return nil, 0, err
-		}
-		return folders, len(folders), nil
-	}
-
-	rawFilter := filter.Entity()
 	var folders []*entity.Folder
-	basicFiltered := tx.Where(rawFilter)
-	if len(filter.IDs) > 0 {
-		basicFiltered.Scopes(scopeInIDs(filter.IDs))
-	}
-	if err := basicFiltered.Find(&folders).Error; err != nil {
+	if err := tx.Scopes(scopeFolderFilter(filter)).Find(&folders).Error; err != nil {
 		return nil, 0, err
 	}
 	return folders, len(folders), nil
+}
+
+func selectFolderCount(tx *gorm.DB, filter *vo.FolderVo) (int64, error) {
+	var count int64
+	if err := tx.Scopes(scopeFolderFilter(filter)).Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return count, nil
 }
 
 func findFolderTree(tx *gorm.DB, filter *vo.FolderVo) ([]*dto.FolderDto, int, error) {
@@ -310,4 +275,16 @@ func findFolderTree(tx *gorm.DB, filter *vo.FolderVo) ([]*dto.FolderDto, int, er
 		folders[i] = dto.NewFolderDto(rawFolder, contents)
 	}
 	return folders, len(folders), nil
+}
+
+func scopeFolderFilter(filter *vo.FolderVo) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if filter == nil {
+			return db
+		}
+		moved := db.Where(filter.Entity())
+		// Extra filters here
+		moved = db.Scopes(scopeInIDs(filter.IDs))
+		return moved
+	}
 }

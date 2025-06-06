@@ -1,11 +1,11 @@
 <template>
 	<perfect-scrollbar>
-		<n-flex justify="space-start">
+		<n-flex justify="start">
 			<n-h1 prefix="bar" style="text-align: start;">
 				<n-text type="primary">{{ t('title') }}</n-text>
 			</n-h1>
 		</n-flex>
-		<n-flex justify="flex-start" style="margin-bottom: 15px;">
+		<n-flex justify="start" style="margin-bottom: 15px;">
 			<n-select :loading="tableLoading" v-model:value="currentRivalID" :options="rivalOptions" style="width: 200px;" />
 			<n-button style="margin-left: auto;" type="primary" @click="showAddModal = true">{{ t('button.add') }}</n-button>
 		</n-flex>

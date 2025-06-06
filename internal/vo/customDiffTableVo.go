@@ -15,7 +15,10 @@ type CustomDiffTableVo struct {
 	LevelOrders string
 
 	// Pagination
-	Pagination         *entity.Page
+	Pagination *entity.Page
+	// Extra Filters
+	IgnoreDefaultTable bool // When flagged, exclude the default 'lampghost' table from the query result
+	// Unused
 	UnjoinedLevelOrder []string `json:"level_order"`
 }
 

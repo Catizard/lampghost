@@ -151,6 +151,9 @@ func scopeCustomDiffTableFilter(filter *vo.CustomDiffTableVo) func(db *gorm.DB) 
 		}
 		moved := db.Where(filter.Entity())
 		// Add extra filter here
+		if filter.IgnoreDefaultTable {
+			moved = moved.Where("ID != 1")
+		}
 		return moved
 	}
 }

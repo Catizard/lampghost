@@ -1277,6 +1277,7 @@ export namespace vo {
 	    Symbol: string;
 	    LevelOrders: string;
 	    Pagination?: entity.Page;
+	    IgnoreDefaultTable: boolean;
 	    level_order: string[];
 	
 	    static createFrom(source: any = {}) {
@@ -1293,6 +1294,7 @@ export namespace vo {
 	        this.Symbol = source["Symbol"];
 	        this.LevelOrders = source["LevelOrders"];
 	        this.Pagination = this.convertValues(source["Pagination"], entity.Page);
+	        this.IgnoreDefaultTable = source["IgnoreDefaultTable"];
 	        this.level_order = source["level_order"];
 	    }
 	

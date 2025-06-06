@@ -15,7 +15,7 @@ type FolderContentDto struct {
 	Comment    string
 
 	Lamp      int
-	TableTags []*DiffTableTagDto
+	TableTags []*DiffTableTagDto `gorm:"-"`
 	// Pagination
 	Page      int
 	PageSize  int

@@ -1,0 +1,81 @@
+<!-- A selectable data table represents unbound folders under one custom table  -->
+<!-- Used both for custom table and favrioute folder module -->
+<template>
+	<n-data-table :columns="columns" :data="data" :pagination="false" :bordered="false"
+		:row-key="(row: dto.FolderDto) => row.ID" @update:checked-row-keys="handleCheck" :loading="loading"
+		:checked-row-keys="checkedFolerIds" />
+</template>
+
+<script lang="ts" setup>
+import { FindFolderList } from '@wailsjs/go/main/App';
+import { dto } from '@wailsjs/go/models';
+import { DataTableColumns } from 'naive-ui';
+import { Ref, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
+
+const props = defineProps<{
+	type: "table" | "folder",
+	sha256?: string,
+	customTableId?: number
+}>();
+defineExpose({ reload })
+let checkedFolerIds = defineModel<number[]>("checkedFolderIds");
+
+const loading = ref(false);
+
+const data: Ref<dto.FolderDto[]> = ref([]);
+const columns: DataTableColumns<dto.FolderDto> = [
+	{ type: "selection" },
+	{
+		title: () => {
+			if (props.type == "folder") {
+				return t('column.name.folder');
+			} else if (props.type == "table") {
+				return t('column.name.table');
+			}
+		},
+		key: "FolderName"
+	}
+];
+
+function reload() {
+	loading.value = true;
+	checkedFolerIds.value = [];
+	FindFolderList({
+		IgnoreSha256: props.sha256,
+		CustomTableID: props.customTableId ?? 1
+	} as any).then(result => {
+		if (result.Code != 200) {
+			return Promise.reject(result.Msg);
+		}
+		data.value = [...result.Rows];
+	})
+		.catch(err => window.$notifyError(err))
+		.finally(() => loading.value = false);
+}
+
+function handleCheck(rowKeys: number[]) {
+	checkedFolerIds.value = [...rowKeys];
+}
+</script>
+
+<i18n lang="json">{
+	"en": {
+		"column": {
+			"name": {
+				"folder": "Folder Name",
+				"table": "Difficult Name"
+			}
+		}
+	},
+	"zh-CN": {
+		"column": {
+			"name": {
+				"folder": "收藏夹名称",
+				"table": "难度名称"
+			}
+		}
+	}
+}</i18n>

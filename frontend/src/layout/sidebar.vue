@@ -24,7 +24,7 @@ import {
 	Pencil as PencilIcon
 } from '@vicons/ionicons5'
 import { MenuOption, NIcon } from 'naive-ui'
-import { computed, h, ref, watchEffect } from 'vue'
+import { h, ref } from 'vue'
 import { RouterLink } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 
@@ -91,6 +91,23 @@ const menuOptions: MenuOption[] = [
 		icon: renderIcon(BookmarksIcon)
 	},
 	{
+		label: t('menuName.customtable.self'),
+		key: "customtable",
+		icon: renderIcon(CustomTableIcon),
+		children: [
+			{
+				label: renderOption("/customtable/management", t('menuName.customtable.management')),
+				key: "customtable_management",
+				icon: renderIcon(ListIcon)
+			},
+			{
+				label: renderOption("/customtable/design", t('menuName.customtable.design')),
+				key: "customtable_design",
+				icon: renderIcon(PencilIcon)
+			}
+		]
+	},
+	{
 		label: renderOption("/recent", t('menuName.recent')),
 		key: "recent",
 		icon: renderIcon(TimeIcon)
@@ -110,23 +127,7 @@ const menuOptions: MenuOption[] = [
 		key: "download",
 		icon: renderIcon(DownloadIcon)
 	},
-	{
-		label: t('menuName.customtable.self'),
-		key: "customtable",
-		icon: renderIcon(CustomTableIcon),
-		children: [
-			{
-				label: renderOption("/customtable/management", t('menuName.customtable.management')),
-				key: "customtable_management",
-				icon: renderIcon(ListIcon)
-			},
-			{
-				label: renderOption("/customtable/design", t('menuName.customtable.design')),
-				key: "customtable_design",
-				icon: renderIcon(PencilIcon)
-			}
-		]
-	},
+
 	{
 		label: renderOption("/settings", t('menuName.settings')),
 		key: "settings",

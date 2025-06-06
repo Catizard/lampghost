@@ -147,16 +147,6 @@ func (ctl *DiffTableController) QueryLevelLayeredDiffTableInfoByID(ID uint) resu
 	return result.NewRtnData(data)
 }
 
-func (ctl *DiffTableController) BindDiffTableDataToFolder(diffTableDataID uint, folderIDs []uint) result.RtnMessage {
-	log.Info("[Controller] Calling DiffTableController.bindDiffTableDataToFolder")
-	err := ctl.diffTableService.BindDiffTableDataToFolder(diffTableDataID, folderIDs)
-	if err != nil {
-		log.Errorf("[DiffTableController] returning err: %v", err)
-		return result.NewErrorMessage(err)
-	}
-	return result.SUCCESS
-}
-
 func (ctl *DiffTableController) UpdateHeaderOrder(headerIDs []uint) result.RtnMessage {
 	log.Info("[Controller] Calling DiffTableController.UpdateHeaderOrder")
 	if err := ctl.diffTableService.UpdateHeaderOrder(headerIDs); err != nil {

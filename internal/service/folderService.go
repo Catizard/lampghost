@@ -57,6 +57,48 @@ func (s *FolderService) AddFolder(param *vo.FolderVo) (*entity.Folder, error) {
 	return ret, nil
 }
 
+func (s *FolderService) BindSongToFolder(param *vo.BindToFolderVo) error {
+	if param == nil {
+		return eris.New("BindSongToFolder: param cannot be nil")
+	}
+	if len(param.FolderIDs) == 0 {
+		return eris.New("BindSongToFolder: bind song to nothing")
+	}
+	if param.Md5 == "" && param.Sha256 == "" {
+		return eris.New("BindSongToFolder: md5 and sha256 are both not provided")
+	}
+
+	cache, err := queryDefaultSongHashCache(s.db)
+	if err != nil {
+		return eris.Wrap(err, "query cache")
+	}
+	if param.Md5 == "" {
+		md5, ok := cache.GetMD5(param.Sha256)
+		if !ok {
+			return eris.New("BindSongToFolder: cannot bind an unexist song to folder")
+		}
+		param.Md5 = md5
+	}
+	if param.Sha256 == "" {
+		sha256, ok := cache.GetSHA256(param.Md5)
+		if !ok {
+			return eris.New("BindSongToFolder: cannot bind an unexist song to folder")
+		}
+		param.Sha256 = sha256
+	}
+
+	content := entity.FolderContent{
+		Sha256: param.Sha256,
+		Md5:    param.Md5,
+		Title:  param.Title,
+	}
+
+	if err := bindSongToFolder(s.db, content, param.FolderIDs); err != nil {
+		return eris.Wrap(err, "bind")
+	}
+	return nil
+}
+
 // Delete a folder, and its contents
 func (s *FolderService) DelFolder(ID uint) error {
 	if err := s.db.Transaction(func(tx *gorm.DB) error {
@@ -202,7 +244,7 @@ func (s *FolderService) FindFolderContentList(filter *vo.FolderContentVo) ([]*en
 
 func findFolderList(tx *gorm.DB, filter *vo.FolderVo) ([]*entity.Folder, int, error) {
 	var folders []*entity.Folder
-	if err := tx.Scopes(scopeFolderFilter(filter)).Find(&folders).Error; err != nil {
+	if err := tx.Debug().Scopes(scopeFolderFilter(filter)).Find(&folders).Error; err != nil {
 		return nil, 0, err
 	}
 	return folders, len(folders), nil
@@ -210,7 +252,7 @@ func findFolderList(tx *gorm.DB, filter *vo.FolderVo) ([]*entity.Folder, int, er
 
 func selectFolderCount(tx *gorm.DB, filter *vo.FolderVo) (int64, error) {
 	var count int64
-	if err := tx.Scopes(scopeFolderFilter(filter)).Count(&count).Error; err != nil {
+	if err := tx.Model(&entity.Folder{}).Scopes(scopeFolderFilter(filter)).Count(&count).Error; err != nil {
 		return 0, err
 	}
 	return count, nil
@@ -284,7 +326,10 @@ func scopeFolderFilter(filter *vo.FolderVo) func(db *gorm.DB) *gorm.DB {
 		}
 		moved := db.Where(filter.Entity())
 		// Extra filters here
-		moved = db.Scopes(scopeInIDs(filter.IDs))
+		moved = moved.Scopes(scopeInIDs(filter.IDs))
+		if filter.IgnoreSha256 != nil {
+			moved = moved.Where("folder.id not in (select distinct folder_id from folder_content fc where fc.sha256 = ?)", *filter.IgnoreSha256)
+		}
 		return moved
 	}
 }

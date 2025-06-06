@@ -1205,6 +1205,24 @@ export namespace result {
 
 export namespace vo {
 	
+	export class BindToFolderVo {
+	    FolderIDs: number[];
+	    Title: string;
+	    Md5: string;
+	    Sha256: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new BindToFolderVo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.FolderIDs = source["FolderIDs"];
+	        this.Title = source["Title"];
+	        this.Md5 = source["Md5"];
+	        this.Sha256 = source["Sha256"];
+	    }
+	}
 	export class ChartInfoVo {
 	    Title: string;
 	    SubTitle: string;
@@ -1462,7 +1480,6 @@ export namespace vo {
 	    CustomTableID: number;
 	    IDs: number[];
 	    IgnoreSha256?: string;
-	    IgnoreRivalSongDataID?: number;
 	    RivalID: number;
 	
 	    static createFrom(source: any = {}) {
@@ -1479,7 +1496,6 @@ export namespace vo {
 	        this.CustomTableID = source["CustomTableID"];
 	        this.IDs = source["IDs"];
 	        this.IgnoreSha256 = source["IgnoreSha256"];
-	        this.IgnoreRivalSongDataID = source["IgnoreRivalSongDataID"];
 	        this.RivalID = source["RivalID"];
 	    }
 	

@@ -24,27 +24,6 @@ func NewRivalSongDataService(db *gorm.DB) *RivalSongDataService {
 	}
 }
 
-func (s *RivalSongDataService) BindRivalSongDataToFolder(rivalSongDataID uint, folderIDs []uint) error {
-	return s.db.Transaction(func(tx *gorm.DB) error {
-		songData, err := findRivalSongDataByID(tx, rivalSongDataID)
-		if err != nil {
-			return err
-		}
-
-		content := entity.FolderContent{
-			Sha256: songData.Sha256,
-			Md5:    songData.Md5,
-			Title:  songData.Title,
-		}
-
-		if err := bindSongToFolder(tx, content, folderIDs); err != nil {
-			return err
-		}
-
-		return nil
-	})
-}
-
 // Basic query function for rival_song_data table
 func findRivalSongDataByID(tx *gorm.DB, ID uint) (*entity.RivalSongData, error) {
 	var data *entity.RivalSongData

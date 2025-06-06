@@ -95,6 +95,9 @@ const columns: DataTableColumns<dto.RivalTagDto> = [
 					tertiary: true,
 					size: 'small',
 					type: "error",
+					style: {
+						"margin-left": "5px",
+					},
 					onClick: () => deleteTag(row),
 				},
 				{ default: () => t('button.delete') }
@@ -110,7 +113,7 @@ const columns: DataTableColumns<dto.RivalTagDto> = [
 				{ default: () => row.Enabled ? t('button.disable') : t('button.enable') }
 			);
 			if (deleteTagButton != null) {
-				return [deleteTagButton, revertEnabledStateButton];
+				return [revertEnabledStateButton, deleteTagButton];
 			}
 			return revertEnabledStateButton;
 		}
@@ -220,7 +223,7 @@ function revertTagEnabledState(tag: dto.RivalTagDto) {
 			}
 			loadData();
 		}).catch(err => window.$notifyError(err));
-;
+	;
 }
 
 // Watch: Whenever changing current rival, reset current page to the first one

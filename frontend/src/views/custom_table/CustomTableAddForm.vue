@@ -79,7 +79,7 @@ function resetFormData() {
       "labelName": "Name",
       "placeholderName": "Please Input name",
       "labelSymbol": "Symbol",
-      "placeHolderSymbol": "Customize Table Symbol"
+      "placeholderSymbol": "Customize Table Symbol"
     },
     "rules": {
       "missingName": "Name cannot be empty"
@@ -93,7 +93,7 @@ function resetFormData() {
       "labelName": "名称",
       "placeholderName": "请输入名称",
       "labelSymbol": "标志",
-      "placeHolderSymbol": "自定义难度表标志"
+      "placeholderSymbol": "自定义难度表标志"
     },
     "rules": {
       "missingName": "名称不能为空"

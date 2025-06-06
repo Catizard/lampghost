@@ -1,19 +1,21 @@
 <template>
 	<n-data-table remote :columns="columns" :data="data" :pagination="pagination" :bordered="false" min-height="500px"
 		:loading="loading" :row-key="(row: dto.DiffTableDataDto) => row.ID" @update-sorter="handleUpdateSorter" />
-	<select-folder v-model:show="showFolderSelection" :sha256="candidateSongSha256" @submit="handleSubmit" />
+	<select-folder v-model:show="showFolderSelection" :sha256="candidateSongInfo?.Sha256" @submit="handleSubmit" />
+	<select-difficult v-model:show="showTableSelection" :sha256="candidateSongInfo?.Sha256" @submit="handleSubmit" />
 </template>
 
 <script setup lang="ts">
 import { DataTableColumns, DataTableSortState, NButton, NDropdown, NEllipsis, NIcon } from 'naive-ui';
 import { dto } from '@wailsjs/go/models';
 import { h, reactive, ref, Ref, watch } from 'vue';
-import { BindDiffTableDataToFolder, QueryDiffTableDataWithRival, SubmitSingleMD5DownloadTask } from '@wailsjs/go/main/App';
+import { BindSongToFolder, QueryDiffTableDataWithRival, SubmitSingleMD5DownloadTask } from '@wailsjs/go/main/App';
 import SelectFolder from '@/views/folder/SelectFolder.vue';
 import ClearTag from '@/components/ClearTag.vue';
 import { useI18n } from 'vue-i18n';
 import { WarningOutline } from '@vicons/ionicons5';
 import { BrowserOpenURL } from '@wailsjs/runtime/runtime';
+import SelectDifficult from '../custom_table/SelectDifficult.vue';
 
 const i18n = useI18n();
 const { t } = i18n;
@@ -69,6 +71,7 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
 					trigger: "hover",
 					options: [
 						{ label: t('button.addToFolder'), key: "AddToFolder" },
+						{ label: t('button.addToTable'), key: "AddToTable" },
 						{ label: t('button.download'), key: "Download" },
 						{ label: t('button.gotoURL'), key: "GotoURL", disabled: row.Url == "" },
 						{ label: t('button.gotoURLDiff'), key: "GotoURLDiff", disabled: row.UrlDiff == "" },
@@ -81,6 +84,7 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
 						const sha256 = row.Sha256;
 						switch (key) {
 							case 'AddToFolder': handleAddToFolder(row); break;
+							case 'AddToTable': handleAddToTable(row); break;
 							case 'Download': handleSubmitSingleMD5DownloadTask(row); break;
 							case "GotoURL": BrowserOpenURL(row.Url); break;
 							case "GotoURLDiff": BrowserOpenURL(row.UrlDiff); break;
@@ -142,17 +146,35 @@ watch(props, () => {
 	loadData()
 });
 
-const candidateDiffDataId = ref<number | null>(null);
-const candidateSongSha256 = ref<string | null>(null);
+type SongInfo = {
+	Sha256: string,
+	Title: string
+};
+const candidateSongInfo = ref<SongInfo | null>(null);
 const showFolderSelection = ref<boolean>(false);
 function handleAddToFolder(row: dto.DiffTableDataDto) {
-	candidateDiffDataId.value = row.ID;
-	candidateSongSha256.value = row.Sha256;
+	candidateSongInfo.value = {
+		Sha256: row.Sha256,
+		Title: row.Title
+	};
 	showFolderSelection.value = true;
 }
 
-function handleSubmit(selected: [any]) {
-	BindDiffTableDataToFolder(candidateDiffDataId.value, selected)
+const showTableSelection = ref<boolean>(false);
+function handleAddToTable(row: dto.DiffTableDataDto) {
+	candidateSongInfo.value = {
+		Sha256: row.Sha256,
+		Title: row.Title,
+	};
+	showTableSelection.value = true;
+}
+
+function handleSubmit(selected: [number]) {
+	BindSongToFolder({
+		Md5: "",
+		FolderIDs: selected,
+		...candidateSongInfo.value
+	} as any)
 		.then(result => {
 			if (result.Code != 200) {
 				return Promise.reject(result.Msg);
@@ -201,7 +223,8 @@ loadData();
 			"actions": "Actions"
 		},
 		"button": {
-			"addToFolder": "Add to folder",
+			"addToFolder": "Add to Folder",
+			"addToTable": "Add to Custom Table",
 			"download": "Download",
 			"gotoURL": "Open song url in browser",
 			"gotoURLDiff": "Open sabun url in browser",
@@ -226,6 +249,7 @@ loadData();
 		},
 		"button": {
 			"addToFolder": "添加至收藏夹",
+			"addToTable": "添加至自定义难度表",
 			"download": "下载",
 			"gotoURL": "在浏览器中打开单曲URL",
 			"gotoURLDiff": "在浏览器中打开差分URL",

@@ -7,8 +7,8 @@
 			<n-button type="primary" @click="showAddModal = true">{{ t('button.addFolder') }}</n-button>
 		</n-flex>
 	</n-flex>
-	<FolderTable ref="folderTableRef"/>
-	<FolderAddForm v-model:show="showAddModal" @refresh="reload" />
+	<FolderTable type="folder" ref="folderTableRef" />
+	<FolderAddForm type="folder" v-model:show="showAddModal" @refresh="reload" />
 </template>
 
 <script setup lang="ts">

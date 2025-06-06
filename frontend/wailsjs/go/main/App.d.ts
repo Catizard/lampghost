@@ -18,9 +18,7 @@ export function AddRivalInfo(arg1:vo.RivalInfoVo):Promise<result.RtnMessage>;
 
 export function AddRivalTag(arg1:vo.RivalTagVo):Promise<result.RtnMessage>;
 
-export function BindDiffTableDataToFolder(arg1:number,arg2:Array<number>):Promise<result.RtnMessage>;
-
-export function BindRivalSongDataToFolder(arg1:number,arg2:Array<number>):Promise<result.RtnMessage>;
+export function BindSongToFolder(arg1:vo.BindToFolderVo):Promise<result.RtnMessage>;
 
 export function CancelDownloadTask(arg1:number):Promise<result.RtnMessage>;
 

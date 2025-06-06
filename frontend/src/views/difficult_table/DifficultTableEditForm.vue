@@ -119,7 +119,7 @@ function open(headerId: number) {
   "zh-CN": {
     "modal": {
       "title": "修改难度表",
-      "positiveText": "新增",
+      "positiveText": "提交",
       "negativeText": "取消",
       "labelNoTagBuild": "是否展示标签",
       "labelTagColor": "标签颜色",

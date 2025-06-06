@@ -28,6 +28,15 @@ func (ctl *FolderController) AddFolder(param *vo.FolderVo) result.RtnMessage {
 	return result.SUCCESS
 }
 
+func (ctl *FolderController) BindSongToFolder(param *vo.BindToFolderVo) result.RtnMessage {
+	log.Info("[Controller] Calling FolderController.BindSongToFolder")
+	if err := ctl.folderService.BindSongToFolder(param); err != nil {
+		log.Errorf("[FolderController] returning err: %s", err)
+		return result.NewErrorMessage(err)
+	}
+	return result.SUCCESS
+}
+
 func (ctl *FolderController) DelFolder(ID uint) result.RtnMessage {
 	log.Info("[Controller] calling FolderController.DelDiffTableHeader")
 	err := ctl.folderService.DelFolder(ID)

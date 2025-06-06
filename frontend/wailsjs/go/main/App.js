@@ -26,12 +26,8 @@ export function AddRivalTag(arg1) {
   return window['go']['main']['App']['AddRivalTag'](arg1);
 }
 
-export function BindDiffTableDataToFolder(arg1, arg2) {
-  return window['go']['main']['App']['BindDiffTableDataToFolder'](arg1, arg2);
-}
-
-export function BindRivalSongDataToFolder(arg1, arg2) {
-  return window['go']['main']['App']['BindRivalSongDataToFolder'](arg1, arg2);
+export function BindSongToFolder(arg1) {
+  return window['go']['main']['App']['BindSongToFolder'](arg1);
 }
 
 export function CancelDownloadTask(arg1) {

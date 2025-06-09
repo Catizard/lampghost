@@ -16,9 +16,13 @@ type RivalInfoVo struct {
 	ScoreDataLogPath *string
 	PlayCount        int
 	MainUser         bool
+	// Below fields cannot be updated by `UpdateRivalInfo`
+	LockTagID     uint
+	ReverseImport int
 
-	Pagination *entity.Page
-	Locale     *string // only passed at initialized phase
+	Pagination     *entity.Page
+	Locale         *string // only passed at initialized phase
+	IgnoreMainUser bool    // equivalent to ID != 1
 }
 
 func (rivalInfo *RivalInfoVo) Entity() *entity.RivalInfo {
@@ -35,6 +39,8 @@ func (rivalInfo *RivalInfoVo) Entity() *entity.RivalInfo {
 		ScoreDataLogPath: rivalInfo.ScoreDataLogPath,
 		PlayCount:        rivalInfo.PlayCount,
 		MainUser:         rivalInfo.MainUser,
+		LockTagID:        rivalInfo.LockTagID,
+		ReverseImport:    rivalInfo.ReverseImport,
 	}
 }
 

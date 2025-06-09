@@ -15,6 +15,10 @@ const mainRoutes: RouteRecordRaw[] = [
     component: () => import("../views/rivals/RivalTags.vue"),
   },
   {
+    path: "rivals/lock",
+    component: () => import("../views/rivals/RivalLock.vue"),
+  },
+  {
     path: "/difftable/management",
     component: () => import("../views/difficult_table/DifficultTable.vue"),
   },

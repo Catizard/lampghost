@@ -158,12 +158,8 @@ func (s *RivalInfoService) AddRivalInfo(rivalInfo *vo.RivalInfoVo) error {
 	})
 }
 
-func (s *RivalInfoService) FindRivalInfoList() ([]*entity.RivalInfo, int, error) {
-	var rivals []*entity.RivalInfo
-	if err := s.db.Find(&rivals).Error; err != nil {
-		return nil, 0, err
-	}
-	return rivals, len(rivals), nil
+func (s *RivalInfoService) FindRivalInfoList(filter *vo.RivalInfoVo) ([]*entity.RivalInfo, int, error) {
+	return findRivalInfoList(s.db, filter)
 }
 
 func (s *RivalInfoService) FindRivalInfoByID(rivalID uint) (*entity.RivalInfo, error) {
@@ -374,16 +370,35 @@ func addRivalInfo(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
 	return nil
 }
 
-func selectRivalInfoCount(tx *gorm.DB, filter *vo.RivalInfoVo) (int64, error) {
-	querying := tx.Model(&entity.RivalInfo{})
-	if filter != nil {
-		querying = querying.Where(filter.Entity())
+func findRivalInfoList(tx *gorm.DB, filter *vo.RivalInfoVo) ([]*entity.RivalInfo, int, error) {
+	var out []*entity.RivalInfo
+	if err := tx.Model(&entity.RivalInfo{}).Scopes(scopeRivalInfoFilter(filter)).Find(&out).Error; err != nil {
+		return nil, 0, err
 	}
+	return out, len(out), nil
+}
+
+func selectRivalInfoCount(tx *gorm.DB, filter *vo.RivalInfoVo) (int64, error) {
 	var count int64
-	if err := querying.Count(&count).Error; err != nil {
+	if err := tx.Model(&entity.RivalInfo{}).Scopes(scopeRivalInfoFilter(filter)).Count(&count).Error; err != nil {
 		return 0, err
 	}
 	return count, nil
+}
+
+// Cmmon query scope for vo.RivalInfoVo
+func scopeRivalInfoFilter(filter *vo.RivalInfoVo) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if filter == nil {
+			return db
+		}
+		moved := db.Where(filter.Entity())
+		// Add extra filter here
+		if filter.IgnoreMainUser {
+			moved.Where("ID != 1")
+		}
+		return moved
+	}
 }
 
 // Fully reload one rival's saves files

@@ -21,7 +21,8 @@ import {
 	List as ListIcon,
 	DownloadOutline as DownloadIcon,
 	ColorWand as CustomTableIcon,
-	Pencil as PencilIcon
+	Pencil as PencilIcon,
+	SnowOutline as LockIcon,
 } from '@vicons/ionicons5'
 import { MenuOption, NIcon } from 'naive-ui'
 import { h, ref } from 'vue'
@@ -64,6 +65,11 @@ const menuOptions: MenuOption[] = [
 				label: renderOption("/rivals/tags", t('menuName.rivals.tags')),
 				key: "rival_tags",
 				icon: renderIcon(MedalIcon),
+			},
+			{
+				label: renderOption("/rivals/lock", t('menuName.rivals.lock')),
+				key: "rival_lock",
+				icon: renderIcon(LockIcon)
 			}
 		],
 	},
@@ -143,7 +149,8 @@ const menuOptions: MenuOption[] = [
 			"rivals": {
 				"self": "Player",
 				"management": "Management",
-				"tags": "Player Tags"
+				"tags": "Player Tags",
+				"lock": "Lock Version"
 			},
 			"difftable": {
 				"self": "Table",
@@ -169,7 +176,8 @@ const menuOptions: MenuOption[] = [
 			"rivals": {
 				"self": "玩家",
 				"management": "管理",
-				"tags": "标签"
+				"tags": "标签",
+				"lock": "版本锁定"
 			},
 			"difftable": {
 				"self": "难度表",

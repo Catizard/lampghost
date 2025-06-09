@@ -106,6 +106,14 @@ func (s *RivalScoreLogService) QueryPrevDayScoreLogList(filter *vo.RivalScoreLog
 	return out, len(out), nil
 }
 
+func (s *RivalScoreLogService) FindRivalMaximumClearScoreLogList(filter *vo.RivalScoreLogVo) ([]*dto.RivalScoreLogDto, int, error) {
+	return findRivalMaximumClearScoreLogList(s.db, filter)
+}
+
+func (s *RivalScoreLogService) QueryReverseImportScoreData(filter *vo.RivalScoreLogVo) ([]*entity.IRLampData, int, error) {
+	return queryReverseImportScoreData(s.db, filter)
+}
+
 func findRivalScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.RivalScoreLogDto, int, error) {
 	fields := `
 		rival_score_log.*,
@@ -146,9 +154,6 @@ func findRivalMaximumClearScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) 
 	partial := tx.Model(&entity.RivalScoreLog{}).Order("record_time desc").Select(fields)
 	var out []*dto.RivalScoreLogDto
 	partial = partial.Scopes(scopeRivalScoreLogFilter(filter))
-	if filter != nil {
-		partial = partial.Scopes(scopeInSha256s(filter.Sha256s))
-	}
 	// NOTE: without this statement, this function has strange behaviour
 	partial = partial.Group("sha256")
 	if err := partial.Debug().Find(&out).Error; err != nil {
@@ -244,6 +249,34 @@ func queryPrevDayScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.R
 	return out, len(out), nil
 }
 
+// select max(rsl.clear) as clear, rsd.mode, rival_score_log
+// from rival_score_log
+// left join (select ID, sha256, mode from rival_song_data rsd group by sha256) as rsd on rsl.sha256 = rsd.sha256
+// where rsl.rival_id = ? and rsd.ID is not null
+// group by rsl.sha256
+func queryReverseImportScoreData(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*entity.IRLampData, int, error) {
+	fields := `
+		max(rival_score_log.clear) as clear,
+		rsd.mode,
+		rival_score_log.sha256
+	`
+
+	var out []*entity.IRLampData
+	if err := tx.
+		Debug().
+		Model(&entity.RivalScoreLog{}).
+		Select(fields).
+		Scopes(scopeRivalScoreLogFilter(filter)).
+		Joins(`left join (select ID, sha256, mode from rival_song_data rsd group by sha256) as rsd on rival_score_log.sha256 = rsd.sha256`).
+		Where("rsd.ID is not null").
+		Group("rival_score_log.sha256").
+		Find(&out).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return out, len(out), nil
+}
+
 // Specialized scope for vo.RivalScoreLogVo
 func scopeRivalScoreLogFilter(filter *vo.RivalScoreLogVo) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
@@ -269,6 +302,9 @@ func scopeRivalScoreLogFilter(filter *vo.RivalScoreLogVo) func(db *gorm.DB) *gor
 		}
 		if filter.SpecifyYear != nil {
 			moved = moved.Where("STRFTIME('%Y', `rival_score_log`.`record_time`) = ?", filter.SpecifyYear)
+		}
+		if len(filter.Sha256s) > 0 {
+			moved = moved.Where("rival_score_log.sha256 in (?)", filter.Sha256s)
 		}
 		return moved
 	}

@@ -403,6 +403,8 @@ export namespace dto {
 	    ScoreDataLogPath?: string;
 	    PlayCount: number;
 	    MainUser: boolean;
+	    LockTagID: number;
+	    ReverseImport: number;
 	    DiffTableHeader?: DiffTableHeaderDto;
 	
 	    static createFrom(source: any = {}) {
@@ -421,6 +423,8 @@ export namespace dto {
 	        this.ScoreDataLogPath = source["ScoreDataLogPath"];
 	        this.PlayCount = source["PlayCount"];
 	        this.MainUser = source["MainUser"];
+	        this.LockTagID = source["LockTagID"];
+	        this.ReverseImport = source["ReverseImport"];
 	        this.DiffTableHeader = this.convertValues(source["DiffTableHeader"], DiffTableHeaderDto);
 	    }
 	
@@ -952,6 +956,8 @@ export namespace entity {
 	    ScoreDataLogPath?: string;
 	    PlayCount: number;
 	    MainUser: boolean;
+	    LockTagID: number;
+	    ReverseImport: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new RivalInfo(source);
@@ -969,6 +975,8 @@ export namespace entity {
 	        this.ScoreDataLogPath = source["ScoreDataLogPath"];
 	        this.PlayCount = source["PlayCount"];
 	        this.MainUser = source["MainUser"];
+	        this.LockTagID = source["LockTagID"];
+	        this.ReverseImport = source["ReverseImport"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1557,8 +1565,11 @@ export namespace vo {
 	    ScoreDataLogPath?: string;
 	    PlayCount: number;
 	    MainUser: boolean;
+	    LockTagID: number;
+	    ReverseImport: number;
 	    Pagination?: entity.Page;
 	    Locale?: string;
+	    IgnoreMainUser: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new RivalInfoVo(source);
@@ -1576,8 +1587,11 @@ export namespace vo {
 	        this.ScoreDataLogPath = source["ScoreDataLogPath"];
 	        this.PlayCount = source["PlayCount"];
 	        this.MainUser = source["MainUser"];
+	        this.LockTagID = source["LockTagID"];
+	        this.ReverseImport = source["ReverseImport"];
 	        this.Pagination = this.convertValues(source["Pagination"], entity.Page);
 	        this.Locale = source["Locale"];
+	        this.IgnoreMainUser = source["IgnoreMainUser"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

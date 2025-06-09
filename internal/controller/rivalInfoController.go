@@ -103,7 +103,7 @@ func (ctl *RivalInfoController) ReloadRivalData(rivalID uint, fullyReload bool) 
 
 func (ctl *RivalInfoController) FindRivalInfoList() result.RtnDataList {
 	log.Info("[Controller] calling RivalInfoController.FindRivalInfoList")
-	rows, _, err := ctl.rivalInfoService.FindRivalInfoList()
+	rows, _, err := ctl.rivalInfoService.FindRivalInfoList(nil)
 	if err != nil {
 		log.Errorf("[RivalInfoController] returning error: %v", err)
 		return result.NewErrorDataList(err)
@@ -113,7 +113,7 @@ func (ctl *RivalInfoController) FindRivalInfoList() result.RtnDataList {
 
 func (ctl *RivalInfoController) QueryRivalInfoPageList(filter *vo.RivalInfoVo) result.RtnPage {
 	log.Info("[Controller] calling RivalInfoController.QueryRivalInfoPageList")
-	rows, _, err := ctl.rivalInfoService.FindRivalInfoList()
+	rows, _, err := ctl.rivalInfoService.FindRivalInfoList(nil)
 	if err != nil {
 		log.Errorf("[RivalInfoController] returning error: %v", err)
 		return result.NewErrorPage(err)

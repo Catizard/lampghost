@@ -94,7 +94,16 @@ func NewApp() *App {
 	customDiffTableController := controller.NewCustomDiffTableController(customDiffTableService)
 	folderService := service.NewFolderService(db)
 	folderController := controller.NewFolderController(folderService)
-	folderInternalServer := server.NewInternalServer(customDiffTableService, folderService)
+
+	// Internal Server
+	internalServer := server.NewInternalServer(
+		customDiffTableService,
+		folderService,
+		rivalInfoService,
+		rivalScoreLogService,
+		rivalTagService,
+		rivalSongDataService,
+	)
 
 	return &App{
 		nil,
@@ -109,7 +118,7 @@ func NewApp() *App {
 		folderController,
 		downloadTaskController,
 		customDiffTableController,
-		folderInternalServer,
+		internalServer,
 	}
 }
 

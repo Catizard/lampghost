@@ -6,27 +6,46 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/Catizard/lampghost_wails/internal/dto"
+	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/service"
 	"github.com/Catizard/lampghost_wails/internal/vo"
 	"github.com/charmbracelet/log"
+	. "github.com/samber/lo"
+	"gorm.io/gorm"
 )
 
 // TODO: make port configurable
 // However make it configurable might be broken in the future, since a ir connect jar
-// cannot dynamically set port
+// cannot set port dynamically
 const port = 7391
 
 type InternalServer struct {
 	customDiffTableService *service.CustomDiffTableService
 	folderService          *service.FolderService
+	rivalInfoService       *service.RivalInfoService
+	rivalScoreLogService   *service.RivalScoreLogService
+	rivalTagService        *service.RivalTagService
+	rivalSongDataService   *service.RivalSongDataService
 }
 
-func NewInternalServer(customDiffTableService *service.CustomDiffTableService, folderService *service.FolderService) *InternalServer {
+func NewInternalServer(
+	customDiffTableService *service.CustomDiffTableService,
+	folderService *service.FolderService,
+	rivalInfoService *service.RivalInfoService,
+	rivalScoreLogService *service.RivalScoreLogService,
+	rivalTagService *service.RivalTagService,
+	rivalSongDataService *service.RivalSongDataService,
+) *InternalServer {
 	return &InternalServer{
 		customDiffTableService: customDiffTableService,
 		folderService:          folderService,
+		rivalInfoService:       rivalInfoService,
+		rivalScoreLogService:   rivalScoreLogService,
+		rivalTagService:        rivalTagService,
+		rivalSongDataService:   rivalSongDataService,
 	}
 }
 
@@ -36,11 +55,12 @@ func NewInternalServer(customDiffTableService *service.CustomDiffTableService, f
 //  1. /table/[???].json: return a difficult table metadata which name is '???' and could be imported by beatoraja
 //  2. /content/[???].json: return a difficult table's contents data which custom_table_id = '???'
 //
-// TODO: Mock an IR server for providing version lockable rivals import mechanism
+// Mock an IR server for providing version lockable rivals import mechanism
+// 1. /ir/...: route dispatch, see 'irHandler' for details
 func (s *InternalServer) RunServer() error {
-	// TODO: make the name as the parameter
 	http.HandleFunc("/table/", s.tableHandler)
 	http.HandleFunc("/content/", s.tableContentHandler)
+	http.HandleFunc("/ir/", s.irHandler)
 	go http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 	return nil
 }
@@ -118,6 +138,105 @@ func (s *InternalServer) tableContentHandler(w http.ResponseWriter, r *http.Requ
 	if err != nil {
 		log.Errorf("failed to marshal json: %v", err)
 		http.Error(w, "Failed to marshal json", 500)
+		return
+	}
+	fmt.Fprintf(w, "%s", data)
+}
+
+// Dispatch IR requests.
+//  1. ir/rivals: return registered rivals back
+//  2. ir/scores/[rival id]: return one rival's score data back
+func (s *InternalServer) irHandler(w http.ResponseWriter, r *http.Request) {
+	path := r.URL.Path
+	route := strings.TrimPrefix(path, "/ir/")
+	log.Debugf("[InternalServer | IR] route: %s", route)
+	if strings.HasPrefix(route, "rivals") {
+		s.rivalsHandler(w, r)
+	} else if strings.HasPrefix(route, "scores") {
+		s.scoresHandler(w, r)
+	} else {
+		http.Error(w, "Not Found", 404)
+		return
+	}
+}
+
+func (s *InternalServer) rivalsHandler(w http.ResponseWriter, r *http.Request) {
+	rivals, n, err := s.rivalInfoService.FindRivalInfoList(&vo.RivalInfoVo{
+		IgnoreMainUser: true,
+		ReverseImport:  1,
+	})
+	if err != nil {
+		http.Error(w, fmt.Sprintf("failed to query rival: %s", err), 500)
+		return
+	}
+	if n == 0 {
+		fmt.Fprintf(w, "[]")
+	}
+
+	ret := Map(rivals, func(rival *entity.RivalInfo, _ int) *entity.IRPlayer {
+		return &entity.IRPlayer{
+			ID:   rival.ID,
+			Name: rival.Name,
+			Rank: fmt.Sprintf("%d", rival.LockTagID),
+		}
+	})
+	data, err := json.Marshal(ret)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("marshal: %s", err), 500)
+		return
+	}
+	fmt.Fprintf(w, "%s", data)
+}
+
+func (s *InternalServer) scoresHandler(w http.ResponseWriter, r *http.Request) {
+	path := r.URL.Path
+	strRivalID := strings.TrimPrefix(path, "/ir/scores/")
+	log.Debugf("[InternalServer | IR] /ir/scores/: %s", strRivalID)
+	rivalID, err := strconv.Atoi(strRivalID)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to parse rival's id: %s", err), 500)
+		return
+	}
+
+	rivals, n, err := s.rivalInfoService.FindRivalInfoList(&vo.RivalInfoVo{
+		IgnoreMainUser: true,
+		ReverseImport:  1,
+		Model: gorm.Model{
+			ID: uint(rivalID),
+		},
+	})
+	if err != nil {
+		http.Error(w, fmt.Sprintf("failed to query rival: %s", err), 500)
+		return
+	}
+	if n == 0 {
+		http.Error(w, "No Data", 404)
+		return
+	}
+
+	rival := rivals[0]
+
+	tagTime := time.Time{}
+	if rival.LockTagID != 0 {
+		tag, err := s.rivalTagService.FindRivalTagByID(rival.LockTagID)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("failed to query tag: %s", err), 500)
+			return
+		}
+		tagTime = tag.RecordTime
+	}
+
+	lampData, _, err := s.rivalScoreLogService.QueryReverseImportScoreData(&vo.RivalScoreLogVo{
+		RivalId:       rival.ID,
+		EndRecordTime: tagTime,
+	})
+	if err != nil {
+		http.Error(w, fmt.Sprintf("failed to query score log: %s", err), 500)
+		return
+	}
+	data, err := json.Marshal(lampData)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("marshal: %s", err), 500)
 		return
 	}
 	fmt.Fprintf(w, "%s", data)

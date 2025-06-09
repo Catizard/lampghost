@@ -15,18 +15,27 @@ import (
 
 // TODO: make port configurable
 // However make it configurable might be broken in the future, since a ir connect jar
-// cannot dynamically set port
+// cannot set port dynamically
 const port = 7391
 
 type InternalServer struct {
 	customDiffTableService *service.CustomDiffTableService
 	folderService          *service.FolderService
+	rivalScoreLogService   *service.RivalScoreLogService
+	rivalTagService        *service.RivalTagService
 }
 
-func NewInternalServer(customDiffTableService *service.CustomDiffTableService, folderService *service.FolderService) *InternalServer {
+func NewInternalServer(
+	customDiffTableService *service.CustomDiffTableService,
+	folderService *service.FolderService,
+	rivalScoreLogService *service.RivalScoreLogService,
+	rivalTagService *service.RivalTagService,
+) *InternalServer {
 	return &InternalServer{
 		customDiffTableService: customDiffTableService,
 		folderService:          folderService,
+		rivalScoreLogService:   rivalScoreLogService,
+		rivalTagService:        rivalTagService,
 	}
 }
 
@@ -36,11 +45,12 @@ func NewInternalServer(customDiffTableService *service.CustomDiffTableService, f
 //  1. /table/[???].json: return a difficult table metadata which name is '???' and could be imported by beatoraja
 //  2. /content/[???].json: return a difficult table's contents data which custom_table_id = '???'
 //
-// TODO: Mock an IR server for providing version lockable rivals import mechanism
+// Mock an IR server for providing version lockable rivals import mechanism
+// 1. /ir/...: route dispatch, see 'irHandler' for details
 func (s *InternalServer) RunServer() error {
-	// TODO: make the name as the parameter
 	http.HandleFunc("/table/", s.tableHandler)
 	http.HandleFunc("/content/", s.tableContentHandler)
+	http.HandleFunc("/ir/", s.irHandler)
 	go http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 	return nil
 }
@@ -121,4 +131,29 @@ func (s *InternalServer) tableContentHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	fmt.Fprintf(w, "%s", data)
+}
+
+// Dispatch IR requests.
+//  1. ir/rivals: return registered rivals back
+//  2. ir/scores: return one rival's score data back
+func (s *InternalServer) irHandler(w http.ResponseWriter, r *http.Request) {
+	path := r.URL.Path
+	route := strings.TrimPrefix(path, "/ir/")
+	log.Debugf("[InternalServer | IR] route: %s", route)
+	switch route {
+	case "rivals":
+		s.rivalsHandler(w, r)
+	case "scores":
+		s.scoresHandler(w, r)
+	default:
+		http.Error(w, "Not Found", 404)
+	}
+}
+
+func (s *InternalServer) rivalsHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func (s *InternalServer) scoresHandler(w http.ResponseWriter, r *http.Request) {
+
 }

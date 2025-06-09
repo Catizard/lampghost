@@ -63,10 +63,11 @@ func delCourseInfo(tx *gorm.DB, filter *vo.CourseInfoVo) error {
 	return tx.Unscoped().Where(filter.Entity()).Delete(&entity.CourseInfo{}).Error
 }
 
-// This function returns CourseInfoDto directly due to some historical problem
-//
+// This function returns CourseInfoDto directly due to a historical problem:
 // scorelog.db only records the sha256 while most courses doesn't have, what it has is "md5"
-// therefore we always need to link the md5 with sha256, so the code is written in basic find method
+//
+// Therefore, only sha256 returned is not enough, we always have to get the md5 by sha256 so this is implemented
+// in this basic query function
 //
 // TODO: This function forces using the main user's songdata.db to build the cache, should be implemented with a config
 func findCourseInfoList(tx *gorm.DB, filter *vo.CourseInfoVo) ([]*dto.CourseInfoDto, int, error) {

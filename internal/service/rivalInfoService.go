@@ -482,17 +482,17 @@ func syncRivalData(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
 //  1. scorelog.db
 //  2. scoredatalog.db (if provides)
 //
-// And these tables' data would be re-generated
-//  1. rival_score_log (incrementally added, not re-generated)
-//  2. rival_score_data_log (incrementally added, not re-generated)
-//  3. rival_tag
+// And these tables' data would be updated
+//  1. rival_score_log (incrementally added)
+//  2. rival_score_data_log (incrementally added)
+//  3. rival_tag (keep to old data as much as possible)
 //
 // NOTE: This function wouldn't read `songdata.db` file, therefore there
 // is no need to invalidate the default song cache
 //
 // NOTE: This function would degenerate to fully reload if:
 //  1. rival_score_log is empty
-//  2. rival_score_data_log is empty
+//  2. rival_score_data_log is empty (This wouldn't be a problem since songdata.db could only be imported by main user currently)
 func incrementalSyncRivalData(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
 	lastRivalScoreLog, err := findLastRivalScoreLog(tx, &vo.RivalScoreLogVo{RivalId: rivalInfo.ID})
 	if err != nil {

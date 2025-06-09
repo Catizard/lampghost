@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"slices"
 	"sort"
 	"strconv"
 	"time"
@@ -10,6 +11,8 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/vo"
 	"github.com/charmbracelet/log"
+	"github.com/rotisserie/eris"
+	. "github.com/samber/lo"
 	"gorm.io/gorm"
 )
 
@@ -56,7 +59,8 @@ func (s *RivalTagService) AddRivalTag(rivalTag *vo.RivalTagVo) error {
 // Rebuild one rival's tags
 //
 // Implementaion Details:
-// All user customized tags would be kept
+//  1. All user customized tags would be kept
+//  2. All generated tags would be kept as much as possible
 func (s *RivalTagService) SyncRivalTag(rivalID uint) error {
 	return s.db.Transaction(func(tx *gorm.DB) error {
 		return syncRivalTag(tx, rivalID)
@@ -95,33 +99,17 @@ func (s *RivalTagService) FindRivalTagByID(ID uint) (*entity.RivalTag, error) {
 	return findRivalTagByID(s.db, ID)
 }
 
-// Rebuild one rival's tag list
+// Sync one rival's tags
+//
+// This function should keep the old tags as much as possible because 'rival_info' table
+// has a field 'lock_tag_id' which is a de facto froeign key to 'rival_tag'
 func syncRivalTag(tx *gorm.DB, rivalID uint) error {
-	courseInfoDtos, _, err := findCourseInfoList(tx, nil)
+	tags, n, err := buildRivalTag(tx, rivalID)
 	if err != nil {
-		return err
+		return eris.Wrap(err, "build rival tags")
 	}
-	interestHashSet := make(map[string]interface{})
-	for _, course := range courseInfoDtos {
-		interestHashSet[course.GetJoinedSha256("")] = new(interface{})
-	}
-	var minimumClear int32 = entity.Normal
-	rawScorelogs, _, err := findRivalScoreLogList(tx, &vo.RivalScoreLogVo{
-		RivalId:        rivalID,
-		OnlyCourseLogs: true,
-		MinimumClear:   &minimumClear,
-	})
-	if err != nil {
-		return err
-	}
-	interestScoreLogs := make([]*dto.RivalScoreLogDto, 0)
-	for _, log := range rawScorelogs {
-		if _, ok := interestHashSet[log.Sha256]; ok {
-			interestScoreLogs = append(interestScoreLogs, log)
-		}
-	}
-	if len(interestScoreLogs) == 0 {
-		log.Warn("[RivalTagService] There's no course related play record, skip tag build")
+	if n == 0 {
+		log.Warn("[RivalTagService] No tags have been built, skip syncing tags")
 		// Small hack for clearing unexpected tags
 		if count, err := selectRivalTagCount(tx, &vo.RivalTagVo{
 			RivalId: rivalID,
@@ -133,6 +121,83 @@ func syncRivalTag(tx *gorm.DB, rivalID uint) error {
 			}
 		}
 		return nil
+	}
+
+	prev, n, err := findRivalTagList(tx, &vo.RivalTagVo{
+		RivalId:   rivalID,
+		Generated: true,
+	})
+	if err != nil {
+		return eris.Wrap(err, "find rival_tag")
+	}
+	if n == 0 {
+		// Nothing to do
+		return tx.Create(tags).Error
+	}
+
+	// Delete all previous generated tags that is no longer existsed in new tags
+	deleteTagIDs := FilterMap(prev, func(prevTag *entity.RivalTag, _ int) (uint, bool) {
+		if slices.IndexFunc(tags, func(newTag *entity.RivalTag) bool {
+			return newTag.RecordTime.Equal(prevTag.RecordTime)
+		}) == -1 {
+			return prevTag.ID, true
+		}
+		return 0, false
+	})
+
+	// NOTE: This behaivour should not be triggered easily. Only two possible ways:
+	// 	1. user provides the wrong scorelog.db
+	// 	2. user changed the config 'IgnoreVariant' and rebuild the tags
+	if len(deleteTagIDs) != 0 {
+		log.Warnf("[RivalTagService] deleteTagIDs(len=%d) is not empty", len(deleteTagIDs))
+		if err := tx.Unscoped().Delete(&entity.RivalTag{}, deleteTagIDs).Error; err != nil {
+			return eris.Wrap(err, "delete rival_tag")
+		}
+	}
+
+	// Insert all generated tags that is not existed in previous generated tags
+	insertNewTags := Filter(tags, func(newTag *entity.RivalTag, _ int) bool {
+		return slices.IndexFunc(prev, func(prevTag *entity.RivalTag) bool {
+			return newTag.RecordTime.Equal(prevTag.RecordTime)
+		}) == -1
+	})
+
+	if len(insertNewTags) == 0 {
+		return nil
+	}
+	log.Debugf("[RivalTagService] insert %d new tags", len(insertNewTags))
+	return tx.Create(insertNewTags).Error
+}
+
+// Build one rival's new tags, based on current data
+// Currently, only 'First Clear' type tags are generated
+func buildRivalTag(tx *gorm.DB, rivalID uint) ([]*entity.RivalTag, int, error) {
+	courseInfoDtos, _, err := findCourseInfoList(tx, nil)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	interestHashSet := make(map[string]any)
+	for _, course := range courseInfoDtos {
+		interestHashSet[course.GetJoinedSha256("")] = new(any)
+	}
+
+	var minimumClear int32 = entity.Normal
+	rawScorelogs, _, err := findRivalScoreLogList(tx, &vo.RivalScoreLogVo{
+		RivalId:        rivalID,
+		OnlyCourseLogs: true,
+		MinimumClear:   &minimumClear,
+	})
+	if err != nil {
+		return nil, 0, err
+	}
+	interestScoreLogs := Filter(rawScorelogs, func(log *dto.RivalScoreLogDto, _ int) bool {
+		_, ok := interestHashSet[log.Sha256]
+		return ok
+	})
+
+	if len(interestScoreLogs) == 0 {
+		return make([]*entity.RivalTag, 0), 0, nil
 	}
 
 	sort.Slice(interestScoreLogs, func(i int, j int) bool {
@@ -162,17 +227,7 @@ func syncRivalTag(tx *gorm.DB, rivalID uint) error {
 			break
 		}
 	}
-
-	if len(tags) == 0 {
-		log.Warn("no tags to build")
-		return nil
-	}
-
-	if err := tx.Debug().Unscoped().Where("rival_id = ? and generated = true", rivalID).Delete(&entity.RivalTag{}).Error; err != nil {
-		return err
-	}
-
-	return tx.Create(tags).Error
+	return tags, len(tags), nil
 }
 
 /*

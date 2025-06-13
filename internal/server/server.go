@@ -8,9 +8,11 @@ import (
 	"strings"
 
 	"github.com/Catizard/lampghost_wails/internal/dto"
+	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/service"
 	"github.com/Catizard/lampghost_wails/internal/vo"
 	"github.com/charmbracelet/log"
+	. "github.com/samber/lo"
 )
 
 // TODO: make port configurable
@@ -21,6 +23,7 @@ const port = 7391
 type InternalServer struct {
 	customDiffTableService *service.CustomDiffTableService
 	folderService          *service.FolderService
+	rivalInfoService       *service.RivalInfoService
 	rivalScoreLogService   *service.RivalScoreLogService
 	rivalTagService        *service.RivalTagService
 }
@@ -28,12 +31,14 @@ type InternalServer struct {
 func NewInternalServer(
 	customDiffTableService *service.CustomDiffTableService,
 	folderService *service.FolderService,
+	rivalInfoService *service.RivalInfoService,
 	rivalScoreLogService *service.RivalScoreLogService,
 	rivalTagService *service.RivalTagService,
 ) *InternalServer {
 	return &InternalServer{
 		customDiffTableService: customDiffTableService,
 		folderService:          folderService,
+		rivalInfoService:       rivalInfoService,
 		rivalScoreLogService:   rivalScoreLogService,
 		rivalTagService:        rivalTagService,
 	}
@@ -151,7 +156,31 @@ func (s *InternalServer) irHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *InternalServer) rivalsHandler(w http.ResponseWriter, r *http.Request) {
+	rivals, n, err := s.rivalInfoService.FindRivalInfoList(&vo.RivalInfoVo{
+		IgnoreMainUser: true,
+		ReverseImport:  1,
+	})
+	if err != nil {
+		http.Error(w, fmt.Sprintf("failed to query rival: %s", err), 500)
+		return
+	}
+	if n == 0 {
+		fmt.Fprintf(w, "[]")
+	}
 
+	ret := Map(rivals, func(rival *entity.RivalInfo, _ int) *IRPlayer {
+		return &IRPlayer{
+			ID:   rival.ID,
+			Name: rival.Name,
+			Rank: fmt.Sprintf("%d", rival.LockTagID),
+		}
+	})
+	data, err := json.Marshal(ret)
+	if err != nil {
+		http.Error(w, fmt.Sprint("marshal: %s", err), 500)
+		return
+	}
+	fmt.Fprintf(w, "%s", data)
 }
 
 func (s *InternalServer) scoresHandler(w http.ResponseWriter, r *http.Request) {

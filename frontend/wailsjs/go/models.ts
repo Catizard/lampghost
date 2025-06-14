@@ -1569,6 +1569,7 @@ export namespace vo {
 	    ReverseImport: number;
 	    Pagination?: entity.Page;
 	    Locale?: string;
+	    IgnoreMainUser: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new RivalInfoVo(source);
@@ -1590,6 +1591,7 @@ export namespace vo {
 	        this.ReverseImport = source["ReverseImport"];
 	        this.Pagination = this.convertValues(source["Pagination"], entity.Page);
 	        this.Locale = source["Locale"];
+	        this.IgnoreMainUser = source["IgnoreMainUser"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

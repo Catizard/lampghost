@@ -372,7 +372,7 @@ func addRivalInfo(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
 
 func findRivalInfoList(tx *gorm.DB, filter *vo.RivalInfoVo) ([]*entity.RivalInfo, int, error) {
 	var out []*entity.RivalInfo
-	if err := tx.Model(&entity.RivalInfo{}).Scopes(scopeRivalInfoFilter(filter)).Error; err != nil {
+	if err := tx.Model(&entity.RivalInfo{}).Scopes(scopeRivalInfoFilter(filter)).Find(&out).Error; err != nil {
 		return nil, 0, err
 	}
 	return out, len(out), nil

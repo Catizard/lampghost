@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
@@ -26,6 +27,7 @@ type InternalServer struct {
 	rivalInfoService       *service.RivalInfoService
 	rivalScoreLogService   *service.RivalScoreLogService
 	rivalTagService        *service.RivalTagService
+	rivalSongDataService   *service.RivalSongDataService
 }
 
 func NewInternalServer(
@@ -34,6 +36,7 @@ func NewInternalServer(
 	rivalInfoService *service.RivalInfoService,
 	rivalScoreLogService *service.RivalScoreLogService,
 	rivalTagService *service.RivalTagService,
+	rivalSongDataService *service.RivalSongDataService,
 ) *InternalServer {
 	return &InternalServer{
 		customDiffTableService: customDiffTableService,
@@ -41,6 +44,7 @@ func NewInternalServer(
 		rivalInfoService:       rivalInfoService,
 		rivalScoreLogService:   rivalScoreLogService,
 		rivalTagService:        rivalTagService,
+		rivalSongDataService:   rivalSongDataService,
 	}
 }
 
@@ -140,7 +144,7 @@ func (s *InternalServer) tableContentHandler(w http.ResponseWriter, r *http.Requ
 
 // Dispatch IR requests.
 //  1. ir/rivals: return registered rivals back
-//  2. ir/scores: return one rival's score data back
+//  2. ir/scores/[rival name]: return one rival's score data back
 func (s *InternalServer) irHandler(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
 	route := strings.TrimPrefix(path, "/ir/")
@@ -168,8 +172,8 @@ func (s *InternalServer) rivalsHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "[]")
 	}
 
-	ret := Map(rivals, func(rival *entity.RivalInfo, _ int) *IRPlayer {
-		return &IRPlayer{
+	ret := Map(rivals, func(rival *entity.RivalInfo, _ int) *entity.IRPlayer {
+		return &entity.IRPlayer{
 			ID:   rival.ID,
 			Name: rival.Name,
 			Rank: fmt.Sprintf("%d", rival.LockTagID),
@@ -177,12 +181,55 @@ func (s *InternalServer) rivalsHandler(w http.ResponseWriter, r *http.Request) {
 	})
 	data, err := json.Marshal(ret)
 	if err != nil {
-		http.Error(w, fmt.Sprint("marshal: %s", err), 500)
+		http.Error(w, fmt.Sprintf("marshal: %s", err), 500)
 		return
 	}
 	fmt.Fprintf(w, "%s", data)
 }
 
 func (s *InternalServer) scoresHandler(w http.ResponseWriter, r *http.Request) {
+	path := r.URL.Path
+	rivalName := strings.TrimPrefix(path, "/ir/scores/")
+	log.Debugf("[InternalServer | IR] /ir/scores/: %s", rivalName)
 
+	rivals, n, err := s.rivalInfoService.FindRivalInfoList(&vo.RivalInfoVo{
+		IgnoreMainUser: true,
+		ReverseImport:  1,
+		Name:           rivalName,
+	})
+	if err != nil {
+		http.Error(w, fmt.Sprintf("failed to query rival: %s", err), 500)
+		return
+	}
+	if n == 0 {
+		http.Error(w, "No Data", 404)
+		return
+	}
+
+	rival := rivals[0]
+
+	tagTime := time.Time{}
+	if rival.LockTagID != 0 {
+		tag, err := s.rivalTagService.FindRivalTagByID(rival.LockTagID)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("failed to query tag: %s", err), 500)
+			return
+		}
+		tagTime = tag.RecordTime
+	}
+
+	lampData, _, err := s.rivalScoreLogService.QueryReverseImportScoreData(&vo.RivalScoreLogVo{
+		RivalId:       rival.ID,
+		EndRecordTime: tagTime,
+	})
+	if err != nil {
+		http.Error(w, fmt.Sprintf("failed to query score log: %s", err), 500)
+		return
+	}
+	data, err := json.Marshal(lampData)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("marshal: %s", err), 500)
+		return
+	}
+	fmt.Fprintf(w, "%s", data)
 }

@@ -86,3 +86,47 @@ type ScoreDataLog struct {
 func (ScoreDataLog) TableName() string {
 	return "scoredatalog"
 }
+
+type BeatorajaSongMode int
+
+const (
+	BeatorajaBeat5K  = 5
+	BeatorajaBeat7K  = 7
+	BeatorajaBeat10K = 10
+	BeatorajaBeat14K = 14
+	// BeatorajaPopn5K = 9 We cannot distinguish a mode is popn5k or popn9k
+	BeatorajaPopn9K            = 9
+	BeatorajaKeyboard24K       = 25
+	BeatorajaKeyboard24KDouble = 50
+)
+
+var beatorajaSongModeName = map[BeatorajaSongMode]string{
+	BeatorajaBeat5K:  "beat-5k",
+	BeatorajaBeat7K:  "beat-7k",
+	BeatorajaBeat10K: "beat-10k",
+	BeatorajaBeat14K: "beat-14k",
+	// BeatorajaPopn5K: "popn-5k",
+	BeatorajaPopn9K:            "popn-9k",
+	BeatorajaKeyboard24K:       "keyboard-24k",
+	BeatorajaKeyboard24KDouble: "keyboard-24k-double",
+}
+
+func (s BeatorajaSongMode) String() string {
+	return beatorajaSongModeName[s]
+}
+
+type IRPlayer struct {
+	ID   uint   `json:"id"`
+	Name string `json:"name"`
+	Rank string `json:"rank"`
+}
+
+// Part of the ScoreData, the missing fields are filled by Lampghost-IR
+// The reason do such a simplify is Beatoraja's save file is incomplete,
+// which makes Lampghost cannot build completely historical play records
+// but only lamp data
+type IRLampData struct {
+	Clear  int    `json:"clear"`
+	Sha256 string `json:"sha256"`
+	Mode   int    `json:"mode"`
+}

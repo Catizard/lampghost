@@ -91,6 +91,10 @@ func (s *RivalTagService) RevertRivalTagEnabledState(rivalTagID uint) error {
 	return s.db.Model(&entity.RivalTag{}).Where("ID = ?", rivalTagID).UpdateColumn("enabled", gorm.Expr("1 - enabled")).Error
 }
 
+func (s *RivalTagService) FindRivalTagByID(ID uint) (*entity.RivalTag, error) {
+	return findRivalTagByID(s.db, ID)
+}
+
 // Rebuild one rival's tag list
 func syncRivalTag(tx *gorm.DB, rivalID uint) error {
 	courseInfoDtos, _, err := findCourseInfoList(tx, nil)

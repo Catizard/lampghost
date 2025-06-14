@@ -24,6 +24,10 @@ func NewRivalSongDataService(db *gorm.DB) *RivalSongDataService {
 	}
 }
 
+func (s *RivalSongDataService) QueryDefaultSongHashCache() (*entity.SongHashCache, error) {
+	return queryDefaultSongHashCache(s.db)
+}
+
 // Basic query function for rival_song_data table
 func findRivalSongDataByID(tx *gorm.DB, ID uint) (*entity.RivalSongData, error) {
 	var data *entity.RivalSongData

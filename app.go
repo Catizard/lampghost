@@ -96,7 +96,13 @@ func NewApp() *App {
 	folderController := controller.NewFolderController(folderService)
 
 	// Internal Server
-	internalServer := server.NewInternalServer(customDiffTableService, folderService, rivalScoreLogService, rivalTagService)
+	internalServer := server.NewInternalServer(
+		customDiffTableService,
+		folderService,
+		rivalInfoService,
+		rivalScoreLogService,
+		rivalTagService,
+	)
 
 	return &App{
 		nil,

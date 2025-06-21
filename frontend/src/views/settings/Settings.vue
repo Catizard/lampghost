@@ -7,7 +7,8 @@
             {{ t('title') }}
           </n-text>
         </n-h1>
-        <n-button type="primary" @click="handleSaveSettings">{{ t('button.save') }}</n-button>
+        <n-float-button shape="square" style="font-size: 15px; height: 39px; width: 60px;" :right="50" :top="20" type="primary" @click="handleSaveSettings">{{ t('button.save') }}</n-float-button>
+        <!-- <n-button type="primary" @click="handleSaveSettings">{{ t('button.save') }}</n-button> -->
       </n-flex>
 
       <n-form ref="formRef" :model="model">

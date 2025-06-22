@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-import { DataTableColumns, DataTableSortState, NButton, NDropdown, NEllipsis, NIcon } from 'naive-ui';
+import { DataTableColumns, DataTableSortState, NButton, NDropdown, NEllipsis, NIcon, useModal } from 'naive-ui';
 import { dto } from '@wailsjs/go/models';
 import { h, reactive, ref, Ref, watch } from 'vue';
 import { BindSongToFolder, QueryDiffTableDataWithRival, SubmitSingleMD5DownloadTask } from '@wailsjs/go/main/App';
@@ -20,6 +20,7 @@ import SelectDifficult from '../custom_table/SelectDifficult.vue';
 const i18n = useI18n();
 const { t } = i18n;
 const loading = ref<boolean>(false);
+const modal = useModal();
 
 const props = defineProps<{
 	headerId?: number
@@ -90,7 +91,26 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
 							case "GotoURLDiff": BrowserOpenURL(row.UrlDiff); break;
 							case "GotoLR2IR": BrowserOpenURL(`https://www.dream-pro.info/~lavalse/LR2IR/search.cgi?mode=ranking&bmsmd5=${md5}`); break;
 							case "GotoMochaIR": BrowserOpenURL(`https://mocha-repository.info/song.php?sha256=${sha256}`); break;
-							case "GotoPreview": BrowserOpenURL(`https://bms-score-viewer.pages.dev/view?md5=${md5}`); break;
+							// case "GotoPreview": BrowserOpenURL(`https://bms-score-viewer.pages.dev/view?md5=${md5}`); break;
+							case "GotoPreview":
+								modal.create({
+									preset: "dialog",
+									title: "Preview",
+									contentStyle: { "height": "100%" },
+									content: () => h(
+										'iframe',
+										{ 
+											src: `https://bms-score-viewer.pages.dev/view?md5=${md5}`,
+											width: "95%",
+											height: "95%",
+										},
+									),
+									style: {
+										width: "95vw",
+										height: "95vh"
+									}
+								});
+								break;
 						}
 					}
 				},

@@ -161,6 +161,7 @@ export namespace dto {
 	    GhostLamp: number;
 	    GhostPlayCount: number;
 	    DataLost: boolean;
+	    LastPlayedTimestamp: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new DiffTableDataDto(source);
@@ -185,6 +186,7 @@ export namespace dto {
 	        this.GhostLamp = source["GhostLamp"];
 	        this.GhostPlayCount = source["GhostPlayCount"];
 	        this.DataLost = source["DataLost"];
+	        this.LastPlayedTimestamp = source["LastPlayedTimestamp"];
 	    }
 	}
 	export class DiffTableHeaderDto {

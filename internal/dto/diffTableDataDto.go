@@ -21,9 +21,10 @@ type DiffTableDataDto struct {
 	Lamp      int
 	PlayCount int
 
-	GhostLamp      int
-	GhostPlayCount int
-	DataLost       bool
+	GhostLamp           int
+	GhostPlayCount      int
+	DataLost            bool
+	LastPlayedTimestamp int64
 }
 
 func NewDiffTableDataDto(data *entity.DiffTableData) *DiffTableDataDto {

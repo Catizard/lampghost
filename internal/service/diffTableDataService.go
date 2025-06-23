@@ -150,6 +150,12 @@ func findDiffTableDataListWithRival(tx *gorm.DB, filter *vo.DiffTableDataVo) ([]
 		where rsl.rival_id = ?
 		group by rsl.sha256
 	) as rsl on rsl.sha256 = rsd.sha256`, filter.RivalID)
+	partial = partial.Joins(`left join (
+		select max(record_time) as record_time, sha256
+		from rival_score_data_log
+		where rival_id = ?
+		group by sha256
+	) as rsdl on rsdl.sha256 = rsl.sha256`, filter.RivalID)
 	if filter.GhostRivalID > 0 {
 		// TODO: How to do this???
 		if !filter.EndGhostRecordTime.IsZero() {
@@ -173,7 +179,8 @@ func findDiffTableDataListWithRival(tx *gorm.DB, filter *vo.DiffTableDataVo) ([]
 		difftable_data.*,
 		rsd.sha256,
 		rsl.Lamp as Lamp, rsl.PlayCount as PlayCount,
-		(rsd.id is null) as data_lost
+		(rsd.id is null) as data_lost,
+		strftime("%s", rsdl.record_time) as LastPlayedTimestamp
 	`
 	if filter.GhostRivalID > 0 {
 		fields = fields + ", ghost_rsl.Lamp as GhostLamp, ghost_rsl.PlayCount as GhostPlayCount"

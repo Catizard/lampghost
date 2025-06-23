@@ -8,7 +8,7 @@
 <script setup lang="ts">
 import { DataTableColumns, DataTableSortState, NButton, NDropdown, NEllipsis, NIcon, useModal } from 'naive-ui';
 import { dto } from '@wailsjs/go/models';
-import { h, reactive, ref, Ref, watch } from 'vue';
+import { h, reactive, ref, Ref, render, watch } from 'vue';
 import { BindSongToFolder, QueryDiffTableDataWithRival, SubmitSingleMD5DownloadTask } from '@wailsjs/go/main/App';
 import SelectFolder from '@/views/folder/SelectFolder.vue';
 import ClearTag from '@/components/ClearTag.vue';
@@ -16,6 +16,7 @@ import { useI18n } from 'vue-i18n';
 import { WarningOutline } from '@vicons/ionicons5';
 import { BrowserOpenURL } from '@wailsjs/runtime/runtime';
 import SelectDifficult from '../custom_table/SelectDifficult.vue';
+import dayjs from 'dayjs';
 
 const i18n = useI18n();
 const { t } = i18n;
@@ -48,16 +49,25 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
 	{ title: t('column.artist'), key: "Artist", ellipsis: { tooltip: true }, sorter: true, width: "125px" },
 	{ title: t('column.count'), key: "PlayCount", width: "100px" },
 	{
-		title: t('column.clear'), key: "Lamp", width: "125px", resizable: true, sorter: true,
+		title: t('column.clear'), key: "Lamp", width: "100px", resizable: true, sorter: true,
 		render(row: dto.DiffTableDataDto) {
 			return h(ClearTag, { clear: row.Lamp },)
 		}
 	},
 	{
 		// TODO: Change sorter from false to true when user choosed ghost rival
-		title: t('column.ghost'), key: "GhostLamp", width: "125px", resizable: true, sorter: true,
+		title: t('column.ghost'), key: "GhostLamp", width: "100px", resizable: true, sorter: true,
 		render(row: dto.DiffTableDataDto) {
 			return h(ClearTag, { clear: row.GhostLamp, },)
+		}
+	},
+	{
+		title: t('column.lastPlayed'), key: "LastPlayedTimestamp", width: "175px", resizable: true, sorter: true,
+		render(row: dto.DiffTableDataDto) {
+			if (row.LastPlayedTimestamp == 0) {
+				return "NO PLAY";
+			}
+			return dayjs(row.LastPlayedTimestamp * 1000).format("YYYY-MM-DD HH:mm:ss");
 		}
 	},
 	{
@@ -240,6 +250,7 @@ loadData();
 			"count": "Play Count",
 			"clear": "Clear",
 			"ghost": "Ghost",
+			"lastPlayed": "Last Played",
 			"actions": "Actions"
 		},
 		"button": {
@@ -265,6 +276,7 @@ loadData();
 			"count": "游玩次数",
 			"clear": "通关状态",
 			"ghost": "对比通关状态",
+			"lastPlayed": "最近游玩",
 			"actions": "操作"
 		},
 		"button": {

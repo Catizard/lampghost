@@ -408,6 +408,7 @@ export namespace dto {
 	    LockTagID: number;
 	    ReverseImport: number;
 	    DiffTableHeader?: DiffTableHeaderDto;
+	    TagName: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new RivalInfoDto(source);
@@ -428,6 +429,7 @@ export namespace dto {
 	        this.LockTagID = source["LockTagID"];
 	        this.ReverseImport = source["ReverseImport"];
 	        this.DiffTableHeader = this.convertValues(source["DiffTableHeader"], DiffTableHeaderDto);
+	        this.TagName = source["TagName"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

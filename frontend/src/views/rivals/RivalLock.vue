@@ -1,18 +1,21 @@
 <template>
-  <n-flex justify="space-between">
-    <n-h1 prefix="bar" style="text-align: start;">
-      <n-text type="primary">{{ t('title') }}</n-text>
-    </n-h1>
-  </n-flex>
-  <n-data-table :columns="columns" :data="data" :pagination="pagination" :bordered="false"
-    :row-key="(row: dto.RivalInfoDto) => row.ID" :loading="loading" />
+  <n-spin :show="loading">
+    <n-flex justify="space-between">
+      <n-h1 prefix="bar" style="text-align: start;">
+        <n-text type="primary">{{ t('title') }}</n-text>
+      </n-h1>
+    </n-flex>
+    <n-data-table :columns="columns" :data="data" :pagination="pagination" :bordered="false"
+      :row-key="(row: dto.RivalInfoDto) => row.ID" />
+  </n-spin>
 </template>
 
 <script lang="ts" setup>
+import YesNotTag from '@/components/YesNotTag.vue';
 import { QueryRivalInfoPageList } from '@wailsjs/go/main/App';
 import { dto } from '@wailsjs/go/models';
 import { DataTableColumns, NFlex } from 'naive-ui';
-import { reactive, ref } from 'vue';
+import { h, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const loading = ref<boolean>(false);
@@ -40,8 +43,18 @@ const data = ref<Array<dto.RivalInfoDto>>([]);
 function createColumns(): DataTableColumns<dto.RivalInfoDto> {
   return [
     { title: t('column.name'), key: "Name", ellipsis: { tooltip: true }, },
-    { title: t('column.version'), key: "Version", width: "100px" },
-    { title: t('column.reverseImport'), key: "ReverseImport", width: "100px" },
+    { title: t('column.version'), key: "TagName", width: "300px" },
+    {
+      title: t('column.reverseImport'), key: "ReverseImport", width: "100px",
+      render(row: dto.RivalInfoDto) {
+        return h(YesNotTag, {
+          state: row.ReverseImport == 1,
+          onClick: () => {
+            console.log('clicked: rival id: ', row.ID);
+          }
+        });
+      }
+    },
   ]
 }
 

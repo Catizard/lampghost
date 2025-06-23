@@ -17,7 +17,9 @@ type RivalInfoDto struct {
 	LockTagID        uint
 	ReverseImport    int
 
-	DiffTableHeader *DiffTableHeaderDto
+	DiffTableHeader *DiffTableHeaderDto `gorm:"-"`
+
+	TagName string
 }
 
 func NewRivalInfoDto(rival *entity.RivalInfo) *RivalInfoDto {

@@ -158,7 +158,7 @@ func (s *RivalInfoService) AddRivalInfo(rivalInfo *vo.RivalInfoVo) error {
 	})
 }
 
-func (s *RivalInfoService) FindRivalInfoList(filter *vo.RivalInfoVo) ([]*entity.RivalInfo, int, error) {
+func (s *RivalInfoService) FindRivalInfoList(filter *vo.RivalInfoVo) ([]*dto.RivalInfoDto, int, error) {
 	return findRivalInfoList(s.db, filter)
 }
 
@@ -370,11 +370,19 @@ func addRivalInfo(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
 	return nil
 }
 
-func findRivalInfoList(tx *gorm.DB, filter *vo.RivalInfoVo) ([]*entity.RivalInfo, int, error) {
-	var out []*entity.RivalInfo
-	if err := tx.Model(&entity.RivalInfo{}).Scopes(scopeRivalInfoFilter(filter)).Find(&out).Error; err != nil {
+func findRivalInfoList(tx *gorm.DB, filter *vo.RivalInfoVo) ([]*dto.RivalInfoDto, int, error) {
+	var out []*dto.RivalInfoDto
+	fields := `
+		rival_info.*,
+		rival_tag.tag_name
+	`
+	moved := tx.Select(fields).Model(&entity.RivalInfo{}).Scopes(scopeRivalInfoFilter(filter))
+	moved = moved.Joins(`left join rival_tag on rival_info.lock_tag_id = rival_tag.id`)
+
+	if err := moved.Find(&out).Error; err != nil {
 		return nil, 0, err
 	}
+
 	return out, len(out), nil
 }
 

@@ -1,14 +1,18 @@
 <template>
-  <n-tag :color="{ color: def.color, textColor: def.textColor }">
-    {{ def.text }}
-  </n-tag>
+  <div @click="props.onClick">
+    <n-tag :color="{ color: def.color, textColor: def.textColor }">
+      {{ def.text }}
+    </n-tag>
+  </div>
+
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
 
 const props = defineProps<{
-  state: boolean
+  state: boolean,
+  onClick: (payload: MouseEvent) => void
 }>();
 
 interface TagDef {

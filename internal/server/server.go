@@ -173,7 +173,7 @@ func (s *InternalServer) rivalsHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "[]")
 	}
 
-	ret := Map(rivals, func(rival *entity.RivalInfo, _ int) *entity.IRPlayer {
+	ret := Map(rivals, func(rival *dto.RivalInfoDto, _ int) *entity.IRPlayer {
 		return &entity.IRPlayer{
 			ID:   rival.ID,
 			Name: rival.Name,

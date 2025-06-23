@@ -64,8 +64,6 @@ function loadCustomTableOptions() {
 		.finally(() => loading.value = false);
 }
 
-loadCustomTableOptions();
-
 function handleClickAddFolder() {
 	showAddModal.value = true;
 }
@@ -76,6 +74,7 @@ function reload() {
 
 watch(show, (newValue, oldValue) => {
 	if (newValue == true) {
+		loadCustomTableOptions();
 		// NOTE: SelectUnboundFolder component is under NModel
 		// Therefore, we have to wait until it mounted
 		const spinUntilMounted = () => {
@@ -108,6 +107,9 @@ function handleNegativeClick() {
 		},
 		"button": {
 			"addFolder": "Add Difficult"
+		},
+		"message": {
+			"noTableError": "Cannot handle no custom difficult table data currenlty, please add at least one custom table first"
 		}
 	},
 	"zh-CN": {
@@ -118,6 +120,9 @@ function handleNegativeClick() {
 		},
 		"button": {
 			"addFolder": "添加难度"
+		},
+		"message": {
+      "noTableError": "目前无法处理一个自定义难度表都没有的情况，请至少先添加一个难度表"
 		}
 	}
 }</i18n>

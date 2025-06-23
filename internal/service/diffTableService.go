@@ -45,7 +45,7 @@ func (s *DiffTableService) AddDiffTableHeader(param *vo.DiffTableHeaderVo) (*ent
 		return nil, eris.Errorf("AddDiffTableHeader: url cannot be empty")
 	}
 	log.Debugf("[DiffTableService] calling AddDiffTableHeader with url: %s", url)
-	if isDuplicated, err := queryDiffTableHeaderExistence(s.db, &entity.DiffTableHeader{HeaderUrl: url}); isDuplicated || err != nil {
+	if isDuplicated, err := queryDiffTableHeaderExistence(s.db, &vo.DiffTableHeaderVo{HeaderUrl: url}); isDuplicated || err != nil {
 		if err != nil {
 			return nil, eris.Wrap(err, "failed to query duplicate header url")
 		}
@@ -58,7 +58,7 @@ func (s *DiffTableService) AddDiffTableHeader(param *vo.DiffTableHeaderVo) (*ent
 	if rawHeader.DataURL == "" {
 		return nil, eris.Errorf("assert: data_url is empty")
 	}
-	if isDuplicated, err := queryDiffTableHeaderExistence(s.db, &entity.DiffTableHeader{DataUrl: rawHeader.DataURL}); isDuplicated || err != nil {
+	if isDuplicated, err := queryDiffTableHeaderExistence(s.db, &vo.DiffTableHeaderVo{DataUrl: rawHeader.DataURL}); isDuplicated || err != nil {
 		if err != nil {
 			return nil, eris.Wrap(err, "failed to query duplicate data url")
 		}
@@ -545,12 +545,19 @@ func (s *DiffTableService) SupplyMissingBMSFromTable(ID uint) error {
 }
 
 // Query if there exists a header that satisfies the condition
-func queryDiffTableHeaderExistence(tx *gorm.DB, filter *entity.DiffTableHeader) (bool, error) {
-	var dupCount int64
-	if err := tx.Model(&entity.DiffTableHeader{}).Where(filter).Count(&dupCount).Error; err != nil {
+func queryDiffTableHeaderExistence(tx *gorm.DB, filter *vo.DiffTableHeaderVo) (bool, error) {
+	count, err := selectDiffTableHeaderCount(tx, filter)
+	if err != nil {
 		return false, eris.Wrap(err, "failed to query difficult table header existence")
 	}
-	return dupCount > 0, nil
+	return count > 0, nil
+}
+
+func selectDiffTableHeaderCount(tx *gorm.DB, filter *vo.DiffTableHeaderVo) (count int64, err error) {
+	if err = tx.Model(&entity.DiffTableHeader{}).Scopes(scopeDiffTableHeaderFilter(filter)).Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return count, nil
 }
 
 func queryLevelLayeredDiffTableInfoById(tx *gorm.DB, ID uint) (*dto.DiffTableHeaderDto, error) {
@@ -669,17 +676,8 @@ func mergeRivalRelatedData(sha256ScoreLogsMap map[string][]*dto.RivalScoreLogDto
 }
 
 func findDiffTableHeaderList(tx *gorm.DB, filter *vo.DiffTableHeaderVo) ([]*entity.DiffTableHeader, int, error) {
-	if filter == nil {
-		var headers []*entity.DiffTableHeader
-		if err := tx.Order("order_number").Find(&headers).Error; err != nil {
-			log.Error("[DiffTableService] Find difftable header failed with %v", err)
-			return nil, 0, err
-		}
-		return headers, len(headers), nil
-	}
-
 	var headers []*entity.DiffTableHeader
-	if err := tx.Where(filter.Entity()).Order("order_number").Find(&headers).Error; err != nil {
+	if err := tx.Scopes(scopeDiffTableHeaderFilter(filter)).Order("order_number").Find(&headers).Error; err != nil {
 		return nil, 0, err
 	}
 	return headers, len(headers), nil
@@ -788,4 +786,15 @@ func levelComparator(lhs string, rhs string, preSortLevels []string) int {
 		return 0
 	}
 	return inxL - inxR
+}
+
+func scopeDiffTableHeaderFilter(filter *vo.DiffTableHeaderVo) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if filter == nil {
+			return db
+		}
+		moved := db.Where(filter.Entity())
+		// Extra filters here
+		return moved
+	}
 }

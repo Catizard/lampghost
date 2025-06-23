@@ -203,7 +203,7 @@ func groupingScoreLogsBySha256(scoreLogs []*dto.RivalScoreLogDto) map[string][]*
 	return sha256ScoreLogsMap
 }
 
-// NOTE: selectRivalScoreLogCount's filter statment should always be equal to selectRivalScoreLog
+// NOTE: selectRivalScoreLogCount's filter statment should always be equal to findRivalScoreLogList
 func selectRivalScoreLogCount(tx *gorm.DB, filter *vo.RivalScoreLogVo) (int64, error) {
 	if filter == nil {
 		var count int64

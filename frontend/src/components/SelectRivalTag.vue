@@ -1,6 +1,6 @@
 <template>
   <n-select :loading="loading" v-model:value="value" :options="options" :style="{ width: width }"
-    :placeholder="t('placeholderRivalTag')" :render-option="renderRivalTagOption" />
+    :placeholder="placeholder" :render-option="renderRivalTagOption" :clearable="clearable ?? false"/>
 </template>
 
 <script lang="ts" setup>
@@ -8,13 +8,12 @@ import { FindRivalTagList } from '@wailsjs/go/main/App';
 import { dto } from '@wailsjs/go/models';
 import { NTooltip, SelectOption } from 'naive-ui';
 import { h, Ref, ref, VNode, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
 
-const { t } = useI18n();
-
-const value = defineModel<number | null>("value");
+const value = defineModel<number | null>("value", { default: null });
 const props = defineProps<{
-  rivalId?: number
+  rivalId: number | null,
+  clearable?: boolean,
+  placeholder?: string
   width: string
 }>();
 
@@ -49,14 +48,5 @@ watch(() => props.rivalId, (rivalId: number | null) => {
     })
     .catch(err => window.$notifyError(err))
     .finally(() => loading.value = false);
-})
+}, { immediate: true});
 </script>
-
-<i18n lang="json">{
-  "en": {
-    "placeholderRivalTag": "Choose Rival Tag"
-  },
-  "zh-CN": {
-    "placeholderRivalTag": "选择对比玩家的标签"
-  }
-}</i18n>

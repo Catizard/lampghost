@@ -8,18 +8,21 @@
     <n-data-table :columns="columns" :data="data" :pagination="pagination" :bordered="false"
       :row-key="(row: dto.RivalInfoDto) => row.ID" />
   </n-spin>
+  <RivalEditReverseImportForm ref="editFormRef" @refresh="loadData()" />
 </template>
 
 <script lang="ts" setup>
 import YesNotTag from '@/components/YesNotTag.vue';
 import { QueryRivalInfoPageList } from '@wailsjs/go/main/App';
 import { dto } from '@wailsjs/go/models';
-import { DataTableColumns, NFlex } from 'naive-ui';
-import { h, reactive, ref } from 'vue';
+import { DataTableColumns, NButton, NFlex } from 'naive-ui';
+import { h, reactive, ref, VNode } from 'vue';
 import { useI18n } from 'vue-i18n';
+import RivalEditReverseImportForm from './RivalEditReverseImportForm.vue';
 
 const loading = ref<boolean>(false);
 const { t } = useI18n();
+const editFormRef = ref<InstanceType<typeof RivalEditReverseImportForm>>(null);
 
 const pagination = reactive({
   page: 1,
@@ -55,6 +58,16 @@ function createColumns(): DataTableColumns<dto.RivalInfoDto> {
         });
       }
     },
+    {
+      title: t('column.actions'), key: "action", width: "100px",
+      render(row: dto.RivalInfoDto): VNode {
+        return h(NButton, {
+          type: "primary",
+          size: "small",
+          onClick: () => editFormRef.value.open(row.ID), 
+        }, { default: () => t('button.edit')});
+      }
+    }
   ]
 }
 
@@ -84,6 +97,9 @@ loadData();
       "version": "Version",
       "reverseImport": "Reverse Import",
       "actions": "Actions"
+    },
+    "button": {
+      "edit": "Edit"
     }
   },
   "zh-CN": {
@@ -93,6 +109,9 @@ loadData();
       "version": "版本",
       "reverseImport": "逆向导入",
       "actions": "操作"
+    },
+    "button": {
+      "edit": "修改"
     }
   }
 }</i18n>

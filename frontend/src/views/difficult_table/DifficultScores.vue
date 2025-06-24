@@ -9,7 +9,7 @@
       style="width: 200px;" />
     <n-select :loading="loadingRivalData" v-model:value="currentRivalID" :options="rivalOptions" style="width: 200px;"
       :placeholder="t('placeHolderRival')" />
-    <SelectRivalTag v-model:value="currentRivalTagID" :rivalId="currentRivalID" width="200px"/>
+    <SelectRivalTag v-model:value="currentRivalTagID" :rivalId="currentRivalID" width="200px" :placeholder="t('placeholderRivalTag')"/>
   </n-flex>
   <n-data-table :columns="columns" :data="data" :pagination="pagination" :loading="levelTableLoading"
     :row-key="(row: dto.DiffTableHeaderDto) => row.Level" :row-class-name="rowClassName" />
@@ -206,7 +206,8 @@ watch(currentDiffTableID, (newID: string | number) => {
     "button": {
       "addToFolder": "Add to Folder"
     },
-    "placeHolderRival": "Choose Rival"
+    "placeHolderRival": "Choose Rival",
+    "placeholderRivalTag": "Choose Rival Tag"
   },
   "zh-CN": {
     "title": "难度表统计信息",
@@ -228,7 +229,7 @@ watch(currentDiffTableID, (newID: string | number) => {
       "addToFolder": "添加至收藏夹"
     },
     "placeHolderRival": "选择对比玩家",
-    "placeHolderRivalTag": "选择对比玩家的标签"
+    "placeholderRivalTag": "选择对比玩家的标签"
   }
 }</i18n>
 

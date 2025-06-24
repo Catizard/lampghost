@@ -350,6 +350,10 @@ export function UpdateRivalInfo(arg1) {
   return window['go']['main']['App']['UpdateRivalInfo'](arg1);
 }
 
+export function UpdateRivalReverseImportInfo(arg1) {
+  return window['go']['main']['App']['UpdateRivalReverseImportInfo'](arg1);
+}
+
 export function WriteConfig(arg1) {
   return window['go']['main']['App']['WriteConfig'](arg1);
 }

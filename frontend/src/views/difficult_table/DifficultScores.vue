@@ -9,21 +9,21 @@
       style="width: 200px;" />
     <n-select :loading="loadingRivalData" v-model:value="currentRivalID" :options="rivalOptions" style="width: 200px;"
       :placeholder="t('placeHolderRival')" />
-    <n-select :loading="loadingRivalData" v-model:value="currentRivalTagID" :options="rivalTagOptions"
-      style="width: 200px;" :placeholder="t('placeHolderRivalTag')" :render-option="renderRivalTagOption" />
+    <SelectRivalTag v-model:value="currentRivalTagID" :rivalId="currentRivalID" width="200px"/>
   </n-flex>
   <n-data-table :columns="columns" :data="data" :pagination="pagination" :loading="levelTableLoading"
     :row-key="(row: dto.DiffTableHeaderDto) => row.Level" :row-class-name="rowClassName" />
 </template>
 
 <script setup lang="ts">
-import { FindDiffTableHeaderList, FindDiffTableHeaderTreeWithRival, FindRivalInfoList, FindRivalTagList } from '@wailsjs/go/main/App';
+import { FindDiffTableHeaderList, FindDiffTableHeaderTreeWithRival, FindRivalInfoList } from '@wailsjs/go/main/App';
 import { dto } from '@wailsjs/go/models';
-import { DataTableColumns, NDataTable, NTooltip, SelectOption } from 'naive-ui';
-import { h, Ref, ref, VNode, watch } from 'vue';
+import { DataTableColumns, NDataTable, SelectOption } from 'naive-ui';
+import { h, Ref, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import DifficultTableDetail from './DifficultTableDetail.vue';
 import { ClearType, ClearTypeDef, DefaultClearTypeColorStyle } from '@/constants/cleartype';
+import SelectRivalTag from '@/components/SelectRivalTag.vue';
 
 const i18n = useI18n();
 const { t } = i18n;
@@ -157,15 +157,7 @@ const loadingRivalData = ref(false);
 const currentRivalID: Ref<number | null> = ref(null);
 const currentRivalTagID: Ref<number | null> = ref(null);
 const rivalOptions: Ref<Array<SelectOption>> = ref([]);
-const rivalTagOptions: Ref<Array<SelectOption>> = ref([]);
-function renderRivalTagOption({ node, option }: { node: VNode, option: SelectOption }) {
-  return h(NTooltip, {
-    style: "max-width: 200px; font-color: white",
-  }, {
-    trigger: () => node,
-    default: () => option.label
-  });
-}
+
 function loadRivalOptions() {
   loadingRivalData.value = true;
   FindRivalInfoList()
@@ -186,34 +178,11 @@ function loadRivalOptions() {
     .catch(err => window.$notifyError(err))
     .finally(() => loadingRivalData.value = false);
 }
-function loadRivalTagOptions(rivalID: number) {
-  // TODO: same logic, and should be handled together
-  loadingRivalData.value = true;
-  FindRivalTagList({ RivalId: rivalID } as any)
-    .then(result => {
-      if (result.Code != 200) {
-        return Promise.reject(result.Msg);
-      }
-      rivalTagOptions.value = result.Rows.map((row: dto.RivalTagDto) => {
-        return {
-          label: row.TagName,
-          value: row.ID,
-        } as SelectOption
-      });
-    })
-    .catch(err => window.$notifyError(err))
-    .finally(() => loadingRivalData.value = false);
-}
 loadRivalOptions();
 
 // Watch 1: Whenever changing current difftable, reload the level table
 watch(currentDiffTableID, (newID: string | number) => {
   loadLevelTableData(newID);
-});
-
-// Watch 2: Whenever changing ghost rival, reload its corresponding tags
-watch(currentRivalID, (newID: number) => {
-  loadRivalTagOptions(newID);
 });
 </script>
 
@@ -237,8 +206,7 @@ watch(currentRivalID, (newID: number) => {
     "button": {
       "addToFolder": "Add to Folder"
     },
-    "placeHolderRival": "Choose Rival",
-    "placeHolderRivalTag": "Choose Rival Tag"
+    "placeHolderRival": "Choose Rival"
   },
   "zh-CN": {
     "title": "难度表统计信息",

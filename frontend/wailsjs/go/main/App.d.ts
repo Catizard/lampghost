@@ -180,4 +180,6 @@ export function UpdateHeaderOrder(arg1:Array<number>):Promise<result.RtnMessage>
 
 export function UpdateRivalInfo(arg1:vo.RivalInfoVo):Promise<result.RtnMessage>;
 
+export function UpdateRivalReverseImportInfo(arg1:vo.RivalInfoVo):Promise<result.RtnMessage>;
+
 export function WriteConfig(arg1:config.ApplicationConfig):Promise<result.RtnMessage>;

@@ -13,7 +13,6 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/vo"
 	"github.com/charmbracelet/log"
 	"github.com/glebarez/sqlite"
-	"github.com/mitchellh/mapstructure"
 	"github.com/rotisserie/eris"
 	. "github.com/samber/lo"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -376,7 +375,7 @@ func (s *RivalInfoService) UpdateRivalReverseImportInfo(rivalInfo *vo.RivalInfoV
 		ReverseImport: rivalInfo.ReverseImport,
 		LockTagID:     rivalInfo.LockTagID,
 	}
-	if err := updateRivalInfoPlainFields(s.db, *updateParam.Entity()); err != nil {
+	if err := updateRivalReverseImportInfo(s.db, *updateParam.Entity()); err != nil {
 		return eris.Wrap(err, "update rival info plain fields")
 	}
 	return nil
@@ -761,13 +760,10 @@ func updateRivalInfo(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
 	return tx.Updates(rivalInfo).Error
 }
 
-// Update one rival's plain fields, no special treatment is being done
-// The caller side must know what they are doing
-func updateRivalInfoPlainFields(tx *gorm.DB, rivalInfo entity.RivalInfo) error {
-	updates := new(map[string]any)
-	if err := mapstructure.Decode(rivalInfo, updates); err != nil {
-		return eris.Wrap(err, "cannot map rival info into map")
-	}
+func updateRivalReverseImportInfo(tx *gorm.DB, rivalInfo entity.RivalInfo) error {
+	updates := make(map[string]any)
+	updates["ReverseImport"] = rivalInfo.ReverseImport
+	updates["LockTagID"] = rivalInfo.LockTagID
 	return eris.Wrap(tx.Model(&rivalInfo).Updates(updates).Error, "cannot update rival_info")
 }
 

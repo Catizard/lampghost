@@ -430,7 +430,7 @@ func scopeRivalInfoFilter(filter *vo.RivalInfoVo) func(db *gorm.DB) *gorm.DB {
 		moved := db.Where(filter.Entity())
 		// Add extra filter here
 		if filter.IgnoreMainUser {
-			moved.Where("ID != 1")
+			moved.Where("rival_info.ID != 1")
 		}
 		return moved
 	}

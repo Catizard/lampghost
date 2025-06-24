@@ -151,6 +151,15 @@ func (ctl *RivalInfoController) UpdateRivalInfo(updateParam *vo.RivalInfoVo) res
 	return result.SUCCESS
 }
 
+func (ctl *RivalInfoController) UpdateRivalReverseImportInfo(updateParam *vo.RivalInfoVo) result.RtnMessage {
+	log.Info("[Controller] calling RivalInfoController.UpdateRivalReverseImportInfo")
+	if err := ctl.rivalInfoService.UpdateRivalReverseImportInfo(updateParam); err != nil {
+		log.Errorf("[RivalInfoController] returning error: %v", err)
+		return result.NewErrorMessage(err)
+	}
+	return result.SUCCESS
+}
+
 func (ctl *RivalInfoController) GENERATOR_RIVAL_INFO() *entity.RivalInfo     { return nil }
 func (ctl *RivalInfoController) GENERATOR_RIVAL_INFO_DTO() *dto.RivalInfoDto { return nil }
 func (ctl *RivalInfoController) GENERATOR_BEATORAJA_DIRECTORY_META() *dto.BeatorajaDirectoryMeta {

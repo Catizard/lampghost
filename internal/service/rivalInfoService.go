@@ -13,6 +13,7 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/vo"
 	"github.com/charmbracelet/log"
 	"github.com/glebarez/sqlite"
+	"github.com/mitchellh/mapstructure"
 	"github.com/rotisserie/eris"
 	. "github.com/samber/lo"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -354,6 +355,33 @@ func (s *RivalInfoService) UpdateRivalInfo(rivalInfo *vo.RivalInfoVo) error {
 	})
 }
 
+// Special variant of 'UpdateRivalInfo' function, for updating 'Reverse Import' feature fields
+//
+// Frontend shows the fundemental fields (save files location, name...) and reverse import fields
+// (lock tag id, reverse import flag) in different components with different forms.
+// And it's painful for updating plain value fields when using gorm :(
+// Therefore, spliting the update functions seems feasible way currently
+func (s *RivalInfoService) UpdateRivalReverseImportInfo(rivalInfo *vo.RivalInfoVo) error {
+	if rivalInfo == nil {
+		return eris.Errorf("UpdateRivalReverseImportInfo: rivalInfo cannot be nil")
+	}
+	if rivalInfo.ID == 0 {
+		return eris.Errorf("UpdateRivalReverseImportInfo: ID cannot be 0")
+	}
+	// Only preserve necessary fields
+	updateParam := vo.RivalInfoVo{
+		Model: gorm.Model{
+			ID: rivalInfo.ID,
+		},
+		ReverseImport: rivalInfo.ReverseImport,
+		LockTagID:     rivalInfo.LockTagID,
+	}
+	if err := updateRivalInfoPlainFields(s.db, *updateParam.Entity()); err != nil {
+		return eris.Wrap(err, "update rival info plain fields")
+	}
+	return nil
+}
+
 // Add one rival
 //
 // Don't call incremental sync in this method
@@ -691,7 +719,6 @@ func queryMainUser(tx *gorm.DB) (*entity.RivalInfo, error) {
 // Special Requirements:
 //  1. when updating main user, songdata.db file path cannot be empty
 func updateRivalInfo(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
-	log.Debugf("rivalInfo.ID=%d", rivalInfo.ID)
 	var prev entity.RivalInfo
 	if err := tx.Debug().First(&prev, rivalInfo.ID).Error; err != nil {
 		return err
@@ -732,6 +759,16 @@ func updateRivalInfo(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
 	}
 
 	return tx.Updates(rivalInfo).Error
+}
+
+// Update one rival's plain fields, no special treatment is being done
+// The caller side must know what they are doing
+func updateRivalInfoPlainFields(tx *gorm.DB, rivalInfo entity.RivalInfo) error {
+	updates := new(map[string]any)
+	if err := mapstructure.Decode(rivalInfo, updates); err != nil {
+		return eris.Wrap(err, "cannot map rival info into map")
+	}
+	return eris.Wrap(tx.Model(&rivalInfo).Updates(updates).Error, "cannot update rival_info")
 }
 
 // Simple helper function for updating one rival's play count field

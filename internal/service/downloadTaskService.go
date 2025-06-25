@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/Catizard/lampghost_wails/internal/config"
+	"github.com/Catizard/lampghost_wails/internal/config/download"
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/charmbracelet/log"
@@ -305,7 +306,11 @@ func (s *DownloadTaskService) SubmitSingleMD5DownloadTask(md5 string, taskName *
 	if md5 == "" {
 		return eris.New("assert: md5 cannot be empty")
 	}
-	url := fmt.Sprintf(s.config.SeparateDownloadMD5, md5)
+	downloadSource := download.GetDownloadSource(s.config.DownloadSite)
+	url, err := downloadSource.GetDownloadURLFromMD5(md5)
+	if err != nil {
+		return err
+	}
 	log.Debugf("[DownloadTaskService] build url: %s", url)
 	currentTaskID := s.taskID
 	s.taskID++

@@ -5,7 +5,6 @@ export namespace config {
 	    IgnoreVariantCourse: number;
 	    Locale: string;
 	    DownloadSite: string;
-	    SeparateDownloadMD5: string;
 	    DownloadDirectory: string;
 	    MaximumDownloadCount: number;
 	    EnableDownloadFeature: boolean;
@@ -20,7 +19,6 @@ export namespace config {
 	        this.IgnoreVariantCourse = source["IgnoreVariantCourse"];
 	        this.Locale = source["Locale"];
 	        this.DownloadSite = source["DownloadSite"];
-	        this.SeparateDownloadMD5 = source["SeparateDownloadMD5"];
 	        this.DownloadDirectory = source["DownloadDirectory"];
 	        this.MaximumDownloadCount = source["MaximumDownloadCount"];
 	        this.EnableDownloadFeature = source["EnableDownloadFeature"];

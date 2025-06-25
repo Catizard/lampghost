@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"sync"
 
+	"github.com/Catizard/lampghost_wails/internal/config/download"
 	"github.com/rotisserie/eris"
 	"github.com/spf13/viper"
 )
@@ -41,8 +42,8 @@ func init() {
 	viper.SetDefault("InternalServerPort", 7391)
 	viper.SetDefault("IgnoreVariantCourse", 0)
 	viper.SetDefault("Locale", "en")
-	viper.SetDefault("DownloadSite", "wriggle")
-	viper.SetDefault("SeparateDownloadMD5", "https://bms.wrigglebug.xyz/download/package/%s")
+	viper.SetDefault("DownloadSite", download.DefaultDownloadSource.GetMeta().Name)
+	// viper.SetDefault("SeparateDownloadMD5", "https://bms.wrigglebug.xyz/download/package/%s")
 	viper.SetDefault("MaximumDownloadCount", 5)
 	viper.SafeWriteConfig()
 }
@@ -54,7 +55,7 @@ type ApplicationConfig struct {
 	// Constants, currently the only option is wriggle
 	DownloadSite string
 	// Related to DownloadSite
-	SeparateDownloadMD5 string
+	// SeparateDownloadMD5 string
 	// Download directory
 	DownloadDirectory    string
 	MaximumDownloadCount int
@@ -69,11 +70,11 @@ func ReadConfig() (*ApplicationConfig, error) {
 		return nil, err
 	}
 	conf := &ApplicationConfig{
-		InternalServerPort:   viper.GetInt32("InternalServerPort"),
-		IgnoreVariantCourse:  viper.GetInt32("IgnoreVariantCourse"),
-		Locale:               viper.GetString("Locale"),
-		DownloadSite:         viper.GetString("DownloadSite"),
-		SeparateDownloadMD5:  viper.GetString("SeparateDownloadMD5"),
+		InternalServerPort:  viper.GetInt32("InternalServerPort"),
+		IgnoreVariantCourse: viper.GetInt32("IgnoreVariantCourse"),
+		Locale:              viper.GetString("Locale"),
+		DownloadSite:        viper.GetString("DownloadSite"),
+		// SeparateDownloadMD5:  viper.GetString("SeparateDownloadMD5"),
 		DownloadDirectory:    viper.GetString("DownloadDirectory"),
 		MaximumDownloadCount: viper.GetInt("MaximumDownloadCount"),
 	}
@@ -88,7 +89,7 @@ func (c *ApplicationConfig) WriteConfig() error {
 	viper.Set("IgnoreVariantCourse", c.IgnoreVariantCourse)
 	viper.Set("Locale", c.Locale)
 	viper.Set("DownloadSite", c.DownloadSite)
-	viper.Set("SeparateDownloadMD5", c.SeparateDownloadMD5)
+	// viper.Set("SeparateDownloadMD5", c.SeparateDownloadMD5)
 	viper.Set("DownloadDirectory", c.DownloadDirectory)
 	viper.Set("MaximumDownloadCount", c.MaximumDownloadCount)
 	if err := viper.WriteConfig(); err != nil {
@@ -102,9 +103,9 @@ func (c *ApplicationConfig) EnableDownload() error {
 	if c.DownloadDirectory == "" {
 		return eris.New("cannot download: download directory hasn't been set yet")
 	}
-	if c.SeparateDownloadMD5 == "" {
-		return eris.New("cannot download: download url hasn't been set yet")
-	}
+	// if c.SeparateDownloadMD5 == "" {
+	// 	return eris.New("cannot download: download url hasn't been set yet")
+	// }
 	return nil
 }
 

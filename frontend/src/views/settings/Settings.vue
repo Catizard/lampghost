@@ -56,10 +56,10 @@
           <n-form-item :label="t('downloadSettings.labelDownloadSite')" path="downloadSite">
             <n-select v-model:value="model.DownloadSite" :options="downloadSiteOptions" style="width: 150px;" />
           </n-form-item>
-          <n-form-item :label="t('downloadSettings.labelSeparateDownloadMD5')" path="separateDownloadMD5">
+          <!-- <n-form-item :label="t('downloadSettings.labelSeparateDownloadMD5')" path="separateDownloadMD5">
             <n-input v-model:value="model.SeparateDownloadMD5"
               :placeholder="t('downloadSettings.placeholderSeparateDownloadMD5')" style="width: 500px;" />
-          </n-form-item>
+          </n-form-item> -->
           <n-form-item :label="t('downloadSettings.labelDownloadDirectory')" path="downloadDirectory">
             <n-button type="info" @click="chooseDownloadDirectory()">
               {{ t('button.chooseDownloadDirectory') }}
@@ -106,7 +106,6 @@ const model = ref<config.ApplicationConfig>({
   IgnoreVariantCourse: null,
   Locale: null,
   DownloadSite: null,
-  SeparateDownloadMD5: null,
   DownloadDirectory: null,
   MaximumDownloadCount: null,
   EnableDownloadFeature: null // Unused
@@ -128,6 +127,10 @@ const downloadSiteOptions: Array<SelectOption> = [
     label: "wriggle",
     value: "wriggle"
   },
+  {
+    label: "konmai",
+    value: "konmai"
+  }
 ];
 
 function handleSaveSettings() {

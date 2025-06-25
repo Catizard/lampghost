@@ -113,7 +113,7 @@ func (ctl *RivalInfoController) FindRivalInfoList() result.RtnDataList {
 
 func (ctl *RivalInfoController) QueryRivalInfoPageList(filter *vo.RivalInfoVo) result.RtnPage {
 	log.Info("[Controller] calling RivalInfoController.QueryRivalInfoPageList")
-	rows, _, err := ctl.rivalInfoService.FindRivalInfoList(nil)
+	rows, _, err := ctl.rivalInfoService.FindRivalInfoList(filter)
 	if err != nil {
 		log.Errorf("[RivalInfoController] returning error: %v", err)
 		return result.NewErrorPage(err)

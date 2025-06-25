@@ -75,6 +75,7 @@ function loadData() {
   loading.value = true;
   QueryRivalInfoPageList({
     Pagination: pagination,
+    IgnoreMainUser: true
   } as any)
     .then(result => {
       if (result.Code != 200) {

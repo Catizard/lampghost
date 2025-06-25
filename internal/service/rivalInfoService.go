@@ -406,7 +406,7 @@ func findRivalInfoList(tx *gorm.DB, filter *vo.RivalInfoVo) ([]*dto.RivalInfoDto
 	moved := tx.Select(fields).Model(&entity.RivalInfo{}).Scopes(scopeRivalInfoFilter(filter))
 	moved = moved.Joins(`left join rival_tag on rival_info.lock_tag_id = rival_tag.id`)
 
-	if err := moved.Find(&out).Error; err != nil {
+	if err := moved.Debug().Find(&out).Error; err != nil {
 		return nil, 0, err
 	}
 
@@ -430,7 +430,7 @@ func scopeRivalInfoFilter(filter *vo.RivalInfoVo) func(db *gorm.DB) *gorm.DB {
 		moved := db.Where(filter.Entity())
 		// Add extra filter here
 		if filter.IgnoreMainUser {
-			moved.Where("rival_info.ID != 1")
+			moved = moved.Where("rival_info.ID != 1")
 		}
 		return moved
 	}

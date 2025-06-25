@@ -1,6 +1,6 @@
 package download
 
-var DefaultDownloadSource DownloadSource = &WriggleDownloadSource
+var DefaultDownloadSource DownloadSource = &KonmaiDownloadSource
 var downloadSources map[string]DownloadSource = map[string]DownloadSource{
 	"wriggle": &WriggleDownloadSource,
 	"konmai":  &KonmaiDownloadSource,

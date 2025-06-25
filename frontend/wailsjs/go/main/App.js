@@ -150,6 +150,10 @@ export function GENERATOR_CUSTOM_DIFF_TABLE_DTO() {
   return window['go']['main']['App']['GENERATOR_CUSTOM_DIFF_TABLE_DTO']();
 }
 
+export function GENERATOR_DOWNLOAD_SOURCE() {
+  return window['go']['main']['App']['GENERATOR_DOWNLOAD_SOURCE']();
+}
+
 export function GENERATOR_DOWNLOAD_TASK() {
   return window['go']['main']['App']['GENERATOR_DOWNLOAD_TASK']();
 }
@@ -216,6 +220,10 @@ export function OpenDirectoryDialog(arg1) {
 
 export function OpenFileDialog(arg1) {
   return window['go']['main']['App']['OpenFileDialog'](arg1);
+}
+
+export function QueryCurrentDownloadSource() {
+  return window['go']['main']['App']['QueryCurrentDownloadSource']();
 }
 
 export function QueryCustomDiffTablePageList(arg1) {

@@ -3,7 +3,7 @@ package controller
 import (
 	"context"
 
-	"github.com/Catizard/lampghost_wails/internal/entity"
+	"github.com/Catizard/lampghost_wails/internal/config/download"
 	"github.com/Catizard/lampghost_wails/internal/result"
 	"github.com/Catizard/lampghost_wails/internal/service"
 	"github.com/charmbracelet/log"
@@ -69,4 +69,4 @@ func (ctl *DownloadTaskController) RestartDownloadTask(taskID uint) result.RtnMe
 	return result.SUCCESS
 }
 
-func (*DownloadTaskController) GENERATOR_DOWNLOAD_TASK() *entity.DownloadTask { return nil }
+func (*DownloadTaskController) GENERATOR_DOWNLOAD_TASK() *download.DownloadSource { return nil }

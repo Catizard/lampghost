@@ -4,6 +4,7 @@ import {vo} from '../models';
 import {result} from '../models';
 import {dto} from '../models';
 import {entity} from '../models';
+import {download} from '../models';
 import {config} from '../models';
 
 export function AddBatchDiffTableHeader(arg1:Array<vo.DiffTableHeaderVo>):Promise<result.RtnDataList>;
@@ -80,7 +81,9 @@ export function GENERATOR_COURSE_INFO_DTO():Promise<dto.CourseInfoDto>;
 
 export function GENERATOR_CUSTOM_DIFF_TABLE_DTO():Promise<dto.CustomDiffTableDto>;
 
-export function GENERATOR_DOWNLOAD_TASK():Promise<entity.DownloadTask>;
+export function GENERATOR_DOWNLOAD_SOURCE():Promise<download.DownloadSource>;
+
+export function GENERATOR_DOWNLOAD_TASK():Promise<download.DownloadSource>;
 
 export function GENERATOR_FOLDER():Promise<entity.Folder>;
 
@@ -113,6 +116,8 @@ export function InitializeMainUser(arg1:vo.InitializeRivalInfoVo):Promise<result
 export function OpenDirectoryDialog(arg1:string):Promise<result.RtnData>;
 
 export function OpenFileDialog(arg1:string):Promise<result.RtnData>;
+
+export function QueryCurrentDownloadSource():Promise<result.RtnData>;
 
 export function QueryCustomDiffTablePageList(arg1:vo.CustomDiffTableVo):Promise<result.RtnPage>;
 

@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/Catizard/bmstable"
+	"github.com/Catizard/lampghost_wails/internal/config"
+	"github.com/Catizard/lampghost_wails/internal/config/download"
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/vo"
@@ -523,6 +525,14 @@ func (s *DiffTableService) UpdateHeaderLevelOrders(updateParam *vo.DiffTableHead
 }
 
 func (s *DiffTableService) SupplyMissingBMSFromTable(ID uint) error {
+	conf, err := config.ReadConfig()
+	if err != nil {
+		return err
+	}
+	downloadSource := download.GetDownloadSource(conf.DownloadSite)
+	if !downloadSource.AllowBatchDownload() {
+		return fmt.Errorf("%s doesn't allow batch download, please choose other download source instead", downloadSource.GetMeta().Name)
+	}
 	data, _, err := findDiffTableDataList(s.db, &vo.DiffTableDataVo{HeaderID: ID})
 	if err != nil {
 		return err

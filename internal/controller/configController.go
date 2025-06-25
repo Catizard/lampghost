@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/Catizard/lampghost_wails/internal/config"
+	"github.com/Catizard/lampghost_wails/internal/config/download"
 	"github.com/Catizard/lampghost_wails/internal/result"
 	"github.com/Catizard/lampghost_wails/internal/service"
 )
@@ -59,3 +60,14 @@ func (ctl *ConfigController) WriteConfig(conf *config.ApplicationConfig) result.
 	}
 	return result.SUCCESS
 }
+
+func (ctl *ConfigController) QueryCurrentDownloadSource() result.RtnData {
+	if conf, err := config.ReadConfig(); err != nil {
+		return result.NewErrorData(err)
+	} else {
+		downloadSource := download.GetDownloadSource(conf.DownloadSite)
+		return result.NewRtnData(downloadSource)
+	}
+}
+
+func (ctl *ConfigController) GENERATOR_DOWNLOAD_SOURCE() *download.DownloadSource { return nil }

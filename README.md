@@ -10,8 +10,10 @@ English | [简体中文](./README.zh-CN.md)
 
 - `I18n`:`English` and `zh-CN` are supported currently
 - `Multiple User`: You can load your friends' save file and view their scores
-- `Time Machine`: Compare lamp status between you and your friends, and could even "turn back" your friend's save file time(Suppose your friend is already ^^, using `LampGhost` allows you comparing the lamp status the moment that your friend achived ★5)
-- `Favorite Folder`: Customize favorite folder and import it as a difficult table in `beatoraja`(tip: You can reload table by pressing F2 in game). More specifically, import `http://127.0.0.1:7391/table/lampghost.json` in `beatoraja` while keep `LampGhost` opening.
+- `Time Machine`: Compare lamp status between you and your friends, and could even "turn back" your friend's save file time(Suppose your friend is already ^^, using `LampGhost` allows you comparing the lamp status the moment that your friend achived ★5). And even "back port" the data into beatoraja
+- `Favorite Folder`: Customize favorite folder and import it as a difficult table in `beatoraja`(tip: You can reload table by pressing F2 in game). More specifically, import `http://127.0.0.1:7391/table/lampghost.json` in `beatoraja` while keep `LampGhost` opening
+- `Custom Difficult Table`: Customize your own difficult table and export, share, or deploy to static website
+- `Download Missing BMS`: LampGhost implements the integration with some BMS download servers, you can download the missing BMS through LampGhost
 
 Because `LampGhost` is an **offline** tool, therefore:
 
@@ -53,6 +55,7 @@ This project is made by my own(at least for now), so it's still very simple and 
 
 - [@Yuntian](https://www.github.com/Yuntian52s): Providing ui design advices, without his selfless work `LampGhost` would still a be a very unfriendly tool
 - [@Wriggle](https://www.github.com/wrigglebug): Providing bms download site [The Big Sister BMS Project](https://bms.wrigglebug.xyz/) and separate bms sabun download api.
+- [@MaverickLong](https://www.github.com/MaverickLong): Providing bms download site [Konmai](https://616.sb/bms/download) and separate bms sabun download api.
 - [@Sayaka](https://github.com/SayakaIsBaka): Providing bms preview site [BMS Score Viewer](https://github.com/SayakaIsBaka/bms-score-viewer)
 - [@Chuang](https://github.com/chuang1213), yzy, yf and other early version testers
 - [Wails](https://github.com/wailsapp/wails): This project is based on `wails` framework, and benefits a lot from its amazing hot reload time and easy mind model

@@ -10,8 +10,10 @@
 
 - 国际化设置: 目前版本支持`English`和`简体中文`
 - 多用户: 你可以导入你朋友的存档文件，并查看他们的点灯情况和历史
-- "时间机器": `LampGhost`不仅可以对比你和你朋友的点灯情况，允许你"**退回**"你朋友的游戏记录（例如：你的朋友可能已经狂皆了，通过这个工具你可以对比你朋友在刚通过发狂五段时的点灯情况）
+- "时间机器": `LampGhost`不仅可以对比你和你朋友的点灯情况，允许你"**退回**"你朋友的游戏记录（例如：你的朋友可能已经狂皆了，通过这个工具你可以对比你朋友在刚通过发狂五段时的点灯情况）。甚至是将数据"反向导入"到beatoraja中
 - 自定义收藏夹: 并将你的收藏夹数据当作一个难度表导入到`beatoraja`中，可以在游戏内刷新收藏夹定义。具体地，在默认设置下**开启**`LampGhost`程序的同时在`beatoraja`中引入`http://127.0.0.1:7391/table/lampghost.json`即可
+- 自定义难度表：自定义你自己的难度表，导出、分享甚至是部署到静态网站
+- 下载缺失的BMS：LampGhost实现了一些BMS下载站的对接，你可以通过LampGhost展示并从这些站点直接下载BMS
 
 由于`LampGhost`是一个**离线**的存档查看工具，因此它:
 
@@ -53,6 +55,7 @@
 
 - [@Yuntian](https://www.github.com/Yuntian52s): 提供ui设计以及交互意见, 没有他的帮助`LampGhost`可能仍然是一个非常不友好的工具
 - [@Wriggle](https://www.github.com/wrigglebug): 提供BMS下载网站 [The Big Sister BMS Project](https://bms.wrigglebug.xyz/) 以及差分下载接口
+- [@MaverickLong](https://www.github.com/MaverickLong): 提供BMS下载网站 [Konmai](https://616.sb/bms/download) 以及差分下载接口
 - [@Sayaka](https://github.com/SayakaIsBaka): 提供BMS预览网站 [BMS Score Viewer](https://github.com/SayakaIsBaka/bms-score-viewer)
 - [@Chuang](https://github.com/chuang1213), yzy, yf等早期测试用户
 - [Wails](https://github.com/wailsapp/wails): 这个项目基于`wails`框架开发，并且从其提供的非常快速的热加载和优秀的开发心智模型中收益

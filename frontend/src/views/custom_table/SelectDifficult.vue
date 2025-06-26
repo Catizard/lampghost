@@ -23,6 +23,7 @@ import FolderAddForm from '../folder/FolderAddForm.vue';
 import SelectUnboundFolder from '../folder/SelectUnboundFolder.vue';
 import { SelectOption } from 'naive-ui';
 import { FindCustomDiffTableList } from '@wailsjs/go/main/App';
+import { ReloadDiffTableHeader } from '../../../wailsjs/go/main/App';
 
 const { t } = useI18n();
 const show = defineModel<boolean>("show");
@@ -41,16 +42,17 @@ const selectUnboundFolderRef: Ref<InstanceType<typeof SelectUnboundFolder>> = re
 
 const currentCustomTableID: Ref<number | null> = ref(null);
 const customTableOptions: Ref<SelectOption[]> = ref([]);
-function loadCustomTableOptions() {
+async function loadCustomTableOptions() {
 	loading.value = true;
-	FindCustomDiffTableList({
-		IgnoreDefaultTable: true
-	} as any).then(result => {
+	try {
+		const result = await FindCustomDiffTableList({
+			IgnoreDefaultTable: true
+		} as any)
 		if (result.Code != 200) {
-			return Promise.reject(result.Msg);
+			throw result.Msg;
 		}
 		if (result.Rows.length == 0) {
-			return Promise.reject(t('message.noTableError'))
+			throw t('message.noTableError');
 		}
 		customTableOptions.value = result.Rows.map((row: dto.CustomDiffTableDto): SelectOption => {
 			return {
@@ -59,9 +61,11 @@ function loadCustomTableOptions() {
 			}
 		});
 		currentCustomTableID.value = customTableOptions.value[0].value as number;
-	})
-		.catch(err => window.$notifyError(err))
-		.finally(() => loading.value = false);
+		console.log('setting custom table id to ', currentCustomTableID.value);
+	} catch (e) {
+		window.$notifyError(e);
+	}
+	loading.value = false;
 }
 
 function handleClickAddFolder() {
@@ -75,16 +79,6 @@ function reload() {
 watch(show, (newValue, oldValue) => {
 	if (newValue == true) {
 		loadCustomTableOptions();
-		// NOTE: SelectUnboundFolder component is under NModel
-		// Therefore, we have to wait until it mounted
-		const spinUntilMounted = () => {
-			if (selectUnboundFolderRef == null) {
-				nextTick(() => spinUntilMounted());
-			} else {
-				selectUnboundFolderRef.value.reload();
-			}
-		}
-		nextTick(() => spinUntilMounted());
 	}
 }, { deep: true });
 
@@ -122,7 +116,7 @@ function handleNegativeClick() {
 			"addFolder": "添加难度"
 		},
 		"message": {
-      "noTableError": "目前无法处理一个自定义难度表都没有的情况，请至少先添加一个难度表"
+			"noTableError": "目前无法处理一个自定义难度表都没有的情况，请至少先添加一个难度表"
 		}
 	}
 }</i18n>

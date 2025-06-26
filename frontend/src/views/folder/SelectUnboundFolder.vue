@@ -10,7 +10,7 @@
 import { FindFolderList } from '@wailsjs/go/main/App';
 import { dto } from '@wailsjs/go/models';
 import { DataTableColumns } from 'naive-ui';
-import { Ref, ref } from 'vue';
+import { Ref, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -20,7 +20,7 @@ const props = defineProps<{
 	sha256?: string,
 	customTableId?: number
 }>();
-defineExpose({ reload })
+defineExpose({ reload });
 let checkedFolerIds = defineModel<number[]>("checkedFolderIds");
 
 const loading = ref(false);
@@ -41,6 +41,7 @@ const columns: DataTableColumns<dto.FolderDto> = [
 ];
 
 function reload() {
+	console.log('SelectUnboundFolder component reload: ', props.customTableId)
 	loading.value = true;
 	checkedFolerIds.value = [];
 	FindFolderList({
@@ -59,6 +60,10 @@ function reload() {
 function handleCheck(rowKeys: number[]) {
 	checkedFolerIds.value = [...rowKeys];
 }
+
+watch(() => props.customTableId, () => {
+	reload();
+});
 </script>
 
 <i18n lang="json">{

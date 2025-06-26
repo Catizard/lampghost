@@ -12,7 +12,7 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/service"
 )
 
-const VERSION = "0.2.4"
+const VERSION = "0.2.4.1"
 
 type ConfigController struct {
 	service *service.ConfigService

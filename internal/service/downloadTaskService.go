@@ -312,13 +312,14 @@ func (s *DownloadTaskService) SubmitSingleMD5DownloadTask(md5 string, taskName *
 		return err
 	}
 	s.lock()
-	defer s.unlock()
 	for _, task := range s.tasks {
 		if task.URL == url {
 			// Skip duplicate download url
+			s.unlock()
 			return nil
 		}
 	}
+	s.unlock()
 	log.Debugf("[DownloadTaskService] build url: %s", url)
 	currentTaskID := s.taskID
 	s.taskID++

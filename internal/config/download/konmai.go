@@ -22,7 +22,7 @@ func (d *konmaiDownloadSource) GetMeta() DownloadSourceMeta {
 	return d.Meta
 }
 
-func (d *konmaiDownloadSource) GetDownloadURLFromMD5(md5 string) (url string, err error) {
+func (d *konmaiDownloadSource) GetDownloadURLFromMD5(md5 string) (url, fallbackName string, err error) {
 	metaQueryURL := fmt.Sprintf(d.Meta.DownloadURL, md5)
 	resp, err := http.Get(metaQueryURL)
 	if err != nil {
@@ -38,12 +38,12 @@ func (d *konmaiDownloadSource) GetDownloadURLFromMD5(md5 string) (url string, er
 		return
 	}
 	if result.Result != "success" {
-		return "", fmt.Errorf("konmai: %s", result.Msg)
+		return "", "", fmt.Errorf("konmai: %s", result.Msg)
 	}
 	if result.Data.SongURL == "" {
-		return "", fmt.Errorf("Not Found")
+		return "", "", fmt.Errorf("Not Found")
 	}
-	return result.Data.SongURL, nil
+	return result.Data.SongURL, fmt.Sprintf("%s.7z", result.Data.SongName), nil
 }
 
 func (d *konmaiDownloadSource) AllowBatchDownload() bool {

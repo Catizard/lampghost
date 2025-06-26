@@ -21,6 +21,7 @@ type DownloadTask struct {
 	Status               *int
 	IntermediateFilePath string
 	TaskName             *string
+	FallbackName         string
 	DownloadSize         int64
 	ContentLength        int64
 	ErrorMessage         string

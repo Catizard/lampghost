@@ -19,9 +19,9 @@ func (d *wriggleDownloadSource) GetMeta() DownloadSourceMeta {
 	return d.Meta
 }
 
-func (d *wriggleDownloadSource) GetDownloadURLFromMD5(md5 string) (string, error) {
+func (d *wriggleDownloadSource) GetDownloadURLFromMD5(md5 string) (string, string, error) {
 	pattern := d.Meta.DownloadURL
-	return fmt.Sprintf(pattern, md5), nil
+	return fmt.Sprintf(pattern, md5), "", nil
 }
 
 func (d *wriggleDownloadSource) AllowBatchDownload() bool {

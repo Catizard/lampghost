@@ -234,6 +234,9 @@ func (s *DownloadTaskService) tryKickingWaitTask() {
 		if next.TaskName != nil {
 			filename = *next.TaskName
 		}
+		if next.FallbackName != "" {
+			filename = next.FallbackName
+		}
 		contentDisposition := resp.GetHeader("Content-Disposition")
 		log.Debugf("Content-Disposition: %s", contentDisposition)
 		if contentDisposition != "" {
@@ -296,7 +299,7 @@ func (s *DownloadTaskService) SubmitDownloadTask(url string, taskName *string) e
 	currentTaskID := s.taskID
 	currentTaskID++
 	intermediateFileName := fmt.Sprintf("%d.crdownload", currentTaskID)
-	return s.submitSingleDownloadTask(currentTaskID, url, intermediateFileName, taskName)
+	return s.submitSingleDownloadTask(currentTaskID, url, intermediateFileName, "", taskName)
 }
 
 func (s *DownloadTaskService) SubmitSingleMD5DownloadTask(md5 string, taskName *string) error {
@@ -307,7 +310,7 @@ func (s *DownloadTaskService) SubmitSingleMD5DownloadTask(md5 string, taskName *
 		return eris.New("assert: md5 cannot be empty")
 	}
 	downloadSource := download.GetDownloadSource(s.config.DownloadSite)
-	url, err := downloadSource.GetDownloadURLFromMD5(md5)
+	url, fallbackName, err := downloadSource.GetDownloadURLFromMD5(md5)
 	if err != nil {
 		return err
 	}
@@ -324,10 +327,10 @@ func (s *DownloadTaskService) SubmitSingleMD5DownloadTask(md5 string, taskName *
 	currentTaskID := s.taskID
 	s.taskID++
 	intermediateFileName := fmt.Sprintf("%d.crdownload", currentTaskID)
-	return s.submitSingleDownloadTask(currentTaskID, url, intermediateFileName, taskName)
+	return s.submitSingleDownloadTask(currentTaskID, url, intermediateFileName, fallbackName, taskName)
 }
 
-func (s *DownloadTaskService) submitSingleDownloadTask(id uint, url, intermediateFileName string, taskName *string) error {
+func (s *DownloadTaskService) submitSingleDownloadTask(id uint, url, intermediateFileName, fallbackName string, taskName *string) error {
 	if err := s.config.EnableDownload(); err != nil {
 		return err
 	}
@@ -342,6 +345,7 @@ func (s *DownloadTaskService) submitSingleDownloadTask(id uint, url, intermediat
 		URL:                  url,
 		Status:               &status,
 		IntermediateFilePath: intermediateFilePath,
+		FallbackName:         fallbackName,
 		TaskName:             taskName,
 		DownloadSize:         0,
 		ContentLength:        0,

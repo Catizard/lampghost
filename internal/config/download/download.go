@@ -12,7 +12,7 @@ type DownloadSourceMeta struct {
 }
 
 type DownloadSource interface {
-	GetDownloadURLFromMD5(string) (string, error)
+	GetDownloadURLFromMD5(string) (string, string, error)
 	GetMeta() DownloadSourceMeta
 	AllowBatchDownload() bool
 }

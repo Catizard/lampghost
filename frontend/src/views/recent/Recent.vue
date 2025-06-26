@@ -19,7 +19,7 @@
 <script lang="ts" setup>
 import ClearTag from '@/components/ClearTag.vue';
 import { BindSongToFolder, QueryRivalScoreLogPageList } from '@wailsjs/go/main/App';
-import { DataTableColumns, NButton, NDropdown } from 'naive-ui';
+import { DataTableColumns, NButton, NDropdown, useModal } from 'naive-ui';
 import { h, onMounted, reactive, Ref, ref } from 'vue';
 import SelectFolder from '../folder/SelectFolder.vue';
 import { dto, vo } from '@wailsjs/go/models';
@@ -30,6 +30,8 @@ import SelectDifficult from '../custom_table/SelectDifficult.vue';
 
 const i18n = useI18n();
 const { t } = i18n;
+const modal = useModal();
+
 const loading = ref<boolean>(false);
 const showFolderSelection = ref<boolean>(false);
 const showDifficultSelection = ref<boolean>(false);
@@ -107,7 +109,8 @@ function createColumns(): DataTableColumns<dto.RivalScoreLogDto> {
 						trigger: "hover",
 						options: [
 							{ label: t('button.addToFolder'), key: "AddToFolder" },
-							{ label: t('button.addToTable'), key: "AddToTable" }
+							{ label: t('button.addToTable'), key: "AddToTable" },
+							{ label: t('button.gotoPreview'), key: "GotoPreview" },
 						],
 						onSelect: (key: string) => {
 							const setSongInfo = () => {
@@ -119,6 +122,25 @@ function createColumns(): DataTableColumns<dto.RivalScoreLogDto> {
 							switch (key) {
 								case 'AddToFolder': handleAddToFolder(row.Sha256, row.Title); break;
 								case 'AddToTable': handleAddToTable(row.Sha256, row.Title); break;
+								case "GotoPreview":
+									modal.create({
+										preset: "dialog",
+										title: "Preview",
+										contentStyle: { "height": "100%" },
+										content: () => h(
+											'iframe',
+											{
+												src: `https://bms-score-viewer.pages.dev/view?md5=${row.Md5}`,
+												width: "100%",
+												height: "95%",
+											},
+										),
+										style: {
+											width: "95vw",
+											height: "95vh"
+										}
+									});
+									break;
 							}
 						}
 					},
@@ -182,7 +204,8 @@ onMounted(() => {
 			"chooseClearType": "Choose Clear Type",
 			"minimumClearType": "Minimum Clear Type",
 			"addToFolder": "Add to Folder",
-			"addToTable": "Add to Custom Table"
+			"addToTable": "Add to Custom Table",
+			"gotoPreview": "Preview BMS Chart"
 		},
 		"column": {
 			"name": "Song Name",
@@ -205,7 +228,8 @@ onMounted(() => {
 			"chooseClearType": "筛选点灯记录",
 			"minimumClearType": "筛选最小灯记录",
 			"addToFolder": "添加至收藏夹",
-			"addToTable": "添加至自定义难度表"
+			"addToTable": "添加至自定义难度表",
+			"gotoPreview": "预览BMS谱面"
 		},
 		"column": {
 			"name": "谱面名称",

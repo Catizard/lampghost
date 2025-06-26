@@ -111,7 +111,7 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
 										'iframe',
 										{ 
 											src: `https://bms-score-viewer.pages.dev/view?md5=${md5}`,
-											width: "95%",
+											width: "100%",
 											height: "95%",
 										},
 									),
@@ -261,7 +261,7 @@ loadData();
 			"gotoURLDiff": "Open sabun url in browser",
 			"gotoLR2IR": "Open LR2IR in broswer",
 			"gotoMochaIR": "Open MochaIR in broswer",
-			"gotoPreview": "Open BMS Preview in browser"
+			"gotoPreview": "Preview BMS Chart"
 		},
 		"message": {
 			"bindSuccess": "Bind successfully",
@@ -287,7 +287,7 @@ loadData();
 			"gotoURLDiff": "在浏览器中打开差分URL",
 			"gotoLR2IR": "在浏览器中打开LR2IR",
 			"gotoMochaIR": "在浏览器中打开MochaIR",
-			"gotoPreview": "在浏览器中打开BMS预览"
+			"gotoPreview": "预览BMS谱面"
 		},
 		"message": {
 			"bindSucess": "绑定成功",

@@ -147,6 +147,8 @@ export function QueryRivalScoreLogPageList(arg1:vo.RivalScoreLogVo):Promise<resu
 
 export function QueryRivalTagPageList(arg1:vo.RivalTagVo):Promise<result.RtnPage>;
 
+export function QuerySongDataPageList(arg1:vo.RivalSongDataVo):Promise<result.RtnPage>;
+
 export function QueryUserInfoByID(arg1:number):Promise<result.RtnData>;
 
 export function QueryUserInfoWithLevelLayeredDiffTableLampStatus(arg1:number,arg2:number):Promise<result.RtnData>;
@@ -160,6 +162,8 @@ export function ReadConfig():Promise<result.RtnData>;
 export function ReloadDiffTableHeader(arg1:number):Promise<result.RtnMessage>;
 
 export function ReloadRivalData(arg1:number,arg2:boolean):Promise<result.RtnMessage>;
+
+export function ReloadRivalSongData():Promise<result.RtnMessage>;
 
 export function RestartDownloadTask(arg1:number):Promise<result.RtnMessage>;
 

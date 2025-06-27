@@ -282,6 +282,10 @@ export function QueryRivalTagPageList(arg1) {
   return window['go']['main']['App']['QueryRivalTagPageList'](arg1);
 }
 
+export function QuerySongDataPageList(arg1) {
+  return window['go']['main']['App']['QuerySongDataPageList'](arg1);
+}
+
 export function QueryUserInfoByID(arg1) {
   return window['go']['main']['App']['QueryUserInfoByID'](arg1);
 }
@@ -308,6 +312,10 @@ export function ReloadDiffTableHeader(arg1) {
 
 export function ReloadRivalData(arg1, arg2) {
   return window['go']['main']['App']['ReloadRivalData'](arg1, arg2);
+}
+
+export function ReloadRivalSongData() {
+  return window['go']['main']['App']['ReloadRivalSongData']();
 }
 
 export function RestartDownloadTask(arg1) {

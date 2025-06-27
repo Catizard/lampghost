@@ -23,6 +23,7 @@ import {
 	ColorWand as CustomTableIcon,
 	Pencil as PencilIcon,
 	SnowOutline as LockIcon,
+	MusicalNote as SongIcon
 } from '@vicons/ionicons5'
 import { MenuOption, NIcon } from 'naive-ui'
 import { h, ref } from 'vue'
@@ -74,6 +75,11 @@ const menuOptions: MenuOption[] = [
 		],
 	},
 	{
+		label: renderOption("/song", t('menuName.song')),
+		key: "song",
+		icon: renderIcon(SongIcon),
+	},
+	{
 		label: t('menuName.difftable.self'),
 		key: "difftable",
 		icon: renderIcon(BookIcon),
@@ -88,7 +94,6 @@ const menuOptions: MenuOption[] = [
 				key: "difftable_scores",
 				icon: renderIcon(StatisticIcon)
 			},
-
 		]
 	},
 	{
@@ -157,6 +162,7 @@ const menuOptions: MenuOption[] = [
 				"management": "Management",
 				"scores": "Statistics"
 			},
+			"song": "Song",
 			"customtable": {
 				"self": "Custom Table",
 				"management": "Management",
@@ -184,6 +190,7 @@ const menuOptions: MenuOption[] = [
 				"management": "管理",
 				"scores": "统计信息"
 			},
+			"song": "歌曲",
 			"customtable": {
 				"self": "自定义难度表",
 				"management": "管理",

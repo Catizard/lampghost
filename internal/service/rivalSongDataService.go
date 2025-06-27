@@ -55,10 +55,12 @@ func findRivalSongDataByID(tx *gorm.DB, ID uint) (*entity.RivalSongData, error) 
 
 // Basic query function for rival_song_data table
 func findRivalSongDataList(tx *gorm.DB, filter *vo.RivalSongDataVo) (out []*dto.RivalSongDataDto, cnt int, err error) {
-	if err = tx.Model(&entity.RivalSongData{}).
-		Scopes(scopeRivalSongDataFilter(filter), pagination(filter.Pagination)).
-		Find(&out).Error; err != nil {
-		return nil, 0, err
+	moved := tx.Select(`rival_song_data.*`).Model(&entity.RivalSongData{}).Scopes(scopeRivalSongDataFilter(filter))
+	if filter != nil {
+		moved = moved.Scopes(pagination(filter.Pagination))
+	}
+	if err = moved.Find(&out).Error; err != nil {
+		return
 	}
 	cnt = len(out)
 	return

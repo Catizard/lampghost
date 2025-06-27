@@ -559,6 +559,7 @@ export namespace dto {
 	    Notes: number;
 	    Page: number;
 	    PageSize: number;
+	    PageCount: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new RivalSongDataDto(source);
@@ -595,6 +596,7 @@ export namespace dto {
 	        this.Notes = source["Notes"];
 	        this.Page = source["Page"];
 	        this.PageSize = source["PageSize"];
+	        this.PageCount = source["PageCount"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1725,6 +1727,93 @@ export namespace vo {
 	        this.SongNameLike = source["SongNameLike"];
 	        this.Sha256s = source["Sha256s"];
 	        this.HeaderID = source["HeaderID"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class RivalSongDataVo {
+	    ID: number;
+	    // Go type: time
+	    CreatedAt: any;
+	    // Go type: time
+	    UpdatedAt: any;
+	    // Go type: gorm
+	    DeletedAt: any;
+	    RivalId: number;
+	    Md5: string;
+	    Sha256: string;
+	    Title: string;
+	    SubTitle: string;
+	    Genre: string;
+	    Artist: string;
+	    SubArtist: string;
+	    Tag: string;
+	    BackBmp: string;
+	    Level: number;
+	    Difficulty: number;
+	    MaxBpm: number;
+	    MinBpm: number;
+	    Length: number;
+	    Mode: number;
+	    Judge: number;
+	    Feature: number;
+	    Content: number;
+	    Date: number;
+	    Favorite: number;
+	    AddDate: number;
+	    Notes: number;
+	    Pagination?: entity.Page;
+	
+	    static createFrom(source: any = {}) {
+	        return new RivalSongDataVo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.ID = source["ID"];
+	        this.CreatedAt = this.convertValues(source["CreatedAt"], null);
+	        this.UpdatedAt = this.convertValues(source["UpdatedAt"], null);
+	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
+	        this.RivalId = source["RivalId"];
+	        this.Md5 = source["Md5"];
+	        this.Sha256 = source["Sha256"];
+	        this.Title = source["Title"];
+	        this.SubTitle = source["SubTitle"];
+	        this.Genre = source["Genre"];
+	        this.Artist = source["Artist"];
+	        this.SubArtist = source["SubArtist"];
+	        this.Tag = source["Tag"];
+	        this.BackBmp = source["BackBmp"];
+	        this.Level = source["Level"];
+	        this.Difficulty = source["Difficulty"];
+	        this.MaxBpm = source["MaxBpm"];
+	        this.MinBpm = source["MinBpm"];
+	        this.Length = source["Length"];
+	        this.Mode = source["Mode"];
+	        this.Judge = source["Judge"];
+	        this.Feature = source["Feature"];
+	        this.Content = source["Content"];
+	        this.Date = source["Date"];
+	        this.Favorite = source["Favorite"];
+	        this.AddDate = source["AddDate"];
+	        this.Notes = source["Notes"];
+	        this.Pagination = this.convertValues(source["Pagination"], entity.Page);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

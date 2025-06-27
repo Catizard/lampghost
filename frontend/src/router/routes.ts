@@ -35,6 +35,10 @@ const mainRoutes: RouteRecordRaw[] = [
     component: () => import("../views/custom_table/CustomTableDesign.vue"),
   },
   {
+    path: "song",
+    component: () => import("../views/song/Song.vue")
+  },
+  {
     name: "folder",
     path: "/folder",
     component: () => import("../views/folder/FolderManagement.vue"),

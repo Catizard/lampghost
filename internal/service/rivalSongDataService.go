@@ -62,7 +62,20 @@ func findRivalSongDataList(tx *gorm.DB, filter *vo.RivalSongDataVo) (out []*dto.
 	if err = moved.Find(&out).Error; err != nil {
 		return
 	}
+	// pagination
+	if filter != nil && filter.Pagination != nil {
+		count, err := selectRivalSongDataCount(tx, filter)
+		if err != nil {
+			return nil, 0, err
+		}
+		filter.Pagination.PageCount = calcPageCount(count, filter.Pagination.PageSize)
+	}
 	cnt = len(out)
+	return
+}
+
+func selectRivalSongDataCount(tx *gorm.DB, filter *vo.RivalSongDataVo) (cnt int64, err error) {
+	err = tx.Model(&entity.RivalSongData{}).Scopes(scopeRivalSongDataFilter(filter)).Count(&cnt).Error
 	return
 }
 

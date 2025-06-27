@@ -19,44 +19,31 @@ func NewRivalScoreLogService(db *gorm.DB) *RivalScoreLogService {
 	}
 }
 
-func (s *RivalScoreLogService) QueryRivalScoreLogPageList(filter *vo.RivalScoreLogVo) ([]*dto.RivalScoreLogDto, int, error) {
-	tx := s.db.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
+func (s *RivalScoreLogService) QueryRivalScoreLogPageList(filter *vo.RivalScoreLogVo) (out []*dto.RivalScoreLogDto, cnt int, err error) {
+	err = s.db.Transaction(func(tx *gorm.DB) error {
+		out, cnt, err = findRivalScoreLogList(tx, filter)
+		if err != nil {
+			return err
 		}
-	}()
-	var count int64
-	if err := tx.Model(&entity.RivalScoreLog{}).Count(&count).Error; err != nil {
-		tx.Rollback()
-		return nil, 0, err
-	}
-	scoreLogs, n, err := findRivalScoreLogList(tx, filter)
-	if err != nil {
-		tx.Rollback()
-		return nil, 0, err
-	}
-	tableTags, _, err := queryDiffTableTag(tx, &vo.DiffTableDataVo{
-		Md5s: Map(scoreLogs, func(log *dto.RivalScoreLogDto, _ int) string {
-			return log.Md5
-		}),
-	})
-	if err != nil {
-		tx.Rollback()
-		return nil, 0, err
-	}
-	ForEach(scoreLogs, func(log *dto.RivalScoreLogDto, _ int) {
-		log.TableTags = make([]*dto.DiffTableTagDto, 0)
-		ForEach(tableTags, func(tag *dto.DiffTableTagDto, _ int) {
-			if tag.Md5 == log.Md5 {
-				log.TableTags = append(log.TableTags, tag)
-			}
+		tableTags, _, err := queryDiffTableTag(tx, &vo.DiffTableDataVo{
+			Md5s: Map(out, func(log *dto.RivalScoreLogDto, _ int) string {
+				return log.Md5
+			}),
 		})
+		if err != nil {
+			return err
+		}
+		ForEach(out, func(log *dto.RivalScoreLogDto, _ int) {
+			log.TableTags = make([]*dto.DiffTableTagDto, 0)
+			ForEach(tableTags, func(tag *dto.DiffTableTagDto, _ int) {
+				if tag.Md5 == log.Md5 {
+					log.TableTags = append(log.TableTags, tag)
+				}
+			})
+		})
+		return nil
 	})
-	if err := tx.Commit().Error; err != nil {
-		return nil, 0, err
-	}
-	return scoreLogs, n, nil
+	return
 }
 
 // Return play logs in one specified day, which satisfy:

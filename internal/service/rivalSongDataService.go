@@ -3,7 +3,9 @@ package service
 import (
 	"sync"
 
+	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
+	"github.com/Catizard/lampghost_wails/internal/vo"
 	"github.com/charmbracelet/log"
 	"github.com/rotisserie/eris"
 	"gorm.io/gorm"
@@ -28,6 +30,20 @@ func (s *RivalSongDataService) QueryDefaultSongHashCache() (*entity.SongHashCach
 	return queryDefaultSongHashCache(s.db)
 }
 
+func (s *RivalSongDataService) QuerySongDataPageList(filter *vo.RivalSongDataVo) (out []*dto.RivalSongDataDto, cnt int, err error) {
+	err = s.db.Transaction(func(tx *gorm.DB) error {
+		out, cnt, err = findRivalSongDataList(tx, filter)
+		return err
+	})
+	return
+}
+
+func (s *RivalSongDataService) ReloadRivalSongData() error {
+	return s.db.Transaction(func(tx *gorm.DB) error {
+		return reloadRivalSongData(tx)
+	})
+}
+
 // Basic query function for rival_song_data table
 func findRivalSongDataByID(tx *gorm.DB, ID uint) (*entity.RivalSongData, error) {
 	var data *entity.RivalSongData
@@ -38,16 +54,14 @@ func findRivalSongDataByID(tx *gorm.DB, ID uint) (*entity.RivalSongData, error) 
 }
 
 // Basic query function for rival_song_data table
-func findRivalSongDataList(tx *gorm.DB, filter *entity.RivalSongData) ([]*entity.RivalSongData, int, error) {
-	var songDataList []*entity.RivalSongData
-	partial := tx.Model(&entity.RivalSongData{})
-	if filter != nil {
-		partial = partial.Where(filter)
+func findRivalSongDataList(tx *gorm.DB, filter *vo.RivalSongDataVo) (out []*dto.RivalSongDataDto, cnt int, err error) {
+	if err = tx.Model(&entity.RivalSongData{}).
+		Scopes(scopeRivalSongDataFilter(filter), pagination(filter.Pagination)).
+		Find(&out).Error; err != nil {
+		return nil, 0, err
 	}
-	if err := partial.Find(&songDataList).Error; err != nil {
-		return nil, 0, eris.Wrap(err, "cannot select from rival_song_data")
-	}
-	return songDataList, len(songDataList), nil
+	cnt = len(out)
+	return
 }
 
 // Query the default song hash cache, which is built by main user's save file
@@ -84,7 +98,7 @@ func expireDefaultCache() {
 func querySongHashCache(tx *gorm.DB, rivalID uint) (*entity.SongHashCache, error) {
 	md5KeyCache := make(map[string]string)
 	sha256KeyCache := make(map[string]string)
-	dataList, _, err := findRivalSongDataList(tx, &entity.RivalSongData{RivalId: rivalID})
+	dataList, _, err := findRivalSongDataList(tx, &vo.RivalSongDataVo{RivalId: rivalID})
 	if err != nil {
 		return nil, eris.Wrapf(err, "failed to query user(id=%d)'s songdata.db contents", rivalID)
 	}
@@ -106,4 +120,34 @@ func generateSongHashCacheFromRawData(songData []*entity.SongData) *entity.SongH
 		sha256KeyCache[data.Sha256] = data.Md5
 	}
 	return entity.NewSongHashCache(md5KeyCache, sha256KeyCache)
+}
+
+// fully reload rival_song_data
+func reloadRivalSongData(tx *gorm.DB) error {
+	mainUser, err := queryMainUser(tx)
+	if err != nil {
+		return err
+	}
+	fp := mainUser.SongDataPath
+	rawSongData, err := loadSongData(*fp)
+	if err != nil {
+		return err
+	}
+	if err := syncSongData(tx, rawSongData, mainUser.ID); err != nil {
+		return err
+	}
+	// invalidate default song cache since we have rebuilt the `rival_song_data` table
+	expireDefaultCache()
+	return nil
+}
+
+// Specialized scope for vo.RivalSongDataVo
+func scopeRivalSongDataFilter(filter *vo.RivalSongDataVo) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if filter == nil {
+			return db
+		}
+		moved := db.Where(filter.Entity())
+		return moved
+	}
 }

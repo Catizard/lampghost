@@ -33,8 +33,7 @@ type RivalSongDataVo struct {
 	Notes      int32
 
 	// Pagination
-	Page     int
-	PageSize int
+	Pagination *entity.Page
 }
 
 func (rivalSongData *RivalSongDataVo) Entity() *entity.RivalSongData {

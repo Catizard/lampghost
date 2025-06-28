@@ -7,6 +7,7 @@ export namespace config {
 	    DownloadSite: string;
 	    DownloadDirectory: string;
 	    MaximumDownloadCount: number;
+	    EnableAutoReload: number;
 	    EnableDownloadFeature: boolean;
 	
 	    static createFrom(source: any = {}) {
@@ -21,6 +22,7 @@ export namespace config {
 	        this.DownloadSite = source["DownloadSite"];
 	        this.DownloadDirectory = source["DownloadDirectory"];
 	        this.MaximumDownloadCount = source["MaximumDownloadCount"];
+	        this.EnableAutoReload = source["EnableAutoReload"];
 	        this.EnableDownloadFeature = source["EnableDownloadFeature"];
 	    }
 	}

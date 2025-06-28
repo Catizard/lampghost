@@ -330,6 +330,10 @@ export function RunServer() {
   return window['go']['main']['App']['RunServer']();
 }
 
+export function SetScoreLogFilePath(arg1) {
+  return window['go']['main']['App']['SetScoreLogFilePath'](arg1);
+}
+
 export function SubmitDownloadTask(arg1, arg2) {
   return window['go']['main']['App']['SubmitDownloadTask'](arg1, arg2);
 }

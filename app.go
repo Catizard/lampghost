@@ -28,6 +28,7 @@ type App struct {
 	*controller.FolderController
 	*controller.DownloadTaskController
 	*controller.CustomDiffTableController
+	*service.MonitorService
 	*server.InternalServer
 }
 
@@ -67,8 +68,12 @@ func NewApp() *App {
 		log.Fatalf("cannot read config: %s", err)
 	}
 
+	// auto-reload module
+	notifySyncChan := make(chan any)
+	monitorService := service.NewMonitorService(conf, notifySyncChan)
+
 	// rival module
-	rivalInfoService := service.NewRivalInfoService(db)
+	rivalInfoService := service.NewRivalInfoService(db, monitorService, notifySyncChan)
 	rivalTagService := service.NewRivalTagService(db)
 	rivalScoreLogService := service.NewRivalScoreLogService(db)
 	rivalSongDataService := service.NewRivalSongDataService(db)
@@ -78,6 +83,11 @@ func NewApp() *App {
 	rivalScoreLogController := controller.NewRivalScoreLogController(rivalScoreLogService)
 	rivalScoreDataLogController := controller.NewRivalScoreDataLogController(rivalScoreDataLogService)
 	rivalSongDataController := controller.NewRivalSongDataController(rivalSongDataService)
+
+	// Set up the initial scorelog path
+	if mainUser, err := rivalInfoService.QueryMainUser(); err == nil && mainUser != nil {
+		monitorService.SetScoreLogFilePath(*mainUser.ScoreLogPath)
+	}
 
 	// download task module
 	downloadTaskService := service.NewDownloadTaskService(db, conf, configSubscribeChannel[0])
@@ -118,6 +128,7 @@ func NewApp() *App {
 		folderController,
 		downloadTaskController,
 		customDiffTableController,
+		monitorService,
 		internalServer,
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"time"
 
 	"github.com/Catizard/lampghost_wails/internal/config"
 	"github.com/Catizard/lampghost_wails/internal/database"
@@ -22,13 +23,49 @@ import (
 const READONLY_PARAMETER = "?open_mode=1"
 
 type RivalInfoService struct {
-	db  *gorm.DB
-	ctx context.Context
+	db             *gorm.DB
+	monitorService *MonitorService
+	ctx            context.Context
+	syncChan       <-chan any
 }
 
-func NewRivalInfoService(db *gorm.DB) *RivalInfoService {
-	return &RivalInfoService{
-		db: db,
+func NewRivalInfoService(db *gorm.DB, monitorService *MonitorService, syncChan <-chan any) *RivalInfoService {
+	ret := &RivalInfoService{
+		db:             db,
+		monitorService: monitorService,
+		syncChan:       syncChan,
+	}
+	go ret.listen()
+	return ret
+}
+
+func (s *RivalInfoService) listen() {
+	for {
+		select {
+		case <-s.syncChan:
+			runtime.EventsEmit(s.ctx, "global:notify", dto.NotificationDto{
+				Type:    "info",
+				Content: "File change detected, trying to auto-reload save files",
+			})
+			// TODO: Magical main user id=1
+			if err := s.ReloadRivalData(1, false); err != nil {
+				log.Errorf("failed to auto-reload: %s", err)
+				runtime.EventsEmit(s.ctx, "global:notify", dto.NotificationDto{
+					Type:    "error",
+					Content: fmt.Sprintf("Failed to auto-reload: %s", err),
+				})
+			} else {
+				runtime.EventsEmit(s.ctx, "global:refresh")
+				// HACK: Make the message as visible as possible
+				go func() {
+					time.Sleep(1 * time.Second)
+					runtime.EventsEmit(s.ctx, "global:notify", dto.NotificationDto{
+						Type:    "success",
+						Content: fmt.Sprintf("Successfully auto-reload save files"),
+					})
+				}()
+			}
+		}
 	}
 }
 
@@ -54,13 +91,6 @@ func (s *RivalInfoService) InitializeMainUser(rivalInfo *vo.InitializeRivalInfoV
 	if mainUserCount > 0 {
 		return fmt.Errorf("cannot have two main user, what are you doing?")
 	}
-	// Initialize the config
-	// TODO: Wtf is this, does it do anything?
-	config, err := config.ReadConfig()
-	if err != nil {
-		return err
-	}
-	config.WriteConfig()
 	insertRivalInfo := rivalInfo.Into()
 	insertRivalInfo.MainUser = true
 	// Prechecks
@@ -73,9 +103,16 @@ func (s *RivalInfoService) InitializeMainUser(rivalInfo *vo.InitializeRivalInfoV
 	if insertRivalInfo.ScoreDataLogPath == nil || *insertRivalInfo.ScoreDataLogPath == "" {
 		return eris.New("scoredatalog.db path cannot be empty")
 	}
-	return s.db.Transaction(func(tx *gorm.DB) error {
+	if err := s.db.Transaction(func(tx *gorm.DB) error {
 		return addRivalInfo(tx, insertRivalInfo)
-	})
+	}); err != nil {
+		return err
+	}
+
+	if err := s.monitorService.SetScoreLogFilePath(*insertRivalInfo.ScoreLogPath); err != nil {
+		log.Errorf("monitor: cannot setup monitor service: %s", err)
+	}
+	return nil
 }
 
 // Open a choose directory dialog and verify whether it's a valid
@@ -348,9 +385,36 @@ func (s *RivalInfoService) UpdateRivalInfo(rivalInfo *vo.RivalInfoVo) error {
 	// Unset crucial fields
 	rivalInfo.PlayCount = 0
 	rivalInfo.MainUser = false
-	log.Debug("before opening transaction")
 	return s.db.Transaction(func(tx *gorm.DB) error {
-		return updateRivalInfo(tx, rivalInfo.Entity())
+		var prev entity.RivalInfo
+		if err := tx.Debug().First(&prev, rivalInfo.ID).Error; err != nil {
+			return err
+		}
+
+		if prev.MainUser && (rivalInfo.SongDataPath == nil || *rivalInfo.SongDataPath == "") {
+			return eris.Errorf("updateRivalInfo: SongDataPath cannot be empty when updateing main user")
+		}
+
+		if !prev.MainUser && (rivalInfo.SongDataPath != nil && *rivalInfo.SongDataPath != "") {
+			return eris.Errorf("updateRivalInfo: cannot provide songdata path for a non main user")
+		}
+
+		shouldFullyReload := false
+		changedScorelogPath := false
+		if rivalInfo.ScoreLogPath != nil && *rivalInfo.ScoreLogPath != *prev.ScoreLogPath {
+			shouldFullyReload = true
+			changedScorelogPath = true
+		}
+		if rivalInfo.SongDataPath != nil && *rivalInfo.SongDataPath != *prev.SongDataPath {
+			shouldFullyReload = true
+		}
+		if rivalInfo.ScoreDataLogPath != nil && (prev.ScoreDataLogPath == nil || *prev.ScoreDataLogPath != *rivalInfo.ScoreDataLogPath) {
+			shouldFullyReload = true
+		}
+		if changedScorelogPath {
+			s.monitorService.SetScoreLogFilePath(*rivalInfo.ScoreLogPath)
+		}
+		return updateRivalInfo(tx, shouldFullyReload, rivalInfo.Entity())
 	})
 }
 
@@ -717,31 +781,7 @@ func queryMainUser(tx *gorm.DB) (*entity.RivalInfo, error) {
 //
 // Special Requirements:
 //  1. when updating main user, songdata.db file path cannot be empty
-func updateRivalInfo(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
-	var prev entity.RivalInfo
-	if err := tx.Debug().First(&prev, rivalInfo.ID).Error; err != nil {
-		return err
-	}
-
-	if prev.MainUser && (rivalInfo.SongDataPath == nil || *rivalInfo.SongDataPath == "") {
-		return eris.Errorf("updateRivalInfo: SongDataPath cannot be empty when updateing main user")
-	}
-
-	// TODO: we haven't implemented the correct seperate songdata file feature
-	if !prev.MainUser && (rivalInfo.SongDataPath != nil && *rivalInfo.SongDataPath != "") {
-		return eris.Errorf("updateRivalInfo: cannot provide songdata path for a non main user")
-	}
-
-	shouldFullyReload := false
-	if rivalInfo.ScoreLogPath != nil && *rivalInfo.ScoreLogPath != *prev.ScoreLogPath {
-		shouldFullyReload = true
-	}
-	if rivalInfo.SongDataPath != nil && *rivalInfo.SongDataPath != *prev.SongDataPath {
-		shouldFullyReload = true
-	}
-	if rivalInfo.ScoreDataLogPath != nil && (prev.ScoreDataLogPath == nil || *prev.ScoreDataLogPath != *rivalInfo.ScoreDataLogPath) {
-		shouldFullyReload = true
-	}
+func updateRivalInfo(tx *gorm.DB, shouldFullyReload bool, rivalInfo *entity.RivalInfo) error {
 
 	if shouldFullyReload {
 		log.Debugf("[RivalInfoService] trying to fully update rival info")

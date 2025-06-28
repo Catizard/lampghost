@@ -7,7 +7,8 @@
             {{ t('title') }}
           </n-text>
         </n-h1>
-        <n-float-button shape="square" style="font-size: 15px; height: 39px; width: 60px;" :right="50" :top="20" type="primary" @click="handleSaveSettings">{{ t('button.save') }}</n-float-button>
+        <n-float-button shape="square" style="font-size: 15px; height: 39px; width: 60px;" :right="50" :top="20"
+          type="primary" @click="handleSaveSettings">{{ t('button.save') }}</n-float-button>
         <!-- <n-button type="primary" @click="handleSaveSettings">{{ t('button.save') }}</n-button> -->
       </n-flex>
 
@@ -34,6 +35,11 @@
                 <span style="white-space: pre-line;">{{ t('generalSettings.labelIgnoreVariantCourse') }}</span>
               </template>
               <n-select v-model:value="model.IgnoreVariantCourse" :options="yesnoOptions" style="width: 150px;" />
+            </n-form-item>
+          </n-p>
+          <n-p>
+            <n-form-item :label="t('generalSettings.labelEnableAutoReload')">
+              <n-select v-model:value="model.EnableAutoReload" :options="yesnoOptions" style="width: 150px;" />
             </n-form-item>
           </n-p>
         </n-h2>
@@ -69,8 +75,7 @@
               :placeholder="t('downloadSettings.placeholderDownloadDirectory')" style="width: 500px;" />
           </n-form-item>
           <n-form-item :label="t('downloadSettings.labelMaximumDownloadCount')" path="maximumDownloadCount">
-            <n-input-number show-button v-model:value="model.MaximumDownloadCount" :min="1"
-              style="width: 150px;" />
+            <n-input-number show-button v-model:value="model.MaximumDownloadCount" :min="1" style="width: 150px;" />
           </n-form-item>
         </n-h2>
       </n-form>
@@ -108,6 +113,7 @@ const model = ref<config.ApplicationConfig>({
   DownloadSite: null,
   DownloadDirectory: null,
   MaximumDownloadCount: null,
+  EnableAutoReload: null,
   EnableDownloadFeature: null // Unused
 });
 const loading = ref(false);
@@ -212,7 +218,8 @@ loadSettings();
       "title": "General Settings",
       "labelLanguage": "Language Options(Reboot needed)",
       "labelIgnoreVariantCourse": "Controls whether we should ignore variant courses or not",
-      "tipIgnoreVariantCourse": "When opend, ignore all the courses which constraint contains 'no_good', 'no_speed', 'no_great', only reserve the normal course\nWarning: rival's tag won't be re-generated again by changing this option, you still need to reload manually"
+      "tipIgnoreVariantCourse": "When opend, ignore all the courses which constraint contains 'no_good', 'no_speed', 'no_great', only reserve the normal course\nWarning: rival's tag won't be re-generated again by changing this option, you still need to reload manually",
+      "labelEnableAutoReload": "Enable auto-reload save files feature"
     },
     "saveSettings": {
       "title": "Save File Settings",
@@ -261,7 +268,8 @@ loadSettings();
       "title": "通用设置",
       "labelLanguage": "语言设置(需要重启)",
       "labelIgnoreVariantCourse": "是否忽略带有特殊变化的段位",
-      "tipIgnoreVariantCourse": "开启时移除所有带有no_good/no_great/no_speed的段位\n注意: 修改该配置不会自动更新用户的标签,你必须手动刷新用户的标签信息"
+      "tipIgnoreVariantCourse": "开启时移除所有带有no_good/no_great/no_speed的段位\n注意: 修改该配置不会自动更新用户的标签,你必须手动刷新用户的标签信息",
+      "labelEnableAutoReload": "启用自动更新存档文件"
     },
     "saveSettings": {
       "title": "存档设置",

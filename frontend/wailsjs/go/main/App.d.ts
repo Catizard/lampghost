@@ -171,6 +171,8 @@ export function RevertRivalTagEnabledState(arg1:number):Promise<result.RtnMessag
 
 export function RunServer():Promise<void>;
 
+export function SetScoreLogFilePath(arg1:string):Promise<void>;
+
 export function SubmitDownloadTask(arg1:string,arg2:any):Promise<result.RtnMessage>;
 
 export function SubmitSingleMD5DownloadTask(arg1:string,arg2:any):Promise<result.RtnMessage>;

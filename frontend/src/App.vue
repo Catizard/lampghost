@@ -3,6 +3,7 @@ import { ReadConfig } from '@wailsjs/go/main/App';
 import { Provider, Viewer } from './components';
 import { useI18n } from 'vue-i18n';
 import { ref } from 'vue';
+import { EventsOn } from '@wailsjs/runtime/runtime';
 
 const i18n = useI18n();
 
@@ -14,7 +15,12 @@ ReadConfig()
     }
     console.log(result);
     i18n.locale = ref(result.Data.Locale);
-  })
+  });
+
+// Global refresh
+EventsOn("global:refresh", () => {
+  window.location.reload();
+})
 </script>
 
 <template>

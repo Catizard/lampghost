@@ -29,7 +29,9 @@ const loading = ref(false);
 const searchNameLike: Ref<string | null> = ref(null);
 const columns: DataTableColumns<dto.RivalSongDataDto> = [
   { title: t('column.name'), key: "Title", resizable: true },
-  { title: t('column.artist'), key: "Artist", resizable: true },
+  { title: t('column.subTitle'), key: "SubTitle", resizable: true, width: "125px", ellipsis: { tooltip: true } },
+  { title: t('column.artist'), key: "Artist", resizable: true, width: "125px", ellipsis: { tooltip: true } },
+  { title: t('column.genre'), key: "Genre", resizable: true, width: "125px", ellipsis: { tooltip: true } },
 ];
 const data: Ref<dto.RivalSongDataDto[]> = ref([]);
 const pagination = reactive({
@@ -97,6 +99,8 @@ loadData();
     },
     "column": {
       "name": "Title",
+      "subTitle": "Sub Title",
+      "genre": "Genre",
       "artist": "Artist"
     },
     "searchNamePlaceholder": "Search Song/Sabun Name"
@@ -108,7 +112,9 @@ loadData();
     },
     "column": {
       "name": "谱面名称",
-      "artist": "谱师"
+      "subTitle": "副标题",
+      "genre": "风格",
+      "artist": "作者"
     },
     "searchNamePlaceholder": "搜索歌曲/差分名称"
   }

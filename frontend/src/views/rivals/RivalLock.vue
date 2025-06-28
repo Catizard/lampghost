@@ -64,8 +64,8 @@ function createColumns(): DataTableColumns<dto.RivalInfoDto> {
         return h(NButton, {
           type: "primary",
           size: "small",
-          onClick: () => editFormRef.value.open(row.ID), 
-        }, { default: () => t('button.edit')});
+          onClick: () => editFormRef.value.open(row.ID),
+        }, { default: () => t('button.edit') });
       }
     }
   ]
@@ -92,7 +92,7 @@ loadData();
 
 <i18n lang="json">{
   "en": {
-    "title": "Lock Player Version",
+    "title": "Player IR Import Management",
     "column": {
       "name": "Name",
       "version": "Version",
@@ -104,7 +104,7 @@ loadData();
     }
   },
   "zh-CN": {
-    "title": "锁定玩家版本",
+    "title": "玩家IR导入管理",
     "column": {
       "name": "名称",
       "version": "版本",

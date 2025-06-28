@@ -219,7 +219,7 @@ loadSettings();
       "labelLanguage": "Language Options(Reboot needed)",
       "labelIgnoreVariantCourse": "Controls whether we should ignore variant courses or not",
       "tipIgnoreVariantCourse": "When opend, ignore all the courses which constraint contains 'no_good', 'no_speed', 'no_great', only reserve the normal course\nWarning: rival's tag won't be re-generated again by changing this option, you still need to reload manually",
-      "labelEnableAutoReload": "Enable auto-reload save files feature"
+      "labelEnableAutoReload": "Reload save files automatically"
     },
     "saveSettings": {
       "title": "Save File Settings",
@@ -269,7 +269,7 @@ loadSettings();
       "labelLanguage": "语言设置(需要重启)",
       "labelIgnoreVariantCourse": "是否忽略带有特殊变化的段位",
       "tipIgnoreVariantCourse": "开启时移除所有带有no_good/no_great/no_speed的段位\n注意: 修改该配置不会自动更新用户的标签,你必须手动刷新用户的标签信息",
-      "labelEnableAutoReload": "启用自动更新存档文件"
+      "labelEnableAutoReload": "是否自动更新存档文件"
     },
     "saveSettings": {
       "title": "存档设置",

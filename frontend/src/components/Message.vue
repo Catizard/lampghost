@@ -1,4 +1,3 @@
-
 <script lang="ts">
 import { createDiscreteApi } from 'naive-ui';
 import './message.d.ts';
@@ -36,7 +35,10 @@ window.$notifyWarning = (content: string, duration: number = 3000, keepAliveOnHo
 window.$notifySuccess = (content: string, duration: number = 3000, keepAliveOnHover: boolean = true) => {
   createNotification("success", content, duration, keepAliveOnHover);
 };
-window.$notifyError = (content: string, duration: number = 3000, keepAliveOnHover: boolean = true) => {
+window.$notifyError = (content: string | Error, duration: number = 3000, keepAliveOnHover: boolean = true) => {
+  if (content instanceof Error) {
+    content = String(content);
+  }
   createNotification("error", content, duration, keepAliveOnHover);
 };
 

@@ -1779,6 +1779,7 @@ export namespace vo {
 	    AddDate: number;
 	    Notes: number;
 	    Pagination?: entity.Page;
+	    TitleLike?: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new RivalSongDataVo(source);
@@ -1814,6 +1815,7 @@ export namespace vo {
 	        this.AddDate = source["AddDate"];
 	        this.Notes = source["Notes"];
 	        this.Pagination = this.convertValues(source["Pagination"], entity.Page);
+	        this.TitleLike = source["TitleLike"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

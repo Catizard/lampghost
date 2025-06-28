@@ -34,6 +34,8 @@ type RivalSongDataVo struct {
 
 	// Pagination
 	Pagination *entity.Page
+	// Extra filter field
+	TitleLike *string
 }
 
 func (rivalSongData *RivalSongDataVo) Entity() *entity.RivalSongData {

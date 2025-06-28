@@ -5,7 +5,9 @@
         <n-text type="primary">{{ t('title') }}</n-text>
       </n-h1>
     </n-flex>
-    <n-flex justify="end">
+    <n-flex justify="space-between">
+      <n-input :placeholder="t('searchNamePlaceholder')" v-model:value="searchNameLike" @keyup.enter="loadData()"
+        style="width: 350px;" />
       <n-button type="primary" @click="reloadSongData">{{ t('button.reload') }}</n-button>
     </n-flex>
     <n-data-table remote :columns="columns" :data="data" :pagination="pagination" :bordered="false"
@@ -24,6 +26,7 @@ const { t } = useI18n();
 
 const loading = ref(false);
 
+const searchNameLike: Ref<string | null> = ref(null);
 const columns: DataTableColumns<dto.RivalSongDataDto> = [
   { title: t('column.name'), key: "Title", resizable: true },
   { title: t('column.artist'), key: "Artist", resizable: true },
@@ -52,6 +55,7 @@ async function loadData() {
     // TODO: Remove magical 1 here
     let arg: vo.RivalSongDataVo = {
       RivalID: 1,
+      TitleLike: searchNameLike.value,
       Pagination: pagination
     } as any;
     const result = await QuerySongDataPageList(arg);
@@ -94,14 +98,18 @@ loadData();
     "column": {
       "name": "Title",
       "artist": "Artist"
-    }
+    },
+    "searchNamePlaceholder": "Search Song/Sabun Name"
   },
   "zh-CN": {
     "title": "歌曲列表",
     "button": {
       "reload": "同步文件"
     },
-    "column": "谱面名称",
-    "artist": "谱师"
+    "column": {
+      "name": "谱面名称",
+      "artist": "谱师"
+    },
+    "searchNamePlaceholder": "搜索歌曲/差分名称"
   }
 }</i18n>

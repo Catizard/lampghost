@@ -163,6 +163,10 @@ func scopeRivalSongDataFilter(filter *vo.RivalSongDataVo) func(db *gorm.DB) *gor
 			return db
 		}
 		moved := db.Where(filter.Entity())
+		// Extra filter fields
+		if filter.TitleLike != nil {
+			moved = moved.Where("rival_song_data.title like ('%' || ? || '%')", filter.TitleLike)
+		}
 		return moved
 	}
 }

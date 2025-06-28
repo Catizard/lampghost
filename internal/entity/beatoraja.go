@@ -23,22 +23,22 @@ type SongData struct {
 	Md5        string
 	Sha256     string
 	Title      string
-	SubTitle   string
+	SubTitle   string `gorm:"column:subtitle"`
 	Genre      string
 	Artist     string
-	SubArtist  string
+	SubArtist  string `gorm:"column:subartist"`
 	Tag        string
 	Path       string
 	Folder     string
-	StageFile  string
+	StageFile  string `gorm:"column:stagefile"`
 	Banner     string
-	BackBmp    string
+	BackBmp    string `gorm:"column:backbmp"`
 	Preview    string
 	Parent     string
 	Level      int32
 	Difficulty int32
-	MaxBpm     int32
-	MinBpm     int32
+	MaxBpm     int32 `gorm:"column:maxbpm"`
+	MinBpm     int32 `gorm:"column:minbpm"`
 	Length     int32
 	Mode       int32
 	Judge      int32
@@ -46,9 +46,9 @@ type SongData struct {
 	Content    int32
 	Date       int64
 	Favorite   int32
-	AddDate    int64
+	AddDate    int64 `gorm:"column:adddate"`
 	Notes      int32
-	ChartHash  string
+	ChartHash  string `gorm:"column:charthash"`
 }
 
 func (SongData) TableName() string {

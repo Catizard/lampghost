@@ -12,8 +12,6 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/service"
 )
 
-const VERSION = "0.2.4.1"
-
 type ConfigController struct {
 	service *service.ConfigService
 }
@@ -40,8 +38,8 @@ func (ctl *ConfigController) QueryLatestVersion() result.RtnMessage {
 	if err := json.Unmarshal(body, &ret); err != nil {
 		return result.NewErrorMessage(err)
 	}
-	if ret.TagName != VERSION {
-		return result.NewRtnMessage(result.SUCCESS.Code, fmt.Sprintf("Release: %s; Using %s", ret.TagName, VERSION))
+	if ret.TagName != config.VERSION {
+		return result.NewRtnMessage(result.SUCCESS.Code, fmt.Sprintf("Release: %s; Using %s", ret.TagName, config.VERSION))
 	}
 	return result.NewRtnMessage(result.SUCCESS.Code, "Using the latest version")
 }

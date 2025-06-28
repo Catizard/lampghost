@@ -13,6 +13,7 @@ import (
 
 const (
 	DBFileName = "lampghost.db"
+	VERSION    = "0.2.5-dev"
 )
 
 var (

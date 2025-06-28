@@ -2,7 +2,9 @@ package main
 
 import (
 	"embed"
+	"fmt"
 
+	"github.com/Catizard/lampghost_wails/internal/config"
 	"github.com/charmbracelet/log"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"
@@ -26,7 +28,7 @@ func main() {
 
 	// Create application with options
 	err := wails.Run(&options.App{
-		Title:  "lampghost_wails",
+		Title:  fmt.Sprintf("lampghost_wails %s", config.VERSION),
 		Width:  1024,
 		Height: 768,
 		AssetServer: &assetserver.Options{

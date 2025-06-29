@@ -14,6 +14,7 @@
     :row-key="row => row.ID" />
   <select-folder v-model:show="showFolderSelection" :sha256="candidateSongInfo?.Sha256" @submit="handleSubmit" />
   <select-difficult v-model:show="showDifficultSelection" :sha256="candidateSongInfo?.Sha256" @submit="handleSubmit" />
+  <ChartPreview ref="chartPreviewRef" />
 </template>
 
 <script lang="ts" setup>
@@ -27,15 +28,16 @@ import { useI18n } from 'vue-i18n';
 import dayjs from 'dayjs';
 import TableTags from '@/components/TableTags.vue';
 import SelectDifficult from '../custom_table/SelectDifficult.vue';
+import ChartPreview from '@/components/ChartPreview.vue';
 
 const i18n = useI18n();
 const { t } = i18n;
-const modal = useModal();
 
 const loading = ref<boolean>(false);
 const showFolderSelection = ref<boolean>(false);
 const showDifficultSelection = ref<boolean>(false);
 const searchNameLike: Ref<string | null> = ref(null);
+const chartPreviewRef = ref<InstanceType<typeof ChartPreview>>(null);
 
 type SongInfo = {
   Sha256: string,
@@ -122,25 +124,7 @@ function createColumns(): DataTableColumns<dto.RivalScoreLogDto> {
               switch (key) {
                 case 'AddToFolder': handleAddToFolder(row.Sha256, row.Title); break;
                 case 'AddToTable': handleAddToTable(row.Sha256, row.Title); break;
-                case "GotoPreview":
-                  modal.create({
-                    preset: "dialog",
-                    title: "Preview",
-                    contentStyle: { "height": "100%" },
-                    content: () => h(
-                      'iframe',
-                      {
-                        src: `https://bms-score-viewer.pages.dev/view?md5=${row.Md5}`,
-                        width: "100%",
-                        height: "95%",
-                      },
-                    ),
-                    style: {
-                      width: "95vw",
-                      height: "95vh"
-                    }
-                  });
-                  break;
+                case "GotoPreview": chartPreviewRef.value.open(row.Md5); break;
               }
             }
           },

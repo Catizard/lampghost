@@ -38,3 +38,12 @@ function refresh() {
   });
 }
 </script>
+
+<i18n lang="json">{
+  "en": {
+    "title": "Chart Preview"
+  },
+  "zh-CN": {
+    "title": "谱面预览"
+  }
+}</i18n>

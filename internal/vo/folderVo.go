@@ -10,12 +10,13 @@ type FolderVo struct {
 
 	FolderName    string
 	CustomTableID uint
+	OrderNumber   int
 
 	// Extra filter fields
 	IDs []uint
 	// When not nil, filter out related data
-	IgnoreSha256          *string
-	RivalID               uint
+	IgnoreSha256 *string
+	RivalID      uint
 }
 
 func (folder *FolderVo) Entity() *entity.Folder {

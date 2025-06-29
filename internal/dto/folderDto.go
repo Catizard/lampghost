@@ -8,6 +8,7 @@ type FolderDto struct {
 	ID            uint
 	FolderName    string
 	CustomTableID uint
+	OrderNumber   int
 
 	// Only used in tree query interface
 	Contents []*FolderContentDto
@@ -15,9 +16,10 @@ type FolderDto struct {
 
 func NewFolderDto(folder *entity.Folder, contents []*FolderContentDto) *FolderDto {
 	return &FolderDto{
-		ID:         folder.ID,
-		FolderName: folder.FolderName,
-		Contents:   contents,
+		ID:          folder.ID,
+		FolderName:  folder.FolderName,
+		Contents:    contents,
+		OrderNumber: folder.OrderNumber,
 	}
 }
 

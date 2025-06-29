@@ -358,6 +358,10 @@ export function UpdateDiffTableHeader(arg1) {
   return window['go']['main']['App']['UpdateDiffTableHeader'](arg1);
 }
 
+export function UpdateFolderOrder(arg1) {
+  return window['go']['main']['App']['UpdateFolderOrder'](arg1);
+}
+
 export function UpdateHeaderLevelOrders(arg1) {
   return window['go']['main']['App']['UpdateHeaderLevelOrders'](arg1);
 }

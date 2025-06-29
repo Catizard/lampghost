@@ -331,6 +331,7 @@ export namespace dto {
 	    ID: number;
 	    FolderName: string;
 	    CustomTableID: number;
+	    OrderNumber: number;
 	    Contents: FolderContentDto[];
 	
 	    static createFrom(source: any = {}) {
@@ -342,6 +343,7 @@ export namespace dto {
 	        this.ID = source["ID"];
 	        this.FolderName = source["FolderName"];
 	        this.CustomTableID = source["CustomTableID"];
+	        this.OrderNumber = source["OrderNumber"];
 	        this.Contents = this.convertValues(source["Contents"], FolderContentDto);
 	    }
 	
@@ -792,6 +794,7 @@ export namespace entity {
 	    DeletedAt: any;
 	    FolderName: string;
 	    CustomTableID: number;
+	    OrderNumber: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new Folder(source);
@@ -805,6 +808,7 @@ export namespace entity {
 	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
 	        this.FolderName = source["FolderName"];
 	        this.CustomTableID = source["CustomTableID"];
+	        this.OrderNumber = source["OrderNumber"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1439,6 +1443,7 @@ export namespace vo {
 	    DeletedAt: any;
 	    FolderName: string;
 	    CustomTableID: number;
+	    OrderNumber: number;
 	    IDs: number[];
 	    IgnoreSha256?: string;
 	    RivalID: number;
@@ -1455,6 +1460,7 @@ export namespace vo {
 	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
 	        this.FolderName = source["FolderName"];
 	        this.CustomTableID = source["CustomTableID"];
+	        this.OrderNumber = source["OrderNumber"];
 	        this.IDs = source["IDs"];
 	        this.IgnoreSha256 = source["IgnoreSha256"];
 	        this.RivalID = source["RivalID"];

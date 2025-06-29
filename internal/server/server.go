@@ -87,11 +87,21 @@ func (s *InternalServer) tableHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	customTable := customTables[0]
+	folderList, _, err := s.folderService.FindFolderList(&vo.FolderVo{
+		CustomTableID: customTable.ID,
+	})
+	if err != nil {
+		http.Error(w, fmt.Sprintf("faile to export table[%s]: %v", tableName, err), 500)
+		return
+	}
 	export := &dto.DiffTableHeaderExportDto{
 		Name:      customTable.Name,
 		Symbol:    customTable.Symbol,
 		HeaderUrl: fmt.Sprintf("http://localhost:%d/table/%s.json", port, tableName),
 		DataUrl:   fmt.Sprintf("http://localhost:%d/content/%d.json", port, customTable.ID),
+		LevelOrder: strings.Join(Map(folderList, func(folder *dto.FolderDto, _ int) string {
+			return folder.FolderName
+		}), ","),
 	}
 	data, err := json.Marshal(export)
 	if err != nil {

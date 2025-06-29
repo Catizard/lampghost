@@ -185,6 +185,8 @@ export function UpdateCustomDiffTable(arg1:vo.CustomDiffTableVo):Promise<result.
 
 export function UpdateDiffTableHeader(arg1:vo.DiffTableHeaderVo):Promise<result.RtnMessage>;
 
+export function UpdateFolderOrder(arg1:Array<number>):Promise<result.RtnMessage>;
+
 export function UpdateHeaderLevelOrders(arg1:vo.DiffTableHeaderVo):Promise<result.RtnMessage>;
 
 export function UpdateHeaderOrder(arg1:Array<number>):Promise<result.RtnMessage>;

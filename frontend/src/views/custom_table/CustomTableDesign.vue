@@ -11,12 +11,17 @@
         <n-button v-if="customTableOptions.length > 0" type="primary" @click="showAddModal = true">
           {{ t('button.add') }}
         </n-button>
+        <n-button v-if="customTableOptions.length > 0" type="info"
+          @click="levelSortModalRef.open(currentCustomTableID)">
+          {{ t('button.sort') }}
+        </n-button>
       </n-flex>
     </n-flex>
     <template v-if="customTableOptions.length > 0">
       <FolderTable type="table" ref="folderTableRef" :customTableId="currentCustomTableID" />
     </template>
     <FolderAddForm type="table" :customTableId="currentCustomTableID" v-model:show="showAddModal" @refresh="reload" />
+    <FolderSortModal ref="levelSortModalRef" @refresh="reload" />
   </n-spin>
 </template>
 
@@ -28,12 +33,14 @@ import { ref, Ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import FolderTable from '../folder/FolderTable.vue';
 import FolderAddForm from '../folder/FolderAddForm.vue';
+import FolderSortModal from '../folder/FolderSortModal.vue';
 
 const { t } = useI18n();
 
 const loading = ref(false);
 const showAddModal = ref(false);
 const folderTableRef = ref<InstanceType<typeof FolderTable>>(null);
+const levelSortModalRef = ref<InstanceType<typeof FolderSortModal>>(null);
 
 const currentCustomTableID: Ref<number | null> = ref(null);
 const customTableOptions: Ref<SelectOption[]> = ref([]);
@@ -71,7 +78,8 @@ function reload() {
   "en": {
     "title": "Custom Table Design",
     "button": {
-      "add": "Add Difficult"
+      "add": "Add Difficult",
+      "sort": "Sort Levels"
     },
     "message": {
       "noTableError": "No custom difficult table found"
@@ -80,7 +88,8 @@ function reload() {
   "zh-CN": {
     "title": "自定义难度表设计",
     "button": {
-      "add": "新增难度"
+      "add": "新增难度",
+      "sort": "设定难度排序"
     },
     "message": {
       "noTableError": "当前无任何自定义难度表"

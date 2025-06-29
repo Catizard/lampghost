@@ -242,9 +242,15 @@ func (s *FolderService) FindFolderContentList(filter *vo.FolderContentVo) ([]*en
 	return findFolderContentList(s.db, filter)
 }
 
+func (s *FolderService) UpdateFolderOrder(folderIDs []uint) error {
+	return s.db.Transaction(func(tx *gorm.DB) error {
+		return updateFolderOrder(tx, folderIDs)
+	})
+}
+
 func findFolderList(tx *gorm.DB, filter *vo.FolderVo) ([]*entity.Folder, int, error) {
 	var folders []*entity.Folder
-	if err := tx.Debug().Scopes(scopeFolderFilter(filter)).Find(&folders).Error; err != nil {
+	if err := tx.Debug().Scopes(scopeFolderFilter(filter)).Order("order_number").Find(&folders).Error; err != nil {
 		return nil, 0, err
 	}
 	return folders, len(folders), nil
@@ -317,6 +323,20 @@ func findFolderTree(tx *gorm.DB, filter *vo.FolderVo) ([]*dto.FolderDto, int, er
 		folders[i] = dto.NewFolderDto(rawFolder, contents)
 	}
 	return folders, len(folders), nil
+}
+
+func updateFolderOrder(tx *gorm.DB, folderIDs []uint) error {
+	if len(folderIDs) == 0 {
+		return nil
+	}
+	for i, folderID := range folderIDs {
+		entity := &entity.Folder{}
+		entity.ID = folderID
+		if err := tx.Model(entity).Update("order_number", i).Error; err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func scopeFolderFilter(filter *vo.FolderVo) func(db *gorm.DB) *gorm.DB {

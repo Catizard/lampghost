@@ -15,6 +15,7 @@ type Folder struct {
 	// table which id is always 1 and can never be removed. It's not a very
 	// big deal but still tedious.
 	CustomTableID uint `gorm:"default:1"`
+	OrderNumber   int  `gorm:"default:0"`
 }
 
 func (Folder) TableName() string {

@@ -114,7 +114,7 @@ function handleNegativeClick() {
 <i18n lang="json">{
   "en": {
     "modal": {
-      "title": "Customize Table Level Order",
+      "title": "Refactor Table's Level Order",
       "positiveText": "Submit",
       "negativeText": "Cancel"
     },
@@ -128,7 +128,7 @@ function handleNegativeClick() {
   },
   "zh-CN": {
     "modal": {
-      "title": "自定义难度表内难度排序",
+      "title": "修改难度表内难度排序",
       "positiveText": "提交",
       "negativeText": "取消"
     },

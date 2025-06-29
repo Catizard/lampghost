@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@vicons/fa": "^0.13.0",
     "apexcharts": "^4.1.0",
     "dayjs": "^1.11.13",
     "highlight.js": "^11.11.1",

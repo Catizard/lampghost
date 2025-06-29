@@ -78,6 +78,43 @@
             <n-input-number show-button v-model:value="model.MaximumDownloadCount" :min="1" style="width: 150px;" />
           </n-form-item>
         </n-h2>
+        <n-h2>
+          <n-text>{{ t('misc.title') }}</n-text>
+          <n-p>
+            <n-flex>
+              <n-tooltip placement="top" trigger="hover">
+                <template #trigger>
+                  <n-button type="info" circle @click="gotoGithubRepo">
+                    <template #icon>
+                      <GithubIcon />
+                    </template>
+                  </n-button>
+                </template>
+                <span>{{ t('misc.gotoGithub') }}</span>
+              </n-tooltip>
+              <n-tooltip placement="top" trigger="hover">
+                <template #trigger>
+                  <n-button type="info" circle @click="gotoDocument">
+                    <template #icon>
+                      <DocumentIcon />
+                    </template>
+                  </n-button>
+                </template>
+                <span>{{ t('misc.gotoDocument') }}</span>
+              </n-tooltip>
+              <n-tooltip placement="top" trigger="hover">
+                <template #trigger>
+                  <n-button type="info" circle @click="gotoJoinQQGroup()">
+                    <template #icon>
+                      <QQIcon />
+                    </template>
+                  </n-button>
+                </template>
+                <span>{{ t('misc.joinQQGroup') }}</span>
+              </n-tooltip>
+            </n-flex>
+          </n-p>
+        </n-h2>
       </n-form>
     </div>
   </n-spin>
@@ -88,10 +125,14 @@ import { FormInst, SelectOption } from 'naive-ui';
 import { ref } from 'vue';
 import {
   ChatboxEllipsesOutline as HintIcon,
+  LogoGithub as GithubIcon,
+  DocumentTextOutline as DocumentIcon,
 } from '@vicons/ionicons5';
+import { Qq as QQIcon } from "@vicons/fa";
 import { QueryLatestVersion, ReadConfig, WriteConfig, OpenDirectoryDialog } from '@wailsjs/go/main/App';
 import { config } from '../../../wailsjs/go/models';
 import { useI18n } from 'vue-i18n';
+import { BrowserOpenURL } from '@wailsjs/runtime/runtime';
 
 const i18n = useI18n();
 const { t } = i18n;
@@ -187,6 +228,18 @@ function checkVersion() {
     }).catch(err => window.$notifyError(err));
 }
 
+function gotoGithubRepo() {
+  BrowserOpenURL("https://github.com/Catizard/lampghost");
+}
+
+function gotoDocument() {
+  BrowserOpenURL("https://docs.qq.com/doc/DSEROYVZydXdDUUd6?rtkey=dbaaa020bbeabb89938632c4xV4Yu1")
+}
+
+function gotoJoinQQGroup() {
+  BrowserOpenURL("https://qm.qq.com/cgi-bin/qm/qr?k=KS1jP1ii8AbSAtM89L8YRScn907QDSdP&jump_from=webapi&authKey=LIIF9+agKNK1cnoLdBu4lP8UqbOS+dDG/gfLFO2iwQIaa4WA0PNBUX6ERHm2GKNy");
+}
+
 loadSettings();
 </script>
 
@@ -249,6 +302,12 @@ loadSettings();
       "placeholderSeparateDownloadMD5": "Please input download url",
       "placeholderDownloadDirectory": "Please input download directory"
     },
+    "misc": {
+      "title": "Misc",
+      "gotoGithub": "Open Github repo in browser",
+      "gotoDocument": "Open Manual in browser",
+      "joinQQGroup": "Join QQ Group"
+    },
     "options": {
       "yes": "Yes",
       "no": "No"
@@ -297,6 +356,12 @@ loadSettings();
       "labelMaximumDownloadCount": "最大同时下载数量",
       "placeholderSeparateDownloadMD5": "请输入下载地址",
       "placeholderDownloadDirectory": "请输入下载路径"
+    },
+    "misc": {
+      "title": "杂项",
+      "gotoGithub": "在浏览器中打开github仓库",
+      "gotoDocument": "在浏览器中打开使用文档",
+      "joinQQGroup": "加入QQ群"
     },
     "options": {
       "yes": "是",

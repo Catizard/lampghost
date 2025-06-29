@@ -13,18 +13,25 @@
     <n-data-table remote :columns="columns" :data="data" :pagination="pagination" :bordered="false"
       :row-key="row => row.ID" />
   </n-spin>
+  <select-folder v-model:show="showFolderSelection" :sha256="candidateSongInfo?.Sha256" @submit="handleSubmit" />
+  <select-difficult v-model:show="showDifficultSelection" :sha256="candidateSongInfo?.Sha256" @submit="handleSubmit" />
+  <ChartPreview ref="chartPreviewRef" />
 </template>
 
 <script setup lang="ts">
-import { QuerySongDataPageList, ReloadRivalSongData } from '@wailsjs/go/main/App';
+import { BindSongToFolder, QuerySongDataPageList, ReloadRivalSongData } from '@wailsjs/go/main/App';
 import { dto, vo } from '@wailsjs/go/models';
-import { DataTableColumns } from 'naive-ui';
-import { reactive, Ref, ref } from 'vue';
+import { DataTableColumns, NButton, NDropdown } from 'naive-ui';
+import { h, reactive, Ref, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import ChartPreview from '@/components/ChartPreview.vue';
+import SelectFolder from '../folder/SelectFolder.vue';
+import SelectDifficult from '../custom_table/SelectDifficult.vue';
 
 const { t } = useI18n();
 
 const loading = ref(false);
+const chartPreviewRef = ref<InstanceType<typeof ChartPreview>>(null);
 
 const searchNameLike: Ref<string | null> = ref(null);
 const columns: DataTableColumns<dto.RivalSongDataDto> = [
@@ -32,6 +39,30 @@ const columns: DataTableColumns<dto.RivalSongDataDto> = [
   { title: t('column.subTitle'), key: "SubTitle", resizable: true, width: "125px", ellipsis: { tooltip: true } },
   { title: t('column.artist'), key: "Artist", resizable: true, width: "125px", ellipsis: { tooltip: true } },
   { title: t('column.genre'), key: "Genre", resizable: true, width: "125px", ellipsis: { tooltip: true } },
+  {
+    title: t('column.actions'), key: "actions", resizable: true, width: "90px",
+    render(row: dto.RivalSongDataDto) {
+      return h(
+        NDropdown,
+        {
+          trigger: "hover",
+          options: [
+            { label: t('button.addToFolder'), key: "AddToFolder" },
+            { label: t('button.addToTable'), key: "AddToTable" },
+            { label: t('button.gotoPreview'), key: "GotoPreview" },
+          ],
+          onSelect: (key: string) => {
+            switch (key) {
+              case 'AddToFolder': handleAddToFolder(row.Sha256, row.Title); break;
+              case 'AddToTable': handleAddToTable(row.Sha256, row.Title); break;
+              case "GotoPreview": chartPreviewRef.value.open(row.Md5); break;
+            }
+          }
+        },
+        { default: () => h(NButton, null, { default: () => '...' }) }
+      )
+    }
+  }
 ];
 const data: Ref<dto.RivalSongDataDto[]> = ref([]);
 const pagination = reactive({
@@ -88,6 +119,44 @@ async function reloadSongData() {
   loadData();
 }
 
+const showFolderSelection = ref<boolean>(false);
+const showDifficultSelection = ref<boolean>(false);
+type SongInfo = {
+  Sha256: string,
+  Title: string
+};
+const candidateSongInfo = ref<SongInfo | null>(null);
+
+function handleAddToFolder(sha256: string, title: string) {
+  candidateSongInfo.value = {
+    Sha256: sha256,
+    Title: title
+  };
+  showFolderSelection.value = true;
+}
+
+function handleAddToTable(sha256: string, title: string) {
+  candidateSongInfo.value = {
+    Sha256: sha256,
+    Title: title
+  };
+  showDifficultSelection.value = true;
+}
+
+function handleSubmit(folderIds: number[]) {
+  BindSongToFolder({
+    Md5: "",
+    FolderIDs: folderIds,
+    ...candidateSongInfo.value,
+  })
+    .then(result => {
+      if (result.Code != 200) {
+        return Promise.reject(result.Msg);
+      }
+      window.$notifySuccess(t('message.bindSuccess'));
+    }).catch(err => window.$notifyError(err));
+}
+
 loadData();
 </script>
 
@@ -95,26 +164,34 @@ loadData();
   "en": {
     "title": "Song",
     "button": {
-      "reload": "Reload"
+      "reload": "Reload",
+      "addToFolder": "Add to Folder",
+      "addToTable": "Add to Custom Table",
+      "gotoPreview": "Preview BMS Chart"
     },
     "column": {
       "name": "Title",
       "subTitle": "Sub Title",
       "genre": "Genre",
-      "artist": "Artist"
+      "artist": "Artist",
+      "actions": "Actions"
     },
     "searchNamePlaceholder": "Search Song/Sabun Name"
   },
   "zh-CN": {
     "title": "歌曲列表",
     "button": {
-      "reload": "同步文件"
+      "reload": "同步文件",
+      "addToFolder": "添加至收藏夹",
+      "addToTable": "添加至自定义难度表",
+      "gotoPreview": "预览BMS谱面"
     },
     "column": {
       "name": "谱面名称",
       "subTitle": "副标题",
       "genre": "风格",
-      "artist": "作者"
+      "artist": "作者",
+      "actions": "操作"
     },
     "searchNamePlaceholder": "搜索歌曲/差分名称"
   }

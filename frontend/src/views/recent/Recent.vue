@@ -115,12 +115,6 @@ function createColumns(): DataTableColumns<dto.RivalScoreLogDto> {
               { label: t('button.gotoPreview'), key: "GotoPreview" },
             ],
             onSelect: (key: string) => {
-              const setSongInfo = () => {
-                candidateSongInfo.value = {
-                  Sha256: row.Sha256,
-                  Title: row.Title
-                };
-              }
               switch (key) {
                 case 'AddToFolder': handleAddToFolder(row.Sha256, row.Title); break;
                 case 'AddToTable': handleAddToTable(row.Sha256, row.Title); break;

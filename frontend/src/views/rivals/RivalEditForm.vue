@@ -187,9 +187,6 @@ watch(() => formData.value.MainUser, newValue => {
 			"placeholderSongDataPath": "Please input songdata.db file path",
 			"placeholderScoreDataLogPath": "Please input scoredatalog.db file path"
 		},
-		"button": {
-			"chooseFile": "Choose File"
-		},
 		"rules": {
 			"missingRivalName": "Player's name cannot be empty",
 			"missingScoreLogPath": "scorelog.db file path cannot be empty",
@@ -210,9 +207,6 @@ watch(() => formData.value.MainUser, newValue => {
 			"placeholderScoreLogPath": "请输入scorelog.db文件路径",
 			"placeholderSongDataPath": "请输入songdata.db文件路径",
 			"placeholderScoreDataLogPath": "请输入scoredatalog.db文件路径"
-		},
-		"button": {
-			"chooseFile": "选择文件"
 		},
 		"rules": {
 			"missingRivalName": "玩家名称不可为空",

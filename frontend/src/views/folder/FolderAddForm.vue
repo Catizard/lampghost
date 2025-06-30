@@ -92,9 +92,6 @@ function handleNegativeClick() {
 		"form": {
 			"labelName": "Name",
 			"placeholderName": "Input name"
-		},
-		"message": {
-			"missingName": "Please input name"
 		}
 	},
 	"zh-CN": {
@@ -109,9 +106,6 @@ function handleNegativeClick() {
 		"form": {
 			"labelName": "名称",
 			"placeholderName": "请输入名称"
-		},
-		"message": {
-			"missingName": "请输入名称"
 		}
 	}
 }</i18n>

@@ -176,16 +176,6 @@ loadData();
 			"lastSyncTime": "Last Sync Time",
 			"actions": "Actions"
 		},
-		"button": {
-			"reload": "Fully Reload",
-			"add": "Add Player",
-			"delete": "Delete",
-			"edit": "Edit"
-		},
-		"message": {
-			"reloadSuccess": "Reload successfully",
-			"cannotDeleteMainUser": "Cannot delete main user"
-		},
 		"deleteDialog": {
 			"title": "Confirm to delete?",
 			"positiveText": "Yes",
@@ -201,16 +191,6 @@ loadData();
 			"songdataFilePath": "songdata.db文件路径",
 			"lastSyncTime": "最后更新时间",
 			"actions": "操作"
-		},
-		"button": {
-			"reload": "全量同步",
-			"add": "添加玩家",
-			"delete": "删除",
-			"edit": "修改"
-		},
-		"message": {
-			"reloadSuccess": "同步成功",
-			"cannotDeleteMainUser": "不能删除主用户"
 		},
 		"deleteDialog": {
 			"title": "确定要删除吗？",

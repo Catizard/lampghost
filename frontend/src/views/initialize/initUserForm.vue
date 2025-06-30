@@ -211,11 +211,6 @@ function handleSubmit(e) {
       "placeholderScorelogPath": "Please input /beatoraja path/*Player Name*/scorelog.db file path",
       "placeholderScoredatalogPath": "Please input /beatoraja path/*Player Name*/scoredatalog.db file path"
     },
-    "button": {
-      "submit": "Submit",
-      "chooseFile": "Choose File",
-      "chooseBeatorajaDirectory": "Choose Beatoraja Directory"
-    },
     "rule": {
       "missingUserName": "Name cannot be empty",
       "missingSongdataPath": "songdata.db file path cannot be empty",
@@ -239,11 +234,6 @@ function handleSubmit(e) {
       "placeholderSongdataPath": "请输入/beatoraja path/songdata.db文件路径",
       "placeholderScorelogPath": "请输入/beatoraja path/*Player Name*/scorelog.db文件路径",
       "placeholderScoredatalogPath": "请输入/beatoraja path/*Player Name*/scoredatalog.db文件路径"
-    },
-    "button": {
-      "submit": "提交",
-      "chooseFile": "选择文件",
-      "chooseBeatorajaDirectory": "选择Beatoraja路径"
     },
     "rule": {
       "missingUserName": "用户名不可为空",

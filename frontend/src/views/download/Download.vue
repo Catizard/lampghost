@@ -159,10 +159,6 @@ function humanFileSize(bytes, si = false, dp = 1) {
 			"progress": "Progress",
 			"status": "Status",
 			"actions": "Actions"
-		},
-		"button": {
-			"restart": "Restart",
-			"cancel": "Cancel"
 		}
 	},
 	"zh-CN": {
@@ -173,10 +169,6 @@ function humanFileSize(bytes, si = false, dp = 1) {
 			"progress": "当前进度",
 			"status": "状态",
 			"actions": "操作"
-		},
-		"button": {
-			"restart": "重新开始任务",
-			"cancel": "取消任务"
 		}
 	}
 }</i18n>

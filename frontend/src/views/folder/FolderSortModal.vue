@@ -117,9 +117,6 @@ function handleNegativeClick() {
     "column": {
       "name": "Name",
       "rowIndex": "Index"
-    },
-    "message": {
-      "noChosenCustomTableError": "No custom table was chosed currently"
     }
   },
   "zh-CN": {
@@ -131,9 +128,6 @@ function handleNegativeClick() {
     "column": {
       "name": "名称",
       "rowIndex": "序号"
-    },
-    "message": {
-      "noChosenCustomTableError": "当前没有选择任何自定义难度表"
     }
   }
 }</i18n>

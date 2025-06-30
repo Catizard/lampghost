@@ -6,7 +6,7 @@
     @close="() => { show = false }">
     <n-flex justify="space-between">
       <n-select v-model:value="currentCustomTableID" :options="customTableOptions" style="width: 200px;" />
-      <!-- <n-button type="primary" @click="handleClickAddFolder">{{ t('button.addFolder') }}</n-button> -->
+      <!-- <n-button type="primary" @click="handleClickAddFolder">{{ t('button.addDifficultFolder') }}</n-button> -->
     </n-flex>
     <SelectUnboundFolder ref="selectUnboundFolderRef" type="folder" v-model:checkedFolderIds="checkedFolderIds"
       :sha256="sha256" :customTableId="currentCustomTableID" />
@@ -97,12 +97,6 @@ function handleNegativeClick() {
       "title": "Bind to Custom Table",
       "positiveText": "Submit",
       "negativeText": "Cancel"
-    },
-    "button": {
-      "addFolder": "Add Difficult"
-    },
-    "message": {
-      "noTableError": "Cannot handle no custom difficult table data currenlty, please add at least one custom table first"
     }
   },
   "zh-CN": {
@@ -110,12 +104,6 @@ function handleNegativeClick() {
       "title": "加入自定义难度表",
       "positiveText": "提交",
       "negativeText": "取消"
-    },
-    "button": {
-      "addFolder": "添加难度"
-    },
-    "message": {
-      "noTableError": "目前无法处理一个自定义难度表都没有的情况，请至少先添加一个难度表"
     }
   }
 }</i18n>

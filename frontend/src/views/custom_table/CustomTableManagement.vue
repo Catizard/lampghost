@@ -57,7 +57,7 @@ const columns: DataTableColumns<dto.CustomDiffTableDto> = [
     title: t('column.actions'), key: "actions", width: "200px",
     render(row: dto.CustomDiffTableDto) {
       return [
-        h(NButton, { type: "primary", size: "small", onClick: () => editFormRef.value.open(row.ID) }, { default: () => t('button.update') }),
+        h(NButton, { type: "primary", size: "small", onClick: () => editFormRef.value.open(row.ID) }, { default: () => t('button.edit') }),
         h(NButton, {
           style: {
             "margin-left": "5px",
@@ -128,12 +128,6 @@ loadData();
       "name": "Name",
       "actions": "Actions"
     },
-    "button": {
-      "add": "Add Custom Table",
-      "update": "Edit",
-      "delete": "Delete",
-      "link": "Import Link"
-    },
     "deleteDialog": {
       "title": "Delete Custom Table",
       "positiveText": "Yes",
@@ -147,12 +141,6 @@ loadData();
     "column": {
       "name": "名称",
       "actions": "操作"
-    },
-    "button": {
-      "add": "新增自定义难度表",
-      "update": "修改",
-      "delete": "删除",
-      "link": "导入链接"
     },
     "deleteDialog": {
       "title": "删除自定义难度表",

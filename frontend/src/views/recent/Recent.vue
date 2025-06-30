@@ -110,8 +110,8 @@ function createColumns(): DataTableColumns<dto.RivalScoreLogDto> {
           {
             trigger: "hover",
             options: [
-              { label: t('button.addToFolder'), key: "AddToFolder" },
-              { label: t('button.addToTable'), key: "AddToTable" },
+              { label: t('button.addToFavoriteFolder'), key: "AddToFolder" },
+              { label: t('button.addToCustomTable'), key: "AddToTable" },
               { label: t('button.gotoPreview'), key: "GotoPreview" },
             ],
             onSelect: (key: string) => {
@@ -178,13 +178,6 @@ onMounted(() => {
 <i18n lang="json">{
   "en": {
     "title": "Recent Play",
-    "button": {
-      "chooseClearType": "Choose Clear Type",
-      "minimumClearType": "Minimum Clear Type",
-      "addToFolder": "Add to Folder",
-      "addToTable": "Add to Custom Table",
-      "gotoPreview": "Preview BMS Chart"
-    },
     "column": {
       "name": "Song Name",
       "tag": "Tag",
@@ -193,22 +186,10 @@ onMounted(() => {
       "minbp": "Min BP",
       "actions": "Actions"
     },
-    "message": {
-      "loadRecentRecordFailedPrefix": "Load recent records failed, error message: ",
-      "bindSuccess": "Bind successfully",
-      "bindFailedPrefix": "Failed to bind song to folder, error message: "
-    },
     "searchNamePlaceholder": "Search Song/Sabun Name"
   },
   "zh-CN": {
     "title": "最近游玩",
-    "button": {
-      "chooseClearType": "筛选点灯记录",
-      "minimumClearType": "筛选最小灯记录",
-      "addToFolder": "添加至收藏夹",
-      "addToTable": "添加至自定义难度表",
-      "gotoPreview": "预览BMS谱面"
-    },
     "column": {
       "name": "谱面名称",
       "tag": "难度表标签",
@@ -216,11 +197,6 @@ onMounted(() => {
       "time": "记录时间",
       "minbp": "最小BP",
       "actions": "操作"
-    },
-    "message": {
-      "loadRecentRecordFailedPrefix": "加载最近游玩记录失败，错误信息: ",
-      "bindSucess": "绑定成功",
-      "bindFailedPrefix": "绑定失败, 错误信息: "
     },
     "searchNamePlaceholder": "搜索歌曲/差分名称"
   }

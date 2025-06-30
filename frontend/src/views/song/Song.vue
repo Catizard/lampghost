@@ -47,8 +47,8 @@ const columns: DataTableColumns<dto.RivalSongDataDto> = [
         {
           trigger: "hover",
           options: [
-            { label: t('button.addToFolder'), key: "AddToFolder" },
-            { label: t('button.addToTable'), key: "AddToTable" },
+            { label: t('button.addToFavoriteFolder'), key: "AddToFolder" },
+            { label: t('button.addToCustomTable'), key: "AddToTable" },
             { label: t('button.gotoPreview'), key: "GotoPreview" },
           ],
           onSelect: (key: string) => {
@@ -163,12 +163,6 @@ loadData();
 <i18n lang="json">{
   "en": {
     "title": "Song",
-    "button": {
-      "reload": "Reload",
-      "addToFolder": "Add to Folder",
-      "addToTable": "Add to Custom Table",
-      "gotoPreview": "Preview BMS Chart"
-    },
     "column": {
       "name": "Title",
       "subTitle": "Sub Title",
@@ -180,12 +174,6 @@ loadData();
   },
   "zh-CN": {
     "title": "歌曲列表",
-    "button": {
-      "reload": "同步文件",
-      "addToFolder": "添加至收藏夹",
-      "addToTable": "添加至自定义难度表",
-      "gotoPreview": "预览BMS谱面"
-    },
     "column": {
       "name": "谱面名称",
       "subTitle": "副标题",

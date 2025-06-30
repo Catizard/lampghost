@@ -128,9 +128,6 @@ loadData();
 			},
 			"clear": "Clear",
 			"actions": "Actions"
-		},
-		"button": {
-			"delete": "Delete"
 		}
 	},
 	"zh-CN": {
@@ -142,9 +139,6 @@ loadData();
 			},
 			"clear": "通关状态",
 			"actions": "操作"
-		},
-		"button": {
-			"delete": "删除"
 		}
 	}
 }</i18n>

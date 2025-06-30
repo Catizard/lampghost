@@ -98,9 +98,6 @@ loadData();
       "version": "Version",
       "reverseImport": "Reverse Import",
       "actions": "Actions"
-    },
-    "button": {
-      "edit": "Edit"
     }
   },
   "zh-CN": {
@@ -110,9 +107,6 @@ loadData();
       "version": "版本",
       "reverseImport": "逆向导入",
       "actions": "操作"
-    },
-    "button": {
-      "edit": "修改"
     }
   }
 }</i18n>

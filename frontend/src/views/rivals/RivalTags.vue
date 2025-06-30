@@ -7,7 +7,7 @@
 		</n-flex>
 		<n-flex justify="start" style="margin-bottom: 15px;">
 			<n-select :loading="tableLoading" v-model:value="currentRivalID" :options="rivalOptions" style="width: 200px;" />
-			<n-button style="margin-left: auto;" type="primary" @click="showAddModal = true">{{ t('button.add') }}</n-button>
+			<n-button style="margin-left: auto;" type="primary" @click="showAddModal = true">{{ t('button.addCustomTag') }}</n-button>
 		</n-flex>
 		<n-data-table remote :columns="columns" :data="data" :pagination="pagination" :loading="tableLoading"
 			:row-key="(row: dto.RivalTagDto) => row.ID" />
@@ -80,7 +80,7 @@ const columns: DataTableColumns<dto.RivalTagDto> = [
 		render: (row: dto.RivalTagDto) => {
 			return h(
 				YesNotTag,
-				{ state: row.Enabled }
+				{ state: row.Enabled, onClick: () => {} }
 			);
 		}
 	},
@@ -243,9 +243,6 @@ watch(currentRivalID, () => {
 			"tagTime": "Tag Time",
 			"actions": "Actions"
 		},
-		"message": {
-			"noRivalError": "FATAL ERROR: no rival data found"
-		},
 		"modal": {
 			"title": "Add Custom Tag",
 			"positiveText": "Submit",
@@ -254,12 +251,6 @@ watch(currentRivalID, () => {
 			"labelRecordTime": "Tag Time",
 			"placeholderTagName": "Please input tag name",
 			"placeholderRecordTime": "Please input tag time"
-		},
-		"button": {
-			"add": "Add Custom Tag",
-			"delete": "Delete",
-			"enable": "Enable",
-			"disable": "Disable"
 		},
 		"rules": {
 			"missingRecordTime": "Tag time cannot be empty"
@@ -279,9 +270,6 @@ watch(currentRivalID, () => {
 			"tagTime": "标签时间",
 			"actions": "操作"
 		},
-		"message": {
-			"noRivalError": "未知错误: 找不到任何玩家信息?"
-		},
 		"modal": {
 			"title": "添加自定义标签",
 			"positiveText": "提交",
@@ -290,12 +278,6 @@ watch(currentRivalID, () => {
 			"labelRecordTime": "标签时间",
 			"placeholderTagName": "请输入标签名称",
 			"placeholderRecordTime": "请输入标签时间"
-		},
-		"button": {
-			"add": "添加自定义标签",
-			"delete": "删除",
-			"enable": "启用",
-			"disable": "禁用"
 		},
 		"rules": {
 			"missingRecordTime": "标签时间不可为空"

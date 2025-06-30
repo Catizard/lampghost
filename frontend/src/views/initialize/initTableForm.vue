@@ -172,8 +172,8 @@ function createSkipModal() {
     title: t('skipModal.title'),
     preset: "dialog",
     content: t('skipModal.content'),
-    positiveText: t('button.positive'),
-    negativeText: t('button.negative'),
+    positiveText: t('message.yes'),
+    negativeText: t('message.no'),
     onPositiveClick: () => {
       props.moveOn();
     },
@@ -220,12 +220,6 @@ loadSchemes();
       "tag": "Tag",
       "url": "URL"
     },
-    "button": {
-      "skip": "Skip",
-      "submit": "Submit",
-      "positive": "Yes",
-      "negative": "Cancel"
-    },
     "skipModal": {
       "title": "Skip Table Initialization",
       "content": "Lampghost might work abnormally with no tables. Do you really want to skip this step?"
@@ -240,12 +234,6 @@ loadSchemes();
       "name": "名称",
       "tag": "难度表标签",
       "url": "地址"
-    },
-    "button": {
-      "skip": "跳过",
-      "submit": "提交",
-      "positive": "确定",
-      "negative": "取消"
     },
     "skipModal": {
       "title": "跳过难度表新增",

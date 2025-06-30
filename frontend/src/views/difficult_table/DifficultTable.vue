@@ -187,7 +187,7 @@ function loadDiffTableData() {
 			}
 			data.value = [...result.Rows]
 		})
-		.catch((err) => window.$notifyError(t('message.loadTableDataFailed', { msg: err })))
+		.catch((err) => window.$notifyError(t('message.loadTableDataError', { msg: err })))
 		.finally(() => loading.value = false);
 }
 
@@ -196,15 +196,6 @@ function loadDiffTableData() {
 <i18n lang="json">{
 	"en": {
 		"title": "Table Management",
-		"button": {
-			"add": "Add Table",
-			"delete": "Delete",
-			"edit": "Edit",
-			"sort": "Sort",
-			"sortLevels": "Sort Levels",
-			"reload": "Reload",
-			"supply": "Supply all missing bms"
-		},
 		"column": {
 			"name": "Name",
 			"url": "URL",
@@ -220,23 +211,10 @@ function loadDiffTableData() {
 			"title": "Do you really want to supply all missing bms?",
 			"positiveText": "Yes",
 			"negativeText": "No"
-		},
-		"message": {
-			"deleteSuccess": "Deleted successfully",
-			"loadTableDataFailed": "Failed to load table, error message: {msg}"
 		}
 	},
 	"zh-CN": {
 		"title": "难度表管理",
-		"button": {
-			"add": "新增",
-			"delete": "删除",
-			"edit": "修改",
-			"sort": "排序",
-			"sortLevels": "设定难度排序",
-			"reload": "重新导入",
-			"supply": "补充所有缺少的BMS"
-		},
 		"column": {
 			"name": "名称",
 			"url": "地址",
@@ -252,10 +230,6 @@ function loadDiffTableData() {
 			"title": "确定要添加所有缺少的BMS吗?",
 			"positiveText": "是",
 			"negativeText": "否"
-		},
-		"message": {
-			"deleteSuccess": "删除成功",
-			"loadTableDataFailed": "读取难度表信息失败, 错误信息: {msg}"
 		}
 	}
 }</i18n>

@@ -13,7 +13,7 @@
         </n-button>
         <n-button v-if="customTableOptions.length > 0" type="info"
           @click="levelSortModalRef.open(currentCustomTableID)">
-          {{ t('button.sort') }}
+          {{ t('button.sortLevels') }}
         </n-button>
       </n-flex>
     </n-flex>
@@ -53,7 +53,7 @@ function loadCustomTableOptions() {
       return Promise.reject(result.Msg);
     }
     if (result.Rows.length == 0) {
-      return Promise.reject(t('message.noTableError'))
+      return Promise.reject(t('message.noCustomTableError'))
     }
     customTableOptions.value = result.Rows.map((row: dto.CustomDiffTableDto): SelectOption => {
       return {
@@ -76,23 +76,9 @@ function reload() {
 
 <i18n lang="json">{
   "en": {
-    "title": "Custom Table Design",
-    "button": {
-      "add": "Add Difficult",
-      "sort": "Sort Levels"
-    },
-    "message": {
-      "noTableError": "No custom difficult table found"
-    }
+    "title": "Custom Table Design"
   },
   "zh-CN": {
-    "title": "自定义难度表设计",
-    "button": {
-      "add": "新增难度",
-      "sort": "设定难度排序"
-    },
-    "message": {
-      "noTableError": "当前无任何自定义难度表"
-    }
+    "title": "自定义难度表设计"
   }
 }</i18n>

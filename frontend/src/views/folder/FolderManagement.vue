@@ -4,7 +4,7 @@
 			<n-text type="primary">{{ t('title') }}</n-text>
 		</n-h1>
 		<n-flex justify="end">
-			<n-button type="primary" @click="showAddModal = true">{{ t('button.addFolder') }}</n-button>
+			<n-button type="primary" @click="showAddModal = true">{{ t('button.addFavoriteFolder') }}</n-button>
 		</n-flex>
 	</n-flex>
 	<FolderTable type="folder" ref="folderTableRef" />
@@ -31,15 +31,9 @@ function reload() {
 
 <i18n lang="json">{
 	"en": {
-		"title": "Folder",
-		"button": {
-			"addFolder": "Add Folder"
-		}
+		"title": "Folder"
 	},
 	"zh-CN": {
-		"title": "收藏夹",
-		"button": {
-			"addFolder": "新增收藏夹"
-		}
+		"title": "收藏夹"
 	}
 }</i18n>

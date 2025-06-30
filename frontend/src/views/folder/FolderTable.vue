@@ -112,7 +112,7 @@ function loadData() {
 			}
 			data.value = [...result.Rows];
 		})
-		.catch((err) => window.$notifyError(t('message.loadFolderDataFailed', { msg: err })))
+		.catch((err) => window.$notifyError(t('message.loadFolderDataError', { msg: err })))
 		.finally(() => loading.value = false);
 }
 
@@ -124,10 +124,6 @@ watch(() => props.customTableId, () => {
 <i18n lang="json">{
 	"en": {
 		"title": "Folder",
-		"button": {
-			"addFolder": "Add Folder",
-			"delete": "Delete"
-		},
 		"column": {
 			"name": {
 				"folder": "Folder Name",
@@ -141,11 +137,6 @@ watch(() => props.customTableId, () => {
 			"clear": "Clear",
 			"tag": "Tag"
 		},
-		"message": {
-			"deleteSuccess": "Delete successfully",
-			"confirmToDelete": "Do you really want to delete this content?",
-			"loadFolderDataFailed": "Failed to load folder data, error message: {msg}"
-		},
 		"dialog": {
 			"positiveText": "Yes",
 			"negativeText": "Cancel"
@@ -153,10 +144,6 @@ watch(() => props.customTableId, () => {
 	},
 	"zh-CN": {
 		"title": "收藏夹",
-		"button": {
-			"addFolder": "新增收藏夹",
-			"delete": "删除"
-		},
 		"column": {
 			"name": {
 				"folder": "收藏夹名称",
@@ -169,11 +156,6 @@ watch(() => props.customTableId, () => {
 			"actions": "操作",
 			"clear": "通关状态",
 			"tag": "难度表标签"
-		},
-		"message": {
-			"deleteSuccess": "删除成功",
-			"confirmToDelete": "确定删除吗？",
-			"loadFolderDataFailed": "读取收藏夹信息失败，错误信息: {msg}"
 		},
 		"dialog": {
 			"positiveText": "确定",

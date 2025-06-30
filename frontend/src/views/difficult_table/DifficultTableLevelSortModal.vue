@@ -121,9 +121,6 @@ function handleNegativeClick() {
     "column": {
       "name": "Name",
       "rowIndex": "Index"
-    },
-    "message": {
-      "noChosenHeaderError": "No header was chosed currently"
     }
   },
   "zh-CN": {
@@ -135,9 +132,6 @@ function handleNegativeClick() {
     "column": {
       "name": "名称",
       "rowIndex": "序号"
-    },
-    "message": {
-      "noChosenHeaderError": "当前没有选择任何难度表"
     }
   }
 }</i18n>

@@ -292,18 +292,12 @@ watch([currentHeader, currentLampOrder], (_) => {
 
 <i18n lang="json">{
   "en": {
-    "message": {
-      "noTableError": "Cannot handle no difficult table data currenlty, please add at least one table first"
-    },
     "radio": {
       "reverse": "Reverse",
       "ordered": "Ordered"
     }
   },
   "zh-CN": {
-    "message": {
-      "noTableError": "目前无法处理一个难度表都没有的情况，请至少先添加一个难度表"
-    },
     "radio": {
       "reverse": "倒序",
       "ordered": "正序"

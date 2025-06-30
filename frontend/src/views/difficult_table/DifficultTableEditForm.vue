@@ -111,9 +111,6 @@ function open(headerId: number) {
     "options": {
       "noDisplay": "Don't display",
       "display": "Display"
-    },
-    "message": {
-      "noChosenHeaderError": "No header was chosed currently"
     }
   },
   "zh-CN": {
@@ -128,9 +125,6 @@ function open(headerId: number) {
     "options": {
       "noDisplay": "不展示",
       "display": "展示"
-    },
-    "message": {
-      "noChosenHeaderError": "当前没有选择任何难度表"
     }
   }
 }</i18n>

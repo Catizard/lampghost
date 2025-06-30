@@ -262,11 +262,6 @@ loadSettings();
 <i18n lang="json">{
   "en": {
     "title": "Settings",
-    "button": {
-      "save": "Save",
-      "checkVersion": "Check Version",
-      "chooseDownloadDirectory": "Choose Directory"
-    },
     "generalSettings": {
       "title": "General Settings",
       "labelLanguage": "Language Options(Reboot needed)",
@@ -311,18 +306,10 @@ loadSettings();
     "options": {
       "yes": "Yes",
       "no": "No"
-    },
-    "message": {
-      "saveSuccess": "Saved successfully"
     }
   },
   "zh-CN": {
     "title": "设置",
-    "button": {
-      "save": "保存",
-      "checkVersion": "检查版本",
-      "chooseDownloadDirectory": "选择文件夹"
-    },
     "generalSettings": {
       "title": "通用设置",
       "labelLanguage": "语言设置(需要重启)",
@@ -366,9 +353,6 @@ loadSettings();
     "options": {
       "yes": "是",
       "no": "否"
-    },
-    "message": {
-      "saveSuccess": "保存成功"
     }
   }
 }</i18n>

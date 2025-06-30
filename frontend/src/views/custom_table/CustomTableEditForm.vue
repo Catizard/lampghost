@@ -64,7 +64,7 @@ function handleNegativeClick() {
 
 function open(customTableID: number) {
 	if (customTableID == null || customTableID == 0) {
-		window.$notifyError(t('message.noChosenTableError'))
+		window.$notifyError(t('message.noChosenCustomTableError'))
 		show.value = false;
 		return;
 	}
@@ -97,9 +97,6 @@ function open(customTableID: number) {
 			"placeholderName": "Please Input name",
 			"labelSymbol": "Symbol",
 			"placeHolderSymbol": "Customize Table Symbol"
-		},
-		"message": {
-			"noChosenTableError": "No custom table was chosed currently"
 		}
 	},
 	"zh-CN": {
@@ -111,9 +108,6 @@ function open(customTableID: number) {
 			"placeholderName": "请输入名称",
 			"labelSymbol": "标志",
 			"placeHolderSymbol": "自定义难度表标志"
-		},
-		"message": {
-			"noChosenTableError": "当前没有选中任何自定义难度表"
 		}
 	}
 }</i18n>

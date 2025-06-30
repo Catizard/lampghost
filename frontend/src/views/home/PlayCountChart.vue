@@ -113,15 +113,9 @@ watch(currentYear, (newValue) => {
 
 <i18n lang="json">{
   "en": {
-    "title": "Play Count",
-    "message": {
-      "noRecordError": "No record found"
-    }
+    "title": "Play Count"
   },
   "zh-CN": {
-    "title": "游玩次数",
-    "message": {
-      "noRecordError": "无任何记录"
-    }
+    "title": "游玩次数"
   }
 }</i18n>

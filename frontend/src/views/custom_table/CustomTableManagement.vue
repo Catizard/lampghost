@@ -25,6 +25,8 @@ import { dto } from '@wailsjs/go/models';
 import { DeleteCustomDiffTable, QueryCustomDiffTablePageList } from '@wailsjs/go/main/App';
 import CustomTableEditForm from './CustomTableEditForm.vue';
 import CustomTableAddForm from './CustomTableAddForm.vue';
+import { ClearTypeColorStyle } from '../../constants/cleartype';
+import { ClipboardSetText } from '@wailsjs/runtime/runtime';
 
 const { t } = useI18n();
 const dialog = useDialog();
@@ -80,6 +82,20 @@ const columns: DataTableColumns<dto.CustomDiffTableDto> = [
             })
           }
         }, { default: () => t('button.delete') }),
+        h(NButton, {
+          style: {
+            "margin-left": "5px",
+          },
+          type: "info", size: "small", onClick: () => {
+            try {
+              const name = row.Name;
+              ClipboardSetText(`http://localhost:7391/${encodeURIComponent(name)}.json`)
+              window.$notifySuccess(t('setClipboardSuccess'));
+            } catch (e) {
+              window.$notifyError(t('setClipboardError', {msg: String(e)}));
+            }
+          }
+        }, { default: () => t('button.link')})
       ];
     }
   }
@@ -115,13 +131,16 @@ loadData();
     "button": {
       "add": "Add Custom Table",
       "update": "Edit",
-      "delete": "Delete"
+      "delete": "Delete",
+      "link": "Import Link"
     },
     "deleteDialog": {
       "title": "Delete Custom Table",
       "positiveText": "Yes",
       "negativeText": "Cancel"
-    }
+    },
+    "setClipboardSuccess": "Copied import link to clipboard successfully",
+    "setClipboardError": "Failed to copy import link to clipboard, error: {msg}"
   },
   "zh-CN": {
     "title": "自定义难度表管理",
@@ -132,12 +151,15 @@ loadData();
     "button": {
       "add": "新增自定义难度表",
       "update": "修改",
-      "delete": "删除"
+      "delete": "删除",
+      "link": "导入链接"
     },
     "deleteDialog": {
       "title": "删除自定义难度表",
       "positiveText": "确认",
       "negativeText": "取消"
-    }
+    },
+    "setClipboardSuccess": "成功复制导入链接",
+    "setClipboardError": "复制导入链接失败，错误原因: {msg}"
   }
 }</i18n>

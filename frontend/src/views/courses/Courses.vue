@@ -1,7 +1,7 @@
 <template>
   <perfect-scrollbar>
     <n-h1 prefix="bar" style="text-align: left;">
-      <n-text type="primary">{{ t('title') }}</n-text>
+      <n-text type="primary">{{ t('title.courses') }}</n-text>
     </n-h1>
     <n-data-table :columns="columns" :data="data" :pagination="pagination" :bordered="false" />
   </perfect-scrollbar>
@@ -66,24 +66,3 @@ function loadData() {
 
 loadData();
 </script>
-
-<i18n lang="json">{
-  "en": {
-    "title": "Courses",
-    "column": {
-      "name": "Name",
-      "constraints": "Constraints",
-      "clear": "Clear",
-      "firstClearTime": "First Clear"
-    }
-  },
-  "zh-CN": {
-    "title": "段位",
-    "column": {
-      "name": "名称",
-      "constraints": "限制",
-      "clear": "通关状态",
-      "firstClearTime": "首次过段"
-    }
-  }
-}</i18n>

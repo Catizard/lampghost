@@ -39,7 +39,7 @@ const sorter: Ref<Sorter> = ref({
 });
 const columns: DataTableColumns<dto.DiffTableDataDto> = [
   {
-    title: t('column.songName'), key: "Title", resizable: true, sorter: true,
+    title: t('column.title'), key: "Title", resizable: true, sorter: true,
     render: (row: dto.DiffTableDataDto) => {
       let vnodes = [];
       if (row.DataLost) {
@@ -50,7 +50,7 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
     }
   },
   { title: t('column.artist'), key: "Artist", ellipsis: { tooltip: true }, sorter: true, width: "125px" },
-  { title: t('column.count'), key: "PlayCount", width: "100px" },
+  { title: t('column.playCount'), key: "PlayCount", width: "100px" },
   {
     title: t('column.clear'), key: "Lamp", width: "100px", resizable: true, sorter: true,
     render(row: dto.DiffTableDataDto) {
@@ -84,10 +84,10 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
         {
           trigger: "hover",
           options: [
-            { label: t('button.addToFolder'), key: "AddToFolder" },
-            { label: t('button.addToTable'), key: "AddToTable" },
+            { label: t('button.addToFavoriteFolder'), key: "AddToFolder" },
+            { label: t('button.addToCustomTable'), key: "AddToTable" },
             { label: t('button.download'), key: "Download" },
-            { label: t('button.gotoURL'), key: "GotoURL", disabled: row.Url == "" },
+            { label: t('button.gotoSongURL'), key: "GotoURL", disabled: row.Url == "" },
             { label: t('button.gotoURLDiff'), key: "GotoURLDiff", disabled: row.UrlDiff == "" },
             { label: t('button.gotoLR2IR'), key: "GotoLR2IR", disabled: row.Md5 == "" },
             { label: t('button.gotoMochaIR'), key: "GotoMochaIR", disabled: row.Sha256 == "" },
@@ -226,58 +226,3 @@ function handleSubmitSingleMD5DownloadTask(row: dto.DiffTableDataDto) {
 
 loadData();
 </script>
-
-<i18n lang="json">{
-  "en": {
-    "column": {
-      "songName": "Song Name",
-      "artist": "Artist",
-      "count": "Play Count",
-      "clear": "Clear",
-      "ghost": "Ghost",
-      "lastPlayed": "Last Played",
-      "actions": "Actions"
-    },
-    "button": {
-      "addToFolder": "Add to Folder",
-      "addToTable": "Add to Custom Table",
-      "download": "Download",
-      "gotoURL": "Open song url in browser",
-      "gotoURLDiff": "Open sabun url in browser",
-      "gotoLR2IR": "Open LR2IR in broswer",
-      "gotoMochaIR": "Open MochaIR in broswer",
-      "gotoPreview": "Preview BMS Chart"
-    },
-    "message": {
-      "bindSuccess": "Bind successfully",
-      "bindFailedPrefix": "Failed to bind song to folder, error message: ",
-      "submitSuccess": "Submit successfully"
-    }
-  },
-  "zh-CN": {
-    "column": {
-      "songName": "谱面名称",
-      "artist": "作者",
-      "count": "游玩次数",
-      "clear": "通关状态",
-      "ghost": "对比通关状态",
-      "lastPlayed": "最近游玩",
-      "actions": "操作"
-    },
-    "button": {
-      "addToFolder": "添加至收藏夹",
-      "addToTable": "添加至自定义难度表",
-      "download": "下载",
-      "gotoURL": "在浏览器中打开单曲URL",
-      "gotoURLDiff": "在浏览器中打开差分URL",
-      "gotoLR2IR": "在浏览器中打开LR2IR",
-      "gotoMochaIR": "在浏览器中打开MochaIR",
-      "gotoPreview": "预览BMS谱面"
-    },
-    "message": {
-      "bindSucess": "绑定成功",
-      "bindFailedPrefix": "绑定失败, 错误信息: ",
-      "submitSuccess": "提交成功"
-    }
-  }
-}</i18n>

@@ -1,6 +1,6 @@
 <template>
-  <n-modal :loading="loading" v-model:show="show" preset="dialog" :title="t('modal.title')" style="width: 75%;"
-    :positive-text="t('modal.positiveText')" :negative-text="t('modal.negativeText')"
+  <n-modal :loading="loading" v-model:show="show" preset="dialog" :title="t('title.refactorDifficultTableOrder')" style="width: 75%;"
+    :positive-text="t('button.submit')" :negative-text="t('button.cancel')"
     @positive-click="handlePositiveClick" @negative-click="handleNegativeClick" :mask-closable="false">
     <n-data-table ref="tableRef" :loading="loading" :columns="columns" :data="data" :bordered="false"
       :row-key="(row: dto.DiffTableHeaderDto) => row.ID" />
@@ -98,28 +98,3 @@ watch(show, (newValue: boolean) => {
   }
 });
 </script>
-
-<i18n lang="json">{
-  "en": {
-    "modal": {
-      "title": "Refactor Difficult Table Order",
-      "positiveText": "Submit",
-      "negativeText": "Cancel"
-    },
-    "column": {
-      "name": "Name",
-      "rowIndex": "Index"
-    }
-  },
-  "zh-CN": {
-    "modal": {
-      "title": "修改难度表排序",
-      "positiveText": "提交",
-      "negativeText": "取消"
-    },
-    "column": {
-      "name": "名称",
-      "rowIndex": "序号"
-    }
-  }
-}</i18n>

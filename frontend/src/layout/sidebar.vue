@@ -147,65 +147,6 @@ const menuOptions: MenuOption[] = [
 ]
 </script>
 
-<i18n lang="json">{
-  "en": {
-    "menuName": {
-      "home": "Home",
-      "rivals": {
-        "self": "Player",
-        "management": "Management",
-        "tags": "Player Tags",
-        "lock": "Lock Version"
-      },
-      "difftable": {
-        "self": "Table",
-        "management": "Management",
-        "scores": "Statistics"
-      },
-      "song": "Song",
-      "customtable": {
-        "self": "Custom Table",
-        "management": "Management",
-        "design": "Design"
-      },
-      "folder": "Folder",
-      "recent": "Recent",
-      "courses": "Courses",
-      "download": "Download",
-      "goals": "Goals",
-      "settings": "Settings"
-    }
-  },
-  "zh-CN": {
-    "menuName": {
-      "home": "个人主页",
-      "rivals": {
-        "self": "玩家",
-        "management": "管理",
-        "tags": "标签",
-        "lock": "版本锁定"
-      },
-      "difftable": {
-        "self": "难度表",
-        "management": "管理",
-        "scores": "统计信息"
-      },
-      "song": "歌曲",
-      "customtable": {
-        "self": "自定义难度表",
-        "management": "管理",
-        "design": "设计"
-      },
-      "folder": "收藏夹",
-      "recent": "最近游玩",
-      "courses": "段位",
-      "download": "下载",
-      "goals": "目标列表",
-      "settings": "设置"
-    }
-  }
-}</i18n>
-
 <style scoped>
 .logo {
   position: sticky;

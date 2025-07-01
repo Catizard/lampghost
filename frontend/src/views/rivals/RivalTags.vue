@@ -2,24 +2,24 @@
 	<perfect-scrollbar>
 		<n-flex justify="start">
 			<n-h1 prefix="bar" style="text-align: start;">
-				<n-text type="primary">{{ t('title') }}</n-text>
+				<n-text type="primary">{{ t('title.playerTags') }}</n-text>
 			</n-h1>
 		</n-flex>
 		<n-flex justify="start" style="margin-bottom: 15px;">
 			<n-select :loading="tableLoading" v-model:value="currentRivalID" :options="rivalOptions" style="width: 200px;" />
-			<n-button style="margin-left: auto;" type="primary" @click="showAddModal = true">{{ t('button.add') }}</n-button>
+			<n-button style="margin-left: auto;" type="primary" @click="showAddModal = true">{{ t('button.addCustomTag') }}</n-button>
 		</n-flex>
 		<n-data-table remote :columns="columns" :data="data" :pagination="pagination" :loading="tableLoading"
 			:row-key="(row: dto.RivalTagDto) => row.ID" />
 	</perfect-scrollbar>
-	<n-modal v-model:show="showAddModal" preset="dialog" :title="t('modal.title')"
-		:positive-text="t('modal.positiveText')" :negative-text="t('modal.negativeText')"
+	<n-modal v-model:show="showAddModal" preset="dialog" :title="t('title.addPlayerTag')"
+		:positive-text="t('button.submit')" :negative-text="t('button.submit')"
 		@positive-click="handlePositiveClick" @negative-click="handleNegativeClick" :mask-closable="false">
 		<n-form ref="formRef" :model="formData" :rules="rules">
-			<n-form-item :label="t('modal.labelTagName')" path="TagName">
-				<n-input v-model:value="formData.TagName" :placeholder="t('modal.placeholderTagName')" />
+			<n-form-item :label="t('form.labelTagName')" path="TagName">
+				<n-input v-model:value="formData.TagName" :placeholder="t('form.placeholderTagName')" />
 			</n-form-item>
-			<n-form-item :label="t('modal.labelRecordTime')" path="RecordTimestamp">
+			<n-form-item :label="t('form.labelTagRecordTime')" path="RecordTimestamp">
 				<n-date-picker clearable v-model:value="formData.RecordTimestamp" type="datetime" />
 			</n-form-item>
 		</n-form>
@@ -80,7 +80,7 @@ const columns: DataTableColumns<dto.RivalTagDto> = [
 		render: (row: dto.RivalTagDto) => {
 			return h(
 				YesNotTag,
-				{ state: row.Enabled }
+				{ state: row.Enabled, onClick: () => {} }
 			);
 		}
 	},
@@ -169,7 +169,7 @@ const rules: FormRules = {
 	RecordTimestamp: {
 		type: 'number',
 		required: true,
-		message: t('rules.missingRecordTime'),
+		message: t('rule.missingTagRecordTime'),
 		trigger: ["input", "blur"]
 	}
 }
@@ -232,78 +232,3 @@ watch(currentRivalID, () => {
 	pagination.reset();
 })
 </script>
-
-<i18n lang="json">{
-	"en": {
-		"title": "Player Tags",
-		"column": {
-			"tagName": "Tag Name",
-			"enabled": "Enabled",
-			"generated": "Generated",
-			"tagTime": "Tag Time",
-			"actions": "Actions"
-		},
-		"message": {
-			"noRivalError": "FATAL ERROR: no rival data found"
-		},
-		"modal": {
-			"title": "Add Custom Tag",
-			"positiveText": "Submit",
-			"negativeText": "Cancel",
-			"labelTagName": "Tag Name",
-			"labelRecordTime": "Tag Time",
-			"placeholderTagName": "Please input tag name",
-			"placeholderRecordTime": "Please input tag time"
-		},
-		"button": {
-			"add": "Add Custom Tag",
-			"delete": "Delete",
-			"enable": "Enable",
-			"disable": "Disable"
-		},
-		"rules": {
-			"missingRecordTime": "Tag time cannot be empty"
-		},
-		"deleteDialog": {
-			"title": "Confirm to delete?",
-			"positiveText": "Yes",
-			"negativeText": "No"
-		}
-	},
-	"zh-CN": {
-		"title": "玩家标签",
-		"column": {
-			"tagName": "标签名称",
-			"enabled": "是否启用",
-			"generated": "自动生成",
-			"tagTime": "标签时间",
-			"actions": "操作"
-		},
-		"message": {
-			"noRivalError": "未知错误: 找不到任何玩家信息?"
-		},
-		"modal": {
-			"title": "添加自定义标签",
-			"positiveText": "提交",
-			"negativeText": "取消",
-			"labelTagName": "名称",
-			"labelRecordTime": "标签时间",
-			"placeholderTagName": "请输入标签名称",
-			"placeholderRecordTime": "请输入标签时间"
-		},
-		"button": {
-			"add": "添加自定义标签",
-			"delete": "删除",
-			"enable": "启用",
-			"disable": "禁用"
-		},
-		"rules": {
-			"missingRecordTime": "标签时间不可为空"
-		},
-		"deleteDialog": {
-			"title": "确定要删除吗?",
-			"positiveText": "是",
-			"negativeText": "否"
-		}
-	}
-}</i18n>

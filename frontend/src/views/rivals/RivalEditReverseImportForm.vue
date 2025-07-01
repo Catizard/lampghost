@@ -1,12 +1,12 @@
 <template>
-	<n-modal :loading="loading" v-model:show="show" preset="dialog" :title="t('modal.title')"
-		:positive-text="t('modal.positiveText')" :negative-text="t('modal.negativeText')"
+	<n-modal :loading="loading" v-model:show="show" preset="dialog" :title="t('title.editPlayerReverseImport')"
+		:positive-text="t('button.submit')" :negative-text="t('button.submit')"
 		@positive-click="handlePositiveClick" @negative-click="handleNegativeClick" :mask-closable="false">
 		<n-form ref="formRef" :model="formData" >
-			<n-form-item :label="t('modal.labelReverseImport')" path="ReverseImport">
+			<n-form-item :label="t('form.labelReverseImport')" path="ReverseImport">
         <n-select style="width: 300px;" v-model:value="formData.ReverseImport" :options="reverseImportOptions" />
 			</n-form-item>
-      <n-form-item :label="t('modal.labelLockTag')" path="LockTagID">
+      <n-form-item :label="t('form.labelLockTag')" path="LockTagID">
         <SelectRivalTag v-model:value="formData.LockTagID" :rivalId="formData.ID" width="300px" clearable />
       </n-form-item>
 		</n-form>
@@ -97,32 +97,3 @@ function handleNegativeClick() {
   formData.LockTagID = null;
 }
 </script>
-
-<i18n lang="json">{
-	"en": {
-		"modal": {
-			"title": "Edit Player Reverse Import Setting",
-			"positiveText": "Submit",
-			"negativeText": "Cancel",
-      "labelReverseImport": "Reverse Import",
-      "labelLockTag": "Lock Version"
-		},
-    "options": {
-      "noReverseImport": "Don't import as a rival",
-      "reverseImport": "Import as a rival"
-    }
-	},
-	"zh-CN": {
-		"modal": {
-			"title": "修改玩家反向导入设置",
-			"positiveText": "提交",
-			"negativeText": "取消",
-      "labelReverseImport": "反向导入",
-      "labelLockTag": "锁定版本"
-		},
-    "options": {
-      "noReverseImport": "不作为一个rival导入",
-      "reverseImport": "作为一个rival导入"
-    }
-	}
-}</i18n>

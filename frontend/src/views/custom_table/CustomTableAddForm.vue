@@ -1,13 +1,13 @@
 <template>
-  <n-modal :loading="loading" v-model:show="show" preset="dialog" :title="t('modal.title')"
-    :positive-text="t('modal.positiveText')" :negative-text="t('modal.negativeText')"
+  <n-modal :loading="loading" v-model:show="show" preset="dialog" :title="t('title.addCustomTable')"
+    :positive-text="t('button.submit')" :negative-text="t('button.cancel')"
     @positive-click="handlePositiveClick" @negative-click="handleNegativeClick" :mask-closable="false">
     <n-form ref="formRef" :model="formData" :rules="rules">
-      <n-form-item :label="t('modal.labelName')" path="Name">
-        <n-input v-model:value="formData.Name" :placeholder="t('modal.placeholderName')" />
+      <n-form-item :label="t('form.labelName')" path="Name">
+        <n-input v-model:value="formData.Name" :placeholder="t('form.placeholderName')" />
       </n-form-item>
-      <n-form-item :label="t('modal.labelSymbol')" path="Symbol">
-        <n-input v-model:value="formData.Symbol" :placeholder="t('modal.placeholderSymbol')" />
+      <n-form-item :label="t('form.labelSymbol')" path="Symbol">
+        <n-input v-model:value="formData.Symbol" :placeholder="t('form.placeholderCustomTableSymbol')" />
       </n-form-item>
     </n-form>
   </n-modal>
@@ -34,7 +34,7 @@ const formData = reactive({
 const rules = {
   Name: {
     required: true,
-    message: t('rules.missingName'),
+    message: t('rule.missingName'),
     trigger: ["input", "blur"],
   },
 };
@@ -69,34 +69,3 @@ function resetFormData() {
   formData.Symbol = null;
 }
 </script>
-
-<i18n lang="json">{
-  "en": {
-    "modal": {
-      "title": "Add a new custom table",
-      "positiveText": "Submit",
-      "negativeText": "Cancel",
-      "labelName": "Name",
-      "placeholderName": "Please Input name",
-      "labelSymbol": "Symbol",
-      "placeholderSymbol": "Customize Table Symbol"
-    },
-    "rules": {
-      "missingName": "Name cannot be empty"
-    }
-  },
-  "zh-CN": {
-    "modal": {
-      "title": "新增自定义难度表",
-      "positiveText": "提交",
-      "negativeText": "取消",
-      "labelName": "名称",
-      "placeholderName": "请输入名称",
-      "labelSymbol": "标志",
-      "placeholderSymbol": "自定义难度表标志"
-    },
-    "rules": {
-      "missingName": "名称不能为空"
-    }
-  }
-}</i18n>

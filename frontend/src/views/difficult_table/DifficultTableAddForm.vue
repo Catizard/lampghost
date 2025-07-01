@@ -1,18 +1,18 @@
 <template>
-  <n-modal :loading="loading" v-model:show="show" preset="dialog" :title="t('modal.title')"
-    :positive-text="t('modal.positiveText')" :negative-text="t('modal.negativeText')"
+  <n-modal :loading="loading" v-model:show="show" preset="dialog" :title="t('title.addDifficultTable')"
+    :positive-text="t('button.submit')" :negative-text="t('button.cancel')"
     @positive-click="handlePositiveClick" @negative-click="handleNegativeClick" :mask-closable="false">
     <n-form ref="formRef" :model="formData" :rules="rules">
-      <n-form-item :label="t('modal.labelAddress')" path="HeaderUrl">
-        <n-input v-model:value="formData.HeaderUrl" :placeholder="t('modal.placeholderAddress')" />
+      <n-form-item :label="t('form.labelAddress')" path="HeaderUrl">
+        <n-input v-model:value="formData.HeaderUrl" :placeholder="t('form.placeholderAddress')" />
       </n-form-item>
-      <n-form-item :label="t('modal.labelNoTagBuild')" path="NoTagBuild">
+      <n-form-item :label="t('form.labelNoTagBuild')" path="NoTagBuild">
         <n-select v-model:value="formData.NoTagBuild" :options="tableTagOptions" />
       </n-form-item>
-      <n-form-item :label="t('modal.labelTagColor')" path="TagColor">
+      <n-form-item :label="t('form.labelTagColor')" path="TagColor">
         <n-color-picker v-model:value="formData.TagColor" :show-alpha="false" :modes="['hex', 'rgb']" />
       </n-form-item>
-      <n-form-item :label="t('modal.labelTagTextColor')" path="TagTextColor">
+      <n-form-item :label="t('form.labelTagTextColor')" path="TagTextColor">
         <n-color-picker v-model:value="formData.TagTextColor" :show-alpha="false" :modes="['hex', 'rgb']" />
       </n-form-item>
     </n-form>
@@ -42,7 +42,7 @@ const formData = ref({
 const rules = {
   HeaderUrl: {
     required: true,
-    message: t('rules.missingAddress'),
+    message: t('rule.missingAddress'),
     trigger: ["input", "blur"],
   },
 };
@@ -90,44 +90,3 @@ function resetFormData() {
   formData.value.NoTagBuild = 0;
 }
 </script>
-
-<i18n lang="json">{
-  "en": {
-    "modal": {
-      "title": "Add a new table",
-      "positiveText": "Submit",
-      "negativeText": "Cancel",
-      "labelAddress": "Address",
-      "placeholderAddress": "Input address",
-      "labelNoTagBuild": "Display table tag or not",
-      "labelTagColor": "Tag color",
-      "labelTagTextColor": "Tag text color"
-    },
-    "rules": {
-      "missingAddress": "Please input address"
-    },
-    "options": {
-      "noDisplay": "Don't display",
-			"display": "Display"
-    }
-  },
-  "zh-CN": {
-    "modal": {
-      "title": "新增难度表",
-      "positiveText": "提交",
-      "negativeText": "取消",
-      "labelAddress": "地址",
-      "placeholderAddress": "请输入地址",
-      "labelNoTagBuild": "是否展示标签",
-      "labelTagColor": "标签颜色",
-      "labelTagTextColor": "标签嵌字颜色"
-    },
-    "rules": {
-      "missingAddress": "请输入地址"
-    },
-    "options": {
-			"noDisplay": "不展示",
-			"display": "展示"
-    }
-  }
-}</i18n>

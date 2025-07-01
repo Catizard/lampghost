@@ -1,10 +1,10 @@
 <!-- Pop up page for selecting folders -->
 <template>
-	<n-modal :loading="loading" v-model:show="show" :title="t('dialog.title')" preset="dialog"
-		:positive-text="t('dialog.positiveText')" :negative-text="t('dialog.negativeText')"
+	<n-modal :loading="loading" v-model:show="show" :title="t('title.bindToFavoriteFolder')" preset="dialog"
+		:positive-text="t('button.submit')" :negative-text="t('button.cancel')"
 		@positive-click="handlePositiveClick" @negative-click="handleNegativeClick" closable
 		@close="() => { show = false }">
-		<n-button type="primary" @click="handleClickAddFolder">{{ t('button.addFolder') }}</n-button>
+		<n-button type="primary" @click="handleClickAddFolder">{{ t('button.addFavoriteFolder') }}</n-button>
 		<SelectUnboundFolder ref="selectUnboundFolderRef" type="folder" v-model:checkedFolderIds="checkedFolderIds"
 			:sha256="sha256" :customTableId="customTableId" />
 	</n-modal>
@@ -67,26 +67,3 @@ function handleNegativeClick() {
 	show.value = false;
 }
 </script>
-
-<i18n lang="json">{
-	"en": {
-		"dialog": {
-			"title": "Bind to Folder",
-			"positiveText": "Submit",
-			"negativeText": "Cancel"
-		},
-		"button": {
-			"addFolder": "Add Folder"
-		}
-	},
-	"zh-CN": {
-		"dialog": {
-			"title": "加入收藏夹",
-			"positiveText": "提交",
-			"negativeText": "取消"
-		},
-		"button": {
-			"addFolder": "添加收藏夹"
-		}
-	}
-}</i18n>

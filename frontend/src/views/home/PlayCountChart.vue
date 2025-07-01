@@ -61,7 +61,7 @@ const chartOptions = reactive({
   },
   series: [
     {
-      name: t("title"),
+      name: t("title.playCount"),
       data: [],
     },
   ],
@@ -110,18 +110,3 @@ watch(currentYear, (newValue) => {
 });
 
 </script>
-
-<i18n lang="json">{
-  "en": {
-    "title": "Play Count",
-    "message": {
-      "noRecordError": "No record found"
-    }
-  },
-  "zh-CN": {
-    "title": "游玩次数",
-    "message": {
-      "noRecordError": "无任何记录"
-    }
-  }
-}</i18n>

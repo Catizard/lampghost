@@ -2,7 +2,7 @@
   <n-spin :show="loading">
     <n-flex justify="space-between">
       <n-h1 prefix="bar" style="text-align: start;">
-        <n-text type="primary">{{ t('title') }}</n-text>
+        <n-text type="primary">{{ t('title.playerIRImportManagement') }}</n-text>
       </n-h1>
     </n-flex>
     <n-data-table :columns="columns" :data="data" :pagination="pagination" :bordered="false"
@@ -89,30 +89,3 @@ function loadData() {
 
 loadData();
 </script>
-
-<i18n lang="json">{
-  "en": {
-    "title": "Player IR Import Management",
-    "column": {
-      "name": "Name",
-      "version": "Version",
-      "reverseImport": "Reverse Import",
-      "actions": "Actions"
-    },
-    "button": {
-      "edit": "Edit"
-    }
-  },
-  "zh-CN": {
-    "title": "玩家IR导入管理",
-    "column": {
-      "name": "名称",
-      "version": "版本",
-      "reverseImport": "逆向导入",
-      "actions": "操作"
-    },
-    "button": {
-      "edit": "修改"
-    }
-  }
-}</i18n>

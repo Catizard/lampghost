@@ -1,11 +1,11 @@
 <template>
   <n-flex justify="space-between">
     <n-h1 prefix="bar" style="text-align: start;">
-      <n-text type="primary">{{ t('title') }}</n-text>
+      <n-text type="primary">{{ t('title.customTableManagement') }}</n-text>
     </n-h1>
     <n-flex justify="end">
       <n-button :loading="loading" type="primary" @click="showAddModal = true">
-        {{ t('button.add') }}
+        {{ t('button.addCustomTable') }}
       </n-button>
     </n-flex>
   </n-flex>
@@ -25,7 +25,6 @@ import { dto } from '@wailsjs/go/models';
 import { DeleteCustomDiffTable, QueryCustomDiffTablePageList } from '@wailsjs/go/main/App';
 import CustomTableEditForm from './CustomTableEditForm.vue';
 import CustomTableAddForm from './CustomTableAddForm.vue';
-import { ClearTypeColorStyle } from '../../constants/cleartype';
 import { ClipboardSetText } from '@wailsjs/runtime/runtime';
 
 const { t } = useI18n();
@@ -57,7 +56,7 @@ const columns: DataTableColumns<dto.CustomDiffTableDto> = [
     title: t('column.actions'), key: "actions", width: "200px",
     render(row: dto.CustomDiffTableDto) {
       return [
-        h(NButton, { type: "primary", size: "small", onClick: () => editFormRef.value.open(row.ID) }, { default: () => t('button.update') }),
+        h(NButton, { type: "primary", size: "small", onClick: () => editFormRef.value.open(row.ID) }, { default: () => t('button.edit') }),
         h(NButton, {
           style: {
             "margin-left": "5px",
@@ -90,9 +89,9 @@ const columns: DataTableColumns<dto.CustomDiffTableDto> = [
             try {
               const name = row.Name;
               ClipboardSetText(`http://localhost:7391/${encodeURIComponent(name)}.json`)
-              window.$notifySuccess(t('setClipboardSuccess'));
+              window.$notifySuccess(t('message.setClipboardSuccess'));
             } catch (e) {
-              window.$notifyError(t('setClipboardError', {msg: String(e)}));
+              window.$notifyError(t('message.setClipboardError', {msg: String(e)}));
             }
           }
         }, { default: () => t('button.link')})
@@ -120,46 +119,3 @@ function loadData() {
 
 loadData();
 </script>
-
-<i18n lang="json">{
-  "en": {
-    "title": "Custom Table Management",
-    "column": {
-      "name": "Name",
-      "actions": "Actions"
-    },
-    "button": {
-      "add": "Add Custom Table",
-      "update": "Edit",
-      "delete": "Delete",
-      "link": "Import Link"
-    },
-    "deleteDialog": {
-      "title": "Delete Custom Table",
-      "positiveText": "Yes",
-      "negativeText": "Cancel"
-    },
-    "setClipboardSuccess": "Copied import link to clipboard successfully",
-    "setClipboardError": "Failed to copy import link to clipboard, error: {msg}"
-  },
-  "zh-CN": {
-    "title": "自定义难度表管理",
-    "column": {
-      "name": "名称",
-      "actions": "操作"
-    },
-    "button": {
-      "add": "新增自定义难度表",
-      "update": "修改",
-      "delete": "删除",
-      "link": "导入链接"
-    },
-    "deleteDialog": {
-      "title": "删除自定义难度表",
-      "positiveText": "确认",
-      "negativeText": "取消"
-    },
-    "setClipboardSuccess": "成功复制导入链接",
-    "setClipboardError": "复制导入链接失败，错误原因: {msg}"
-  }
-}</i18n>

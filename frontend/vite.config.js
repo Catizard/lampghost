@@ -8,7 +8,8 @@ export default defineConfig({
   plugins: [
     vue(),
     VueI18nPlugin({
-      /* options */
+      runtimeOnly: false,
+      include: fileURLToPath(new URL('./src/i18n', import.meta.url)),
     }),
   ],
   resolve: {

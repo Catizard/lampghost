@@ -1,15 +1,15 @@
 <template>
   <n-flex justify="space-between">
     <n-h1 prefix="bar" style="text-align: start;">
-      <n-text type="primary">{{ t('title') }}</n-text>
+      <n-text type="primary">{{ t('title.tableStatistics') }}</n-text>
     </n-h1>
   </n-flex>
   <n-flex justify="start">
     <n-select :loading="levelTableLoading" v-model:value="currentDiffTableID" :options="difftableOptions"
       style="width: 200px;" />
     <n-select :loading="loadingRivalData" v-model:value="currentRivalID" :options="rivalOptions" style="width: 200px;"
-      :placeholder="t('placeHolderRival')" />
-    <SelectRivalTag v-model:value="currentRivalTagID" :rivalId="currentRivalID" width="200px" :placeholder="t('placeholderRivalTag')"/>
+      :placeholder="t('form.placeholderRival')" />
+    <SelectRivalTag v-model:value="currentRivalTagID" :rivalId="currentRivalID" width="200px" :placeholder="t('form.placeholderRivalTag')"/>
   </n-flex>
   <n-data-table :columns="columns" :data="data" :pagination="pagination" :loading="levelTableLoading"
     :row-key="(row: dto.DiffTableHeaderDto) => row.Level" :row-class-name="rowClassName" />
@@ -185,53 +185,6 @@ watch(currentDiffTableID, (newID: string | number) => {
   loadLevelTableData(newID);
 });
 </script>
-
-<i18n lang="json">{
-  "en": {
-    "title": "Table Statistics",
-    "column": {
-      "songName": "Song Name",
-      "artist": "Artist",
-      "count": "Play Count",
-      "clear": "Clear",
-      "ghost": "Ghost",
-      "actions": "Actions"
-    },
-    "message": {
-      "noTableError": "Cannot handle no difficult table data currenlty, please add at least one table first",
-      "tableNotFoundError": "FATAL ERROR: cannot load table data?",
-      "duplicateTableError": "FATAL ERROR: table data is duplicated?",
-      "noRivalError": "FATAL ERROR: cannot find at least one rival?"
-    },
-    "button": {
-      "addToFolder": "Add to Folder"
-    },
-    "placeHolderRival": "Choose Rival",
-    "placeholderRivalTag": "Choose Rival Tag"
-  },
-  "zh-CN": {
-    "title": "难度表统计信息",
-    "column": {
-      "songName": "谱名",
-      "artist": "作者",
-      "count": "游玩次数",
-      "clear": "点灯",
-      "ghost": "影子灯",
-      "actions": "操作"
-    },
-    "message": {
-      "noTableError": "目前无法处理一个难度表都没有的情况，请至少先添加一个难度表",
-      "tableNotFoundError": "未知错误: 无法读取难度表数据?",
-      "duplicateTableError": "未知错误: 难度表重复?",
-      "noRivalError": "未知错误: 无玩家信息?"
-    },
-    "button": {
-      "addToFolder": "添加至收藏夹"
-    },
-    "placeHolderRival": "选择对比玩家",
-    "placeholderRivalTag": "选择对比玩家的标签"
-  }
-}</i18n>
 
 <style lang="css" scoped>
 /* background color when clearing whole difficult level */

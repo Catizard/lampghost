@@ -1,15 +1,15 @@
 <template>
-  <n-modal :loading="loading" v-model:show="show" preset="dialog" :title="t('modal.title')"
-    :positive-text="t('modal.positiveText')" :negative-text="t('modal.negativeText')"
+  <n-modal :loading="loading" v-model:show="show" preset="dialog" :title="t('title.editTable')"
+    :positive-text="t('button.submit')" :negative-text="t('button.cancel')"
     @positive-click="handlePositiveClick" @negative-click="handleNegativeClick" :mask-closable="false">
     <n-form ref="formRef" :model="formData">
-      <n-form-item :label="t('modal.labelNoTagBuild')" path="NoTagBuild">
+      <n-form-item :label="t('form.labelNoTagBuild')" path="NoTagBuild">
         <n-select v-model:value="formData.NoTagBuild" :options="tableTagOptions" />
       </n-form-item>
-      <n-form-item :label="t('modal.labelTagColor')" path="TagColor">
+      <n-form-item :label="t('form.labelTagColor')" path="TagColor">
         <n-color-picker v-model:value="formData.TagColor" :show-alpha="false" :modes="['hex', 'rgb']" />
       </n-form-item>
-      <n-form-item :label="t('modal.labelTagTextColor')" path="TagTextColor">
+      <n-form-item :label="t('form.labelTagTextColor')" path="TagTextColor">
         <n-color-picker v-model:value="formData.TagTextColor" :show-alpha="false" :modes="['hex', 'rgb']" />
       </n-form-item>
     </n-form>
@@ -97,40 +97,3 @@ function open(headerId: number) {
     });
 }
 </script>
-
-<i18n lang="json">{
-  "en": {
-    "modal": {
-      "title": "Edit table",
-      "positiveText": "submit",
-      "negativeText": "cancel",
-      "labelNoTagBuild": "Display table tag or not",
-      "labelTagColor": "Tag color",
-      "labelTagTextColor": "Tag text color"
-    },
-    "options": {
-      "noDisplay": "Don't display",
-      "display": "Display"
-    },
-    "message": {
-      "noChosenHeaderError": "No header was chosed currently"
-    }
-  },
-  "zh-CN": {
-    "modal": {
-      "title": "修改难度表",
-      "positiveText": "提交",
-      "negativeText": "取消",
-      "labelNoTagBuild": "是否展示标签",
-      "labelTagColor": "标签颜色",
-      "labelTagTextColor": "标签嵌字颜色"
-    },
-    "options": {
-      "noDisplay": "不展示",
-      "display": "展示"
-    },
-    "message": {
-      "noChosenHeaderError": "当前没有选择任何难度表"
-    }
-  }
-}</i18n>

@@ -31,9 +31,9 @@ const columns: DataTableColumns<dto.FolderDto> = [
 	{
 		title: () => {
 			if (props.type == "folder") {
-				return t('column.name.folder');
+				return t('column.folderName');
 			} else if (props.type == "table") {
-				return t('column.name.table');
+				return t('column.difficultName');
 			}
 		},
 		key: "FolderName"
@@ -65,22 +65,3 @@ watch(() => props.customTableId, () => {
 	reload();
 });
 </script>
-
-<i18n lang="json">{
-	"en": {
-		"column": {
-			"name": {
-				"folder": "Folder Name",
-				"table": "Difficult Name"
-			}
-		}
-	},
-	"zh-CN": {
-		"column": {
-			"name": {
-				"folder": "收藏夹名称",
-				"table": "难度名称"
-			}
-		}
-	}
-}</i18n>

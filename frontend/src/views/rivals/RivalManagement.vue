@@ -1,12 +1,12 @@
 <template>
 	<n-flex justify="space-between">
 		<n-h1 prefix="bar" style="text-align: start;">
-			<n-text type="primary">{{ t('title') }}</n-text>
+			<n-text type="primary">{{ t('title.playerManagement') }}</n-text>
 		</n-h1>
 		<!-- <n-flex justify="end">
 				<n-button>Reload All</n-button>
 			</n-flex> -->
-		<n-button type="primary" @click="showAddModal = true">{{ t('button.add') }}</n-button>
+		<n-button type="primary" @click="showAddModal = true">{{ t('button.addPlayer') }}</n-button>
 	</n-flex>
 	<n-data-table :columns="columns" :data="data" :pagination="pagination" :bordered="false" :row-key="row => row.ID"
 		:loading="loading" />
@@ -69,7 +69,7 @@ function createColumns(): DataTableColumns<dto.RivalInfoDto> {
 				)
 			}
 		},
-		{ title: t('column.count'), key: "PlayCount", width: "100px", ellipsis: { tooltip: true } },
+		{ title: t('column.playCount'), key: "PlayCount", width: "100px", ellipsis: { tooltip: true } },
 		{ title: t('column.scoreLogFilePath'), key: "ScoreLogPath", width: "75px", ellipsis: { tooltip: true } },
 		{ title: t('column.songdataFilePath'), key: "SongDataPath", width: "75px", ellipsis: { tooltip: true } },
 		{
@@ -164,58 +164,3 @@ function handleSyncClick(id: number) {
 
 loadData();
 </script>
-
-<i18n lang="json">{
-	"en": {
-		"title": "Player Management",
-		"column": {
-			"name": "Name",
-			"count": "Play Count",
-			"scoreLogFilePath": "scorelog.db File Path",
-			"songdataFilePath": "songdata.db File Path",
-			"lastSyncTime": "Last Sync Time",
-			"actions": "Actions"
-		},
-		"button": {
-			"reload": "Fully Reload",
-			"add": "Add Player",
-			"delete": "Delete",
-			"edit": "Edit"
-		},
-		"message": {
-			"reloadSuccess": "Reload successfully",
-			"cannotDeleteMainUser": "Cannot delete main user"
-		},
-		"deleteDialog": {
-			"title": "Confirm to delete?",
-			"positiveText": "Yes",
-			"negativeText": "No"
-		}
-	},
-	"zh-CN": {
-		"title": "玩家管理",
-		"column": {
-			"name": "名称",
-			"count": "游玩次数",
-			"scoreLogFilePath": "scorelog.db文件路径",
-			"songdataFilePath": "songdata.db文件路径",
-			"lastSyncTime": "最后更新时间",
-			"actions": "操作"
-		},
-		"button": {
-			"reload": "全量同步",
-			"add": "添加玩家",
-			"delete": "删除",
-			"edit": "修改"
-		},
-		"message": {
-			"reloadSuccess": "同步成功",
-			"cannotDeleteMainUser": "不能删除主用户"
-		},
-		"deleteDialog": {
-			"title": "确定要删除吗？",
-			"positiveText": "是",
-			"negativeText": "否"
-		}
-	}
-}</i18n>

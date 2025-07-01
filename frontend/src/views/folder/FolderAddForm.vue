@@ -1,6 +1,6 @@
 <template>
 	<n-modal :loading="loading" v-model:show="show" preset="dialog" :title="title"
-		:positive-text="t('modal.positiveText')" :negative-text="t('modal.negativeText')"
+		:positive-text="t('button.submit')" :negative-text="t('button.cancel')"
 		@positive-click="handlePositiveClick" @negative-click="handleNegativeClick" :mask-closable="false">
 		<n-form ref="formRef" :model="formData" :rules="rules">
 			<n-form-item :label="t('form.labelName')" path="FolderName">
@@ -31,9 +31,9 @@ const emit = defineEmits<{
 // Dynamic contents
 const title = computed((): string => {
 	if (props.type == "table") {
-		return t('modal.title.table')
+		return t('title.newDifficult')
 	} else if (props.type == "folder") {
-		return t('modal.title.folder')
+		return t('title.newFolder')
 	}
 })
 
@@ -78,40 +78,3 @@ function handleNegativeClick() {
 	show.value = false;
 }
 </script>
-
-<i18n lang="json">{
-	"en": {
-		"modal": {
-			"title": {
-				"folder": "New Folder",
-				"table": "New Difficult"
-			},
-			"positiveText": "Submit",
-			"negativeText": "Cancel"
-		},
-		"form": {
-			"labelName": "Name",
-			"placeholderName": "Input name"
-		},
-		"message": {
-			"missingName": "Please input name"
-		}
-	},
-	"zh-CN": {
-		"modal": {
-			"title": {
-				"folder": "新增收藏夹",
-				"table": "新增难度"
-			},
-			"positiveText": "提交",
-			"negativeText": "取消"
-		},
-		"form": {
-			"labelName": "名称",
-			"placeholderName": "请输入名称"
-		},
-		"message": {
-			"missingName": "请输入名称"
-		}
-	}
-}</i18n>

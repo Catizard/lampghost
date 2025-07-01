@@ -2,11 +2,11 @@
   <n-spin :show="loading">
     <n-flex justify="space-between">
       <n-h1 prefix="bar" style="text-align: start;">
-        <n-text type="primary">{{ t('title') }}</n-text>
+        <n-text type="primary">{{ t('title.song') }}</n-text>
       </n-h1>
     </n-flex>
     <n-flex justify="space-between">
-      <n-input :placeholder="t('searchNamePlaceholder')" v-model:value="searchNameLike" @keyup.enter="loadData()"
+      <n-input :placeholder="t('form.placeholderSearchSongOrSabunName')" v-model:value="searchNameLike" @keyup.enter="loadData()"
         style="width: 350px;" />
       <n-button type="primary" @click="reloadSongData">{{ t('button.reload') }}</n-button>
     </n-flex>
@@ -35,7 +35,7 @@ const chartPreviewRef = ref<InstanceType<typeof ChartPreview>>(null);
 
 const searchNameLike: Ref<string | null> = ref(null);
 const columns: DataTableColumns<dto.RivalSongDataDto> = [
-  { title: t('column.name'), key: "Title", resizable: true },
+  { title: t('column.title'), key: "Title", resizable: true },
   { title: t('column.subTitle'), key: "SubTitle", resizable: true, width: "125px", ellipsis: { tooltip: true } },
   { title: t('column.artist'), key: "Artist", resizable: true, width: "125px", ellipsis: { tooltip: true } },
   { title: t('column.genre'), key: "Genre", resizable: true, width: "125px", ellipsis: { tooltip: true } },
@@ -47,8 +47,8 @@ const columns: DataTableColumns<dto.RivalSongDataDto> = [
         {
           trigger: "hover",
           options: [
-            { label: t('button.addToFolder'), key: "AddToFolder" },
-            { label: t('button.addToTable'), key: "AddToTable" },
+            { label: t('button.addToFavoriteFolder'), key: "AddToFolder" },
+            { label: t('button.addToCustomTable'), key: "AddToTable" },
             { label: t('button.gotoPreview'), key: "GotoPreview" },
           ],
           onSelect: (key: string) => {
@@ -159,40 +159,3 @@ function handleSubmit(folderIds: number[]) {
 
 loadData();
 </script>
-
-<i18n lang="json">{
-  "en": {
-    "title": "Song",
-    "button": {
-      "reload": "Reload",
-      "addToFolder": "Add to Folder",
-      "addToTable": "Add to Custom Table",
-      "gotoPreview": "Preview BMS Chart"
-    },
-    "column": {
-      "name": "Title",
-      "subTitle": "Sub Title",
-      "genre": "Genre",
-      "artist": "Artist",
-      "actions": "Actions"
-    },
-    "searchNamePlaceholder": "Search Song/Sabun Name"
-  },
-  "zh-CN": {
-    "title": "歌曲列表",
-    "button": {
-      "reload": "同步文件",
-      "addToFolder": "添加至收藏夹",
-      "addToTable": "添加至自定义难度表",
-      "gotoPreview": "预览BMS谱面"
-    },
-    "column": {
-      "name": "谱面名称",
-      "subTitle": "副标题",
-      "genre": "风格",
-      "artist": "作者",
-      "actions": "操作"
-    },
-    "searchNamePlaceholder": "搜索歌曲/差分名称"
-  }
-}</i18n>

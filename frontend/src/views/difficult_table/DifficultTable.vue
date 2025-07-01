@@ -1,7 +1,7 @@
 <template>
 	<n-flex justify="space-between">
 		<n-h1 prefix="bar" style="text-align: start">
-			<n-text type="primary">{{ t('title') }}</n-text>
+			<n-text type="primary">{{ t('title.tableManagement') }}</n-text>
 		</n-h1>
 		<n-flex justify="end">
 			<n-button :loading="loading" type="info" @click="showSortModal = true">
@@ -99,7 +99,7 @@ const pagination = false as const;
 const otherActionOptions: Array<DropdownOption> = [
 	{ label: t('button.reload'), key: "Reload" },
 	{ label: t('button.edit'), key: "Edit", },
-	{ label: t('button.supply'), key: "Supply" },
+	{ label: t('button.supplyMissingBMS'), key: "Supply" },
 	{ label: t('button.sortLevels'), key: "SortLevels", },
 	{
 		label: t('button.delete'),
@@ -116,9 +116,9 @@ function handleSelectOtherAction(row: dto.DiffTableHeaderDto, key: string) {
 	}
 	if ("Supply" === key) {
 		dialog.warning({
-			title: t('supplyDialog.title'),
-			positiveText: t('supplyDialog.positiveText'),
-			negativeText: t('supplyDialog.negativeText'),
+			title: t('message.supplyMissingBMS'),
+			positiveText: t('message.yes'),
+			negativeText: t('message.no'),
 			onPositiveClick: () => {
 				loading.value = true;
 				SupplyMissingBMSFromTable(row.ID)
@@ -187,75 +187,8 @@ function loadDiffTableData() {
 			}
 			data.value = [...result.Rows]
 		})
-		.catch((err) => window.$notifyError(t('message.loadTableDataFailed', { msg: err })))
+		.catch((err) => window.$notifyError(t('message.loadTableDataError', { msg: err })))
 		.finally(() => loading.value = false);
 }
 
 </script>
-
-<i18n lang="json">{
-	"en": {
-		"title": "Table Management",
-		"button": {
-			"add": "Add Table",
-			"delete": "Delete",
-			"edit": "Edit",
-			"sort": "Sort",
-			"sortLevels": "Sort Levels",
-			"reload": "Reload",
-			"supply": "Supply all missing bms"
-		},
-		"column": {
-			"name": "Name",
-			"url": "URL",
-			"actions": "Actions",
-			"tag": "Tag"
-		},
-		"deleteDialog": {
-			"title": "Confirm to delete?",
-			"positiveText": "Yes",
-			"negativeText": "No"
-		},
-		"supplyDialog": {
-			"title": "Do you really want to supply all missing bms?",
-			"positiveText": "Yes",
-			"negativeText": "No"
-		},
-		"message": {
-			"deleteSuccess": "Deleted successfully",
-			"loadTableDataFailed": "Failed to load table, error message: {msg}"
-		}
-	},
-	"zh-CN": {
-		"title": "难度表管理",
-		"button": {
-			"add": "新增",
-			"delete": "删除",
-			"edit": "修改",
-			"sort": "排序",
-			"sortLevels": "设定难度排序",
-			"reload": "重新导入",
-			"supply": "补充所有缺少的BMS"
-		},
-		"column": {
-			"name": "名称",
-			"url": "地址",
-			"actions": "操作",
-			"tag": "难度表标签"
-		},
-		"deleteDialog": {
-			"title": "确定要删除吗？",
-			"positiveText": "是",
-			"negativeText": "否"
-		},
-		"supplyDialog": {
-			"title": "确定要添加所有缺少的BMS吗?",
-			"positiveText": "是",
-			"negativeText": "否"
-		},
-		"message": {
-			"deleteSuccess": "删除成功",
-			"loadTableDataFailed": "读取难度表信息失败, 错误信息: {msg}"
-		}
-	}
-}</i18n>

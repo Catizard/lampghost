@@ -1,8 +1,5 @@
 <template>
   <n-space justify="space-between" vertical style="width: 65%">
-    <!-- <n-h1 prefix="bar" style="text-align: start">
-      <n-text type="primary">{{ t('title') }}</n-text>
-    </n-h1> -->
     <n-form ref="formRef" :rules="rules" :model="formData" :loading="loading">
       <n-form-item :label="t('form.labelLanguage')">
         <n-select v-model:value="locale" :options="localeOptions" style="width: 150px;" />
@@ -11,8 +8,8 @@
         <n-input v-model:value="formData.name" :placeholder="t('form.placeholderUserName')" />
       </n-form-item>
       <n-radio-group v-model:value="importStrategy" name="radiogroup">
-        <n-radio-button key="directory" value="directory" :label="t('import.labelDirectory')" />
-        <n-radio-button key="separate" value="separate" :label="t('import.labelSeparate')" />
+        <n-radio-button key="directory" value="directory" :label="t('form.labelBeatorajaDirectory')" />
+        <n-radio-button key="separate" value="separate" :label="t('form.labelSeparateFiles')" />
       </n-radio-group>
       <template v-if="importStrategy == 'directory'">
         <div style="margin-top: 10px;">
@@ -192,64 +189,3 @@ function handleSubmit(e) {
   });
 }
 </script>
-
-<i18n lang="json">{
-  "en": {
-    "title": "Initialize User Data",
-    "import": {
-      "labelDirectory": "Beatoraja Directory",
-      "labelSeparate": "Separate Files"
-    },
-    "form": {
-      "labelLanguage": "Language",
-      "labelUserName": "Your user name",
-      "labelSongdataPath": "songdata.db file path",
-      "labelScorelogPath": "scorelog.db file path",
-      "labelScoredatalogPath": "scoredatalog.db file path",
-      "placeholderUserName": "Please input your name",
-      "placeholderSongdataPath": "Please input /beatoraja path/songdata.db file path",
-      "placeholderScorelogPath": "Please input /beatoraja path/*Player Name*/scorelog.db file path",
-      "placeholderScoredatalogPath": "Please input /beatoraja path/*Player Name*/scoredatalog.db file path"
-    },
-    "button": {
-      "submit": "Submit",
-      "chooseFile": "Choose File",
-      "chooseBeatorajaDirectory": "Choose Beatoraja Directory"
-    },
-    "rule": {
-      "missingUserName": "Name cannot be empty",
-      "missingSongdataPath": "songdata.db file path cannot be empty",
-      "missingScorelogPath": "scorelog.db file path cannot be empty",
-      "missingScoredatalogPath": "scoredatalog.db file path cannot be empty"
-    }
-  },
-  "zh-CN": {
-    "title": "初始化用户信息",
-    "import": {
-      "labelDirectory": "Beatoraja目录",
-      "labelSeparate": "文件导入"
-    },
-    "form": {
-      "labelLanguage": "语言",
-      "labelUserName": "用户名称",
-      "labelSongdataPath": "songdata.db文件路径",
-      "labelScorelogPath": "scorelog.db文件路径",
-      "labelScoredatalogPath": "scoredatalog.db文件路径",
-      "placeholderUserName": "请输入用户名",
-      "placeholderSongdataPath": "请输入/beatoraja path/songdata.db文件路径",
-      "placeholderScorelogPath": "请输入/beatoraja path/*Player Name*/scorelog.db文件路径",
-      "placeholderScoredatalogPath": "请输入/beatoraja path/*Player Name*/scoredatalog.db文件路径"
-    },
-    "button": {
-      "submit": "提交",
-      "chooseFile": "选择文件",
-      "chooseBeatorajaDirectory": "选择Beatoraja路径"
-    },
-    "rule": {
-      "missingUserName": "用户名不可为空",
-      "missingSongdataPath": "songdata.db文件路径不可为空",
-      "missingScorelogPath": "scorelog.db文件路径不可为空",
-      "missingScoredatalogPath": "scoredatalog.db文件路径不可为空"
-    }
-  }
-}</i18n>

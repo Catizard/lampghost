@@ -43,9 +43,9 @@ const columns: DataTableColumns<dto.FolderContentDto> = [
 	{
 		title: (): string => {
 			if (props.type == "folder") {
-				return t('column.tag.folder');
+				return t('column.tag');
 			} else if (props.type == "table") {
-				return t('column.tag.table');
+				return t('column.externalTag');
 			}
 		},
 		key: "Tag",
@@ -117,34 +117,3 @@ function deleteFolderContent(id: number) {
 watch(props, () => loadData());
 loadData();
 </script>
-
-<i18n lang="json">{
-	"en": {
-		"column": {
-			"name": "Name",
-			"tag": {
-				"folder": "Tag",
-				"table": "External Tag"
-			},
-			"clear": "Clear",
-			"actions": "Actions"
-		},
-		"button": {
-			"delete": "Delete"
-		}
-	},
-	"zh-CN": {
-		"column": {
-			"name": "谱面名称",
-			"tag": {
-				"folder": "难度表标签",
-				"table": "外部难度表标签"
-			},
-			"clear": "通关状态",
-			"actions": "操作"
-		},
-		"button": {
-			"delete": "删除"
-		}
-	}
-}</i18n>

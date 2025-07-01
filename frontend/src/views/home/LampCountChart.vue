@@ -2,8 +2,8 @@
   <n-flex justify="start">
     <n-select v-model:value="currentTableId" :options="tableOptions" style="width: 150px" />
     <n-radio-group v-model:value="currentLampOrder">
-      <n-radio-button :key="'reverse'" :value="'reverse'" :label="t('radio.reverse')" />
-      <n-radio-button :key="'ordered'" :value="'ordered'" :label="t('radio.ordered')" />
+      <n-radio-button :key="'reverse'" :value="'reverse'" :label="t('button.reverse')" />
+      <n-radio-button :key="'ordered'" :value="'ordered'" :label="t('button.ordered')" />
     </n-radio-group>
   </n-flex>
   <n-data-table :columns="overviewColumns" :data="overviewData" :row-class-name="'test'" />
@@ -289,24 +289,3 @@ watch([currentHeader, currentLampOrder], (_) => {
   buildOverviewTable();
 });
 </script>
-
-<i18n lang="json">{
-  "en": {
-    "message": {
-      "noTableError": "Cannot handle no difficult table data currenlty, please add at least one table first"
-    },
-    "radio": {
-      "reverse": "Reverse",
-      "ordered": "Ordered"
-    }
-  },
-  "zh-CN": {
-    "message": {
-      "noTableError": "目前无法处理一个难度表都没有的情况，请至少先添加一个难度表"
-    },
-    "radio": {
-      "reverse": "倒序",
-      "ordered": "正序"
-    }
-  }
-}</i18n>

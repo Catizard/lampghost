@@ -1,7 +1,7 @@
 <template>
   <n-flex justify="space-between">
     <n-h1 prefix="bar" style="text-align: start;">
-      <n-text type="primary">{{ t('title') }}</n-text>
+      <n-text type="primary">{{ t('title.designCustomTable') }}</n-text>
     </n-h1>
   </n-flex>
   <n-spin :show="loading">
@@ -9,11 +9,11 @@
       <n-select v-model:value="currentCustomTableID" :options="customTableOptions" style="width: 200px;" />
       <n-flex justify="end">
         <n-button v-if="customTableOptions.length > 0" type="primary" @click="showAddModal = true">
-          {{ t('button.add') }}
+          {{ t('button.addCustomTable') }}
         </n-button>
         <n-button v-if="customTableOptions.length > 0" type="info"
           @click="levelSortModalRef.open(currentCustomTableID)">
-          {{ t('button.sort') }}
+          {{ t('button.sortLevels') }}
         </n-button>
       </n-flex>
     </n-flex>
@@ -53,7 +53,7 @@ function loadCustomTableOptions() {
       return Promise.reject(result.Msg);
     }
     if (result.Rows.length == 0) {
-      return Promise.reject(t('message.noTableError'))
+      return Promise.reject(t('message.noCustomTableError'))
     }
     customTableOptions.value = result.Rows.map((row: dto.CustomDiffTableDto): SelectOption => {
       return {
@@ -73,26 +73,3 @@ function reload() {
   folderTableRef.value.loadData();
 }
 </script>
-
-<i18n lang="json">{
-  "en": {
-    "title": "Custom Table Design",
-    "button": {
-      "add": "Add Difficult",
-      "sort": "Sort Levels"
-    },
-    "message": {
-      "noTableError": "No custom difficult table found"
-    }
-  },
-  "zh-CN": {
-    "title": "自定义难度表设计",
-    "button": {
-      "add": "新增难度",
-      "sort": "设定难度排序"
-    },
-    "message": {
-      "noTableError": "当前无任何自定义难度表"
-    }
-  }
-}</i18n>

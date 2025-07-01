@@ -1,7 +1,7 @@
 <template>
 	<n-flex justify="space-between">
 		<n-h1 prefix="bar" style="text-align: left;">
-			<n-text type="primary"> {{ t('title') }}</n-text>
+			<n-text type="primary"> {{ t('title.downloadTask') }}</n-text>
 		</n-h1>
 	</n-flex>
 	<n-data-table :loading="loading" :columns="columns" :data="data" :row-key="(row: entity.DownloadTask) => row.ID" />
@@ -149,34 +149,3 @@ function humanFileSize(bytes, si = false, dp = 1) {
 	return bytes.toFixed(dp) + ' ' + units[u];
 }
 </script>
-
-<i18n lang="json">{
-	"en": {
-		"title": "Download Tasks",
-		"column": {
-			"url": "URL",
-			"taskName": "Task Name(Click to Copy)",
-			"progress": "Progress",
-			"status": "Status",
-			"actions": "Actions"
-		},
-		"button": {
-			"restart": "Restart",
-			"cancel": "Cancel"
-		}
-	},
-	"zh-CN": {
-		"title": "下载任务",
-		"column": {
-			"url": "下载链接(点击复制)",
-			"taskName": "任务名称",
-			"progress": "当前进度",
-			"status": "状态",
-			"actions": "操作"
-		},
-		"button": {
-			"restart": "重新开始任务",
-			"cancel": "取消任务"
-		}
-	}
-}</i18n>

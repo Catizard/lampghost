@@ -1,6 +1,6 @@
 <template>
-  <n-modal :loading="loading" v-model:show="show" preset="dialog" :title="t('modal.title')" style="width: 75%;"
-    :positive-text="t('modal.positiveText')" :negative-text="t('modal.negativeText')"
+  <n-modal :loading="loading" v-model:show="show" preset="dialog" :title="t('title.refactorCustomTableLevelOrder')" style="width: 75%;"
+    :positive-text="t('button.submit')" :negative-text="t('button.cancel')"
     @positive-click="handlePositiveClick" @negative-click="handleNegativeClick" :mask-closable="false">
     <n-data-table ref="tableRef" :loading="loading" :columns="columns" :data="data" :bordered="false"
       :row-key="(row: dto.DiffTableHeaderDto) => row.ID" max-height="500px" />
@@ -106,34 +106,3 @@ function handleNegativeClick() {
   show.value = false;
 }
 </script>
-
-<i18n lang="json">{
-  "en": {
-    "modal": {
-      "title": "Refactor Custom Table's Level Order",
-      "positiveText": "Submit",
-      "negativeText": "Cancel"
-    },
-    "column": {
-      "name": "Name",
-      "rowIndex": "Index"
-    },
-    "message": {
-      "noChosenCustomTableError": "No custom table was chosed currently"
-    }
-  },
-  "zh-CN": {
-    "modal": {
-      "title": "修改自定义难度表内难度排序",
-      "positiveText": "提交",
-      "negativeText": "取消"
-    },
-    "column": {
-      "name": "名称",
-      "rowIndex": "序号"
-    },
-    "message": {
-      "noChosenCustomTableError": "当前没有选择任何自定义难度表"
-    }
-  }
-}</i18n>

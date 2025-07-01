@@ -1,11 +1,11 @@
 <template>
   <n-flex justify="space-between">
     <n-h1 prefix="bar" style="text-align: start;">
-      <n-text type="primary">{{ t('title') }}</n-text>
+      <n-text type="primary">{{ t('title.recentPlay') }}</n-text>
     </n-h1>
   </n-flex>
   <n-flex justify="start">
-    <n-input :placeholder="t('searchNamePlaceholder')" v-model:value="searchNameLike" @keyup.enter="loadData()"
+    <n-input :placeholder="t('form.placeholderSearchSongOrSabunName')" v-model:value="searchNameLike" @keyup.enter="loadData()"
       style="width: 350px;" />
     <!-- <n-button>{{ t('button.chooseClearType') }}</n-button>
       <n-button>{{ t('button.minimumClearType') }}</n-button> -->
@@ -77,7 +77,7 @@ function handleSubmit(folderIds: number[]) {
 
 function createColumns(): DataTableColumns<dto.RivalScoreLogDto> {
   return [
-    { title: t('column.name'), key: "Title", resizable: true },
+    { title: t('column.title'), key: "Title", resizable: true },
     {
       title: t('column.tag'), key: "Tag", minWidth: "100px", resizable: true,
       render(row: dto.RivalScoreLogDto) {
@@ -91,7 +91,7 @@ function createColumns(): DataTableColumns<dto.RivalScoreLogDto> {
       }
     },
     {
-      title: t('column.time'), key: "RecordTime", minWidth: "100px", resizable: true,
+      title: t('column.recordTime'), key: "RecordTime", minWidth: "100px", resizable: true,
       render(row: dto.RivalScoreLogDto) {
         return dayjs(row.RecordTime).format('YYYY-MM-DD HH:mm:ss');
       }
@@ -110,8 +110,8 @@ function createColumns(): DataTableColumns<dto.RivalScoreLogDto> {
           {
             trigger: "hover",
             options: [
-              { label: t('button.addToFolder'), key: "AddToFolder" },
-              { label: t('button.addToTable'), key: "AddToTable" },
+              { label: t('button.addToFavoriteFolder'), key: "AddToFolder" },
+              { label: t('button.addToCustomTable'), key: "AddToTable" },
               { label: t('button.gotoPreview'), key: "GotoPreview" },
             ],
             onSelect: (key: string) => {
@@ -174,54 +174,3 @@ onMounted(() => {
   loadData();
 })
 </script>
-
-<i18n lang="json">{
-  "en": {
-    "title": "Recent Play",
-    "button": {
-      "chooseClearType": "Choose Clear Type",
-      "minimumClearType": "Minimum Clear Type",
-      "addToFolder": "Add to Folder",
-      "addToTable": "Add to Custom Table",
-      "gotoPreview": "Preview BMS Chart"
-    },
-    "column": {
-      "name": "Song Name",
-      "tag": "Tag",
-      "clear": "Clear",
-      "time": "Record Time",
-      "minbp": "Min BP",
-      "actions": "Actions"
-    },
-    "message": {
-      "loadRecentRecordFailedPrefix": "Load recent records failed, error message: ",
-      "bindSuccess": "Bind successfully",
-      "bindFailedPrefix": "Failed to bind song to folder, error message: "
-    },
-    "searchNamePlaceholder": "Search Song/Sabun Name"
-  },
-  "zh-CN": {
-    "title": "最近游玩",
-    "button": {
-      "chooseClearType": "筛选点灯记录",
-      "minimumClearType": "筛选最小灯记录",
-      "addToFolder": "添加至收藏夹",
-      "addToTable": "添加至自定义难度表",
-      "gotoPreview": "预览BMS谱面"
-    },
-    "column": {
-      "name": "谱面名称",
-      "tag": "难度表标签",
-      "clear": "通关状态",
-      "time": "记录时间",
-      "minbp": "最小BP",
-      "actions": "操作"
-    },
-    "message": {
-      "loadRecentRecordFailedPrefix": "加载最近游玩记录失败，错误信息: ",
-      "bindSucess": "绑定成功",
-      "bindFailedPrefix": "绑定失败, 错误信息: "
-    },
-    "searchNamePlaceholder": "搜索歌曲/差分名称"
-  }
-}</i18n>

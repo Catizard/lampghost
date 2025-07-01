@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts" setup>
-import { DataTableColumns, NButton, useDialog } from 'naive-ui';
+import { DataTableColumns, NButton, NDropdown, useDialog } from 'naive-ui';
 import { h, reactive, Ref, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { dto } from '@wailsjs/go/models';
@@ -55,47 +55,51 @@ const columns: DataTableColumns<dto.CustomDiffTableDto> = [
   {
     title: t('column.actions'), key: "actions", width: "200px",
     render(row: dto.CustomDiffTableDto) {
-      return [
-        h(NButton, { type: "primary", size: "small", onClick: () => editFormRef.value.open(row.ID) }, { default: () => t('button.edit') }),
-        h(NButton, {
-          style: {
-            "margin-left": "5px",
-          },
-          type: "error", size: "small", onClick: () => {
-            dialog.warning({
-              title: t('deleteDialog.title'),
-              positiveText: t('deleteDialog.positiveText'),
-              negativeText: t('deleteDialog.negativeText'),
-              onPositiveClick: () => {
-                loading.value = true;
-                DeleteCustomDiffTable(row.ID)
-                  .then(result => {
-                    if (result.Code != 200) {
-                      return Promise.reject(result.Msg);
-                    }
-                    loadData();
-                  })
-                  .catch(err => window.$notifyError(err))
-                  .finally(() => loading.value = true);
-              }
-            })
-          }
-        }, { default: () => t('button.delete') }),
-        h(NButton, {
-          style: {
-            "margin-left": "5px",
-          },
-          type: "info", size: "small", onClick: () => {
-            try {
-              const name = row.Name;
-              ClipboardSetText(`http://localhost:7391/${encodeURIComponent(name)}.json`)
-              window.$notifySuccess(t('message.setClipboardSuccess'));
-            } catch (e) {
-              window.$notifyError(t('message.setClipboardError', {msg: String(e)}));
+      return h(
+        NDropdown,
+        {
+          trigger: "hover",
+          options: [
+            { label: t("button.edit"), key: "Edit" },
+            { label: t("button.delete"), key: "Delete" },
+            { label: t("button.link"), key: "Link" }
+          ],
+          onSelect: (key: string) => {
+            switch (key) {
+              case "Edit": editFormRef.value.open(row.ID); break;
+              case "Delete":
+                dialog.warning({
+                  title: t('deleteDialog.title'),
+                  positiveText: t('deleteDialog.positiveText'),
+                  negativeText: t('deleteDialog.negativeText'),
+                  onPositiveClick: () => {
+                    loading.value = true;
+                    DeleteCustomDiffTable(row.ID)
+                      .then(result => {
+                        if (result.Code != 200) {
+                          return Promise.reject(result.Msg);
+                        }
+                        loadData();
+                      })
+                      .catch(err => window.$notifyError(err))
+                      .finally(() => loading.value = true);
+                  }
+                });
+                break;
+              case "Link":
+                try {
+                  const name = row.Name;
+                  ClipboardSetText(`http://localhost:7391/${encodeURIComponent(name)}.json`)
+                  window.$notifySuccess(t('message.setClipboardSuccess'));
+                } catch (e) {
+                  window.$notifyError(t('message.setClipboardError', { msg: String(e) }));
+                }
+                break;
             }
           }
-        }, { default: () => t('button.link')})
-      ];
+        },
+        { default: () => h(NButton, null, { default: () => '...' })}
+      );
     }
   }
 ];

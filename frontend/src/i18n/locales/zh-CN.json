@@ -251,5 +251,6 @@
     "download": "下载",
     "goals": "目标列表",
     "settings": "设置"
-  }
+  },
+  "button.link": "生成导入链接"
 }

@@ -10,7 +10,7 @@ const i18n = createI18n({
   silentFallbackWarn: true, // seems not working
   messages: {
     en,
-    zhCN,
+    "zh-CN": zhCN,
   }
 });
 

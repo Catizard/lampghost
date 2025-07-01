@@ -1,11 +1,10 @@
-<script setup>
+<script setup lang="ts">
 import { ReadConfig } from '@wailsjs/go/main/App';
 import { Provider, Viewer } from './components';
-import { useI18n } from 'vue-i18n';
-import { ref } from 'vue';
 import { EventsOn } from '@wailsjs/runtime/runtime';
+import { useI18n } from 'vue-i18n';
 
-const i18n = useI18n();
+let { locale } = useI18n();
 
 ReadConfig()
   .then(result => {
@@ -13,8 +12,7 @@ ReadConfig()
       // Should we report this?
       return;
     }
-    console.log(result);
-    i18n.locale = ref(result.Data.Locale);
+    locale.value = result.Data.Locale;
   });
 
 // Global refresh

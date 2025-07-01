@@ -69,7 +69,7 @@ const table: Array<ClearTypeDef> = [
 	},
 	{
 		value: 8,
-		text: "FULL-COMBO",
+		text: "F-COMBO",
 		color: "#FFD251",
 		textColor: "#ffffff",
 	},

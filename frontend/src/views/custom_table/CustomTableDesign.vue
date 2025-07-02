@@ -9,7 +9,7 @@
       <n-select v-model:value="currentCustomTableID" :options="customTableOptions" style="width: 200px;" />
       <n-flex justify="end">
         <n-button v-if="customTableOptions.length > 0" type="primary" @click="showAddModal = true">
-          {{ t('button.addCustomTable') }}
+          {{ t('button.addDifficultFolder') }}
         </n-button>
         <n-button v-if="customTableOptions.length > 0" type="info"
           @click="levelSortModalRef.open(currentCustomTableID)">

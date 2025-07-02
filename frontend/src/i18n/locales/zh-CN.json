@@ -46,7 +46,7 @@
     "disable": "禁用",
     "sortLevels": "设定难度排序",
     "addDifficultFolder": "新增难度文件夹",
-    "link": "导入链接",
+    "link": "复制导入链接",
     "addCustomTable": "新增自定义难度表",
     "addToFavoriteFolder": "添加至收藏夹",
     "addTable": "新增难度表",
@@ -232,7 +232,7 @@
       "self": "玩家",
       "management": "管理",
       "tags": "标签",
-      "lock": "版本锁定"
+      "lock": "IR导入"
     },
     "difftable": {
       "self": "难度表",
@@ -251,6 +251,5 @@
     "download": "下载",
     "goals": "目标列表",
     "settings": "设置"
-  },
-  "button.link": "生成导入链接"
+  }
 }

@@ -17,6 +17,7 @@ type CourseInfoDto struct {
 	Sha256s            string
 	NoSepJoinedSha256s string
 	Constraints        string
+	Symbol             string
 
 	Clear               int32
 	FirstClearTimestamp time.Time
@@ -32,6 +33,7 @@ func NewCourseInfoDto(courseInfo *entity.CourseInfo, cache *entity.SongHashCache
 		Sha256s:     courseInfo.Sha256s,
 		Constraints: courseInfo.Constraints,
 		Constraint:  strings.Split(courseInfo.Constraints, ","),
+		Symbol:      courseInfo.Symbol,
 	}
 	ret.Md5 = strings.Split(ret.Md5s, ",")
 	// Only apply repair steps when sha256s is absent

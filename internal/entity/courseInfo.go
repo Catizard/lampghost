@@ -16,6 +16,7 @@ type CourseInfo struct {
 	// NOTE: Never use md5 at data processing, use sha256 instead
 	Md5s        string
 	Constraints string
+	Symbol      string
 }
 
 func (CourseInfo) TableName() string {

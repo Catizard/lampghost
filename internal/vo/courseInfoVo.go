@@ -21,6 +21,7 @@ type CourseInfoVo struct {
 	GhostRivalTagID uint
 	// Currently only be used in backend
 	IgnoreVariantCourse bool
+	Symbol              string
 }
 
 // NOTE: This struct is only used in header's parse step
@@ -45,5 +46,6 @@ func (courseInfo *CourseInfoVo) Entity() *entity.CourseInfo {
 		Sha256s:     strings.Join(courseInfo.Sha256, ","),
 		Constraints: strings.Join(courseInfo.Constraint, ","),
 		HeaderID:    courseInfo.HeaderID,
+		Symbol:      courseInfo.Symbol,
 	}
 }

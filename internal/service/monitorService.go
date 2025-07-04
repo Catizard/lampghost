@@ -16,11 +16,13 @@ type MonitorService struct {
 	enableAutoReload      bool
 }
 
-func NewMonitorService(config *config.ApplicationConfig, notifySyncChan chan<- any) *MonitorService {
+func NewMonitorService(config *config.ApplicationConfig) (*MonitorService, <-chan any) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		panic(err)
 	}
+
+	notifySyncChan := make(chan any)
 
 	ret := &MonitorService{
 		watcher:        watcher,
@@ -35,7 +37,7 @@ func NewMonitorService(config *config.ApplicationConfig, notifySyncChan chan<- a
 
 	go ret.listen()
 
-	return ret
+	return ret, notifySyncChan
 }
 
 func (s *MonitorService) listen() {

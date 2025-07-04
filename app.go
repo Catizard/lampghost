@@ -49,8 +49,7 @@ func NewApp() *App {
 	}
 
 	// auto-reload module
-	notifySyncChan := make(chan any)
-	monitorService := service.NewMonitorService(conf, notifySyncChan)
+	monitorService, notifySyncChan := service.NewMonitorService(conf)
 
 	// rival module
 	rivalInfoService := service.NewRivalInfoService(db, monitorService, notifySyncChan)

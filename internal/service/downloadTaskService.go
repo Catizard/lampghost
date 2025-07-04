@@ -32,7 +32,7 @@ type DownloadTaskService struct {
 	waitTasks             []*entity.DownloadTask
 	runningTasks          map[uint]*entity.DownloadTask
 	updMsgReceiver        chan taskUpdMsg
-	subscribeConfigChange chan any
+	subscribeConfigChange <-chan any
 	config                *config.ApplicationConfig
 	// Exeprimental, only for test case
 	taskID uint
@@ -46,7 +46,7 @@ type taskUpdMsg struct {
 	contentLength int64
 }
 
-func NewDownloadTaskService(db *gorm.DB, config *config.ApplicationConfig, configNotify chan any) *DownloadTaskService {
+func NewDownloadTaskService(db *gorm.DB, config *config.ApplicationConfig, configNotify <-chan any) *DownloadTaskService {
 	service := &DownloadTaskService{
 		db:                    db,
 		tasks:                 make([]*entity.DownloadTask, 0),

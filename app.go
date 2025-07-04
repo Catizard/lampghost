@@ -41,27 +41,7 @@ func NewApp() *App {
 	}
 
 	// config module
-	// NOTE: Some modules in lampghost are working based on config module. And obviously, we don't
-	// want to query config current value each time. Therefore, config module & App (God object)
-	// implements a notify mechanism:
-	//
-	// config module -> App: config has changed!
-	// App -> DownloadTaskService: config has changed!
-	// App -> ...Service: config has changed!
-	configPublishChannel := make(chan any) // The config notify publish side
-	configSubscribeChannel := make([]chan any, 0)
-	configSubscribeChannel = append(configSubscribeChannel, make(chan any)) // DownloadTaskService
-	// Here goes other subscribe channels
-	go func() {
-		for {
-			notify := <-configPublishChannel
-			// This should never stuck
-			for _, ch := range configSubscribeChannel {
-				ch <- notify
-			}
-		}
-	}()
-	configService := service.NewConfigService(db, configPublishChannel)
+	configService := service.NewConfigService(db)
 	configController := controller.NewConfigController(configService)
 	conf, err := config.ReadConfig()
 	if err != nil {
@@ -90,7 +70,7 @@ func NewApp() *App {
 	}
 
 	// download task module
-	downloadTaskService := service.NewDownloadTaskService(db, conf, configSubscribeChannel[0])
+	downloadTaskService := service.NewDownloadTaskService(db, conf, configService.Subscribe())
 	downloadTaskController := controller.NewDownloadTaskController(downloadTaskService)
 
 	// difficult table module

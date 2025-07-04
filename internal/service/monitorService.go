@@ -8,6 +8,7 @@ import (
 )
 
 // For monitoring the scorelog.db file changes
+// NOTE: Currently, MonitorService doesn't listen the changes of config file
 type MonitorService struct {
 	watcher               *fsnotify.Watcher
 	currentWatching       *string

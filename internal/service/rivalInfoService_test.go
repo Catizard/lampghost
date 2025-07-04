@@ -3,10 +3,12 @@ package service_test
 import (
 	"testing"
 
+	"github.com/Catizard/lampghost_wails/internal/config"
 	"github.com/Catizard/lampghost_wails/internal/database"
 	"github.com/Catizard/lampghost_wails/internal/service"
 	"github.com/Catizard/lampghost_wails/internal/vo"
 	"github.com/rotisserie/eris"
+	"gorm.io/gorm"
 )
 
 var (
@@ -134,13 +136,19 @@ func skipRealFileTest(noScoreLog, noSongData, noScoreDataLog bool) error {
 	return nil
 }
 
+// Simple wrapper of service.NewRivalInfoService
+func newRivalInfoService(db *gorm.DB) *service.RivalInfoService {
+	monitorService, syncChan := service.NewMonitorService(&config.ApplicationConfig{})
+	return service.NewRivalInfoService(db, monitorService, syncChan)
+}
+
 func TestInitializeMainUser(t *testing.T) {
 	t.Run("FastFailOnMissingFilePath", func(t *testing.T) {
 		db, err := database.NewMemoryDatabase()
 		if err != nil {
 			t.Fatalf("db: %s", err)
 		}
-		rivalInfoService := service.NewRivalInfoService(db)
+		rivalInfoService := newRivalInfoService(db)
 		missingSongDataPath := newEmptyInitializeUser(false, true, true)
 		if err := rivalInfoService.InitializeMainUser(missingSongDataPath); err == nil {
 			t.Fatalf("should fail on missing songdata file path, but not")
@@ -155,7 +163,7 @@ func TestInitializeMainUser(t *testing.T) {
 		if err != nil {
 			t.Fatalf("db: %s", err)
 		}
-		rivalInfoService := service.NewRivalInfoService(db)
+		rivalInfoService := newRivalInfoService(db)
 		emptyFilesWithoutScoreDataLog := newEmptyInitializeUser(false, false, false)
 		if err := rivalInfoService.InitializeMainUser(emptyFilesWithoutScoreDataLog); err != nil {
 			t.Fatalf("failed to initialize main user with empty files(with scoredatalog.db): %s", err)
@@ -199,7 +207,7 @@ func TestInitializeMainUser(t *testing.T) {
 			if err != nil {
 				t.Fatalf("db: %s", err)
 			}
-			rivalInfoService := service.NewRivalInfoService(db)
+			rivalInfoService := newRivalInfoService(db)
 			t.Run(tt.name, func(t *testing.T) {
 				if tt.skip != nil {
 					t.Skipf("skip: %s", tt.skip)
@@ -218,7 +226,7 @@ func TestAddUser(t *testing.T) {
 		if err != nil {
 			t.Fatalf("db: %s", err)
 		}
-		rivalInfoService := service.NewRivalInfoService(db)
+		rivalInfoService := newRivalInfoService(db)
 
 		var tests = []struct {
 			name  string
@@ -256,7 +264,7 @@ func TestAddUser(t *testing.T) {
 		if err != nil {
 			t.Fatalf("db: %s", err)
 		}
-		rivalInfoService := service.NewRivalInfoService(db)
+		rivalInfoService := newRivalInfoService(db)
 		var tests = []struct {
 			name  string
 			input *vo.RivalInfoVo
@@ -287,7 +295,7 @@ func TestUpdateUser(t *testing.T) {
 		if err != nil {
 			t.Fatalf("db: %s", err)
 		}
-		rivalInfoService := service.NewRivalInfoService(db)
+		rivalInfoService := newRivalInfoService(db)
 		var tests = []struct {
 			name  string
 			input *vo.RivalInfoVo
@@ -316,7 +324,7 @@ func TestUpdateUser(t *testing.T) {
 		if err != nil {
 			t.Fatalf("db: %s", err)
 		}
-		rivalInfoService := service.NewRivalInfoService(db)
+		rivalInfoService := newRivalInfoService(db)
 		emptyMainUser := newEmptyInitializeUser(false, false, false)
 		if err := rivalInfoService.InitializeMainUser(emptyMainUser); err != nil {
 			t.Fatalf("initialize main user: %s", err)
@@ -348,7 +356,7 @@ func TestUpdateUser(t *testing.T) {
 		if err != nil {
 			t.Fatalf("db: %s", err)
 		}
-		rivalInfoService := service.NewRivalInfoService(db)
+		rivalInfoService := newRivalInfoService(db)
 		emptyUser := newEmptyUser(false, true, false)
 		if err := rivalInfoService.AddRivalInfo(emptyUser); err != nil {
 			t.Fatalf("initialize main user: %s", err)

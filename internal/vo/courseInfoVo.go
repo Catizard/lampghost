@@ -13,6 +13,7 @@ type CourseInfoVo struct {
 	Constraint []string      `json:"constraint"`
 	Charts     []ChartInfoVo `json:"charts"`
 	HeaderID   uint
+	Symbol     string
 }
 
 // NOTE: This struct is only used in header's parse step
@@ -31,5 +32,6 @@ func (courseInfo *CourseInfoVo) Entity() *entity.CourseInfo {
 		Sha256s:     strings.Join(courseInfo.Sha256, ","),
 		Constraints: strings.Join(courseInfo.Constraint, ","),
 		HeaderID:    courseInfo.HeaderID,
+		Symbol:      courseInfo.Symbol,
 	}
 }

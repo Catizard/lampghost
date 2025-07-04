@@ -15,6 +15,9 @@ type RivalTagVo struct {
 	Generated  bool
 	Enabled    bool
 	RecordTime time.Time
+	Symbol     string
+
+	// Pagination
 	Pagination *entity.Page
 
 	// When flagged, ignore 'Enabled' field in filter statement
@@ -37,6 +40,7 @@ func NewRivalTagVo(rivalTag *entity.RivalTag) *RivalTagVo {
 		Generated:  rivalTag.Generated,
 		Enabled:    rivalTag.Enabled,
 		RecordTime: rivalTag.RecordTime,
+		Symbol:     rivalTag.Symbol,
 	}
 }
 
@@ -53,5 +57,6 @@ func (rivalTag *RivalTagVo) Entity() *entity.RivalTag {
 		Generated:  rivalTag.Generated,
 		Enabled:    rivalTag.Enabled,
 		RecordTime: rivalTag.RecordTime,
+		Symbol:     rivalTag.Symbol,
 	}
 }

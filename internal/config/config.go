@@ -1,7 +1,6 @@
 package config
 
 import (
-	"errors"
 	"os"
 	"path/filepath"
 	"sync"
@@ -122,12 +121,6 @@ type DatabaseConfig struct {
 func NewDatabaseConfig() *DatabaseConfig {
 	return &DatabaseConfig{
 		DSN: WorkingDirectory + DBFileName,
-	}
-}
-
-func CheckInitialize() {
-	if _, err := os.Stat(GetDSN()); errors.Is(err, os.ErrNotExist) {
-		panic("Call init command before you do anything")
 	}
 }
 

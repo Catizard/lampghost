@@ -3,6 +3,7 @@ package service
 import (
 	"sync"
 
+	"github.com/Catizard/lampghost_wails/internal/config"
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/vo"
@@ -17,12 +18,14 @@ var (
 )
 
 type RivalSongDataService struct {
-	db *gorm.DB
+	db             *gorm.DB
+	uniqueSongData bool
 }
 
-func NewRivalSongDataService(db *gorm.DB) *RivalSongDataService {
+func NewRivalSongDataService(db *gorm.DB, conf *config.ApplicationConfig) *RivalSongDataService {
 	return &RivalSongDataService{
-		db: db,
+		db:             db,
+		uniqueSongData: conf.UniqueRivalSongData != 0,
 	}
 }
 
@@ -40,7 +43,7 @@ func (s *RivalSongDataService) QuerySongDataPageList(filter *vo.RivalSongDataVo)
 
 func (s *RivalSongDataService) ReloadRivalSongData() error {
 	return s.db.Transaction(func(tx *gorm.DB) error {
-		return reloadRivalSongData(tx)
+		return reloadRivalSongData(tx, s.uniqueSongData)
 	})
 }
 
@@ -138,13 +141,13 @@ func generateSongHashCacheFromRawData(songData []*entity.SongData) *entity.SongH
 }
 
 // fully reload rival_song_data
-func reloadRivalSongData(tx *gorm.DB) error {
+func reloadRivalSongData(tx *gorm.DB, uniqueSongData bool) error {
 	mainUser, err := queryMainUser(tx)
 	if err != nil {
 		return err
 	}
 	fp := mainUser.SongDataPath
-	rawSongData, err := loadSongData(*fp)
+	rawSongData, err := loadSongData(*fp, uniqueSongData)
 	if err != nil {
 		return err
 	}

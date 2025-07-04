@@ -22,3 +22,11 @@ func (s *SongDataService) FindSongDataList() ([]*entity.SongData, int, error) {
 	}
 	return data, len(data), nil
 }
+
+func (s *SongDataService) FindUniqueSongDataList() ([]*entity.SongData, int, error) {
+	var data []*entity.SongData
+	if err := s.db.Group("md5").Find(&data).Error; err != nil {
+		return nil, 0, err
+	}
+	return data, len(data), nil
+}

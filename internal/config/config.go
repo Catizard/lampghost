@@ -47,6 +47,7 @@ func init() {
 	// viper.SetDefault("SeparateDownloadMD5", "https://bms.wrigglebug.xyz/download/package/%s")
 	viper.SetDefault("MaximumDownloadCount", 5)
 	viper.SetDefault("EnableAutoReload", 1)
+	viper.SetDefault("UniqueRivalSongData", 1)
 	viper.SafeWriteConfig()
 }
 
@@ -63,6 +64,8 @@ type ApplicationConfig struct {
 	MaximumDownloadCount int
 	// Auto reload save files when having write operation on scorelog.db
 	EnableAutoReload int
+	// Force unique rival_song_data
+	UniqueRivalSongData int
 	// Extra fields, need to be setted explicitly
 	EnableDownloadFeature bool
 }
@@ -82,6 +85,7 @@ func ReadConfig() (*ApplicationConfig, error) {
 		DownloadDirectory:    viper.GetString("DownloadDirectory"),
 		MaximumDownloadCount: viper.GetInt("MaximumDownloadCount"),
 		EnableAutoReload:     viper.GetInt("EnableAutoReload"),
+		UniqueRivalSongData:  viper.GetInt("UniqueRivalSongData"),
 	}
 	conf.EnableDownloadFeature = conf.EnableDownload() == nil
 	return conf, nil
@@ -98,6 +102,7 @@ func (c *ApplicationConfig) WriteConfig() error {
 	viper.Set("DownloadDirectory", c.DownloadDirectory)
 	viper.Set("MaximumDownloadCount", c.MaximumDownloadCount)
 	viper.Set("EnableAutoReload", c.EnableAutoReload)
+	viper.Set("UniqueRivalSongData", c.UniqueRivalSongData)
 	if err := viper.WriteConfig(); err != nil {
 		return err
 	}

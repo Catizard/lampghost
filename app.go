@@ -55,7 +55,7 @@ func NewApp() *App {
 	rivalInfoService := service.NewRivalInfoService(db, monitorService, notifySyncChan)
 	rivalTagService := service.NewRivalTagService(db)
 	rivalScoreLogService := service.NewRivalScoreLogService(db)
-	rivalSongDataService := service.NewRivalSongDataService(db)
+	rivalSongDataService := service.NewRivalSongDataService(db, conf)
 	rivalScoreDataLogService := service.NewRivalScoreDataLogService(db)
 	rivalInfoController := controller.NewRivalInfoController(rivalInfoService)
 	rivalTagController := controller.NewRivalTagController(rivalTagService)

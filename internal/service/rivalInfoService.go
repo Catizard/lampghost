@@ -538,7 +538,7 @@ func syncRivalData(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
 	}
 	// (2) load and sync songdata.db if it's provided
 	if rivalInfo.SongDataPath != nil && *rivalInfo.SongDataPath != "" {
-		rawSongData, err := loadSongData(*rivalInfo.SongDataPath)
+		rawSongData, err := loadSongData(*rivalInfo.SongDataPath, false)
 		if err != nil {
 			return err
 		}
@@ -649,7 +649,7 @@ func loadScoreLog(scoreLogPath string, maximumTimestamp *int64) ([]*entity.Score
 }
 
 // Read all contents from `songdata.db` file into memory
-func loadSongData(songDataPath string) ([]*entity.SongData, error) {
+func loadSongData(songDataPath string, unique bool) ([]*entity.SongData, error) {
 	if songDataPath == "" {
 		return nil, fmt.Errorf("assert: songdata path cannot be empty")
 	}
@@ -658,16 +658,22 @@ func loadSongData(songDataPath string) ([]*entity.SongData, error) {
 		return nil, err
 	}
 	dsn := songDataPath + READONLY_PARAMETER
+	var err error
 	songDataDB, err := gorm.Open(sqlite.Open(dsn))
 	if err != nil {
 		return nil, err
 	}
 	songDataService := NewSongDataService(songDataDB)
-	rawSongData, n, err := songDataService.FindSongDataList()
+	var rawSongData []*entity.SongData
+	if unique {
+		rawSongData, _, err = songDataService.FindUniqueSongDataList()
+	} else {
+		rawSongData, _, err = songDataService.FindSongDataList()
+	}
 	if err != nil {
 		return nil, err
 	}
-	log.Infof("[RivalInfoService] Read %d song data from %s", n, songDataPath)
+	log.Infof("[RivalInfoService] Read %d song data from %s", len(rawSongData), songDataPath)
 	return rawSongData, nil
 }
 

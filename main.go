@@ -40,7 +40,8 @@ func main() {
 		Mac: &mac.Options{
 			WebviewIsTransparent: true,
 		},
-		Logger: &logger.Logger{},
+		LogLevel: 3,
+		Logger:   &logger.Logger{},
 	})
 	if err != nil {
 		println("Error:", err.Error())

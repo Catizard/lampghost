@@ -10,7 +10,7 @@
 <script setup lang="ts">
 import { DataTableColumns } from 'naive-ui';
 import { dto } from '@wailsjs/go/models';
-import { ref, h } from 'vue';
+import { ref, h, reactive } from 'vue';
 import { FindCourseInfoListWithRival } from '@wailsjs/go/main/App';
 import ClearTag from "@/components/ClearTag.vue"
 import dayjs from 'dayjs'
@@ -20,7 +20,20 @@ const i18n = useI18n();
 const { t } = i18n;
 
 const columns = createColumns();
-const pagination = false as const;
+const pagination = reactive({
+  page: 1,
+  pageSize: 10,
+  pageCount: 0,
+  showSizePicker: true,
+  pageSizes: [10, 20, 50],
+  onChange: (page: number) => {
+    pagination.page = page;
+  },
+  onUpdatePageSize: (pageSize: number) => {
+    pagination.pageSize = pageSize;
+    pagination.page = 1;
+  }
+});;
 let data = ref<Array<dto.CourseInfoDto>>([]);
 
 function createColumns(): DataTableColumns<dto.CourseInfoDto> {

@@ -35,6 +35,10 @@ const mainRoutes: RouteRecordRaw[] = [
     component: () => import("../views/custom_table/CustomTableDesign.vue"),
   },
   {
+    path: "/customtable/courses",
+    component: () => import("../views/custom_table/CustomTableCourses.vue"),
+  },
+  {
     path: "song",
     component: () => import("../views/song/Song.vue")
   },
@@ -61,7 +65,7 @@ const mainRoutes: RouteRecordRaw[] = [
   {
     name: "download",
     path: "/download",
-    component: () => import("../views/download/Download.vue"), 
+    component: () => import("../views/download/Download.vue"),
   },
   {
     name: "goals",

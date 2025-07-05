@@ -23,7 +23,8 @@ import {
   ColorWand as CustomTableIcon,
   Pencil as PencilIcon,
   SnowOutline as LockIcon,
-  MusicalNotes as SongIcon
+  MusicalNotes as SongIcon,
+  Flag
 } from '@vicons/ionicons5'
 import { MenuOption, NIcon } from 'naive-ui'
 import { h, ref } from 'vue'
@@ -115,6 +116,11 @@ const menuOptions: MenuOption[] = [
         label: renderOption("/customtable/design", t('menuName.customtable.design')),
         key: "customtable_design",
         icon: renderIcon(PencilIcon)
+      },
+      {
+        label: renderOption("/customtable/courses", t('menuName.customtable.courses')),
+        key: "customtable_courses",
+        icon: renderIcon(Flag)
       }
     ]
   },

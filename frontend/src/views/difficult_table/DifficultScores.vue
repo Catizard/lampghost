@@ -5,18 +5,18 @@
     </n-h1>
   </n-flex>
   <n-flex justify="start">
-    <n-select :loading="levelTableLoading" v-model:value="currentDiffTableID" :options="difftableOptions"
-      style="width: 200px;" />
+    <SelectDifficultTable v-model:value="currentDiffTableID" style="width: 200px;" />
     <n-select :loading="loadingRivalData" v-model:value="currentRivalID" :options="rivalOptions" style="width: 200px;"
       :placeholder="t('form.placeholderRival')" />
-    <SelectRivalTag v-model:value="currentRivalTagID" :rivalId="currentRivalID" width="200px" :placeholder="t('form.placeholderRivalTag')"/>
+    <SelectRivalTag v-model:value="currentRivalTagID" :rivalId="currentRivalID" width="200px"
+      :placeholder="t('form.placeholderRivalTag')" />
   </n-flex>
   <n-data-table :columns="columns" :data="data" :pagination="pagination" :loading="levelTableLoading"
     :row-key="(row: dto.DiffTableHeaderDto) => row.Level" :row-class-name="rowClassName" />
 </template>
 
 <script setup lang="ts">
-import { FindDiffTableHeaderList, FindDiffTableHeaderTreeWithRival, FindRivalInfoList } from '@wailsjs/go/main/App';
+import { FindDiffTableHeaderTreeWithRival, FindRivalInfoList } from '@wailsjs/go/main/App';
 import { dto } from '@wailsjs/go/models';
 import { DataTableColumns, NDataTable, SelectOption } from 'naive-ui';
 import { h, Ref, ref, watch } from 'vue';
@@ -24,35 +24,12 @@ import { useI18n } from 'vue-i18n';
 import DifficultTableDetail from './DifficultTableDetail.vue';
 import { ClearType, ClearTypeDef, DefaultClearTypeColorStyle } from '@/constants/cleartype';
 import SelectRivalTag from '@/components/SelectRivalTag.vue';
+import SelectDifficultTable from '@/components/difficult_table/SelectDifficultTable.vue';
 
 const i18n = useI18n();
 const { t } = i18n;
 
-const loadingDifftableOptions = ref<boolean>(false);
 const currentDiffTableID: Ref<number | null> = ref(null);
-const difftableOptions: Ref<Array<SelectOption>> = ref([]);
-function loadDifftableOptions() {
-  loadingDifftableOptions.value = true;
-  FindDiffTableHeaderList()
-    .then(result => {
-      if (result.Code != 200) {
-        return Promise.reject(result.Msg)
-      }
-      if (result.Rows.length == 0) {
-        return Promise.reject(t('message.noTableError'))
-      }
-      difftableOptions.value = result.Rows.map((row: dto.DiffTableHeaderDto): SelectOption => {
-        return {
-          label: row.Name,
-          value: row.ID,
-        }
-      });
-      currentDiffTableID.value = difftableOptions.value[0].value as number;
-    })
-    .catch(err => window.$notifyError(err))
-    .finally(() => loadingDifftableOptions.value = false);
-}
-loadDifftableOptions();
 
 const columns: DataTableColumns<dto.DiffTableHeaderDto> = [
   {

@@ -1,6 +1,6 @@
 <template>
   <n-flex justify="start">
-    <n-select v-model:value="currentTableId" :options="tableOptions" style="width: 150px" />
+    <SelectDifficultTable v-model:value="currentTableId" style="width: 150px;" />
     <n-radio-group v-model:value="currentLampOrder">
       <n-radio-button :key="'reverse'" :value="'reverse'" :label="t('button.reverse')" />
       <n-radio-button :key="'ordered'" :value="'ordered'" :label="t('button.ordered')" />
@@ -12,13 +12,13 @@
 
 <script setup lang="ts">
 import { ClearType } from "@/constants/cleartype";
-import { FindDiffTableHeaderList } from "@wailsjs/go/main/App";
 import { QueryUserInfoWithLevelLayeredDiffTableLampStatus } from "@wailsjs/go/main/App";
 import { dto } from "@wailsjs/go/models";
-import { DataTableColumns, SelectOption } from "naive-ui";
-import { computed, reactive, ref, Ref, watch } from "vue";
+import { DataTableColumns } from "naive-ui";
+import { reactive, ref, Ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import VueApexCharts from "vue3-apexcharts";
+import SelectDifficultTable from "@/components/difficult_table/SelectDifficultTable.vue";
 
 const props = defineProps<{
   rivalId?: number;
@@ -77,27 +77,6 @@ const REVERSE_LAMP_COLOR = [
 const currentLampOrder: Ref<"reverse" | "ordered"> = ref("reverse");
 const currentTableId: Ref<number | null> = ref(null);
 const currentHeader: Ref<dto.DiffTableHeaderDto | null> = ref(null);
-const tableOptions: Ref<Array<SelectOption>> = ref([]);
-function loadTableData() {
-  FindDiffTableHeaderList()
-    .then((result) => {
-      if (result.Code != 200) {
-        return Promise.reject(result.Msg);
-      }
-      if (result.Rows.length == 0) {
-        return Promise.reject(t("message.noTableError"));
-      }
-      tableOptions.value = result.Rows.map((header: dto.DiffTableHeaderDto) => {
-        return {
-          label: header.Name,
-          value: header.ID,
-        } as SelectOption;
-      });
-      currentTableId.value = tableOptions.value[0].value as number;
-    })
-    .catch(err => window.$notifyError(err));
-}
-loadTableData();
 
 // NOTE: ApexCharts Vue doesn't give any responses if we changed lampCountChartOptions.colors
 // The only way to correctly reassign the colors is by rebuilding whole lampCountChartOptions
@@ -275,6 +254,7 @@ function buildOverviewTable() {
 }
 
 watch([currentTableId, () => props.rivalId], ([newTableId, newRivalId]) => {
+  console.log('LampCountChart: ', newTableId, newRivalId);
   if (newTableId == null || newTableId == undefined) {
     return;
   }

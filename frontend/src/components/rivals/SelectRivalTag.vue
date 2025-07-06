@@ -1,6 +1,6 @@
 <template>
   <n-select :loading="loading" v-model:value="value" :options="options" :style="{ width: width }"
-    :placeholder="placeholder" :render-option="renderRivalTagOption" :clearable="clearable ?? false"/>
+    :placeholder="placeholder" :render-option="renderRivalTagOption" :clearable="clearable ?? false" />
 </template>
 
 <script lang="ts" setup>
@@ -30,6 +30,7 @@ function renderRivalTagOption({ node, option }: { node: VNode, option: SelectOpt
 }
 
 watch(() => props.rivalId, (rivalId: number | null) => {
+  value.value = null;
   if (rivalId == null) {
     return;
   }
@@ -48,5 +49,5 @@ watch(() => props.rivalId, (rivalId: number | null) => {
     })
     .catch(err => window.$notifyError(err))
     .finally(() => loading.value = false);
-}, { immediate: true});
+}, { immediate: true });
 </script>

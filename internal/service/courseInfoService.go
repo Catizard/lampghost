@@ -22,20 +22,23 @@ var shouldIgnoreConstraintDefinition []string = []string{
 	"no_speed",
 }
 
+// This is a workaround since we don't have a concreate dao/repository layer
+// Also we are under race-condition
+var ignoreVariantCourse bool = false
+
 // NOTE: NEVER USE MD5 AT DATA PROCESSING
 type CourseInfoService struct {
-	db                  *gorm.DB
-	ignoreVariantCourse bool
-	configNotify        <-chan any
-	mu                  sync.Mutex
+	db           *gorm.DB
+	configNotify <-chan any
+	mu           sync.Mutex
 }
 
 func NewCourseInfoSerivce(db *gorm.DB, conf *config.ApplicationConfig, configNotify <-chan any) *CourseInfoService {
 	ret := &CourseInfoService{
-		db:                  db,
-		ignoreVariantCourse: conf.IgnoreVariantCourse != 0,
-		configNotify:        configNotify,
+		db:           db,
+		configNotify: configNotify,
 	}
+	ignoreVariantCourse = conf.IgnoreVariantCourse != 0
 	go ret.listenUpdateConfig()
 	return ret
 }
@@ -44,25 +47,21 @@ func (s *CourseInfoService) listenUpdateConfig() {
 	for {
 		<-s.configNotify
 		go func() {
-			s.mu.Lock()
 			log.Debugf("[CourseInfoService] updating config")
 			if conf, err := config.ReadConfig(); err != nil {
 				log.Errorf("cannot read config: %s", err)
 			} else {
-				s.ignoreVariantCourse = conf.IgnoreVariantCourse != 0
+				ignoreVariantCourse = conf.IgnoreVariantCourse != 0
 			}
-			s.mu.Unlock()
 		}()
 	}
 }
 
 func (s *CourseInfoService) FindCourseInfoList(filter *vo.CourseInfoVo) ([]*dto.CourseInfoDto, int, error) {
-	filter.IgnoreVariantCourse = s.ignoreVariantCourse
 	return findCourseInfoList(s.db, filter)
 }
 
 func (s *CourseInfoService) FindCourseInfoListWithRival(filter *vo.CourseInfoVo) ([]*dto.CourseInfoDto, int, error) {
-	filter.IgnoreVariantCourse = s.ignoreVariantCourse
 	rawCourses, n, err := findCourseInfoList(s.db, filter)
 	if err != nil {
 		return nil, 0, err
@@ -150,7 +149,7 @@ func findCourseInfoList(tx *gorm.DB, filter *vo.CourseInfoVo) ([]*dto.CourseInfo
 	out := make([]*dto.CourseInfoDto, 0)
 	for i := range raw {
 		shouldIgnore := false
-		if filter.IgnoreVariantCourse {
+		if ignoreVariantCourse {
 			match := false
 			splitedConstraints := strings.Split(raw[i].Constraints, ",")
 			for _, shouldIgnoreConstraint := range shouldIgnoreConstraintDefinition {

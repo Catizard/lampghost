@@ -1237,7 +1237,6 @@ export namespace vo {
 	    RivalID: number;
 	    GhostRivalID: number;
 	    GhostRivalTagID: number;
-	    IgnoreVariantCourse: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new CourseInfoVo(source);
@@ -1258,7 +1257,6 @@ export namespace vo {
 	        this.RivalID = source["RivalID"];
 	        this.GhostRivalID = source["GhostRivalID"];
 	        this.GhostRivalTagID = source["GhostRivalTagID"];
-	        this.IgnoreVariantCourse = source["IgnoreVariantCourse"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

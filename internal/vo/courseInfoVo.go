@@ -19,8 +19,6 @@ type CourseInfoVo struct {
 	RivalID         uint
 	GhostRivalID    uint
 	GhostRivalTagID uint
-	// Currently only be used in backend
-	IgnoreVariantCourse bool
 }
 
 // NOTE: This struct is only used in header's parse step

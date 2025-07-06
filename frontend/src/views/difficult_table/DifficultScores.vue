@@ -6,8 +6,7 @@
   </n-flex>
   <n-flex justify="start">
     <SelectDifficultTable v-model:value="currentDiffTableID" style="width: 200px;" />
-    <n-select :loading="loadingRivalData" v-model:value="currentRivalID" :options="rivalOptions" style="width: 200px;"
-      :placeholder="t('form.placeholderRival')" />
+    <SelectRival v-model:value="currentRivalID" width="200px" :placeholder="t('form.placeholderRival')" />
     <SelectRivalTag v-model:value="currentRivalTagID" :rivalId="currentRivalID" width="200px"
       :placeholder="t('form.placeholderRivalTag')" />
   </n-flex>
@@ -16,15 +15,16 @@
 </template>
 
 <script setup lang="ts">
-import { FindDiffTableHeaderTreeWithRival, FindRivalInfoList } from '@wailsjs/go/main/App';
+import { FindDiffTableHeaderTreeWithRival } from '@wailsjs/go/main/App';
 import { dto } from '@wailsjs/go/models';
-import { DataTableColumns, NDataTable, SelectOption } from 'naive-ui';
+import { DataTableColumns, NDataTable } from 'naive-ui';
 import { h, Ref, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import DifficultTableDetail from './DifficultTableDetail.vue';
 import { ClearType, ClearTypeDef, DefaultClearTypeColorStyle } from '@/constants/cleartype';
-import SelectRivalTag from '@/components/SelectRivalTag.vue';
+import SelectRivalTag from '@/components/rivals/SelectRivalTag.vue';
 import SelectDifficultTable from '@/components/difficult_table/SelectDifficultTable.vue';
+import SelectRival from '@/components/rivals/SelectRival.vue';
 
 const i18n = useI18n();
 const { t } = i18n;
@@ -130,32 +130,8 @@ function loadLevelTableData(difftableID: string | number) {
     .finally(() => levelTableLoading.value = false);
 }
 
-const loadingRivalData = ref(false);
 const currentRivalID: Ref<number | null> = ref(null);
 const currentRivalTagID: Ref<number | null> = ref(null);
-const rivalOptions: Ref<Array<SelectOption>> = ref([]);
-
-function loadRivalOptions() {
-  loadingRivalData.value = true;
-  FindRivalInfoList()
-    .then(result => {
-      if (result.Code != 200) {
-        return Promise.reject(result.Msg);
-      }
-      if (result.Rows.length == 0) {
-        return Promise.reject(t('message.noRivalError'));
-      }
-      rivalOptions.value = result.Rows.map((row: dto.RivalInfoDto) => {
-        return {
-          label: row.Name,
-          value: row.ID,
-        } as SelectOption
-      });
-    })
-    .catch(err => window.$notifyError(err))
-    .finally(() => loadingRivalData.value = false);
-}
-loadRivalOptions();
 
 // Watch 1: Whenever changing current difftable, reload the level table
 watch(currentDiffTableID, (newID: string | number) => {

@@ -4,8 +4,7 @@
   </n-h1>
   <n-flex justify="start">
     <SelectDifficultTable v-model:value="currentDiffTableID" style="width: 200px" />
-    <n-select :loading="loading" v-model:value="currentRivalID" :options="rivalOptions" style="width: 200px;"
-      :placeholder="t('form.placeholderRival')" />
+    <SelectRival v-model:value="currentRivalID" width="200px" :placeholder="t('form.placeholderRival')" />
     <SelectRivalTag v-model:value="currentRivalTagID" :rivalId="currentRivalID" width="200px"
       :placeholder="t('form.placeholderRivalTag')" />
   </n-flex>
@@ -16,16 +15,17 @@
 </template>
 
 <script setup lang="ts">
-import { DataTableColumns, SelectOption } from 'naive-ui';
+import { DataTableColumns } from 'naive-ui';
 import { dto } from '@wailsjs/go/models';
 import { ref, h, reactive, Ref, watch } from 'vue';
-import { FindCourseInfoListWithRival, FindRivalInfoList } from '@wailsjs/go/main/App';
+import { FindCourseInfoListWithRival } from '@wailsjs/go/main/App';
 import ClearTag from "@/components/ClearTag.vue"
 import dayjs from 'dayjs'
 import { useI18n } from 'vue-i18n';
 import CourseTableDetail from './CourseTableDetail.vue';
 import SelectDifficultTable from '@/components/difficult_table/SelectDifficultTable.vue';
-import SelectRivalTag from '@/components/SelectRivalTag.vue';
+import SelectRivalTag from '@/components/rivals/SelectRivalTag.vue';
+import SelectRival from '@/components/rivals/SelectRival.vue';
 
 const i18n = useI18n();
 const { t } = i18n;
@@ -94,30 +94,6 @@ function createColumns(): DataTableColumns<dto.CourseInfoDto> {
 const currentDiffTableID: Ref<number | null> = ref(null);
 const currentRivalID: Ref<number | null> = ref(null);
 const currentRivalTagID: Ref<number | null> = ref(null);
-const rivalOptions: Ref<Array<SelectOption>> = ref([]);
-
-function loadRivalOptions() {
-  loading.value = true;
-  FindRivalInfoList()
-    .then(result => {
-      if (result.Code != 200) {
-        return Promise.reject(result.Msg);
-      }
-      if (result.Rows.length == 0) {
-        return Promise.reject(t('message.noRivalError'));
-      }
-      rivalOptions.value = result.Rows.map((row: dto.RivalInfoDto) => {
-        return {
-          label: row.Name,
-          value: row.ID,
-        } as SelectOption
-      });
-    })
-    .catch(err => window.$notifyError(err))
-    .finally(() => loading.value = false);
-}
-loadRivalOptions();
-
 
 function loadData() {
   loading.value = true;

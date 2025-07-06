@@ -1,7 +1,7 @@
 <script lang="ts">
 import { dto } from '@wailsjs/go/models';
 import { NTag } from 'naive-ui';
-import { defineComponent, h, VNode } from 'vue';
+import { h, VNode } from 'vue';
 
 // NOTE: It's easier to write this component by using render function 
 // instead of an explicit template block since the props passed to NaiveUI's

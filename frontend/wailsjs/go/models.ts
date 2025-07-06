@@ -55,7 +55,6 @@ export namespace dto {
 	    Sha256s: string;
 	    NoSepJoinedSha256s: string;
 	    Constraints: string;
-	    Symbol: string;
 	    Clear: number;
 	    // Go type: time
 	    FirstClearTimestamp: any;
@@ -76,7 +75,6 @@ export namespace dto {
 	        this.Sha256s = source["Sha256s"];
 	        this.NoSepJoinedSha256s = source["NoSepJoinedSha256s"];
 	        this.Constraints = source["Constraints"];
-	        this.Symbol = source["Symbol"];
 	        this.Clear = source["Clear"];
 	        this.FirstClearTimestamp = this.convertValues(source["FirstClearTimestamp"], null);
 	        this.Constraint = source["Constraint"];
@@ -637,7 +635,6 @@ export namespace dto {
 	    Enabled: boolean;
 	    // Go type: time
 	    RecordTime: any;
-	    Symbol: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new RivalTagDto(source);
@@ -654,7 +651,6 @@ export namespace dto {
 	        this.Generated = source["Generated"];
 	        this.Enabled = source["Enabled"];
 	        this.RecordTime = this.convertValues(source["RecordTime"], null);
-	        this.Symbol = source["Symbol"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -693,7 +689,6 @@ export namespace entity {
 	    Sha256s: string;
 	    Md5s: string;
 	    Constraints: string;
-	    Symbol: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new CourseInfo(source);
@@ -710,7 +705,6 @@ export namespace entity {
 	        this.Sha256s = source["Sha256s"];
 	        this.Md5s = source["Md5s"];
 	        this.Constraints = source["Constraints"];
-	        this.Symbol = source["Symbol"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -974,7 +968,6 @@ export namespace entity {
 	    Enabled: boolean;
 	    // Go type: time
 	    RecordTime: any;
-	    Symbol: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new RivalTag(source);
@@ -991,7 +984,6 @@ export namespace entity {
 	        this.Generated = source["Generated"];
 	        this.Enabled = source["Enabled"];
 	        this.RecordTime = this.convertValues(source["RecordTime"], null);
-	        this.Symbol = source["Symbol"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1223,7 +1215,6 @@ export namespace vo {
 	    constraint: string[];
 	    charts: ChartInfoVo[];
 	    HeaderID: number;
-	    Symbol: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new CourseInfoVo(source);
@@ -1237,7 +1228,6 @@ export namespace vo {
 	        this.constraint = source["constraint"];
 	        this.charts = this.convertValues(source["charts"], ChartInfoVo);
 	        this.HeaderID = source["HeaderID"];
-	        this.Symbol = source["Symbol"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1868,7 +1858,6 @@ export namespace vo {
 	    Enabled: boolean;
 	    // Go type: time
 	    RecordTime: any;
-	    Symbol: string;
 	    Pagination?: entity.Page;
 	    NoIgnoreEnabled: boolean;
 	    RecordTimestamp?: number;
@@ -1888,7 +1877,6 @@ export namespace vo {
 	        this.Generated = source["Generated"];
 	        this.Enabled = source["Enabled"];
 	        this.RecordTime = this.convertValues(source["RecordTime"], null);
-	        this.Symbol = source["Symbol"];
 	        this.Pagination = this.convertValues(source["Pagination"], entity.Page);
 	        this.NoIgnoreEnabled = source["NoIgnoreEnabled"];
 	        this.RecordTimestamp = source["RecordTimestamp"];

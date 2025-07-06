@@ -26,8 +26,8 @@ func (s *RivalScoreLogService) QueryRivalScoreLogPageList(filter *vo.RivalScoreL
 			return err
 		}
 		tableTags, _, err := queryDiffTableTag(tx, &vo.DiffTableDataVo{
-			Md5s: Map(out, func(log *dto.RivalScoreLogDto, _ int) string {
-				return log.Md5
+			Md5s: FilterMap(out, func(log *dto.RivalScoreLogDto, _ int) (string, bool) {
+				return log.Md5, log.Md5 != ""
 			}),
 		})
 		if err != nil {
@@ -70,8 +70,8 @@ func (s *RivalScoreLogService) QueryPrevDayScoreLogList(filter *vo.RivalScoreLog
 			return err
 		}
 		tableTags, _, err := queryDiffTableTag(tx, &vo.DiffTableDataVo{
-			Md5s: Map(out, func(log *dto.RivalScoreLogDto, _ int) string {
-				return log.Md5
+			Md5s: FilterMap(out, func(log *dto.RivalScoreLogDto, _ int) (string, bool) {
+				return log.Md5, log.Md5 != ""
 			}),
 		})
 		if err != nil {

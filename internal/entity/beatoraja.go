@@ -5,7 +5,7 @@ type ScoreLog struct {
 	Sha256    string
 	Mode      string
 	Clear     int32
-	OldClear  int32
+	OldClear  int32 `gorm:"column:old_clear"`
 	Score     int32
 	OldScore  int32
 	Combo     int32

@@ -98,6 +98,104 @@ export namespace dto {
 		    return a;
 		}
 	}
+	export class CustomCourseDataDto {
+	    ID: number;
+	    // Go type: time
+	    CreatedAt: any;
+	    // Go type: time
+	    UpdatedAt: any;
+	    // Go type: gorm
+	    DeletedAt: any;
+	    Sha256: string;
+	    Md5: string;
+	    CustomCourseID: number;
+	    OrderNumber: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new CustomCourseDataDto(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.ID = source["ID"];
+	        this.CreatedAt = this.convertValues(source["CreatedAt"], null);
+	        this.UpdatedAt = this.convertValues(source["UpdatedAt"], null);
+	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
+	        this.Sha256 = source["Sha256"];
+	        this.Md5 = source["Md5"];
+	        this.CustomCourseID = source["CustomCourseID"];
+	        this.OrderNumber = source["OrderNumber"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class CustomCourseDto {
+	    ID: number;
+	    // Go type: time
+	    CreatedAt: any;
+	    // Go type: time
+	    UpdatedAt: any;
+	    // Go type: gorm
+	    DeletedAt: any;
+	    Name: string;
+	    CustomTableID: number;
+	    Sha256s: string;
+	    Md5s: string;
+	    Constraints: string;
+	    OrderNumber: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new CustomCourseDto(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.ID = source["ID"];
+	        this.CreatedAt = this.convertValues(source["CreatedAt"], null);
+	        this.UpdatedAt = this.convertValues(source["UpdatedAt"], null);
+	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
+	        this.Name = source["Name"];
+	        this.CustomTableID = source["CustomTableID"];
+	        this.Sha256s = source["Sha256s"];
+	        this.Md5s = source["Md5s"];
+	        this.Constraints = source["Constraints"];
+	        this.OrderNumber = source["OrderNumber"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	export class CustomDiffTableDto {
 	    ID: number;
 	    // Go type: time
@@ -561,6 +659,7 @@ export namespace dto {
 	    Favorite: number;
 	    AddDate: number;
 	    Notes: number;
+	    OrderNumber: number;
 	    Page: number;
 	    PageSize: number;
 	    PageCount: number;
@@ -604,6 +703,7 @@ export namespace dto {
 	        this.Favorite = source["Favorite"];
 	        this.AddDate = source["AddDate"];
 	        this.Notes = source["Notes"];
+	        this.OrderNumber = source["OrderNumber"];
 	        this.Page = source["Page"];
 	        this.PageSize = source["PageSize"];
 	        this.PageCount = source["PageCount"];
@@ -717,6 +817,53 @@ export namespace entity {
 	        this.Sha256s = source["Sha256s"];
 	        this.Md5s = source["Md5s"];
 	        this.Constraints = source["Constraints"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class CustomCourseData {
+	    ID: number;
+	    // Go type: time
+	    CreatedAt: any;
+	    // Go type: time
+	    UpdatedAt: any;
+	    // Go type: gorm
+	    DeletedAt: any;
+	    Sha256: string;
+	    Md5: string;
+	    CustomCourseID: number;
+	    OrderNumber: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new CustomCourseData(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.ID = source["ID"];
+	        this.CreatedAt = this.convertValues(source["CreatedAt"], null);
+	        this.UpdatedAt = this.convertValues(source["UpdatedAt"], null);
+	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
+	        this.Sha256 = source["Sha256"];
+	        this.Md5 = source["Md5"];
+	        this.CustomCourseID = source["CustomCourseID"];
+	        this.OrderNumber = source["OrderNumber"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1257,6 +1404,59 @@ export namespace vo {
 	        this.RivalID = source["RivalID"];
 	        this.GhostRivalID = source["GhostRivalID"];
 	        this.GhostRivalTagID = source["GhostRivalTagID"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class CustomCourseVo {
+	    ID: number;
+	    // Go type: time
+	    CreatedAt: any;
+	    // Go type: time
+	    UpdatedAt: any;
+	    // Go type: gorm
+	    DeletedAt: any;
+	    Name: string;
+	    CustomTableID: number;
+	    Sha256s: string;
+	    Md5s: string;
+	    Constraints: string;
+	    OrderNumber: number;
+	    RivalID: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new CustomCourseVo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.ID = source["ID"];
+	        this.CreatedAt = this.convertValues(source["CreatedAt"], null);
+	        this.UpdatedAt = this.convertValues(source["UpdatedAt"], null);
+	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
+	        this.Name = source["Name"];
+	        this.CustomTableID = source["CustomTableID"];
+	        this.Sha256s = source["Sha256s"];
+	        this.Md5s = source["Md5s"];
+	        this.Constraints = source["Constraints"];
+	        this.OrderNumber = source["OrderNumber"];
+	        this.RivalID = source["RivalID"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

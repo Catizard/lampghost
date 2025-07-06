@@ -28,6 +28,7 @@ type App struct {
 	*controller.FolderController
 	*controller.DownloadTaskController
 	*controller.CustomDiffTableController
+	*controller.CustomCourseController
 	*service.MonitorService
 	*server.InternalServer
 }
@@ -83,6 +84,8 @@ func NewApp() *App {
 	customDiffTableController := controller.NewCustomDiffTableController(customDiffTableService)
 	folderService := service.NewFolderService(db)
 	folderController := controller.NewFolderController(folderService)
+	customCourseService := service.NewCustomCourseService(db)
+	customCourseController := controller.NewCustomCourseController(customCourseService)
 
 	// Internal Server
 	internalServer := server.NewInternalServer(
@@ -107,6 +110,7 @@ func NewApp() *App {
 		folderController,
 		downloadTaskController,
 		customDiffTableController,
+		customCourseController,
 		monitorService,
 		internalServer,
 	}

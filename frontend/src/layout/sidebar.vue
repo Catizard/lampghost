@@ -125,7 +125,7 @@ const menuOptions: MenuOption[] = [
       {
         label: renderOption("/customtable/courses", t('menuName.customtable.courses')),
         key: "customtable_courses",
-        icon: renderIcon(Flag)
+        icon: renderIcon(CoursesIcon)
       }
     ]
   },

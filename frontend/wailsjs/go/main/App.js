@@ -6,6 +6,14 @@ export function AddBatchDiffTableHeader(arg1) {
   return window['go']['main']['App']['AddBatchDiffTableHeader'](arg1);
 }
 
+export function AddCustomCourse(arg1) {
+  return window['go']['main']['App']['AddCustomCourse'](arg1);
+}
+
+export function AddCustomCourseData(arg1) {
+  return window['go']['main']['App']['AddCustomCourseData'](arg1);
+}
+
 export function AddCustomDiffTable(arg1) {
   return window['go']['main']['App']['AddCustomDiffTable'](arg1);
 }
@@ -24,6 +32,14 @@ export function AddRivalInfo(arg1) {
 
 export function AddRivalTag(arg1) {
   return window['go']['main']['App']['AddRivalTag'](arg1);
+}
+
+export function BindFolderContentToCustomCourse(arg1, arg2) {
+  return window['go']['main']['App']['BindFolderContentToCustomCourse'](arg1, arg2);
+}
+
+export function BindSongToCustomCourse(arg1, arg2, arg3) {
+  return window['go']['main']['App']['BindSongToCustomCourse'](arg1, arg2, arg3);
 }
 
 export function BindSongToFolder(arg1) {
@@ -68,6 +84,10 @@ export function FindCourseInfoList() {
 
 export function FindCourseInfoListWithRival(arg1) {
   return window['go']['main']['App']['FindCourseInfoListWithRival'](arg1);
+}
+
+export function FindCustomCourseList(arg1) {
+  return window['go']['main']['App']['FindCustomCourseList'](arg1);
 }
 
 export function FindCustomDiffTableByID(arg1) {
@@ -144,6 +164,14 @@ export function GENERATOR_COURSE_INFO() {
 
 export function GENERATOR_COURSE_INFO_DTO() {
   return window['go']['main']['App']['GENERATOR_COURSE_INFO_DTO']();
+}
+
+export function GENERATOR_CUSTOM_COUSE() {
+  return window['go']['main']['App']['GENERATOR_CUSTOM_COUSE']();
+}
+
+export function GENERATOR_CUSTOM_COUSE_DATA() {
+  return window['go']['main']['App']['GENERATOR_CUSTOM_COUSE_DATA']();
 }
 
 export function GENERATOR_CUSTOM_DIFF_TABLE_DTO() {
@@ -228,6 +256,10 @@ export function QueryCourseSongListWithRival(arg1) {
 
 export function QueryCurrentDownloadSource() {
   return window['go']['main']['App']['QueryCurrentDownloadSource']();
+}
+
+export function QueryCustomCourseSongListWithRival(arg1) {
+  return window['go']['main']['App']['QueryCustomCourseSongListWithRival'](arg1);
 }
 
 export function QueryCustomDiffTablePageList(arg1) {
@@ -352,6 +384,14 @@ export function SupplyMissingBMSFromTable(arg1) {
 
 export function SyncRivalTag(arg1) {
   return window['go']['main']['App']['SyncRivalTag'](arg1);
+}
+
+export function UpdateCustomCourseDataOrder(arg1) {
+  return window['go']['main']['App']['UpdateCustomCourseDataOrder'](arg1);
+}
+
+export function UpdateCustomCourseOrder(arg1) {
+  return window['go']['main']['App']['UpdateCustomCourseOrder'](arg1);
 }
 
 export function UpdateCustomDiffTable(arg1) {

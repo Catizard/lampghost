@@ -8,6 +8,11 @@ import (
 	"gorm.io/gorm"
 )
 
+func findFolderContentByID(tx *gorm.DB, id uint) (out *entity.FolderContent, err error) {
+	err = tx.First(&out, id).Error
+	return
+}
+
 func findFolderContentList(tx *gorm.DB, filter *vo.FolderContentVo) ([]*entity.FolderContent, int, error) {
 	var contents []*entity.FolderContent
 	if err := tx.Debug().Scopes(scopeFolderContentFilter(filter)).Find(&contents).Error; err != nil {

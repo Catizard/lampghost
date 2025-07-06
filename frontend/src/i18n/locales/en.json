@@ -72,7 +72,9 @@
     "gotoGithub": "Open Github repo in browser",
     "gotoDocument": "Open manual in browser",
     "joinQQGroup": "Join QQ Group",
-    "addCustomTag": "Add Custom Tag"
+    "addCustomTag": "Add Custom Tag",
+    "addCustomCourse": "Add Custom Course",
+    "addToCustomCourse": "Select Song"
   },
   "form": {
     "labelLanguage": "Language",
@@ -217,7 +219,11 @@
     "downloadSetting": "Download Settings",
     "folderSetting": "Custom Folder Settings",
     "settings": "Settings",
-    "generalSetting": "General Settings"
+    "generalSetting": "General Settings",
+    "customTableCourses": "Design Courses",
+    "addCustomCourse": "Add Custom Course",
+    "refactorCustomCourseDataOrder": "Refactor Course Play Order",
+    "selectSongFromFolder": "Select Song"
   },
   "hint": {
     "initUser": "Configure your own save files location",

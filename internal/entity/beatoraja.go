@@ -5,13 +5,13 @@ type ScoreLog struct {
 	Sha256    string
 	Mode      string
 	Clear     int32
-	OldClear  int32 `gorm:"column:old_clear"`
+	OldClear  int32 `gorm:"column:oldclear"`
 	Score     int32
-	OldScore  int32
+	OldScore  int32 `gorm:"column:oldscore"`
 	Combo     int32
-	OldCombo  int32
+	OldCombo  int32 `gorm:"column:oldcombo"`
 	Minbp     int32
-	OldMinbp  int32
+	OldMinbp  int32 `gorm:"column:oldminbp"`
 	TimeStamp int64 `gorm:"column:date"`
 }
 
@@ -74,8 +74,8 @@ type ScoreDataLog struct {
 	Notes      int32
 	Combo      int32
 	Minbp      int32
-	PlayCount  int32
-	ClearCount int32
+	PlayCount  int32 `gorm:"playcount"`
+	ClearCount int32 `gorm:"clearcount"`
 	Option     int32
 	Seed       int64
 	Random     int32

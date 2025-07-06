@@ -75,7 +75,7 @@ func NewApp() *App {
 	// difficult table module
 	diffTableService := service.NewDiffTableService(db, downloadTaskService)
 	diffTableController := controller.NewDiffTableController(diffTableService)
-	courseInfoService := service.NewCourseInfoSerivce(db)
+	courseInfoService := service.NewCourseInfoSerivce(db, conf, configService.Subscribe())
 	courseInfoController := controller.NewCourseInfoController(courseInfoService)
 
 	// custom difficult table module

@@ -222,6 +222,10 @@ export function OpenFileDialog(arg1) {
   return window['go']['main']['App']['OpenFileDialog'](arg1);
 }
 
+export function QueryCourseSongListWithRival(arg1) {
+  return window['go']['main']['App']['QueryCourseSongListWithRival'](arg1);
+}
+
 export function QueryCurrentDownloadSource() {
   return window['go']['main']['App']['QueryCurrentDownloadSource']();
 }

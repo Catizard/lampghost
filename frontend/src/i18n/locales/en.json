@@ -237,17 +237,18 @@
     "difftable": {
       "self": "Table",
       "management": "Management",
-      "scores": "Statistics"
+      "scores": "Statistics",
+      "courses": "Courses"
     },
     "song": "Song",
     "customtable": {
       "self": "Custom Table",
       "management": "Management",
-      "design": "Design"
+      "design": "Design",
+      "courses": "Courses"
     },
     "folder": "Folder",
     "recent": "Recent",
-    "courses": "Courses",
     "download": "Download",
     "goals": "Goals",
     "settings": "Settings"

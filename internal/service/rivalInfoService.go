@@ -485,7 +485,7 @@ func selectRivalInfoCount(tx *gorm.DB, filter *vo.RivalInfoVo) (int64, error) {
 	return count, nil
 }
 
-// Cmmon query scope for vo.RivalInfoVo
+// Common query scope for vo.RivalInfoVo
 func scopeRivalInfoFilter(filter *vo.RivalInfoVo) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		if filter == nil {

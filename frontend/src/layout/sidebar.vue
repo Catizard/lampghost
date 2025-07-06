@@ -95,6 +95,11 @@ const menuOptions: MenuOption[] = [
         key: "difftable_scores",
         icon: renderIcon(StatisticIcon)
       },
+      {
+        label: renderOption("/difftable/courses", t('menuName.difftable.courses')),
+        key: "difftable_courses",
+        icon: renderIcon(CoursesIcon)
+      }
     ]
   },
   {
@@ -128,11 +133,6 @@ const menuOptions: MenuOption[] = [
     label: renderOption("/recent", t('menuName.recent')),
     key: "recent",
     icon: renderIcon(TimeIcon)
-  },
-  {
-    label: renderOption("/courses", t('menuName.courses')),
-    key: "courses",
-    icon: renderIcon(CoursesIcon)
   },
   // {
   // 	label: renderOption("/goals", t('menuName.goals')),

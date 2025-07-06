@@ -74,6 +74,68 @@ func findRivalSongDataList(tx *gorm.DB, filter *vo.RivalSongDataVo) (out []*dto.
 	return
 }
 
+// Extend function for findRivalSongDataList, returning some player related
+// fields at the same time. Extra fields are similar to findDiffTableDataListWithRival's
+//
+// Requirements:
+//  1. To reduce complexity, filter should not be nil
+//  2. filter.RivalID should > 0, otherwise this function is meaningless
+func findRivalSongDataListWithRival(tx *gorm.DB, filter *vo.RivalSongDataVo) (out []*dto.RivalSongDataDto, n int, err error) {
+	if filter == nil {
+		err = eris.Errorf("findRivalSongDataListWithRival: filter cannot be nil")
+		return
+	}
+	if filter.RivalId == 0 {
+		err = eris.Errorf("findRivalSongDataListWithRival: rival's id cannot be zero")
+		return
+	}
+
+	partial := tx.Table("rival_song_data").Scopes(scopeRivalSongDataFilter(filter))
+	partial = partial.Joins(`left join (
+		select max(clear) as Lamp, count(1) as PlayCount, rsl.sha256, rsl.minbp as MinBP
+		from rival_score_log rsl
+		where rsl.rival_id = ?
+		group by rsl.sha256
+	) as rsl on rsl.sha256 = rival_song_data.sha256`, filter.RivalId)
+
+	partial = partial.Joins(`left join (
+		select max(record_time) as record_time, sha256
+		from rival_score_data_log
+		where rival_id = ?
+		group by sha256
+	) as rsdl on rsdl.sha256 = rsl.sha256`, filter.RivalId)
+	if filter.GhostRivalID > 0 {
+		// TODO: How to do this???
+		if !filter.EndGhostRecordTime.IsZero() {
+			partial = partial.Joins(`left join (
+			  select max(clear) as Lamp, count(1) as PlayCount, rsl.sha256, rsl.minbp as MinBP
+			  from rival_score_log rsl
+			  where rsl.rival_id = ? and rsl.record_time <= ?
+			  group by rsl.sha256
+		    ) as ghost_rsl on ghost_rsl.sha256 = rival_song_data.sha256`, filter.GhostRivalID, filter.EndGhostRecordTime)
+		} else {
+			partial = partial.Joins(`left join (
+			  select max(clear) as Lamp, count(1) as PlayCount, rsl.sha256, rsl.minbp as MinBP
+			  from rival_score_log rsl
+			  where rsl.rival_id = ?
+			  group by rsl.sha256
+		  ) as ghost_rsl on ghost_rsl.sha256 = rival_song_data.sha256`, filter.GhostRivalID)
+		}
+	}
+
+	fields := `
+		rival_song_data.*,
+		rsl.Lamp, rsl.PlayCount, rsl.MinBP
+	`
+	if filter.GhostRivalID > 0 {
+		fields = fields + ", ghost_rsl.Lamp as GhostLamp, ghost_rsl.PlayCount as GhostPlayCount, ghost_rsl.MinBP as GhostMinBP"
+	}
+
+	err = partial.Debug().Select(fields).Find(&out).Error
+	n = len(out)
+	return
+}
+
 func selectRivalSongDataCount(tx *gorm.DB, filter *vo.RivalSongDataVo) (cnt int64, err error) {
 	err = tx.Model(&entity.RivalSongData{}).Scopes(scopeRivalSongDataFilter(filter)).Count(&cnt).Error
 	return
@@ -166,6 +228,10 @@ func scopeRivalSongDataFilter(filter *vo.RivalSongDataVo) func(db *gorm.DB) *gor
 		// Extra filter fields
 		if filter.TitleLike != nil {
 			moved = moved.Where("rival_song_data.title like ('%' || ? || '%')", filter.TitleLike)
+		}
+		moved = moved.Scopes(scopeInSha256s(filter.Sha256s), scopeInMd5s(filter.Md5s))
+		if filter.RemoveDuplicate {
+			moved = moved.Group("md5")
 		}
 		return moved
 	}

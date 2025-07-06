@@ -27,6 +27,10 @@ const mainRoutes: RouteRecordRaw[] = [
     component: () => import("../views/difficult_table/DifficultScores.vue"),
   },
   {
+    path: "/difftable/courses",
+    component: () => import("../views/courses/Courses.vue"),
+  },
+  {
     path: "/customtable/management",
     component: () => import("../views/custom_table/CustomTableManagement.vue"),
   },
@@ -56,11 +60,6 @@ const mainRoutes: RouteRecordRaw[] = [
     name: "settings",
     path: "/settings",
     component: () => import("../views/settings/Settings.vue"),
-  },
-  {
-    name: "courses",
-    path: "/courses",
-    component: () => import("../views/courses/Courses.vue"),
   },
   {
     name: "download",

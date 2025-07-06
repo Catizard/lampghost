@@ -39,7 +39,7 @@ export function DeleteRivalTagByID(arg1:number):Promise<result.RtnMessage>;
 
 export function FindCourseInfoList():Promise<result.RtnDataList>;
 
-export function FindCourseInfoListWithRival(arg1:number):Promise<result.RtnDataList>;
+export function FindCourseInfoListWithRival(arg1:vo.CourseInfoVo):Promise<result.RtnDataList>;
 
 export function FindCustomDiffTableByID(arg1:number):Promise<result.RtnData>;
 
@@ -116,6 +116,8 @@ export function InitializeMainUser(arg1:vo.InitializeRivalInfoVo):Promise<result
 export function OpenDirectoryDialog(arg1:string):Promise<result.RtnData>;
 
 export function OpenFileDialog(arg1:string):Promise<result.RtnData>;
+
+export function QueryCourseSongListWithRival(arg1:vo.CourseInfoVo):Promise<result.RtnDataList>;
 
 export function QueryCurrentDownloadSource():Promise<result.RtnData>;
 

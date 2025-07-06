@@ -5,6 +5,7 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/result"
 	"github.com/Catizard/lampghost_wails/internal/service"
+	"github.com/Catizard/lampghost_wails/internal/vo"
 	"github.com/charmbracelet/log"
 )
 
@@ -28,9 +29,19 @@ func (ctl *CourseInfoController) FindCourseInfoList() result.RtnDataList {
 	return result.NewRtnDataList(rows)
 }
 
-func (ctl *CourseInfoController) FindCourseInfoListWithRival(rivalID uint) result.RtnDataList {
+func (ctl *CourseInfoController) FindCourseInfoListWithRival(filter *vo.CourseInfoVo) result.RtnDataList {
 	log.Info("[Controller] calling CourseInfoController.FindCourseInfoListWithRival")
-	rows, _, err := ctl.courseInfoService.FindCourseInfoListWithRival(rivalID)
+	rows, _, err := ctl.courseInfoService.FindCourseInfoListWithRival(filter)
+	if err != nil {
+		log.Errorf("[CourseInfoController] returning error: %v", err)
+		return result.NewErrorDataList(err)
+	}
+	return result.NewRtnDataList(rows)
+}
+
+func (ctl *CourseInfoController) QueryCourseSongListWithRival(filter *vo.CourseInfoVo) result.RtnDataList {
+	log.Info("[Controller] calling CourseInfoController.QueryCourseSongListWithRival")
+	rows, _, err := ctl.courseInfoService.QueryCourseSongListWithRival(filter)
 	if err != nil {
 		log.Errorf("[CourseInfoController] returning error: %v", err)
 		return result.NewErrorDataList(err)

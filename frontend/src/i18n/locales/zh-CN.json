@@ -237,17 +237,18 @@
     "difftable": {
       "self": "难度表",
       "management": "管理",
-      "scores": "统计信息"
+      "scores": "统计信息",
+      "courses": "段位"
     },
     "song": "歌曲",
     "customtable": {
       "self": "自定义难度表",
       "management": "管理",
-      "design": "设计"
+      "design": "设计",
+      "courses": "段位"
     },
     "folder": "收藏夹",
     "recent": "最近游玩",
-    "courses": "段位",
     "download": "下载",
     "goals": "目标列表",
     "settings": "设置"

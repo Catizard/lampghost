@@ -53,6 +53,17 @@ func scopeInSha256s(sha256s []string) func(db *gorm.DB) *gorm.DB {
 	}
 }
 
+// db.Where("md5 in ?", md5s)
+// Requirements: len(md5) > 0
+func scopeInMd5s(md5s []string) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if len(md5s) > 0 {
+			return db.Where("md5 in ?", md5s)
+		}
+		return db
+	}
+}
+
 // pagination with page & pageSize
 //
 // Forcements:

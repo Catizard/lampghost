@@ -564,6 +564,12 @@ export namespace dto {
 	    Page: number;
 	    PageSize: number;
 	    PageCount: number;
+	    Lamp: number;
+	    PlayCount: number;
+	    MinBP: number;
+	    GhostLamp: number;
+	    GhostPlayCount: number;
+	    GhostMinBP: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new RivalSongDataDto(source);
@@ -601,6 +607,12 @@ export namespace dto {
 	        this.Page = source["Page"];
 	        this.PageSize = source["PageSize"];
 	        this.PageCount = source["PageCount"];
+	        this.Lamp = source["Lamp"];
+	        this.PlayCount = source["PlayCount"];
+	        this.MinBP = source["MinBP"];
+	        this.GhostLamp = source["GhostLamp"];
+	        this.GhostPlayCount = source["GhostPlayCount"];
+	        this.GhostMinBP = source["GhostMinBP"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1209,12 +1221,23 @@ export namespace vo {
 	    }
 	}
 	export class CourseInfoVo {
+	    ID: number;
+	    // Go type: time
+	    CreatedAt: any;
+	    // Go type: time
+	    UpdatedAt: any;
+	    // Go type: gorm
+	    DeletedAt: any;
 	    name: string;
 	    md5: string[];
 	    sha256: string[];
 	    constraint: string[];
 	    charts: ChartInfoVo[];
 	    HeaderID: number;
+	    RivalID: number;
+	    GhostRivalID: number;
+	    GhostRivalTagID: number;
+	    IgnoreVariantCourse: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new CourseInfoVo(source);
@@ -1222,12 +1245,20 @@ export namespace vo {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.ID = source["ID"];
+	        this.CreatedAt = this.convertValues(source["CreatedAt"], null);
+	        this.UpdatedAt = this.convertValues(source["UpdatedAt"], null);
+	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
 	        this.name = source["name"];
 	        this.md5 = source["md5"];
 	        this.sha256 = source["sha256"];
 	        this.constraint = source["constraint"];
 	        this.charts = this.convertValues(source["charts"], ChartInfoVo);
 	        this.HeaderID = source["HeaderID"];
+	        this.RivalID = source["RivalID"];
+	        this.GhostRivalID = source["GhostRivalID"];
+	        this.GhostRivalTagID = source["GhostRivalTagID"];
+	        this.IgnoreVariantCourse = source["IgnoreVariantCourse"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1788,6 +1819,12 @@ export namespace vo {
 	    Notes: number;
 	    Pagination?: entity.Page;
 	    TitleLike?: string;
+	    Sha256s: string[];
+	    Md5s: string[];
+	    RemoveDuplicate: boolean;
+	    // Go type: time
+	    EndGhostRecordTime: any;
+	    GhostRivalID: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new RivalSongDataVo(source);
@@ -1824,6 +1861,11 @@ export namespace vo {
 	        this.Notes = source["Notes"];
 	        this.Pagination = this.convertValues(source["Pagination"], entity.Page);
 	        this.TitleLike = source["TitleLike"];
+	        this.Sha256s = source["Sha256s"];
+	        this.Md5s = source["Md5s"];
+	        this.RemoveDuplicate = source["RemoveDuplicate"];
+	        this.EndGhostRecordTime = this.convertValues(source["EndGhostRecordTime"], null);
+	        this.GhostRivalID = source["GhostRivalID"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

@@ -4,6 +4,8 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/Catizard/lampghost_wails/internal/config"
 	"github.com/Catizard/lampghost_wails/internal/dto"
@@ -22,21 +24,46 @@ var shouldIgnoreConstraintDefinition []string = []string{
 
 // NOTE: NEVER USE MD5 AT DATA PROCESSING
 type CourseInfoService struct {
-	db *gorm.DB
+	db                  *gorm.DB
+	ignoreVariantCourse bool
+	configNotify        <-chan any
+	mu                  sync.Mutex
 }
 
-func NewCourseInfoSerivce(db *gorm.DB) *CourseInfoService {
-	return &CourseInfoService{
-		db: db,
+func NewCourseInfoSerivce(db *gorm.DB, conf *config.ApplicationConfig, configNotify <-chan any) *CourseInfoService {
+	ret := &CourseInfoService{
+		db:                  db,
+		ignoreVariantCourse: conf.IgnoreVariantCourse != 0,
+		configNotify:        configNotify,
+	}
+	go ret.listenUpdateConfig()
+	return ret
+}
+
+func (s *CourseInfoService) listenUpdateConfig() {
+	for {
+		<-s.configNotify
+		go func() {
+			s.mu.Lock()
+			log.Debugf("[CourseInfoService] updating config")
+			if conf, err := config.ReadConfig(); err != nil {
+				log.Errorf("cannot read config: %s", err)
+			} else {
+				s.ignoreVariantCourse = conf.IgnoreVariantCourse != 0
+			}
+			s.mu.Unlock()
+		}()
 	}
 }
 
 func (s *CourseInfoService) FindCourseInfoList(filter *vo.CourseInfoVo) ([]*dto.CourseInfoDto, int, error) {
+	filter.IgnoreVariantCourse = s.ignoreVariantCourse
 	return findCourseInfoList(s.db, filter)
 }
 
-func (s *CourseInfoService) FindCourseInfoListWithRival(rivalID uint) ([]*dto.CourseInfoDto, int, error) {
-	rawCourses, n, err := findCourseInfoList(s.db, nil)
+func (s *CourseInfoService) FindCourseInfoListWithRival(filter *vo.CourseInfoVo) ([]*dto.CourseInfoDto, int, error) {
+	filter.IgnoreVariantCourse = s.ignoreVariantCourse
+	rawCourses, n, err := findCourseInfoList(s.db, filter)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -44,7 +71,7 @@ func (s *CourseInfoService) FindCourseInfoListWithRival(rivalID uint) ([]*dto.Co
 		return rawCourses, n, err
 	}
 	logs, _, err := findRivalScoreLogList(s.db, &vo.RivalScoreLogVo{
-		RivalId:        rivalID,
+		RivalId:        filter.RivalID,
 		OnlyCourseLogs: true,
 	})
 	if err != nil {
@@ -52,6 +79,42 @@ func (s *CourseInfoService) FindCourseInfoListWithRival(rivalID uint) ([]*dto.Co
 	}
 	mergeRivalScoreLogToCourses(rawCourses, logs)
 	return rawCourses, n, nil
+}
+
+func (s *CourseInfoService) FindCourseInfoByID(courseID uint) (course *entity.CourseInfo, err error) {
+	err = s.db.First(&course, courseID).Error
+	return
+}
+
+func (s *CourseInfoService) QueryCourseSongListWithRival(filter *vo.CourseInfoVo) (songs []*dto.RivalSongDataDto, n int, err error) {
+	courseInfo, err := s.FindCourseInfoByID(filter.ID)
+	if err != nil {
+		return
+	}
+	var endGhostRecordTime time.Time
+	if filter.GhostRivalTagID > 0 {
+		tag, err := findRivalTagByID(s.db, filter.GhostRivalTagID)
+		if err != nil {
+			return nil, 0, eris.Wrap(err, "failed to query rival tag by id")
+		}
+		endGhostRecordTime = tag.RecordTime
+	}
+	queryParam := &vo.RivalSongDataVo{
+		RemoveDuplicate:    true,
+		RivalId:            filter.RivalID,
+		GhostRivalID:       filter.GhostRivalID,
+		EndGhostRecordTime: endGhostRecordTime,
+	}
+	if courseInfo.Md5s != "" {
+		queryParam.Md5s = strings.Split(courseInfo.Md5s, ",")
+	} else if courseInfo.Sha256s != "" {
+		queryParam.Sha256s = strings.Split(courseInfo.Sha256s, ",")
+	} else {
+		err = eris.Errorf("unexpected course data which doesn't have sha256 or md5")
+		return
+	}
+	songs, n, err = findRivalSongDataListWithRival(s.db, queryParam)
+	return
 }
 
 // Insert a list of courses into database
@@ -69,18 +132,12 @@ func delCourseInfo(tx *gorm.DB, filter *vo.CourseInfoVo) error {
 // Therefore, only sha256 returned is not enough, we always have to get the md5 by sha256 so this is implemented
 // in this basic query function
 //
-// TODO: This function forces using the main user's songdata.db to build the cache, should be implemented with a config
+// TODO: It's kind of hard to implement pagination feature for this query function due to:
+// 1. hash identity field might be sha256s or md5s
+// 2. the strategy of using sql to filter variant courses(no_speed, no_good...) also not very obvious
 func findCourseInfoList(tx *gorm.DB, filter *vo.CourseInfoVo) ([]*dto.CourseInfoDto, int, error) {
-	partial := tx.Model(&entity.CourseInfo{})
-	if filter != nil {
-		partial = partial.Where(filter.Entity())
-	}
-	config, err := config.ReadConfig()
-	if err != nil {
-		return nil, 0, eris.Wrap(err, "cannot read config")
-	}
 	var raw []*entity.CourseInfo
-	if err = partial.Find(&raw).Error; err != nil {
+	if err := tx.Debug().Model(&entity.CourseInfo{}).Scopes(scopeCourseInfoFilter(filter)).Find(&raw).Error; err != nil {
 		return nil, 0, err
 	}
 	if len(raw) == 0 {
@@ -93,7 +150,7 @@ func findCourseInfoList(tx *gorm.DB, filter *vo.CourseInfoVo) ([]*dto.CourseInfo
 	out := make([]*dto.CourseInfoDto, 0)
 	for i := range raw {
 		shouldIgnore := false
-		if config.IgnoreVariantCourse != 0 {
+		if filter.IgnoreVariantCourse {
 			match := false
 			splitedConstraints := strings.Split(raw[i].Constraints, ",")
 			for _, shouldIgnoreConstraint := range shouldIgnoreConstraintDefinition {
@@ -139,5 +196,17 @@ func mergeRivalScoreLogToCourses(courses []*dto.CourseInfoDto, logs []*dto.Rival
 				}
 			}
 		}
+	}
+}
+
+// Common query scope for vo.RivalInfoVo
+func scopeCourseInfoFilter(filter *vo.CourseInfoVo) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if filter == nil {
+			return db
+		}
+		moved := db.Where(filter.Entity())
+		// Add extra filter here
+		return moved
 	}
 }

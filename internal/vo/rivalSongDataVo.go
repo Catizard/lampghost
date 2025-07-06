@@ -1,6 +1,8 @@
 package vo
 
 import (
+	"time"
+
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"gorm.io/gorm"
 )
@@ -35,7 +37,12 @@ type RivalSongDataVo struct {
 	// Pagination
 	Pagination *entity.Page
 	// Extra filter field
-	TitleLike *string
+	TitleLike          *string
+	Sha256s            []string
+	Md5s               []string
+	RemoveDuplicate    bool
+	EndGhostRecordTime time.Time
+	GhostRivalID       uint
 }
 
 func (rivalSongData *RivalSongDataVo) Entity() *entity.RivalSongData {

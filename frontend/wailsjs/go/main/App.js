@@ -6,6 +6,10 @@ export function AddBatchDiffTableHeader(arg1) {
   return window['go']['main']['App']['AddBatchDiffTableHeader'](arg1);
 }
 
+export function AddCustomCourse(arg1) {
+  return window['go']['main']['App']['AddCustomCourse'](arg1);
+}
+
 export function AddCustomDiffTable(arg1) {
   return window['go']['main']['App']['AddCustomDiffTable'](arg1);
 }
@@ -68,6 +72,10 @@ export function FindCourseInfoList() {
 
 export function FindCourseInfoListWithRival(arg1) {
   return window['go']['main']['App']['FindCourseInfoListWithRival'](arg1);
+}
+
+export function FindCustomCourseList(arg1) {
+  return window['go']['main']['App']['FindCustomCourseList'](arg1);
 }
 
 export function FindCustomDiffTableByID(arg1) {

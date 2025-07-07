@@ -9,6 +9,8 @@ import {config} from '../models';
 
 export function AddBatchDiffTableHeader(arg1:Array<vo.DiffTableHeaderVo>):Promise<result.RtnDataList>;
 
+export function AddCustomCourse(arg1:vo.CustomCourseVo):Promise<result.RtnMessage>;
+
 export function AddCustomDiffTable(arg1:vo.CustomDiffTableVo):Promise<result.RtnMessage>;
 
 export function AddDiffTableHeader(arg1:vo.DiffTableHeaderVo):Promise<result.RtnMessage>;
@@ -40,6 +42,8 @@ export function DeleteRivalTagByID(arg1:number):Promise<result.RtnMessage>;
 export function FindCourseInfoList():Promise<result.RtnDataList>;
 
 export function FindCourseInfoListWithRival(arg1:vo.CourseInfoVo):Promise<result.RtnDataList>;
+
+export function FindCustomCourseList(arg1:vo.CustomCourseVo):Promise<result.RtnDataList>;
 
 export function FindCustomDiffTableByID(arg1:number):Promise<result.RtnData>;
 

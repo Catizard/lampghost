@@ -217,7 +217,8 @@
     "downloadSetting": "下载设置",
     "settings": "设置",
     "generalSetting": "通用设置",
-    "folderSetting": "收藏夹设置"
+    "folderSetting": "收藏夹设置",
+    "customTableCourses": "设计段位"
   },
   "hint": {
     "initUser": "配置你的存档文件路径",

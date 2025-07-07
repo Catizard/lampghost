@@ -14,6 +14,7 @@
 <script setup lang="ts">
 import { ref, Ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import SelectCustomTable from '@/components/custom_table/SelectCustomTable.vue';
 
 const { t } = useI18n();
 const loading = ref(false);

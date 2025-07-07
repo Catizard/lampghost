@@ -217,7 +217,8 @@
     "downloadSetting": "Download Settings",
     "folderSetting": "Custom Folder Settings",
     "settings": "Settings",
-    "generalSetting": "General Settings"
+    "generalSetting": "General Settings",
+    "customTableCourses": "Design Courses"
   },
   "hint": {
     "initUser": "Configure your own save files location",

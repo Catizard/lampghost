@@ -43,6 +43,7 @@ func init() {
 	viper.SetDefault("IgnoreVariantCourse", 0)
 	viper.SetDefault("Locale", "en")
 	viper.SetDefault("DownloadSite", download.DefaultDownloadSource.GetMeta().Name)
+	viper.SetDefault("PreviewSite", DefaultPreviewSource.GetName())
 	// viper.SetDefault("SeparateDownloadMD5", "https://bms.wrigglebug.xyz/download/package/%s")
 	viper.SetDefault("MaximumDownloadCount", 5)
 	viper.SetDefault("EnableAutoReload", 1)
@@ -53,7 +54,7 @@ type ApplicationConfig struct {
 	InternalServerPort  int32
 	IgnoreVariantCourse int32
 	Locale              string
-	// Constants, currently the only option is wriggle
+	// Download source: wriggle | konmai
 	DownloadSite string
 	// Related to DownloadSite
 	// SeparateDownloadMD5 string
@@ -62,6 +63,8 @@ type ApplicationConfig struct {
 	MaximumDownloadCount int
 	// Auto reload save files when having write operation on scorelog.db
 	EnableAutoReload int
+	// Preview source: sayaka | konmai
+	PreviewSite string
 	// Extra fields, need to be setted explicitly
 	EnableDownloadFeature bool
 }
@@ -81,6 +84,7 @@ func ReadConfig() (*ApplicationConfig, error) {
 		DownloadDirectory:    viper.GetString("DownloadDirectory"),
 		MaximumDownloadCount: viper.GetInt("MaximumDownloadCount"),
 		EnableAutoReload:     viper.GetInt("EnableAutoReload"),
+		PreviewSite:          viper.GetString("PreviewSite"),
 	}
 	conf.EnableDownloadFeature = conf.EnableDownload() == nil
 	return conf, nil
@@ -97,6 +101,7 @@ func (c *ApplicationConfig) WriteConfig() error {
 	viper.Set("DownloadDirectory", c.DownloadDirectory)
 	viper.Set("MaximumDownloadCount", c.MaximumDownloadCount)
 	viper.Set("EnableAutoReload", c.EnableAutoReload)
+	viper.Set("PreviewSite", c.PreviewSite)
 	if err := viper.WriteConfig(); err != nil {
 		return err
 	}

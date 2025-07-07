@@ -141,6 +141,8 @@ export function QueryPredefineTableSchemes():Promise<result.RtnDataList>;
 
 export function QueryPrevDayScoreLogList(arg1:vo.RivalScoreLogVo):Promise<result.RtnDataList>;
 
+export function QueryPreviewURLByMd5(arg1:string):Promise<result.RtnData>;
+
 export function QueryRivalInfoPageList(arg1:vo.RivalInfoVo):Promise<result.RtnPage>;
 
 export function QueryRivalPlayedYears(arg1:number):Promise<result.RtnDataList>;

@@ -270,6 +270,10 @@ export function QueryPrevDayScoreLogList(arg1) {
   return window['go']['main']['App']['QueryPrevDayScoreLogList'](arg1);
 }
 
+export function QueryPreviewURLByMd5(arg1) {
+  return window['go']['main']['App']['QueryPreviewURLByMd5'](arg1);
+}
+
 export function QueryRivalInfoPageList(arg1) {
   return window['go']['main']['App']['QueryRivalInfoPageList'](arg1);
 }

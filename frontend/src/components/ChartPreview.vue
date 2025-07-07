@@ -18,6 +18,7 @@
 
 <script setup lang="ts">
 import { Refresh as RefreshIcon } from '@vicons/ionicons5';
+import { QueryPreviewURLByMd5 } from '@wailsjs/go/main/App';
 import { nextTick, ref, Ref } from 'vue';
 
 defineExpose({ open });
@@ -25,9 +26,14 @@ defineExpose({ open });
 const show = ref(false);
 const url: Ref<string | null> = ref(null);
 
-function open(md5: string) {
-  url.value = `https://bms-score-viewer.pages.dev/view?md5=${md5}`
-  show.value = true;
+async function open(md5: string) {
+  try {
+    const result = await QueryPreviewURLByMd5(md5)
+    url.value = result.Data;
+    show.value = true;
+  } catch (err) {
+    window.$notifyError(err)
+  }
 }
 
 function refresh() {

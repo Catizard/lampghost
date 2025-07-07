@@ -101,6 +101,7 @@
     "labelEnableAutoReload": "Reload save files automatically",
     "labelMaximumDownloadCount": "Maximum Download Count",
     "labelRecordTime": "Record Time",
+    "labelPreviewSite": "Preview Source",
     "placeholderName": "Please input name",
     "placeholderUserName": "Please input your name",
     "placeholderSongdataPath": "Please input /beatoraja path/songdata.db file path",

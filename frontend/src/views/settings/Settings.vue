@@ -42,6 +42,11 @@
               <n-select v-model:value="model.EnableAutoReload" :options="yesnoOptions" style="width: 150px;" />
             </n-form-item>
           </n-p>
+          <n-p>
+            <n-form-item :label="t('form.labelPreviewSite')" path="previewSite">
+              <n-select v-model:value="model.PreviewSite" :options="previewSiteOptions" style="width: 150px" />
+            </n-form-item>
+          </n-p>
         </n-h2>
         <n-h2>
           <n-text>
@@ -64,8 +69,8 @@
               {{ t('button.chooseDirectory') }}
             </n-button>
             <n-divider vertical />
-            <n-input v-model:value="model.DownloadDirectory"
-              :placeholder="t('form.placeholderDownloadDirectory')" style="width: 500px;" />
+            <n-input v-model:value="model.DownloadDirectory" :placeholder="t('form.placeholderDownloadDirectory')"
+              style="width: 500px;" />
           </n-form-item>
           <n-form-item :label="t('form.labelMaximumDownloadCount')" path="maximumDownloadCount">
             <n-input-number show-button v-model:value="model.MaximumDownloadCount" :min="1" style="width: 150px;" />
@@ -148,7 +153,8 @@ const model = ref<config.ApplicationConfig>({
   DownloadDirectory: null,
   MaximumDownloadCount: null,
   EnableAutoReload: null,
-  EnableDownloadFeature: null // Unused
+  EnableDownloadFeature: null, // Unused
+  PreviewSite: null,
 });
 const loading = ref(false);
 const yesnoOptions: Array<SelectOption> = [
@@ -166,6 +172,17 @@ const downloadSiteOptions: Array<SelectOption> = [
   {
     label: "wriggle",
     value: "wriggle"
+  },
+  {
+    label: "konmai",
+    value: "konmai"
+  }
+];
+
+const previewSiteOptions: Array<SelectOption> = [
+  {
+    label: "sayaka",
+    value: "sayaka",
   },
   {
     label: "konmai",

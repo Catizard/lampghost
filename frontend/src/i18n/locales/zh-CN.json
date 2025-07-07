@@ -101,6 +101,7 @@
     "labelIgnoreVariantCourse": "是否忽略带有特殊变化的段位",
     "labelEnableAutoReload": "是否自动更新存档文件",
     "labelTagRecordTime": "标签时间",
+    "labelPreviewSite": "预览来源",
     "placeholderName": "请输入名称",
     "placeholderUserName": "请输入用户名",
     "placeholderSongdataPath": "请输入/beatoraja path/songdata.db文件路径",

@@ -10,6 +10,7 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/config/download"
 	"github.com/Catizard/lampghost_wails/internal/result"
 	"github.com/Catizard/lampghost_wails/internal/service"
+	"github.com/rotisserie/eris"
 )
 
 type ConfigController struct {
@@ -65,6 +66,22 @@ func (ctl *ConfigController) QueryCurrentDownloadSource() result.RtnData {
 	} else {
 		downloadSource := download.GetDownloadSource(conf.DownloadSite)
 		return result.NewRtnData(downloadSource)
+	}
+}
+
+func (ctl *ConfigController) QueryPreviewURLByMd5(md5 string) result.RtnData {
+	if conf, err := config.ReadConfig(); err != nil {
+		return result.NewErrorData(err)
+	} else {
+		previewSource := config.GetPreviewSource(conf.PreviewSite)
+		if previewSource == nil {
+			return result.NewErrorData(eris.Errorf("preview source: %s doesn't exist", conf.PreviewSite))
+		}
+		if url, err := previewSource.GetPreviewURLByMd5(md5); err != nil {
+			return result.NewErrorData(err)
+		} else {
+			return result.NewRtnData(url)
+		}
 	}
 }
 

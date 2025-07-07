@@ -34,6 +34,10 @@ export function BindSongToFolder(arg1) {
   return window['go']['main']['App']['BindSongToFolder'](arg1);
 }
 
+export function BindToCustomCourse(arg1, arg2, arg3) {
+  return window['go']['main']['App']['BindToCustomCourse'](arg1, arg2, arg3);
+}
+
 export function CancelDownloadTask(arg1) {
   return window['go']['main']['App']['CancelDownloadTask'](arg1);
 }

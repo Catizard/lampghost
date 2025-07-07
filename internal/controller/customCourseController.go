@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"github.com/Catizard/lampghost_wails/internal/dto"
+	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/result"
 	"github.com/Catizard/lampghost_wails/internal/service"
 	"github.com/Catizard/lampghost_wails/internal/vo"
@@ -35,3 +37,15 @@ func (ctl *CustomCourseController) FindCustomCourseList(filter *vo.CustomCourseV
 	}
 	return result.NewRtnDataList(rows)
 }
+
+func (ctl *CustomCourseController) BindToCustomCourse(courseID uint, courseData *entity.CustomCourseData) result.RtnMessage {
+	log.Info("[Controller] calling CustomCourseController.BindToCustomCourse")
+	if err := ctl.customCourseService.BindToCustomCourse(courseID, courseData); err != nil {
+		log.Errorf("[CustomCourseController] returning err: %v", err)
+		return result.NewErrorMessage(err)
+	}
+	return result.SUCCESS
+}
+
+func (ctl *CustomCourseController) GENERATOR_CUSTOM_COUSE() *dto.CustomCourseDto          { return nil }
+func (ctl *CustomCourseController) GENERATOR_CUSTOM_COUSE_DATA() *dto.CustomCourseDataDto { return nil }

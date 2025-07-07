@@ -23,6 +23,8 @@ export function AddRivalTag(arg1:vo.RivalTagVo):Promise<result.RtnMessage>;
 
 export function BindSongToFolder(arg1:vo.BindToFolderVo):Promise<result.RtnMessage>;
 
+export function BindToCustomCourse(arg1:number,arg2:string,arg3:string):Promise<result.RtnMessage>;
+
 export function CancelDownloadTask(arg1:number):Promise<result.RtnMessage>;
 
 export function ChooseBeatorajaDirectory():Promise<result.RtnData>;

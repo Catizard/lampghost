@@ -1291,6 +1291,8 @@ export namespace vo {
 	    Md5s: string;
 	    Constraints: string;
 	    OrderNumber: number;
+	    SplitSha256s: string;
+	    SplitMd5s: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new CustomCourseVo(source);
@@ -1308,6 +1310,8 @@ export namespace vo {
 	        this.Md5s = source["Md5s"];
 	        this.Constraints = source["Constraints"];
 	        this.OrderNumber = source["OrderNumber"];
+	        this.SplitSha256s = source["SplitSha256s"];
+	        this.SplitMd5s = source["SplitMd5s"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

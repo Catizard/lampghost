@@ -31,14 +31,23 @@ func (s *CustomCourseService) AddCustomCourse(param *vo.CustomCourseVo) error {
 
 func (s *CustomCourseService) FindCustomCourseList(filter *vo.CustomCourseVo) (out []*entity.CustomCourse, n int, err error) {
 	err = s.db.Transaction(func(tx *gorm.DB) error {
-		out, n, err = FindCustomCourseList(tx, filter)
+		out, n, err = findCustomCourseList(tx, filter)
 		return err
 	})
 	return
 }
 
-func FindCustomCourseList(tx *gorm.DB, filter *vo.CustomCourseVo) (out []*entity.CustomCourse, n int, err error) {
+func (s *CustomCourseService) BindToCustomCourse(customCourseID uint, data *entity.CustomCourseData) error {
+	return nil
+}
+
+func findCustomCourseList(tx *gorm.DB, filter *vo.CustomCourseVo) (out []*entity.CustomCourse, n int, err error) {
 	err = tx.Model(&entity.CustomCourse{}).Scopes(scopeCustomCourseFilter(filter)).Order("order_number").Find(&out).Error
+	return
+}
+
+func findCustomCourseByID(tx *gorm.DB, id uint) (course *entity.CustomCourse, err error) {
+	err = tx.First(&course, id).Error
 	return
 }
 

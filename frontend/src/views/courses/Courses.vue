@@ -4,9 +4,9 @@
   </n-h1>
   <n-flex justify="start">
     <SelectDifficultTable v-model:value="currentDiffTableID" style="width: 200px" />
-    <SelectRival v-model:value="currentRivalID" width="200px" :placeholder="t('form.placeholderRival')" />
+    <SelectRival v-model:value="currentRivalID" width="200px" :placeholder="t('form.placeholderRival')" clearable />
     <SelectRivalTag v-model:value="currentRivalTagID" :rivalId="currentRivalID" width="200px"
-      :placeholder="t('form.placeholderRivalTag')" />
+      :placeholder="t('form.placeholderRivalTag')" clearable />
   </n-flex>
   <n-spin :show="loading">
     <n-data-table :columns="columns" :data="data" :pagination="pagination" :bordered="false"

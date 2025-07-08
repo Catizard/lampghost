@@ -14,9 +14,7 @@ type CustomCourseVo struct {
 	Constraints   string
 	OrderNumber   int
 
-	// This two fields cannot be translated into entity directly
-	SplitSha256s string
-	SplitMd5s    string
+	RivalID uint
 }
 
 func (customCourse *CustomCourseVo) Entity() *entity.CustomCourse {

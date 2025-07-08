@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/vo"
 	"github.com/rotisserie/eris"
@@ -37,12 +38,52 @@ func (s *CustomCourseService) FindCustomCourseList(filter *vo.CustomCourseVo) (o
 	return
 }
 
+func (s *CustomCourseService) QueryCustomCourseSongListWithRival(filter *vo.CustomCourseVo) (out []*dto.RivalSongDataDto, n int, err error) {
+	if filter == nil {
+		err = eris.Errorf("QueryCustomCourseSongListWithRival: filter cannot be nil")
+		return
+	}
+	if filter.ID == 0 {
+		err = eris.Errorf("QueryCustomCourseSongListWithRival: ID cannot be 0")
+		return
+	}
+	if filter.RivalID == 0 {
+		err = eris.Errorf("QueryCustomCourseSongListWithRival: RivalID cannot be 0")
+		return
+	}
+	err = s.db.Transaction(func(tx *gorm.DB) error {
+		rawSongs, _, err := findCustomCourseDataListByID(tx, filter.ID)
+		if err != nil {
+			return err
+		}
+		md5s := make([]string, 0)
+		for _, rawSong := range rawSongs {
+			md5s = append(md5s, rawSong.Md5)
+		}
+		queryParam := &vo.RivalSongDataVo{
+			RemoveDuplicate: true,
+			RivalId:         filter.RivalID,
+			Md5s:            md5s,
+		}
+		out, n, err = findRivalSongDataList(tx, queryParam)
+		return err
+	})
+	return
+}
+
 func (s *CustomCourseService) BindToCustomCourse(customCourseID uint, data *entity.CustomCourseData) error {
 	return nil
 }
 
 func findCustomCourseList(tx *gorm.DB, filter *vo.CustomCourseVo) (out []*entity.CustomCourse, n int, err error) {
 	err = tx.Model(&entity.CustomCourse{}).Scopes(scopeCustomCourseFilter(filter)).Order("order_number").Find(&out).Error
+	n = len(out)
+	return
+}
+
+func findCustomCourseDataListByID(tx *gorm.DB, courseID uint) (out []*entity.CustomCourseData, n int, err error) {
+	err = tx.Model(&entity.CustomCourseData{}).Where("custom_course_id = ?", courseID).Find(&out).Error
+	n = len(out)
 	return
 }
 

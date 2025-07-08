@@ -38,6 +38,16 @@ func (ctl *CustomCourseController) FindCustomCourseList(filter *vo.CustomCourseV
 	return result.NewRtnDataList(rows)
 }
 
+func (ctl *CustomCourseController) QueryCustomCourseSongListWithRival(filter *vo.CustomCourseVo) result.RtnDataList {
+	log.Info("[Controller] calling CustomCourseController.QueryCustomCourseSongListWithRival")
+	rows, _, err := ctl.customCourseService.QueryCustomCourseSongListWithRival(filter)
+	if err != nil {
+		log.Errorf("[CustomCourseController] returning err: %v", err)
+		return result.NewErrorDataList(err)
+	}
+	return result.NewRtnDataList(rows)
+}
+
 func (ctl *CustomCourseController) BindToCustomCourse(courseID uint, courseData *entity.CustomCourseData) result.RtnMessage {
 	log.Info("[Controller] calling CustomCourseController.BindToCustomCourse")
 	if err := ctl.customCourseService.BindToCustomCourse(courseID, courseData); err != nil {

@@ -310,24 +310,24 @@ func (s *DownloadTaskService) SubmitSingleMD5DownloadTask(md5 string, taskName *
 		return eris.New("assert: md5 cannot be empty")
 	}
 	downloadSource := download.GetDownloadSource(s.config.DownloadSite)
-	url, fallbackName, err := downloadSource.GetDownloadURLFromMD5(md5)
+	downloadInfo, err := downloadSource.GetDownloadURLFromMD5(md5)
 	if err != nil {
 		return err
 	}
 	s.lock()
 	for _, task := range s.tasks {
-		if task.URL == url {
-			// Skip duplicate download url
+		if task.UniqueSymbol == downloadInfo.UniqueSymbol {
+			// Skip duplicate based on unique symbol
 			s.unlock()
 			return nil
 		}
 	}
 	s.unlock()
-	log.Debugf("[DownloadTaskService] build url: %s", url)
+	log.Debugf("[DownloadTaskService] build url: %s", downloadInfo.DownloadURL)
 	currentTaskID := s.taskID
 	s.taskID++
 	intermediateFileName := fmt.Sprintf("%d.crdownload", currentTaskID)
-	return s.submitSingleDownloadTask(currentTaskID, url, intermediateFileName, fallbackName, taskName)
+	return s.submitSingleDownloadTask(currentTaskID, downloadInfo.DownloadURL, intermediateFileName, downloadInfo.FileName, taskName)
 }
 
 func (s *DownloadTaskService) submitSingleDownloadTask(id uint, url, intermediateFileName, fallbackName string, taskName *string) error {

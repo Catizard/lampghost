@@ -16,7 +16,8 @@ const (
 
 type DownloadTask struct {
 	gorm.Model
-	URL string
+	URL          string
+	UniqueSymbol string
 	// NOTE: This field is designed to be a pointer due to gorm's update strategy
 	Status               *int
 	IntermediateFilePath string

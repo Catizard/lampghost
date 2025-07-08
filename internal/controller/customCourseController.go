@@ -48,9 +48,9 @@ func (ctl *CustomCourseController) QueryCustomCourseSongListWithRival(filter *vo
 	return result.NewRtnDataList(rows)
 }
 
-func (ctl *CustomCourseController) BindToCustomCourse(courseID uint, courseData *entity.CustomCourseData) result.RtnMessage {
-	log.Info("[Controller] calling CustomCourseController.BindToCustomCourse")
-	if err := ctl.customCourseService.BindToCustomCourse(courseID, courseData); err != nil {
+func (ctl *CustomCourseController) AddCustomCourseData(param *entity.CustomCourseData) result.RtnMessage {
+	log.Info("[Controller] calling CustomCourseController.AddCustomCourseData")
+	if err := ctl.customCourseService.AddCustomCourseData(param); err != nil {
 		log.Errorf("[CustomCourseController] returning err: %v", err)
 		return result.NewErrorMessage(err)
 	}

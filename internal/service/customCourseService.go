@@ -71,8 +71,22 @@ func (s *CustomCourseService) QueryCustomCourseSongListWithRival(filter *vo.Cust
 	return
 }
 
-func (s *CustomCourseService) BindToCustomCourse(customCourseID uint, data *entity.CustomCourseData) error {
-	return nil
+func (s *CustomCourseService) AddCustomCourseData(param *entity.CustomCourseData) error {
+	if param == nil {
+		return eris.Errorf("AddCustomCourseData: param cannot be nil")
+	}
+	if param.CustomCourseID == 0 {
+		return eris.Errorf("AddCustomCourseData: custom course's id cannot 0")
+	}
+	if param.Sha256 == "" {
+		return eris.Errorf("AddCustomCourseData: sha256 cannot be empty")
+	}
+	if param.Md5 == "" {
+		return eris.Errorf("AddCustomCourseData: md5 cannot be empty")
+	}
+	return s.db.Transaction(func(tx *gorm.DB) error {
+		return addCustomCourseData(tx, param)
+	})
 }
 
 func findCustomCourseList(tx *gorm.DB, filter *vo.CustomCourseVo) (out []*entity.CustomCourse, n int, err error) {
@@ -94,6 +108,10 @@ func findCustomCourseByID(tx *gorm.DB, id uint) (course *entity.CustomCourse, er
 
 func addCustomCourse(tx *gorm.DB, param *vo.CustomCourseVo) error {
 	return tx.Create(param.Entity()).Error
+}
+
+func addCustomCourseData(tx *gorm.DB, param *entity.CustomCourseData) error {
+	return tx.Create(param).Error
 }
 
 func scopeCustomCourseFilter(filter *vo.CustomCourseVo) func(db *gorm.DB) *gorm.DB {

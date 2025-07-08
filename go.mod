@@ -9,7 +9,7 @@ require (
 	github.com/samber/lo v1.50.0
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.10.0
-	github.com/wailsapp/wails/v2 v2.10.1
+	github.com/wailsapp/wails/v2 v2.10.2
 	gorm.io/gorm v1.25.12
 )
 
@@ -18,6 +18,7 @@ require (
 	github.com/cloudflare/circl v1.6.1 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/pprof v0.0.0-20250423184734-337e5dd93bb4 // indirect
+	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/icholy/digest v1.1.0 // indirect
@@ -41,7 +42,7 @@ require (
 	github.com/charmbracelet/x/ansi v0.1.4 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
-	github.com/fsnotify/fsnotify v1.8.0
+	github.com/fsnotify/fsnotify v1.9.0
 	github.com/glebarez/go-sqlite v1.21.2 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect

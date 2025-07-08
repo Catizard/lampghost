@@ -42,7 +42,6 @@ const columns: DataTableColumns<dto.RivalSongDataDto> = [
 ];
 
 function loadData() {
-  console.log('1');
   loading.value = true;
   // TODO: Remove magical 1
   QueryCourseSongListWithRival({

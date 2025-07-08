@@ -72,7 +72,8 @@
     "ordered": "正序",
     "gotoGithub": "在浏览器中打开github仓库",
     "gotoDocument": "在浏览器中打开使用文档",
-    "joinQQGroup": "加入QQ群"
+    "joinQQGroup": "加入QQ群",
+    "addCustomCourse": "添加自定义段位"
   },
   "form": {
     "labelLanguage": "语言",

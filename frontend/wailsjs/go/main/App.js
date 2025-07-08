@@ -34,8 +34,8 @@ export function BindSongToFolder(arg1) {
   return window['go']['main']['App']['BindSongToFolder'](arg1);
 }
 
-export function BindToCustomCourse(arg1, arg2, arg3) {
-  return window['go']['main']['App']['BindToCustomCourse'](arg1, arg2, arg3);
+export function BindToCustomCourse(arg1, arg2) {
+  return window['go']['main']['App']['BindToCustomCourse'](arg1, arg2);
 }
 
 export function CancelDownloadTask(arg1) {
@@ -158,6 +158,14 @@ export function GENERATOR_COURSE_INFO_DTO() {
   return window['go']['main']['App']['GENERATOR_COURSE_INFO_DTO']();
 }
 
+export function GENERATOR_CUSTOM_COUSE() {
+  return window['go']['main']['App']['GENERATOR_CUSTOM_COUSE']();
+}
+
+export function GENERATOR_CUSTOM_COUSE_DATA() {
+  return window['go']['main']['App']['GENERATOR_CUSTOM_COUSE_DATA']();
+}
+
 export function GENERATOR_CUSTOM_DIFF_TABLE_DTO() {
   return window['go']['main']['App']['GENERATOR_CUSTOM_DIFF_TABLE_DTO']();
 }
@@ -240,6 +248,10 @@ export function QueryCourseSongListWithRival(arg1) {
 
 export function QueryCurrentDownloadSource() {
   return window['go']['main']['App']['QueryCurrentDownloadSource']();
+}
+
+export function QueryCustomCourseSongListWithRival(arg1) {
+  return window['go']['main']['App']['QueryCustomCourseSongListWithRival'](arg1);
 }
 
 export function QueryCustomDiffTablePageList(arg1) {

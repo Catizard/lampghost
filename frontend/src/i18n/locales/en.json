@@ -72,7 +72,8 @@
     "gotoGithub": "Open Github repo in browser",
     "gotoDocument": "Open manual in browser",
     "joinQQGroup": "Join QQ Group",
-    "addCustomTag": "Add Custom Tag"
+    "addCustomTag": "Add Custom Tag",
+    "addCustomCourse": "Add Custom Course"
   },
   "form": {
     "labelLanguage": "Language",

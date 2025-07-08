@@ -10,6 +10,7 @@ type CustomCourseDataDto struct {
 	Sha256         string
 	Md5            string
 	CustomCourseID uint
+	OrderNumber    int
 }
 
 func NewCustomCourseDataDto(courseData *entity.CustomCourseData) *CustomCourseDataDto {
@@ -23,5 +24,6 @@ func NewCustomCourseDataDto(courseData *entity.CustomCourseData) *CustomCourseDa
 		Sha256:         courseData.Sha256,
 		Md5:            courseData.Md5,
 		CustomCourseID: courseData.CustomCourseID,
+		OrderNumber:    courseData.OrderNumber,
 	}
 }

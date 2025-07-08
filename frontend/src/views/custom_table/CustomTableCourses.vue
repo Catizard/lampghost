@@ -4,19 +4,80 @@
       <n-text type="primary">{{ t('title.customTableCourses') }}</n-text>
     </n-h1>
   </n-flex>
-  <n-spin :show="loading">
-    <n-flex justify="space-between">
-      <SelectCustomTable v-model:value="currentCustomTableID" style="width: 200px;" />
+  <n-flex justify="space-between">
+    <SelectCustomTable v-model:value="currentCustomTableID" style="width: 200px;" />
+    <n-flex justify="end">
+      <n-button :disabled="currentCustomTableID == null" type="primary" @click="showAddModel = true">
+        {{ t('button.addCustomCourse') }}
+      </n-button>
     </n-flex>
+  </n-flex>
+  <n-spin :show="loading">
+    <n-data-table :columns="columns" :data="data" :pagination="pagination" :bordered="false"
+    :row-key="(row: dto.CustomCourseDto) => row.ID"></n-data-table>
   </n-spin>
+  <CustomCourseAddForm v-model:show="showAddModel" :customTableId="currentCustomTableID" @refresh="loadData" />
 </template>
 
 <script setup lang="ts">
-import { ref, Ref } from 'vue';
+import { h, reactive, ref, Ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import SelectCustomTable from '@/components/custom_table/SelectCustomTable.vue';
+import { dto } from '@wailsjs/go/models';
+import { DataTableColumns } from 'naive-ui';
+import CustomCourseDetail from './CustomCourseDetail.vue';
+import { FindCustomCourseList } from '@wailsjs/go/main/App';
+import CustomCourseAddForm from './CustomCourseAddForm.vue';
 
 const { t } = useI18n();
 const loading = ref(false);
+const showAddModel = ref(false);
 const currentCustomTableID: Ref<number | null> = ref(null);
+
+let data: Ref<dto.CustomCourseDto[]> = ref([]);
+const pagination = reactive({
+  page: 1,
+  pageSize: 10,
+  pageCount: 0,
+  showSizePicker: true,
+  pageSizes: [10, 20, 50],
+  onChange: (page: number) => {
+    pagination.page = page;
+  },
+  onUpdatePageSize: (pageSize: number) => {
+    pagination.pageSize = pageSize;
+    pagination.page = 1;
+  }
+});
+const columns: DataTableColumns<dto.CustomCourseDto> = [
+  { 
+    type: "expand",
+    renderExpand(row: dto.CustomCourseDto) {
+      return h(
+        CustomCourseDetail,
+        { customCourseId: row.ID, },
+      );
+    }
+  },
+  { title: t('column.name'), key: "Name" },
+  { title: t('column.constraints'), key: "Constraints" }
+];
+
+function loadData() {
+  loading.value = true;
+  FindCustomCourseList({} as any).then(result => {
+    if (result.Code != 200) {
+      return Promise.reject(result.Msg);
+    }
+    data.value = [...result.Rows];
+  }).catch(err => {
+    window.$notifyError(err);
+  }).finally(() => {
+    loading.value = false;
+  });
+}
+
+watch(currentCustomTableID, () => {
+  loadData();
+});
 </script>

@@ -16,9 +16,11 @@ import { useI18n } from "vue-i18n";
 import FolderDetail from "./FolderDetail.vue";
 import { DelFolder, FindFolderList } from "@wailsjs/go/main/App";
 
+const checkedRowKeys = defineModel<number[]>("checkedRowKeys");
 const props = defineProps<{
 	customTableId?: number
-	type: "table" | "folder"
+	type: "table" | "folder",
+	selectSong?: "single" | "multiple" // need to be passed to FolderDetail
 }>();
 defineExpose({ loadData })
 

@@ -5,7 +5,7 @@
 
 <script lang="ts" setup>
 import { dto } from '@wailsjs/go/models';
-import { DataTableColumns, NButton } from 'naive-ui';
+import { create, DataTableColumns, NButton } from 'naive-ui';
 import { h, reactive, Ref, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import ClearTag from '@/components/ClearTag.vue';
@@ -18,7 +18,8 @@ const { t } = useI18n();
 const props = defineProps<{
 	folderId: number,
 	rivalId?: number,
-	type: "table" | "folder"
+	type: "table" | "folder",
+	selectSong?: "single" | "multiple"
 }>();
 
 let data: Ref<dto.FolderContentDto[]> = ref([]);
@@ -38,49 +39,59 @@ const pagination = reactive({
 		loadData();
 	}
 });
-const columns: DataTableColumns<dto.FolderContentDto> = [
-	{ title: t('column.name'), key: "Title" },
-	{
-		title: (): string => {
-			if (props.type == "folder") {
-				return t('column.tag');
-			} else if (props.type == "table") {
-				return t('column.externalTag');
+function createColumns(): DataTableColumns<dto.FolderContentDto> {
+	let columns: DataTableColumns<dto.FolderContentDto> = [];
+	if (props.selectSong) {
+		columns.push({
+			type: "selection",
+			multiple: props.selectSong == "multiple"
+		});
+	}
+	columns.push(	
+		{ title: t('column.name'), key: "Title" },
+		{
+			title: (): string => {
+				if (props.type == "folder") {
+					return t('column.tag');
+				} else if (props.type == "table") {
+					return t('column.externalTag');
+				}
+			},
+			key: "Tag",
+			width: "200px",
+			render(row: dto.FolderContentDto) {
+				return h(TableTags, { tableTags: row.TableTags });
 			}
 		},
-		key: "Tag",
-		width: "200px",
-		render(row: dto.FolderContentDto) {
-			return h(TableTags, { tableTags: row.TableTags });
-		}
-	},
-	{
-		title: t('column.clear'), key: "Clear",
-		width: "125px",
-		render: (row: dto.FolderContentDto) => {
-			return h(ClearTag, { clear: row.Lamp },)
-		}
-	},
-	{
-		title: t('column.actions'),
-		key: "actions",
-		width: "150px",
-		render(row: dto.FolderContentDto) {
-			return h(
-				NButton,
-				{
-					strong: true,
-					tertiary: true,
-					size: "small",
-					type: "error",
-					onClick: () => deleteFolderContent(row.ID),
-				},
-				{ default: () => t('button.delete') },
-			);
+		{
+			title: t('column.clear'), key: "Clear",
+			width: "125px",
+			render: (row: dto.FolderContentDto) => {
+				return h(ClearTag, { clear: row.Lamp },)
+			}
 		},
-	},
-];
-
+		{
+			title: t('column.actions'),
+			key: "actions",
+			width: "150px",
+			render(row: dto.FolderContentDto) {
+				return h(
+					NButton,
+					{
+						strong: true,
+						tertiary: true,
+						size: "small",
+						type: "error",
+						onClick: () => deleteFolderContent(row.ID),
+					},
+					{ default: () => t('button.delete') },
+				);
+			},
+		},
+	);
+	return columns;
+}
+const columns: DataTableColumns<dto.FolderContentDto> = createColumns();
 function loadData() {
 	loading.value = true;
 	// TODO: remove magic 1

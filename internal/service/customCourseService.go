@@ -89,6 +89,16 @@ func (s *CustomCourseService) AddCustomCourseData(param *entity.CustomCourseData
 	})
 }
 
+func (s *CustomCourseService) BindSongToCustomCourse(sha256, md5 string, customCourseID uint) error {
+	return s.db.Transaction(func(tx *gorm.DB) error {
+		return addCustomCourseData(tx, &entity.CustomCourseData{
+			CustomCourseID: customCourseID,
+			Sha256:         sha256,
+			Md5:            md5,
+		})
+	})
+}
+
 func findCustomCourseList(tx *gorm.DB, filter *vo.CustomCourseVo) (out []*entity.CustomCourse, n int, err error) {
 	err = tx.Model(&entity.CustomCourse{}).Scopes(scopeCustomCourseFilter(filter)).Order("order_number").Find(&out).Error
 	n = len(out)

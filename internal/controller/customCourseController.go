@@ -57,5 +57,14 @@ func (ctl *CustomCourseController) AddCustomCourseData(param *entity.CustomCours
 	return result.SUCCESS
 }
 
+func (ctl *CustomCourseController) BindSongToCustomCourse(sha256, md5 string, customCourseID uint) result.RtnMessage {
+	log.Info("[Controller] calling CustomCourseController.BindSongToCustomCourse")
+	if err := ctl.customCourseService.BindSongToCustomCourse(sha256, md5, customCourseID); err != nil {
+		log.Errorf("[CustomCourseController] returning err: %v", err)
+		return result.NewErrorMessage(err)
+	}
+	return result.SUCCESS
+}
+
 func (ctl *CustomCourseController) GENERATOR_CUSTOM_COUSE() *dto.CustomCourseDto          { return nil }
 func (ctl *CustomCourseController) GENERATOR_CUSTOM_COUSE_DATA() *dto.CustomCourseDataDto { return nil }

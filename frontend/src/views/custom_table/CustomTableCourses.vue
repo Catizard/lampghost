@@ -14,7 +14,7 @@
   </n-flex>
   <n-spin :show="loading">
     <n-data-table :columns="columns" :data="data" :pagination="pagination" :bordered="false"
-    :row-key="(row: dto.CustomCourseDto) => row.ID"></n-data-table>
+      :row-key="(row: dto.CustomCourseDto) => row.ID"></n-data-table>
   </n-spin>
   <CustomCourseAddForm v-model:show="showAddModel" :customTableId="currentCustomTableID" @refresh="loadData" />
 </template>
@@ -50,12 +50,12 @@ const pagination = reactive({
   }
 });
 const columns: DataTableColumns<dto.CustomCourseDto> = [
-  { 
+  {
     type: "expand",
     renderExpand(row: dto.CustomCourseDto) {
       return h(
         CustomCourseDetail,
-        { customCourseId: row.ID, },
+        { customCourseId: row.ID, customTableId: currentCustomTableID.value },
       );
     }
   },

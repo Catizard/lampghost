@@ -38,6 +38,10 @@ export function BindFolderContentToCustomCourse(arg1, arg2) {
   return window['go']['main']['App']['BindFolderContentToCustomCourse'](arg1, arg2);
 }
 
+export function BindSongToCustomCourse(arg1, arg2, arg3) {
+  return window['go']['main']['App']['BindSongToCustomCourse'](arg1, arg2, arg3);
+}
+
 export function BindSongToFolder(arg1) {
   return window['go']['main']['App']['BindSongToFolder'](arg1);
 }

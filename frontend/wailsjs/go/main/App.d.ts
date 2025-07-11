@@ -25,6 +25,8 @@ export function AddRivalTag(arg1:vo.RivalTagVo):Promise<result.RtnMessage>;
 
 export function BindFolderContentToCustomCourse(arg1:number,arg2:number):Promise<result.RtnMessage>;
 
+export function BindSongToCustomCourse(arg1:string,arg2:string,arg3:number):Promise<result.RtnMessage>;
+
 export function BindSongToFolder(arg1:vo.BindToFolderVo):Promise<result.RtnMessage>;
 
 export function CancelDownloadTask(arg1:number):Promise<result.RtnMessage>;

@@ -60,6 +60,10 @@ func (s *CustomCourseService) QueryCustomCourseSongListWithRival(filter *vo.Cust
 		for _, rawSong := range rawSongs {
 			md5s = append(md5s, rawSong.Md5)
 		}
+		if len(md5s) == 0 {
+			out = make([]*dto.RivalSongDataDto, 0)
+			return nil
+		}
 		queryParam := &vo.RivalSongDataVo{
 			RemoveDuplicate: true,
 			RivalId:         filter.RivalID,

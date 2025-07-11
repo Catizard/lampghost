@@ -27,8 +27,6 @@ func (customCourse *CustomCourseVo) Entity() *entity.CustomCourse {
 		},
 		Name:          customCourse.Name,
 		CustomTableID: customCourse.CustomTableID,
-		Sha256s:       customCourse.Sha256s,
-		Md5s:          customCourse.Md5s,
 		Constraints:   customCourse.Constraints,
 		OrderNumber:   customCourse.OrderNumber,
 	}

@@ -10,6 +10,10 @@ export function AddCustomCourse(arg1) {
   return window['go']['main']['App']['AddCustomCourse'](arg1);
 }
 
+export function AddCustomCourseData(arg1) {
+  return window['go']['main']['App']['AddCustomCourseData'](arg1);
+}
+
 export function AddCustomDiffTable(arg1) {
   return window['go']['main']['App']['AddCustomDiffTable'](arg1);
 }
@@ -30,12 +34,12 @@ export function AddRivalTag(arg1) {
   return window['go']['main']['App']['AddRivalTag'](arg1);
 }
 
-export function BindSongToFolder(arg1) {
-  return window['go']['main']['App']['BindSongToFolder'](arg1);
+export function BindFolderContentToCustomCourse(arg1, arg2) {
+  return window['go']['main']['App']['BindFolderContentToCustomCourse'](arg1, arg2);
 }
 
-export function BindToCustomCourse(arg1, arg2) {
-  return window['go']['main']['App']['BindToCustomCourse'](arg1, arg2);
+export function BindSongToFolder(arg1) {
+  return window['go']['main']['App']['BindSongToFolder'](arg1);
 }
 
 export function CancelDownloadTask(arg1) {

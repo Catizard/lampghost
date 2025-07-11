@@ -12,8 +12,6 @@ import (
 	. "github.com/samber/lo"
 )
 
-const BEGIN_FOLDER_INDEX = 5
-
 type FolderService struct {
 	db *gorm.DB
 }
@@ -99,6 +97,23 @@ func (s *FolderService) BindSongToFolder(param *vo.BindToFolderVo) error {
 	return nil
 }
 
+func (s *FolderService) BindFolderContentToCustomCourse(contentID, customCourseID uint) error {
+	return s.db.Transaction(func(tx *gorm.DB) error {
+		content, err := findFolderContentByID(tx, contentID)
+		if err != nil {
+			return err
+		}
+		if err := addCustomCourseData(tx, &entity.CustomCourseData{
+			CustomCourseID: customCourseID,
+			Sha256:         content.Sha256,
+			Md5:            content.Md5,
+		}); err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
 // Delete a folder, and its contents
 func (s *FolderService) DelFolder(ID uint) error {
 	if err := s.db.Transaction(func(tx *gorm.DB) error {
@@ -106,7 +121,8 @@ func (s *FolderService) DelFolder(ID uint) error {
 		if err := tx.First(&candidate, ID).Error; err != nil {
 			return err
 		}
-		if err := tx.Unscoped().Where("folder_id = ?", candidate.ID).Delete(&entity.FolderContent{}).Error; err != nil {
+		if err := tx.Unscoped().Where("folder_id = ?", candidate.ID).Delete(
+			&entity.FolderContent{}).Error; err != nil {
 			return err
 		}
 		if err := tx.Delete(&entity.Folder{}, candidate.ID).Error; err != nil {

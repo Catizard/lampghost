@@ -106,6 +106,15 @@ func (ctl *FolderController) QueryFolderContentWithRival(filter *vo.FolderConten
 	return result.NewRtnPage(*filter.Pagination, rows)
 }
 
+func (ctl *FolderController) BindFolderContentToCustomCourse(contentID uint, customCourseID uint) result.RtnMessage {
+	log.Info("[Controller] calling FolderController.BindFolderContentToCustomCourse")
+	if err := ctl.folderService.BindFolderContentToCustomCourse(contentID, customCourseID); err != nil {
+		log.Errorf("[FolderController] returning err: %v", err)
+		return result.NewErrorMessage(err)
+	}
+	return result.SUCCESS
+}
+
 func (FolderController) GENERATOR_FOLDER() *entity.Folder                    { return nil }
 func (FolderController) GENERATOR_FOLDER_DTO() *dto.FolderDto                { return nil }
 func (FolderController) GENERATOR_FOLDER_CONTENT_DTO() *dto.FolderContentDto { return nil }

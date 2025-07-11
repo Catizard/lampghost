@@ -11,6 +11,8 @@ export function AddBatchDiffTableHeader(arg1:Array<vo.DiffTableHeaderVo>):Promis
 
 export function AddCustomCourse(arg1:vo.CustomCourseVo):Promise<result.RtnMessage>;
 
+export function AddCustomCourseData(arg1:entity.CustomCourseData):Promise<result.RtnMessage>;
+
 export function AddCustomDiffTable(arg1:vo.CustomDiffTableVo):Promise<result.RtnMessage>;
 
 export function AddDiffTableHeader(arg1:vo.DiffTableHeaderVo):Promise<result.RtnMessage>;
@@ -21,9 +23,9 @@ export function AddRivalInfo(arg1:vo.RivalInfoVo):Promise<result.RtnMessage>;
 
 export function AddRivalTag(arg1:vo.RivalTagVo):Promise<result.RtnMessage>;
 
-export function BindSongToFolder(arg1:vo.BindToFolderVo):Promise<result.RtnMessage>;
+export function BindFolderContentToCustomCourse(arg1:number,arg2:number):Promise<result.RtnMessage>;
 
-export function BindToCustomCourse(arg1:number,arg2:entity.CustomCourseData):Promise<result.RtnMessage>;
+export function BindSongToFolder(arg1:vo.BindToFolderVo):Promise<result.RtnMessage>;
 
 export function CancelDownloadTask(arg1:number):Promise<result.RtnMessage>;
 

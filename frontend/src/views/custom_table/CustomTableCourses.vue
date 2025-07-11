@@ -36,6 +36,7 @@ const { t } = useI18n();
 const loading = ref(false);
 const showAddModel = ref(false);
 const currentCustomTableID: Ref<number | null> = ref(null);
+const currentCustomCourseID: Ref<number | null> = ref(null);
 const showSelectSongFromFolder = ref(false);
 
 let data: Ref<dto.CustomCourseDto[]> = ref([]);
@@ -78,7 +79,10 @@ const columns: DataTableColumns<dto.CustomCourseDto> = [
           ],
           onSelect: (key: "Bind" | "Sort") => {
             switch (key) {
-              case 'Bind': showSelectSongFromFolder.value = true; break;
+              case 'Bind':
+                showSelectSongFromFolder.value = true;
+                currentCustomCourseID.value = row.ID;
+                break;
               case 'Sort': handleSortCustomCourseData(row); break;
             }
           }
@@ -105,7 +109,7 @@ function loadData() {
 
 function handleSelectSong(checkedRowKeys: number[]) {
   loading.value = true;
-  BindFolderContentToCustomCourse(checkedRowKeys[0], currentCustomTableID.value)
+  BindFolderContentToCustomCourse(checkedRowKeys[0], currentCustomCourseID.value)
     .then(result => {
       if (result.Code != 200) {
         return Promise.reject(result.Msg);

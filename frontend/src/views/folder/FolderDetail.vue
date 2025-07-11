@@ -1,6 +1,6 @@
 <template>
-	<n-data-table remote :loading="loading" :columns="columns" :data="data" :pagination="pagination" :bordered="false"
-		:row-key="(row: dto.FolderDto) => row.ID" />
+  <n-data-table remote :loading="loading" :columns="columns" :data="data" :pagination="pagination" :bordered="false"
+    :row-key="(row: dto.FolderDto) => row.ID" v-model:checked-row-keys="checkedRowKeys" />
 </template>
 
 <script lang="ts" setup>
@@ -16,113 +16,114 @@ const loading = ref(false);
 const { t } = useI18n();
 
 const props = defineProps<{
-	folderId: number,
-	rivalId?: number,
-	type: "table" | "folder",
-	selectSong?: "single" | "multiple"
+  folderId: number,
+  rivalId?: number,
+  type: "table" | "folder",
+  selectSong?: "single" | "multiple"
 }>();
+const checkedRowKeys = defineModel<number[]>("checkedRowKeys");
 
 let data: Ref<dto.FolderContentDto[]> = ref([]);
 const pagination = reactive({
-	page: 1,
-	pageSize: 10,
-	pageCount: 0,
-	showSizePicker: true,
-	pageSizes: [10, 20, 50],
-	onChange: (page: number) => {
-		pagination.page = page;
-		loadData();
-	},
-	onUpdatePageSize: (pageSize: number) => {
-		pagination.pageSize = pageSize;
-		pagination.page = 1;
-		loadData();
-	}
+  page: 1,
+  pageSize: 10,
+  pageCount: 0,
+  showSizePicker: true,
+  pageSizes: [10, 20, 50],
+  onChange: (page: number) => {
+    pagination.page = page;
+    loadData();
+  },
+  onUpdatePageSize: (pageSize: number) => {
+    pagination.pageSize = pageSize;
+    pagination.page = 1;
+    loadData();
+  }
 });
 function createColumns(): DataTableColumns<dto.FolderContentDto> {
-	let columns: DataTableColumns<dto.FolderContentDto> = [];
-	if (props.selectSong) {
-		columns.push({
-			type: "selection",
-			multiple: props.selectSong == "multiple"
-		});
-	}
-	columns.push(	
-		{ title: t('column.name'), key: "Title" },
-		{
-			title: (): string => {
-				if (props.type == "folder") {
-					return t('column.tag');
-				} else if (props.type == "table") {
-					return t('column.externalTag');
-				}
-			},
-			key: "Tag",
-			width: "200px",
-			render(row: dto.FolderContentDto) {
-				return h(TableTags, { tableTags: row.TableTags });
-			}
-		},
-		{
-			title: t('column.clear'), key: "Clear",
-			width: "125px",
-			render: (row: dto.FolderContentDto) => {
-				return h(ClearTag, { clear: row.Lamp },)
-			}
-		},
-		{
-			title: t('column.actions'),
-			key: "actions",
-			width: "150px",
-			render(row: dto.FolderContentDto) {
-				return h(
-					NButton,
-					{
-						strong: true,
-						tertiary: true,
-						size: "small",
-						type: "error",
-						onClick: () => deleteFolderContent(row.ID),
-					},
-					{ default: () => t('button.delete') },
-				);
-			},
-		},
-	);
-	return columns;
+  let columns: DataTableColumns<dto.FolderContentDto> = [];
+  if (props.selectSong) {
+    columns.push({
+      type: "selection",
+      multiple: props.selectSong == "multiple"
+    });
+  }
+  columns.push(
+    { title: t('column.name'), key: "Title" },
+    {
+      title: (): string => {
+        if (props.type == "folder") {
+          return t('column.tag');
+        } else if (props.type == "table") {
+          return t('column.externalTag');
+        }
+      },
+      key: "Tag",
+      width: "200px",
+      render(row: dto.FolderContentDto) {
+        return h(TableTags, { tableTags: row.TableTags });
+      }
+    },
+    {
+      title: t('column.clear'), key: "Clear",
+      width: "125px",
+      render: (row: dto.FolderContentDto) => {
+        return h(ClearTag, { clear: row.Lamp },)
+      }
+    },
+    {
+      title: t('column.actions'),
+      key: "actions",
+      width: "150px",
+      render(row: dto.FolderContentDto) {
+        return h(
+          NButton,
+          {
+            strong: true,
+            tertiary: true,
+            size: "small",
+            type: "error",
+            onClick: () => deleteFolderContent(row.ID),
+          },
+          { default: () => t('button.delete') },
+        );
+      },
+    },
+  );
+  return columns;
 }
 const columns: DataTableColumns<dto.FolderContentDto> = createColumns();
 function loadData() {
-	loading.value = true;
-	// TODO: remove magic 1
-	QueryFolderContentWithRival({
-		RivalID: 1,
-		FolderID: props.folderId,
-		Pagination: pagination,
-	} as any).then(result => {
-		if (result.Code != 200) {
-			return Promise.reject(result.Msg);
-		}
-		data.value = [...result.Rows];
-		pagination.pageCount = result.Pagination.pageCount;
-	})
-		.catch(err => window.$notifyError(err))
-		.finally(() => loading.value = false)
+  loading.value = true;
+  // TODO: remove magic 1
+  QueryFolderContentWithRival({
+    RivalID: 1,
+    FolderID: props.folderId,
+    Pagination: pagination,
+  } as any).then(result => {
+    if (result.Code != 200) {
+      return Promise.reject(result.Msg);
+    }
+    data.value = [...result.Rows];
+    pagination.pageCount = result.Pagination.pageCount;
+  })
+    .catch(err => window.$notifyError(err))
+    .finally(() => loading.value = false)
 }
 
 function deleteFolderContent(id: number) {
-	DelFolderContent(id)
-		.then((result) => {
-			if (result.Code != 200) {
-				return Promise.reject(result.Msg);
-			}
-			window.$notifySuccess(t('message.deleteSuccess'));
-			loadData();
-		})
-		.catch((err) => {
-			window.$notifyError(err);
-			loadData();
-		});
+  DelFolderContent(id)
+    .then((result) => {
+      if (result.Code != 200) {
+        return Promise.reject(result.Msg);
+      }
+      window.$notifySuccess(t('message.deleteSuccess'));
+      loadData();
+    })
+    .catch((err) => {
+      window.$notifyError(err);
+      loadData();
+    });
 }
 
 watch(props, () => loadData());

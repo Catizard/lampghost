@@ -1,7 +1,7 @@
 <template>
   <n-modal v-model:show="show" preset="dialog" :title="t('title.selectSongFromFolder')"
     :positive-text="t('button.submit')" :negative-text="t('button.cancel')" @positive-click="handlePositiveClick"
-    @negative-click="handleNegativeClick" :mask-closable="false">
+    @negative-click="handleNegativeClick" :mask-closable="false" style="width: 95vh; height: 95vh;">
     <FolderTable :customTableId="customTableId" type="table" selectSong="single"
       v-model:checkedRowKeys="checkedRowKeys" />
   </n-modal>
@@ -13,7 +13,7 @@ import { useI18n } from 'vue-i18n';
 import FolderTable from '@/views/folder/FolderTable.vue';
 
 const props = defineProps<{
-  customTableId: number
+  customTableId?: number
 }>();
 const emit = defineEmits(['select']);
 

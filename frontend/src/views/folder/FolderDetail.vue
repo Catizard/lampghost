@@ -19,7 +19,8 @@ const props = defineProps<{
   folderId: number,
   rivalId?: number,
   type: "table" | "folder",
-  selectSong?: "single" | "multiple"
+  selectSong?: "single" | "multiple",
+  noActions?: boolean
 }>();
 const checkedRowKeys = defineModel<number[]>("checkedRowKeys");
 
@@ -71,7 +72,9 @@ function createColumns(): DataTableColumns<dto.FolderContentDto> {
         return h(ClearTag, { clear: row.Lamp },)
       }
     },
-    {
+  );
+  if (props.noActions == null || props.noActions == true) {
+    columns.push({
       title: t('column.actions'),
       key: "actions",
       width: "150px",
@@ -88,8 +91,8 @@ function createColumns(): DataTableColumns<dto.FolderContentDto> {
           { default: () => t('button.delete') },
         );
       },
-    },
-  );
+    });
+  }
   return columns;
 }
 const columns: DataTableColumns<dto.FolderContentDto> = createColumns();

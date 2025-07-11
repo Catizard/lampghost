@@ -20,7 +20,8 @@ const checkedRowKeys = defineModel<number[]>("checkedRowKeys");
 const props = defineProps<{
   customTableId?: number
   type: "table" | "folder",
-  selectSong?: "single" | "multiple" // need to be passed to FolderDetail
+  selectSong?: "single" | "multiple", // need to be passed to FolderDetail
+  noActions?: boolean // also being passed to FolderDetail
 }>();
 defineExpose({ loadData })
 
@@ -52,7 +53,7 @@ function createColumns({
 }: {
   deleteFolder: (row: dto.FolderDto) => void;
 }): DataTableColumns<dto.FolderDto> {
-  return [
+  let ret: DataTableColumns<dto.FolderDto> = [
     {
       type: "expand",
       renderExpand: (row: dto.FolderDto) => {
@@ -61,6 +62,7 @@ function createColumns({
           type: props.type,
           selectSong: props.selectSong,
           checkedRowKeys: checkedRowKeys.value,
+          noActions: props.noActions,
           'onUpdate:checkedRowKeys': value => emit('update:checkedRowKeys', value)
         });
       },
@@ -76,7 +78,10 @@ function createColumns({
       key: "FolderName",
       minWidth: "150px"
     },
-    {
+
+  ];
+  if (props.noActions == null || props.noActions == false) {
+    ret.push({
       title: t('column.actions'),
       key: "actions",
       render(row: dto.FolderDto) {
@@ -91,9 +96,10 @@ function createColumns({
           },
           { default: () => t('button.delete') },
         );
-      },
-    },
-  ];
+      }
+    })
+  }
+  return ret;
 }
 
 function deleteFolder(id: number) {

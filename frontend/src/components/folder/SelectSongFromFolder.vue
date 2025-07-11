@@ -2,8 +2,8 @@
   <n-modal v-model:show="show" preset="dialog" :title="t('title.selectSongFromFolder')"
     :positive-text="t('button.submit')" :negative-text="t('button.cancel')" @positive-click="handlePositiveClick"
     @negative-click="handleNegativeClick" :mask-closable="false" style="width: 95vh; height: 95vh;">
-    <FolderTable :customTableId="customTableId" type="table" selectSong="single"
-      v-model:checkedRowKeys="checkedRowKeys" />
+    <FolderTable :customTableId="customTableId" type="table" selectSong="single" v-model:checkedRowKeys="checkedRowKeys"
+      noActions />
   </n-modal>
 </template>
 

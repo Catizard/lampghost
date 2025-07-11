@@ -5,7 +5,7 @@
     </n-h1>
   </n-flex>
   <n-flex justify="space-between">
-    <SelectCustomTable v-model:value="currentCustomTableID" style="width: 200px;" />
+    <SelectCustomTable v-model:value="currentCustomTableID" style="width: 200px;" ignoreDefaultTable />
     <n-flex justify="end">
       <n-button :disabled="currentCustomTableID == null" type="primary" @click="showAddModel = true">
         {{ t('button.addCustomCourse') }}

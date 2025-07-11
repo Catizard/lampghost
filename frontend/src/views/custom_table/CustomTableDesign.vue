@@ -6,7 +6,7 @@
   </n-flex>
   <n-spin :show="loading">
     <n-flex justify="space-between">
-      <SelectCustomTable v-model:value="currentCustomTableID" style="width: 200px;" />
+      <SelectCustomTable v-model:value="currentCustomTableID" style="width: 200px;" ignoreDefaultTable />
       <n-flex justify="end">
         <n-button :disabled="currentCustomTableID == null" type="primary" @click="showAddModal = true">
           {{ t('button.addDifficultFolder') }}

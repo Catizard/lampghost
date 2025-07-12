@@ -29,21 +29,20 @@ import { h, reactive, ref, Ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import SelectCustomTable from '@/components/custom_table/SelectCustomTable.vue';
 import { dto } from '@wailsjs/go/models';
-import { DataTableColumns, NButton, NDropdown } from 'naive-ui';
+import { DataTableColumns, NButton, NDropdown, useDialog } from 'naive-ui';
 import CustomCourseDetail from './CustomCourseDetail.vue';
-import { BindFolderContentToCustomCourse, FindCustomCourseList, QueryCourseSongListWithRival, QueryCustomCourseSongListWithRival, UpdateCustomCourseDataOrder } from '@wailsjs/go/main/App';
+import { BindFolderContentToCustomCourse, DeleteCustomCourse, FindCustomCourseList, QueryCustomCourseSongListWithRival, UpdateCustomCourseDataOrder } from '@wailsjs/go/main/App';
 import CustomCourseAddForm from './CustomCourseAddForm.vue';
 import SelectSongFromFolder from '@/components/folder/SelectSongFromFolder.vue';
 import SortTableModal from '@/components/SortTableModal.vue';
-import { CurrentCustomCourse, useCurrentCourseStore } from '@/stores/customCourse';
 
 const { t } = useI18n();
+const dialog = useDialog();
 const loading = ref(false);
 const showAddModel = ref(false);
 const currentCustomTableID: Ref<number | null> = ref(null);
 const currentCustomCourseID: Ref<number | null> = ref(null);
 const showSelectSongFromFolder = ref(false);
-const currentCustomCourseStore = useCurrentCourseStore();
 
 let data: Ref<dto.CustomCourseDto[]> = ref([]);
 const pagination = reactive({
@@ -82,12 +81,30 @@ const columns: DataTableColumns<dto.CustomCourseDto> = [
           options: [
             { label: t('button.addToCustomCourse'), key: "Bind" },
             { label: t('button.sort'), key: "Sort" },
+            { label: t('button.delete'), key: "Delete", props: { style: "color: red" } },
           ],
-          onSelect: (key: "Bind" | "Sort") => {
+          onSelect: (key: "Bind" | "Sort" | "Delete") => {
             currentCustomCourseID.value = row.ID;
             switch (key) {
               case 'Bind': showSelectSongFromFolder.value = true; break;
               case 'Sort': sortTableSettings.show = true; break;
+              case 'Delete':
+                dialog.warning({
+                  title: t('deleteDialog.title'),
+                  positiveText: t('deleteDialog.positiveText'),
+                  negativeText: t('deleteDialog.negativeText'),
+                  onPositiveClick: () => {
+                    loading.value = true;
+                    DeleteCustomCourse(row.ID).then(result => {
+                      if (result.Code != 200) {
+                        return Promise.reject(result.Msg);
+                      }
+                      loadData();
+                    }).catch(err => window.$notifyError(err))
+                      .finally(() => loading.value = false);
+                  }
+                });
+                break;
             }
           }
         },

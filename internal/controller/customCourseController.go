@@ -84,5 +84,23 @@ func (ctl *CustomCourseController) UpdateCustomCourseDataOrder(customCourseDataI
 	return result.SUCCESS
 }
 
+func (ctl *CustomCourseController) DeleteCustomCourse(courseID uint) result.RtnMessage {
+	log.Info("[Controller] calling CustomCourseController.DeleteCustomCourse")
+	if err := ctl.customCourseService.DeleteCustomCourse(courseID); err != nil {
+		log.Errorf("[CustomCourseController] returning err: %v", err)
+		return result.NewErrorMessage(err)
+	}
+	return result.SUCCESS
+}
+
+func (ctl *CustomCourseController) DeleteCustomCourseData(courseDataID uint) result.RtnMessage {
+	log.Info("[Controller] calling CustomCourseController.UpdateCustomCourseDataOrder")
+	if err := ctl.customCourseService.DeleteCustomCourseData(courseDataID); err != nil {
+		log.Errorf("[CustomCourseController] returning err: %v", err)
+		return result.NewErrorMessage(err)
+	}
+	return result.SUCCESS
+}
+
 func (ctl *CustomCourseController) GENERATOR_CUSTOM_COUSE() *dto.CustomCourseDto          { return nil }
 func (ctl *CustomCourseController) GENERATOR_CUSTOM_COUSE_DATA() *dto.CustomCourseDataDto { return nil }

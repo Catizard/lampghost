@@ -70,6 +70,14 @@ export function DelRivalInfo(arg1) {
   return window['go']['main']['App']['DelRivalInfo'](arg1);
 }
 
+export function DeleteCustomCourse(arg1) {
+  return window['go']['main']['App']['DeleteCustomCourse'](arg1);
+}
+
+export function DeleteCustomCourseData(arg1) {
+  return window['go']['main']['App']['DeleteCustomCourseData'](arg1);
+}
+
 export function DeleteCustomDiffTable(arg1) {
   return window['go']['main']['App']['DeleteCustomDiffTable'](arg1);
 }

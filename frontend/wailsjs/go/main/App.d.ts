@@ -41,6 +41,10 @@ export function DelFolderContent(arg1:number):Promise<result.RtnMessage>;
 
 export function DelRivalInfo(arg1:number):Promise<result.RtnMessage>;
 
+export function DeleteCustomCourse(arg1:number):Promise<result.RtnMessage>;
+
+export function DeleteCustomCourseData(arg1:number):Promise<result.RtnMessage>;
+
 export function DeleteCustomDiffTable(arg1:number):Promise<result.RtnMessage>;
 
 export function DeleteRivalTagByID(arg1:number):Promise<result.RtnMessage>;

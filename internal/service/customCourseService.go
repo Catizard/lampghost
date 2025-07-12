@@ -136,6 +136,28 @@ func (s *CustomCourseService) UpdateCustomCourseDataOrder(courseDataIDs []uint) 
 	})
 }
 
+func (s *CustomCourseService) DeleteCustomCourse(courseID uint) error {
+	return s.db.Transaction(func(tx *gorm.DB) error {
+		candidate, err := findCustomCourseByID(tx, courseID)
+		if err != nil {
+			return err
+		}
+		if err := tx.Unscoped().Where("custom_course_id = ?", candidate.ID).Delete(&entity.CustomCourseData{}).Error; err != nil {
+			return err
+		}
+		if err := tx.Unscoped().Delete(&entity.CustomCourse{}, candidate.ID).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
+func (s *CustomCourseService) DeleteCustomCourseData(courseDataID uint) error {
+	return s.db.Transaction(func(tx *gorm.DB) error {
+		return tx.Unscoped().Delete(&entity.CustomCourseData{}, courseDataID).Error
+	})
+}
+
 func findCustomCourseList(tx *gorm.DB, filter *vo.CustomCourseVo) (out []*entity.CustomCourse, n int, err error) {
 	err = tx.Model(&entity.CustomCourse{}).Scopes(scopeCustomCourseFilter(filter)).Order("order_number").Find(&out).Error
 	n = len(out)

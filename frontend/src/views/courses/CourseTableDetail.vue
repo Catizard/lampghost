@@ -8,7 +8,7 @@
 import ClearTag from '@/components/ClearTag.vue';
 import { QueryCourseSongListWithRival } from '@wailsjs/go/main/App';
 import { dto } from '@wailsjs/go/models';
-import { DataTableColumns } from 'naive-ui';
+import { DataTableColumns, NButton, useDialog } from 'naive-ui';
 import { h, onMounted, Ref, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 

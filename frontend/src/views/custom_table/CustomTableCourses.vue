@@ -116,7 +116,7 @@ const columns: DataTableColumns<dto.CustomCourseDto> = [
 
 function loadData() {
   loading.value = true;
-  FindCustomCourseList({} as any).then(result => {
+  FindCustomCourseList({ CustomTableID: currentCustomTableID.value } as any).then(result => {
     if (result.Code != 200) {
       return Promise.reject(result.Msg);
     }

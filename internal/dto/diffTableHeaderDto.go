@@ -88,11 +88,11 @@ func NewLevelChildNode(id uint, name string, level string) *DiffTableHeaderDto {
 
 // For exporting usage (i.e imported by beatoraja)
 type DiffTableHeaderExportDto struct {
-	Name       string `json:"name"`
-	Symbol     string `json:"symbol"`
-	HeaderUrl  string `json:"header_url"`
-	DataUrl    string `json:"data_url"`
-	LevelOrder string `json:"level_order"`
+	Name       string   `json:"name"`
+	Symbol     string   `json:"symbol"`
+	HeaderUrl  string   `json:"header_url"`
+	DataUrl    string   `json:"data_url"`
+	LevelOrder []string `json:"level_order"`
 }
 
 type DiffTableCourseExportDto struct {

@@ -87,5 +87,5 @@ type DiffTableDataExportDto struct {
 	Sha256  string `json:"sha256"`
 	Md5     string `json:"md5"`
 	Title   string `json:"title"`
-	Comment string `json:"comment`
+	Comment string `json:"comment,omitempty"`
 }

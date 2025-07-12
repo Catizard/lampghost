@@ -89,7 +89,7 @@ const columns: DataTableColumns<dto.CustomDiffTableDto> = [
               case "Link":
                 try {
                   const name = row.Name;
-                  ClipboardSetText(`http://localhost:7391/${encodeURIComponent(name)}.json`)
+                  ClipboardSetText(`http://localhost:7391/table/${encodeURIComponent(name)}.json`)
                   window.$notifySuccess(t('message.setClipboardSuccess'));
                 } catch (e) {
                   window.$notifyError(t('message.setClipboardError', { msg: String(e) }));
@@ -98,7 +98,7 @@ const columns: DataTableColumns<dto.CustomDiffTableDto> = [
             }
           }
         },
-        { default: () => h(NButton, null, { default: () => '...' })}
+        { default: () => h(NButton, null, { default: () => '...' }) }
       );
     }
   }

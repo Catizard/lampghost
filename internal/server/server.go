@@ -99,9 +99,9 @@ func (s *InternalServer) tableHandler(w http.ResponseWriter, r *http.Request) {
 		Symbol:    customTable.Symbol,
 		HeaderUrl: fmt.Sprintf("http://localhost:%d/table/%s.json", port, tableName),
 		DataUrl:   fmt.Sprintf("http://localhost:%d/content/%d.json", port, customTable.ID),
-		LevelOrder: strings.Join(Map(folderList, func(folder *dto.FolderDto, _ int) string {
+		LevelOrder: Map(folderList, func(folder *dto.FolderDto, _ int) string {
 			return folder.FolderName
-		}), ","),
+		}),
 	}
 	data, err := json.Marshal(export)
 	if err != nil {

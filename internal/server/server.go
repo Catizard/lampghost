@@ -24,6 +24,7 @@ const port = 7391
 
 type InternalServer struct {
 	customDiffTableService *service.CustomDiffTableService
+	customCourseService    *service.CustomCourseService
 	folderService          *service.FolderService
 	rivalInfoService       *service.RivalInfoService
 	rivalScoreLogService   *service.RivalScoreLogService
@@ -33,6 +34,7 @@ type InternalServer struct {
 
 func NewInternalServer(
 	customDiffTableService *service.CustomDiffTableService,
+	customCourseService *service.CustomCourseService,
 	folderService *service.FolderService,
 	rivalInfoService *service.RivalInfoService,
 	rivalScoreLogService *service.RivalScoreLogService,
@@ -41,6 +43,7 @@ func NewInternalServer(
 ) *InternalServer {
 	return &InternalServer{
 		customDiffTableService: customDiffTableService,
+		customCourseService:    customCourseService,
 		folderService:          folderService,
 		rivalInfoService:       rivalInfoService,
 		rivalScoreLogService:   rivalScoreLogService,
@@ -102,6 +105,37 @@ func (s *InternalServer) tableHandler(w http.ResponseWriter, r *http.Request) {
 		LevelOrder: Map(folderList, func(folder *dto.FolderDto, _ int) string {
 			return folder.FolderName
 		}),
+		Courses: make([][]dto.DiffTableCourseExportDto, 0),
+	}
+	courseList, n, err := s.customCourseService.FindCustomCourseList(&vo.CustomCourseVo{
+		CustomTableID: customTable.ID,
+	})
+	courseDataList, _, err := s.customCourseService.FindCustomCourseDataList(&vo.CustomCourseDataVo{
+		CustomCourseIDs: Map(courseList, func(course *entity.CustomCourse, _ int) uint {
+			return course.ID
+		}),
+	})
+
+	if n > 0 {
+		export.Courses = append(export.Courses, make([]dto.DiffTableCourseExportDto, 0))
+		for _, rawCourse := range courseList {
+			// I'm too lazy to convert it into a map...whatever
+			md5s := make([]string, 0)
+			for _, courseData := range courseDataList {
+				if courseData.CustomCourseID != rawCourse.ID {
+					continue
+				}
+				md5s = append(md5s, courseData.Md5)
+			}
+			if len(md5s) == 0 {
+				continue
+			}
+			export.Courses[0] = append(export.Courses[0], dto.DiffTableCourseExportDto{
+				Name:       rawCourse.Name,
+				Constraint: []string{},
+				Md5:        md5s,
+			})
+		}
 	}
 	data, err := json.Marshal(export)
 	if err != nil {

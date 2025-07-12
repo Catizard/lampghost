@@ -40,6 +40,14 @@ func (s *CustomCourseService) FindCustomCourseList(filter *vo.CustomCourseVo) (o
 	return
 }
 
+func (s *CustomCourseService) FindCustomCourseDataList(filter *vo.CustomCourseDataVo) (out []*entity.CustomCourseData, n int, err error) {
+	err = s.db.Transaction(func(tx *gorm.DB) error {
+		out, n, err = findCustomCourseDataList(tx, filter)
+		return err
+	})
+	return
+}
+
 func (s *CustomCourseService) QueryCustomCourseSongListWithRival(filter *vo.CustomCourseVo) (out []*dto.RivalSongDataDto, n int, err error) {
 	if filter == nil {
 		err = eris.Errorf("QueryCustomCourseSongListWithRival: filter cannot be nil")
@@ -54,7 +62,7 @@ func (s *CustomCourseService) QueryCustomCourseSongListWithRival(filter *vo.Cust
 		return
 	}
 	err = s.db.Transaction(func(tx *gorm.DB) error {
-		rawSongs, _, err := findCustomCourseDataListByID(tx, filter.ID)
+		rawSongs, _, err := findCustomCourseDataList(tx, &vo.CustomCourseDataVo{CustomCourseID: filter.ID})
 		if err != nil {
 			return err
 		}
@@ -155,12 +163,6 @@ func findCustomCourseList(tx *gorm.DB, filter *vo.CustomCourseVo) (out []*entity
 	return
 }
 
-func findCustomCourseDataListByID(tx *gorm.DB, courseID uint) (out []*entity.CustomCourseData, n int, err error) {
-	err = tx.Model(&entity.CustomCourseData{}).Where("custom_course_id = ?", courseID).Find(&out).Error
-	n = len(out)
-	return
-}
-
 func findCustomCourseByID(tx *gorm.DB, id uint) (course *entity.CustomCourse, err error) {
 	err = tx.First(&course, id).Error
 	return
@@ -171,7 +173,9 @@ func addCustomCourse(tx *gorm.DB, param *vo.CustomCourseVo) error {
 }
 
 func addCustomCourseData(tx *gorm.DB, param *entity.CustomCourseData) error {
-	siblings, _, err := findCustomCourseDataListByID(tx, param.CustomCourseID)
+	siblings, _, err := findCustomCourseDataList(tx, &vo.CustomCourseDataVo{
+		CustomCourseID: param.CustomCourseID,
+	})
 	if err != nil {
 		return err
 	}

@@ -90,6 +90,7 @@ func NewApp() *App {
 	// Internal Server
 	internalServer := server.NewInternalServer(
 		customDiffTableService,
+		customCourseService,
 		folderService,
 		rivalInfoService,
 		rivalScoreLogService,

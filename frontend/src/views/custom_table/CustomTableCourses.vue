@@ -43,6 +43,8 @@ const showAddModel = ref(false);
 const currentCustomTableID: Ref<number | null> = ref(null);
 const currentCustomCourseID: Ref<number | null> = ref(null);
 const showSelectSongFromFolder = ref(false);
+// ID => version
+const rowVersion = ref<Record<number, number>>({});
 
 let data: Ref<dto.CustomCourseDto[]> = ref([]);
 const pagination = reactive({
@@ -65,7 +67,10 @@ const columns: DataTableColumns<dto.CustomCourseDto> = [
     renderExpand(row: dto.CustomCourseDto) {
       return h(
         CustomCourseDetail,
-        { customCourseId: row.ID, customTableId: currentCustomTableID.value },
+        {
+          customCourseId: row.ID, customTableId: currentCustomTableID.value,
+          key: `${row.ID}-${rowVersion[row.ID]}`, // Hack: Allow us re-render the detail component
+        },
       );
     }
   },
@@ -130,11 +135,19 @@ function loadData() {
 
 function handleSelectSong(checkedRowKeys: number[]) {
   loading.value = true;
-  BindFolderContentToCustomCourse(checkedRowKeys[0], currentCustomCourseID.value)
+  const courseId = currentCustomCourseID.value;
+  BindFolderContentToCustomCourse(checkedRowKeys[0], courseId)
     .then(result => {
       if (result.Code != 200) {
         return Promise.reject(result.Msg);
       }
+      // Here goes the problem: how could we tell the specified row to
+      // re-render the detail component?
+      // My solution is giving every row a 'version' field, and place it
+      // as a part of the key prop of the detail component
+      // Therefore, whenever we update specified row's version, the related
+      // detail component would be re-rendered
+      rowVersion[courseId] = (rowVersion[courseId] || 0) + 1;
     }).catch(err => window.$notifyError(err))
     .finally(() => loading.value = false);
 }

@@ -32,6 +32,9 @@ type RivalSongDataDto struct {
 	AddDate    int64
 	Notes      int32
 
+	// Not an entity field currently
+	OrderNumber int
+
 	// Pagination
 	Page      int
 	PageSize  int

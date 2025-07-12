@@ -72,7 +72,9 @@
     "ordered": "正序",
     "gotoGithub": "在浏览器中打开github仓库",
     "gotoDocument": "在浏览器中打开使用文档",
-    "joinQQGroup": "加入QQ群"
+    "joinQQGroup": "加入QQ群",
+    "addCustomCourse": "添加自定义段位",
+    "addToCustomCourse": "选择歌曲"
   },
   "form": {
     "labelLanguage": "语言",
@@ -218,7 +220,11 @@
     "downloadSetting": "下载设置",
     "settings": "设置",
     "generalSetting": "通用设置",
-    "folderSetting": "收藏夹设置"
+    "folderSetting": "收藏夹设置",
+    "customTableCourses": "设计段位",
+    "addCustomCourse": "添加自定义段位",
+    "refactorCustomCourseDataOrder": "修改段位歌曲排序",
+    "selectSongFromFolder": "选择歌曲"
   },
   "hint": {
     "initUser": "配置你的存档文件路径",

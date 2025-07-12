@@ -101,15 +101,6 @@ func (s *CustomCourseService) AddCustomCourseData(param *entity.CustomCourseData
 		return eris.Errorf("AddCustomCourseData: md5 cannot be empty")
 	}
 	return s.db.Transaction(func(tx *gorm.DB) error {
-		siblings, _, err := findCustomCourseDataListByID(tx, param.CustomCourseID)
-		if err != nil {
-			return err
-		}
-		for _, sib := range siblings {
-			if sib.Md5 == param.Md5 || sib.Sha256 == param.Sha256 {
-				return eris.Errorf("Cannot add duplicated song into one course")
-			}
-		}
 		return addCustomCourseData(tx, param)
 	})
 }
@@ -180,6 +171,15 @@ func addCustomCourse(tx *gorm.DB, param *vo.CustomCourseVo) error {
 }
 
 func addCustomCourseData(tx *gorm.DB, param *entity.CustomCourseData) error {
+	siblings, _, err := findCustomCourseDataListByID(tx, param.CustomCourseID)
+	if err != nil {
+		return err
+	}
+	for _, sib := range siblings {
+		if sib.Md5 == param.Md5 || sib.Sha256 == param.Sha256 {
+			return eris.Errorf("Cannot add duplicated song into one course")
+		}
+	}
 	return tx.Create(param).Error
 }
 

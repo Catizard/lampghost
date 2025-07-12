@@ -5,8 +5,8 @@
     </n-h1>
   </n-flex>
   <n-flex justify="start">
-    <n-input :placeholder="t('form.placeholderSearchSongOrSabunName')" v-model:value="searchNameLike" @keyup.enter="loadData()"
-      style="width: 350px;" />
+    <n-input :placeholder="t('form.placeholderSearchSongOrSabunName')" v-model:value="searchNameLike"
+      @keyup.enter="loadData()" style="width: 350px;" />
     <!-- <n-button>{{ t('button.chooseClearType') }}</n-button>
       <n-button>{{ t('button.minimumClearType') }}</n-button> -->
   </n-flex>
@@ -43,10 +43,13 @@ type SongInfo = {
   Sha256: string,
   Title: string
 };
-const candidateSongInfo = ref<SongInfo | null>(null);
+let candidateSongInfo = reactive<SongInfo>({
+  Sha256: null,
+  Title: null,
+});
 
 function handleAddToFolder(sha256: string, title: string) {
-  candidateSongInfo.value = {
+  candidateSongInfo = {
     Sha256: sha256,
     Title: title
   };
@@ -54,7 +57,7 @@ function handleAddToFolder(sha256: string, title: string) {
 }
 
 function handleAddToTable(sha256: string, title: string) {
-  candidateSongInfo.value = {
+  candidateSongInfo = {
     Sha256: sha256,
     Title: title
   };
@@ -65,7 +68,7 @@ function handleSubmit(folderIds: number[]) {
   BindSongToFolder({
     Md5: "",
     FolderIDs: folderIds,
-    ...candidateSongInfo.value,
+    ...candidateSongInfo,
   })
     .then(result => {
       if (result.Code != 200) {

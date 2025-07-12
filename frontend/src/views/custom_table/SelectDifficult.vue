@@ -1,9 +1,8 @@
 <!-- Similar to SelectFolder, but candidates are difficult folders from custom tables -->
 <template>
   <n-modal :loading="loading" v-model:show="show" :title="t('title.bindToCustomTable')" preset="dialog"
-    :positive-text="t('button.submit')" :negative-text="t('button.cancel')"
-    @positive-click="handlePositiveClick" @negative-click="handleNegativeClick" closable
-    @close="() => { show = false }">
+    :positive-text="t('button.submit')" :negative-text="t('button.cancel')" @positive-click="handlePositiveClick"
+    @negative-click="handleNegativeClick" closable @close="() => { show = false }">
     <n-flex justify="space-between">
       <n-select v-model:value="currentCustomTableID" :options="customTableOptions" style="width: 200px;" />
       <!-- <n-button type="primary" @click="handleClickAddFolder">{{ t('button.addDifficultFolder') }}</n-button> -->
@@ -78,6 +77,9 @@ function reload() {
 watch(show, (newValue, oldValue) => {
   if (newValue == true) {
     loadCustomTableOptions();
+    watch(selectUnboundFolderRef, (r) => {
+      r.reload();
+    }, { once: true });
   }
 }, { deep: true });
 

@@ -312,7 +312,7 @@ func (s *DownloadTaskService) SubmitSingleMD5DownloadTask(md5 string, taskName *
 	downloadSource := download.GetDownloadSource(s.config.DownloadSite)
 	downloadInfo, err := downloadSource.GetDownloadURLFromMD5(md5)
 	if err != nil {
-		return err
+		return eris.Wrap(err, "build download url")
 	}
 	s.lock()
 	for _, task := range s.tasks {

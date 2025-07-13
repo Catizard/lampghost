@@ -7,6 +7,7 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/result"
 	"github.com/Catizard/lampghost_wails/internal/service"
 	"github.com/charmbracelet/log"
+	"github.com/rotisserie/eris"
 )
 
 type DownloadTaskController struct {
@@ -35,7 +36,7 @@ func (ctl *DownloadTaskController) SubmitDownloadTask(url string, taskName *stri
 func (ctl *DownloadTaskController) SubmitSingleMD5DownloadTask(md5 string, taskName *string) result.RtnMessage {
 	log.Info("[Controller] calling DownloadTaskController.SubmitSingleMD5DownloadTask")
 	if err := ctl.downloadTaskService.SubmitSingleMD5DownloadTask(md5, taskName); err != nil {
-		log.Errorf("[DownloadTaskController] returning err: %v", err)
+		log.Errorf("[DownloadTaskController] returning err: %s", eris.ToString(err, true))
 		return result.NewErrorMessage(err)
 	}
 	return result.SUCCESS

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/rotisserie/eris"
 )
@@ -31,15 +32,22 @@ func (d *wriggleDownloadSource) GetDownloadURLFromMD5(md5 string) (downloadInfo 
 	metaQueryURL := fmt.Sprintf(d.Meta.MetaQueryURL, md5)
 	resp, err := http.Get(metaQueryURL)
 	if err != nil {
+		err = eris.Wrap(err, "get meta")
 		return
 	}
 	defer resp.Body.Close()
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
+		err = eris.Wrap(err, "http read")
+		return
+	}
+	if strings.HasPrefix(string(b), "404") {
+		err = eris.Errorf("404 NOT FOUND")
 		return
 	}
 	var result mResp
 	if err = json.Unmarshal(b, &result); err != nil {
+		err = eris.Wrapf(err, "failed to unmarshal result: %s", string(b))
 		return
 	}
 	if result.Error != "" {

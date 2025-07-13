@@ -38,6 +38,16 @@ func (ctl *CustomCourseController) FindCustomCourseList(filter *vo.CustomCourseV
 	return result.NewRtnDataList(rows)
 }
 
+func (ctl *CustomCourseController) FindCustomCourseByID(customCourseID uint) result.RtnData {
+	log.Info("[Controller] calling CustomCourseController.FindCustomCourseByID")
+	data, err := ctl.customCourseService.FindCustomCourseByID(customCourseID)
+	if err != nil {
+		log.Errorf("[CustomCourseController] returning err: %v", err)
+		return result.NewErrorData(err)
+	}
+	return result.NewRtnData(data)
+}
+
 func (ctl *CustomCourseController) QueryCustomCourseSongListWithRival(filter *vo.CustomCourseVo) result.RtnDataList {
 	log.Info("[Controller] calling CustomCourseController.QueryCustomCourseSongListWithRival")
 	rows, _, err := ctl.customCourseService.QueryCustomCourseSongListWithRival(filter)
@@ -60,6 +70,15 @@ func (ctl *CustomCourseController) AddCustomCourseData(param *entity.CustomCours
 func (ctl *CustomCourseController) BindSongToCustomCourse(sha256, md5 string, customCourseID uint) result.RtnMessage {
 	log.Info("[Controller] calling CustomCourseController.BindSongToCustomCourse")
 	if err := ctl.customCourseService.BindSongToCustomCourse(sha256, md5, customCourseID); err != nil {
+		log.Errorf("[CustomCourseController] returning err: %v", err)
+		return result.NewErrorMessage(err)
+	}
+	return result.SUCCESS
+}
+
+func (ctl *CustomCourseController) UpdateCustomCourse(param *vo.CustomCourseVo) result.RtnMessage {
+	log.Info("[Controller] calling CustomCourseController.UpdateCustomCourse")
+	if err := ctl.customCourseService.UpdateCustomCourse(param); err != nil {
 		log.Errorf("[CustomCourseController] returning err: %v", err)
 		return result.NewErrorMessage(err)
 	}
@@ -102,5 +121,6 @@ func (ctl *CustomCourseController) DeleteCustomCourseData(courseDataID uint) res
 	return result.SUCCESS
 }
 
-func (ctl *CustomCourseController) GENERATOR_CUSTOM_COUSE() *dto.CustomCourseDto          { return nil }
+func (ctl *CustomCourseController) GENERATOR_CUSTOM_COUSE() *entity.CustomCourse { return nil }
+func (ctl *CustomCourseController) GENERATOR_CUSTOM_COUSE_DTO() *dto.CustomCourseDto          { return nil }
 func (ctl *CustomCourseController) GENERATOR_CUSTOM_COUSE_DATA() *dto.CustomCourseDataDto { return nil }

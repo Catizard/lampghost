@@ -782,7 +782,6 @@ func queryMainUser(tx *gorm.DB) (*entity.RivalInfo, error) {
 // Special Requirements:
 //  1. when updating main user, songdata.db file path cannot be empty
 func updateRivalInfo(tx *gorm.DB, shouldFullyReload bool, rivalInfo *entity.RivalInfo) error {
-
 	if shouldFullyReload {
 		log.Debugf("[RivalInfoService] trying to fully update rival info")
 		if err := syncRivalData(tx, rivalInfo); err != nil {

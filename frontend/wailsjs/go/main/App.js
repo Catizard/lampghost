@@ -94,6 +94,10 @@ export function FindCourseInfoListWithRival(arg1) {
   return window['go']['main']['App']['FindCourseInfoListWithRival'](arg1);
 }
 
+export function FindCustomCourseByID(arg1) {
+  return window['go']['main']['App']['FindCustomCourseByID'](arg1);
+}
+
 export function FindCustomCourseList(arg1) {
   return window['go']['main']['App']['FindCustomCourseList'](arg1);
 }
@@ -180,6 +184,10 @@ export function GENERATOR_CUSTOM_COUSE() {
 
 export function GENERATOR_CUSTOM_COUSE_DATA() {
   return window['go']['main']['App']['GENERATOR_CUSTOM_COUSE_DATA']();
+}
+
+export function GENERATOR_CUSTOM_COUSE_DTO() {
+  return window['go']['main']['App']['GENERATOR_CUSTOM_COUSE_DTO']();
 }
 
 export function GENERATOR_CUSTOM_DIFF_TABLE_DTO() {
@@ -396,6 +404,10 @@ export function SupplyMissingBMSFromTable(arg1) {
 
 export function SyncRivalTag(arg1) {
   return window['go']['main']['App']['SyncRivalTag'](arg1);
+}
+
+export function UpdateCustomCourse(arg1) {
+  return window['go']['main']['App']['UpdateCustomCourse'](arg1);
 }
 
 export function UpdateCustomCourseDataOrder(arg1) {

@@ -40,6 +40,14 @@ func (s *CustomCourseService) FindCustomCourseList(filter *vo.CustomCourseVo) (o
 	return
 }
 
+func (s *CustomCourseService) FindCustomCourseByID(customCourseID uint) (out *entity.CustomCourse, err error) {
+	err = s.db.Transaction(func(tx *gorm.DB) error {
+		out, err = findCustomCourseByID(tx, customCourseID)
+		return err
+	})
+	return
+}
+
 func (s *CustomCourseService) FindCustomCourseDataList(filter *vo.CustomCourseDataVo) (out []*entity.CustomCourseData, n int, err error) {
 	err = s.db.Transaction(func(tx *gorm.DB) error {
 		out, n, err = findCustomCourseDataList(tx, filter)
@@ -123,6 +131,21 @@ func (s *CustomCourseService) BindSongToCustomCourse(sha256, md5 string, customC
 	})
 }
 
+func (s *CustomCourseService) UpdateCustomCourse(param *vo.CustomCourseVo) error {
+	if param == nil {
+		return eris.Errorf("UpdateCustomCourse: param cannot be nil")
+	}
+	if param.ID == 0 {
+		return eris.Errorf("UpdateCustomCourse: ID cannot be 0")
+	}
+	if param.Name == "" {
+		return eris.Errorf("UpdateCustomCourse: Name cannot be empty")
+	}
+	return s.db.Transaction(func(tx *gorm.DB) error {
+		return updateCustomCourse(tx, param.Entity())
+	})
+}
+
 func (s *CustomCourseService) UpdateCustomCourseOrder(courseIDs []uint) error {
 	return s.db.Transaction(func(tx *gorm.DB) error {
 		return updateCustomCourseOrder(tx, courseIDs)
@@ -185,6 +208,10 @@ func addCustomCourseData(tx *gorm.DB, param *entity.CustomCourseData) error {
 		}
 	}
 	return tx.Create(param).Error
+}
+
+func updateCustomCourse(tx *gorm.DB, param *entity.CustomCourse) error {
+	return tx.Model(param).Select("name", "constraints").Updates(param).Error
 }
 
 func updateCustomCourseOrder(tx *gorm.DB, courseIDs []uint) error {

@@ -53,6 +53,8 @@ export function FindCourseInfoList():Promise<result.RtnDataList>;
 
 export function FindCourseInfoListWithRival(arg1:vo.CourseInfoVo):Promise<result.RtnDataList>;
 
+export function FindCustomCourseByID(arg1:number):Promise<result.RtnData>;
+
 export function FindCustomCourseList(arg1:vo.CustomCourseVo):Promise<result.RtnDataList>;
 
 export function FindCustomDiffTableByID(arg1:number):Promise<result.RtnData>;
@@ -93,9 +95,11 @@ export function GENERATOR_COURSE_INFO():Promise<entity.CourseInfo>;
 
 export function GENERATOR_COURSE_INFO_DTO():Promise<dto.CourseInfoDto>;
 
-export function GENERATOR_CUSTOM_COUSE():Promise<dto.CustomCourseDto>;
+export function GENERATOR_CUSTOM_COUSE():Promise<entity.CustomCourse>;
 
 export function GENERATOR_CUSTOM_COUSE_DATA():Promise<dto.CustomCourseDataDto>;
+
+export function GENERATOR_CUSTOM_COUSE_DTO():Promise<dto.CustomCourseDto>;
 
 export function GENERATOR_CUSTOM_DIFF_TABLE_DTO():Promise<dto.CustomDiffTableDto>;
 
@@ -204,6 +208,8 @@ export function SubmitSingleMD5DownloadTask(arg1:string,arg2:any):Promise<result
 export function SupplyMissingBMSFromTable(arg1:number):Promise<result.RtnMessage>;
 
 export function SyncRivalTag(arg1:number):Promise<result.RtnMessage>;
+
+export function UpdateCustomCourse(arg1:vo.CustomCourseVo):Promise<result.RtnMessage>;
 
 export function UpdateCustomCourseDataOrder(arg1:Array<number>):Promise<result.RtnMessage>;
 

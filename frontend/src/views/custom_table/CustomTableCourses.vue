@@ -17,6 +17,7 @@
       :row-key="(row: dto.CustomCourseDto) => row.ID"></n-data-table>
   </n-spin>
   <CustomCourseAddForm v-model:show="showAddModel" :customTableId="currentCustomTableID" @refresh="loadData" />
+  <CustomCourseEditForm ref="editFormRef" @refresh="loadData" />
   <SelectSongFromFolder :customTableId="currentCustomTableID" @select="handleSelectSong"
     v-model:show="showSelectSongFromFolder" />
   <SortTableModal v-model:show="sortTableSettings.show" :query-func="sortTableSettings.queryFunc"
@@ -35,6 +36,7 @@ import { BindFolderContentToCustomCourse, DeleteCustomCourse, FindCustomCourseLi
 import CustomCourseAddForm from './CustomCourseAddForm.vue';
 import SelectSongFromFolder from '@/components/folder/SelectSongFromFolder.vue';
 import SortTableModal from '@/components/SortTableModal.vue';
+import CustomCourseEditForm from './CustomCourseEditForm.vue';
 
 const { t } = useI18n();
 const dialog = useDialog();
@@ -43,6 +45,7 @@ const showAddModel = ref(false);
 const currentCustomTableID: Ref<number | null> = ref(null);
 const currentCustomCourseID: Ref<number | null> = ref(null);
 const showSelectSongFromFolder = ref(false);
+const editFormRef = ref<InstanceType<typeof CustomCourseEditForm>>(null);
 // ID => version
 const rowVersion = ref<Record<number, number>>({});
 
@@ -85,13 +88,15 @@ const columns: DataTableColumns<dto.CustomCourseDto> = [
           trigger: "hover",
           options: [
             { label: t('button.addToCustomCourse'), key: "Bind" },
+            { label: t('button.edit'), key: "Edit" },
             { label: t('button.sort'), key: "Sort" },
             { label: t('button.delete'), key: "Delete", props: { style: "color: red" } },
           ],
-          onSelect: (key: "Bind" | "Sort" | "Delete") => {
+          onSelect: (key: "Bind" | "Edit" | "Sort" | "Delete") => {
             currentCustomCourseID.value = row.ID;
             switch (key) {
               case 'Bind': showSelectSongFromFolder.value = true; break;
+              case "Edit": editFormRef.value.open(row.ID); break;
               case 'Sort': sortTableSettings.show = true; break;
               case 'Delete':
                 dialog.warning({

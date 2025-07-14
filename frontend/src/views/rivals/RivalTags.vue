@@ -12,29 +12,21 @@
   </n-flex>
   <n-data-table remote :columns="columns" :data="data" :pagination="pagination" :loading="tableLoading"
     :row-key="(row: dto.RivalTagDto) => row.ID" />
-  <n-modal v-model:show="showAddModal" preset="dialog" :title="t('title.addPlayerTag')"
-    :positive-text="t('button.submit')" :negative-text="t('button.submit')" @positive-click="handlePositiveClick"
-    @negative-click="handleNegativeClick" :mask-closable="false">
-    <n-form ref="formRef" :model="formData" :rules="rules">
-      <n-form-item :label="t('form.labelTagName')" path="TagName">
-        <n-input v-model:value="formData.TagName" :placeholder="t('form.placeholderTagName')" />
-      </n-form-item>
-      <n-form-item :label="t('form.labelTagRecordTime')" path="RecordTimestamp">
-        <n-date-picker clearable v-model:value="formData.RecordTimestamp" type="datetime" />
-      </n-form-item>
-    </n-form>
-  </n-modal>
+  <RivalTagAddForm :rivalId="currentRivalID" v-model:show="showAddModal" @refresh="loadData" />
+  <RivalTagEditForm ref="editFormRef" @refresh="loadData" />
 </template>
 
 <script setup lang="ts">
-import { AddRivalTag, DeleteRivalTagByID, QueryRivalTagPageList, RevertRivalTagEnabledState } from '@wailsjs/go/main/App';
+import { DeleteRivalTagByID, QueryRivalTagPageList, RevertRivalTagEnabledState } from '@wailsjs/go/main/App';
 import { dto } from '@wailsjs/go/models';
-import { DataTableColumns, FormInst, FormRules, NButton, useDialog } from 'naive-ui';
+import { DataTableColumns, NButton, NDropdown, useDialog } from 'naive-ui';
 import { h, reactive, Ref, ref, watch } from 'vue';
 import dayjs from 'dayjs';
 import { useI18n } from 'vue-i18n';
 import YesNotTag from '@/components/YesNotTag.vue';
 import SelectRival from '@/components/rivals/SelectRival.vue';
+import RivalTagAddForm from './RivalTagAddForm.vue';
+import RivalTagEditForm from './RivalTagEditForm.vue';
 
 const i18n = useI18n();
 const { t } = i18n;
@@ -42,9 +34,11 @@ const dialog = useDialog();
 
 const tableLoading = ref(false);
 const currentRivalID: Ref<number | null> = ref(null);
+const editFormRef = ref<InstanceType<typeof RivalTagEditForm>>(null);
 
 const columns: DataTableColumns<dto.RivalTagDto> = [
   { title: t('column.tagName'), key: "TagName", width: "200px", ellipsis: { tooltip: true } },
+  { title: t('column.symbol'), key: "Symbol", width: "100px", ellipsis: { tooltip: true } },
   {
     title: t('column.tagTime'),
     width: "125px",
@@ -65,34 +59,19 @@ const columns: DataTableColumns<dto.RivalTagDto> = [
     title: t('column.actions'), key: "Actions",
     width: "100px",
     render: (row: dto.RivalTagDto) => {
-      const deleteTagButton = row.Generated == false ? h(
-        NButton,
-        {
-          strong: true,
-          tertiary: true,
-          size: 'small',
-          type: "error",
-          style: {
-            "margin-left": "5px",
-          },
-          onClick: () => deleteTag(row),
+      return h(NDropdown, {
+        trigger: "hover",
+        options: [
+          { label: t('button.edit'), key: "Edit", },
+          { label: t('button.delete'), key: "Delete", disabled: !row.Generated }
+        ],
+        onSelect(key: string) {
+          switch (key) {
+            case "Edit": editFormRef.value.open(row.ID); break;
+            case "Delete": deleteTag(row); break;
+          }
         },
-        { default: () => t('button.delete') }
-      ) : null;
-      const revertEnabledStateButton = h(
-        NButton,
-        {
-          strong: true,
-          tertiary: true,
-          size: "small",
-          onClick: () => revertTagEnabledState(row),
-        },
-        { default: () => row.Enabled ? t('button.disable') : t('button.enable') }
-      );
-      if (deleteTagButton != null) {
-        return [revertEnabledStateButton, deleteTagButton];
-      }
-      return revertEnabledStateButton;
+      }, { default: () => h(NButton, null, { default: () => '...' }) });
     }
   }
 ];
@@ -136,44 +115,6 @@ function loadData() {
 }
 
 const showAddModal = ref(false);
-const formRef = ref<FormInst | null>(null);
-const formData = ref({
-  RivalID: null,
-  TagName: null,
-  RecordTimestamp: null
-});
-const rules: FormRules = {
-  RecordTimestamp: {
-    type: 'number',
-    required: true,
-    message: t('rule.missingTagRecordTime'),
-    trigger: ["input", "blur"]
-  }
-}
-function handlePositiveClick(): boolean {
-  formRef.value
-    ?.validate()
-    .then(() => {
-      AddRivalTag({
-        RivalId: currentRivalID.value,
-        ...formData.value
-      } as any)
-        .then(result => {
-          if (result.Code != 200) {
-            return Promise.reject(result.Msg);
-          }
-          showAddModal.value = false;
-        })
-        .catch(err => window.$notifyError(err))
-        .finally(() => loadData());
-    })
-    .catch((err) => { });
-  return false;
-}
-function handleNegativeClick() {
-  formData.value.TagName = null;
-  formData.value.RecordTimestamp = null;
-}
 
 function deleteTag(tag: dto.RivalTagDto) {
   dialog.warning({

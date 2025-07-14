@@ -91,12 +91,35 @@ func (s *RivalTagService) DeleteRivalTagByID(rivalTagID uint) error {
 	})
 }
 
-func (s *RivalTagService) RevertRivalTagEnabledState(rivalTagID uint) error {
-	return s.db.Model(&entity.RivalTag{}).Where("ID = ?", rivalTagID).UpdateColumn("enabled", gorm.Expr("1 - enabled")).Error
+func (s *RivalTagService) UpdateRivalTag(param *vo.RivalTagUpdateParam) error {
+	if param == nil {
+		return eris.Errorf("UpdateCustomCourse: param cannot be nil")
+	}
+	if param.ID == 0 {
+		return eris.Errorf("UpdateCustomCourse: ID cannot be 0")
+	}
+	rivalTag, err := s.FindRivalTagByID(param.ID)
+	if err != nil {
+		return eris.Wrap(err, "query rival tag by id")
+	}
+	if param.RecordTimestamp != nil {
+		if rivalTag.Generated {
+			return eris.Errorf("Cannot update generated rival tag's record time")
+		}
+		param.RecordTime = time.Unix((*param.RecordTimestamp)/1000, 0)
+	}
+
+	return s.db.Transaction(func(tx *gorm.DB) error {
+		return updateRivalTag(tx, param)
+	})
 }
 
-func (s *RivalTagService) FindRivalTagByID(ID uint) (*entity.RivalTag, error) {
-	return findRivalTagByID(s.db, ID)
+func (s *RivalTagService) FindRivalTagByID(ID uint) (*dto.RivalTagDto, error) {
+	rawEntity, err := findRivalTagByID(s.db, ID)
+	if err != nil {
+		return nil, err
+	}
+	return dto.NewRivalTagDto(rawEntity), nil
 }
 
 // Sync one rival's tags
@@ -230,6 +253,10 @@ func buildRivalTag(tx *gorm.DB, rivalID uint) ([]*entity.RivalTag, int, error) {
 	return tags, len(tags), nil
 }
 
+func updateRivalTag(tx *gorm.DB, param *vo.RivalTagUpdateParam) error {
+	return tx.Model(&param).Updates(param).Error
+}
+
 /*
 Sync one rival's tag list with specified raw scorelog.
 
@@ -317,29 +344,19 @@ func syncRivalTagFromRawData(tx *gorm.DB, rivalID uint, rawScoreLog []*entity.Sc
 }
 
 func findRivalTagList(tx *gorm.DB, filter *vo.RivalTagVo) ([]*entity.RivalTag, int, error) {
-	partial := tx.Model(&entity.RivalTag{})
-	if filter != nil {
-		partial = partial.Where(filter.Entity())
-		if !filter.NoIgnoreEnabled {
-			partial = partial.Where("Enabled = true")
-		}
-	}
+	partial := tx.Model(&entity.RivalTag{}).Scopes(scopeRivalTagFilter(filter))
 	var out []*entity.RivalTag
-	if err := partial.Scopes(
-		pagination(filter.Pagination),
-	).Find(&out).Error; err != nil {
+	if err := partial.Find(&out).Error; err != nil {
 		return nil, 0, err
 	}
 
 	if filter != nil && filter.Pagination != nil {
-		if filter.Pagination != nil {
-			count, err := selectRivalTagCount(tx, filter)
-			log.Debugf("[RivalTagService] findRivalTagList: count: %d", count)
-			if err != nil {
-				return nil, 0, err
-			}
-			filter.Pagination.PageCount = calcPageCount(count, filter.Pagination.PageSize)
+		count, err := selectRivalTagCount(tx, filter)
+		log.Debugf("[RivalTagService] findRivalTagList: count: %d", count)
+		if err != nil {
+			return nil, 0, err
 		}
+		filter.Pagination.PageCount = calcPageCount(count, filter.Pagination.PageSize)
 	}
 	return out, len(out), nil
 }
@@ -371,4 +388,18 @@ func deleteRivalTagByID(tx *gorm.DB, rivalTagID uint) error {
 // Removes one rival's all generated tags
 func deleteGeneratedTagsByRivalID(tx *gorm.DB, rivalID uint) error {
 	return tx.Unscoped().Where("rival_id = ? and generated = true", rivalID).Delete(&entity.RivalTag{}).Error
+}
+
+func scopeRivalTagFilter(filter *vo.RivalTagVo) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if filter == nil {
+			return db
+		}
+		moved := db.Where(filter.Entity()).Scopes(pagination(filter.Pagination), scopeInIDs(filter.IDs))
+		// Extra filter fields here
+		if !filter.NoIgnoreEnabled {
+			moved = moved.Where("Enabled = true")
+		}
+		return moved
+	}
 }

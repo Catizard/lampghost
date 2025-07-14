@@ -146,6 +146,10 @@ export function FindRivalInfoList() {
   return window['go']['main']['App']['FindRivalInfoList']();
 }
 
+export function FindRivalTagByID(arg1) {
+  return window['go']['main']['App']['FindRivalTagByID'](arg1);
+}
+
 export function FindRivalTagList(arg1) {
   return window['go']['main']['App']['FindRivalTagList'](arg1);
 }
@@ -444,6 +448,10 @@ export function UpdateRivalInfo(arg1) {
 
 export function UpdateRivalReverseImportInfo(arg1) {
   return window['go']['main']['App']['UpdateRivalReverseImportInfo'](arg1);
+}
+
+export function UpdateRivalTag(arg1) {
+  return window['go']['main']['App']['UpdateRivalTag'](arg1);
 }
 
 export function WriteConfig(arg1) {

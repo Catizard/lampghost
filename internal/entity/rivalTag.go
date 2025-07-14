@@ -13,6 +13,7 @@ type RivalTag struct {
 	Generated  bool
 	Enabled    bool `gorm:"default:1"`
 	RecordTime time.Time
+	Symbol     string
 }
 
 func (RivalTag) TableName() string {

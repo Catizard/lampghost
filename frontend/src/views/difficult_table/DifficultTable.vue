@@ -15,7 +15,6 @@
   <n-data-table :loading="loading" :columns="columns" :data="data" :pagination="pagination" :bordered="false"
     :row-key="(row: dto.DiffTableHeaderDto) => row.ID" />
 
-  <DifficultTableSortModal v-model:show="showSortModal" @refresh="loadDiffTableData()" />
   <DifficultTableAddForm v-model:show="showAddModal" @refresh="loadDiffTableData()" />
   <DifficultTableEditForm ref="editFormRef" @refresh="loadDiffTableData()" />
   <SortTableModal v-model:show="sortTableSettings.show" :query-func="sortTableSettings.queryFunc"

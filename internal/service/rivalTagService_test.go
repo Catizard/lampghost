@@ -1,7 +1,6 @@
 package service_test
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -105,26 +104,139 @@ func TestAddRivalTag(t *testing.T) {
 		t.Fatalf("initializeMainUser: %s", err)
 	}
 
-	var tests = []struct {
-		name  string
-		input *vo.RivalTagVo
-	}{
-		{
-			"completely nil",
-			nil,
-		},
-		{
-			"rival id is 0",
-			&vo.RivalTagVo{RivalId: 0, TagName: "TEST", RecordTime: time.Now()},
-		},
+	t.Run("quick fails", func(t *testing.T) {
+		tests := []struct {
+			name  string
+			input *vo.RivalTagVo
+		}{
+			{
+				"completely nil",
+				nil,
+			},
+			{
+				"rival id is 0",
+				&vo.RivalTagVo{RivalId: 0, TagName: "TEST", RecordTime: time.Now()},
+			},
+		}
+
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				if err := rivalTagService.AddRivalTag(tt.input); err == nil {
+					t.Fatalf("expected error, got nothing")
+				}
+			})
+		}
+	})
+
+	t.Run("smoke", func(t *testing.T) {
+		if err := rivalTagService.AddRivalTag(&vo.RivalTagVo{
+			RivalId:    1,
+			TagName:    "TEST",
+			RecordTime: time.Now(),
+		}); err != nil {
+			t.Fatalf("add rival tag: %s", err)
+		}
+	})
+}
+
+func TestUpdateRivalTag(t *testing.T) {
+	db, err := database.NewMemoryDatabase()
+	if err != nil {
+		t.Fatalf("db: %s", err)
+	}
+	rivalTagService := service.NewRivalTagService(db)
+	rivalInfoService := newRivalInfoService(db)
+	emptyMainUser := newEmptyInitializeUser(false, false, false)
+	if err := rivalInfoService.InitializeMainUser(emptyMainUser); err != nil {
+		t.Fatalf("initializeMainUser: %s", err)
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := rivalTagService.AddRivalTag(tt.input); err == nil {
-				fmt.Printf("err: %s", err)
-				t.Fatalf("expected error, got nothing")
+	t.Run("quick fails", func(t *testing.T) {
+		tests := []struct {
+			name  string
+			input *vo.RivalTagUpdateParam
+		}{
+			{"completely nil", nil},
+			{"no id", &vo.RivalTagUpdateParam{}},
+		}
+
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				if err := rivalTagService.UpdateRivalTag(tt.input); err == nil {
+					t.Fatalf("expected error, got nothing")
+				}
+			})
+		}
+	})
+
+	t.Run("smoke", func(t *testing.T) {
+		currentTime := time.Now()
+		if err := rivalTagService.AddRivalTag(&vo.RivalTagVo{
+			RivalId:    1,
+			TagName:    "TEST",
+			RecordTime: currentTime,
+		}); err != nil {
+			t.Fatalf("add rival tag: %s", err)
+		}
+
+		tags, n, err := rivalTagService.FindRivalTagList(nil)
+		if err != nil {
+			t.Fatalf("FindRivalTagList: %s", err)
+		}
+		if n != 1 {
+			t.Fatalf("expected exactly one rival tag, got %d", n)
+		}
+		tag := tags[0]
+		t.Run("update", func(t *testing.T) {
+			newName := "NEW NAME"
+			newSymbol := "NEW SYMBOL"
+			newEnabled := true
+			if err := rivalTagService.UpdateRivalTag(&vo.RivalTagUpdateParam{
+				ID:         tag.ID,
+				TagName:    &newName,
+				RecordTime: time.Now(),
+				Symbol:     &newSymbol,
+				Enabled:    &newEnabled,
+			}); err != nil {
+				t.Fatalf("UpdateRivalTag: %s", err)
+			}
+			if newTag, err := rivalTagService.FindRivalTagByID(tag.ID); err != nil {
+				t.Fatalf("FindRivalTagByID: %s", err)
+			} else {
+				if newTag.TagName != "NEW NAME" {
+					t.Fatalf("expected to be %s, got %s", "NEW NAME", newTag.TagName)
+				}
+				if !newTag.RecordTime.After(currentTime) {
+					t.Fatalf("record time is not updated")
+				}
+				if newTag.Enabled != true {
+					t.Fatalf("expected to be true, got %v", newTag.Enabled)
+				}
 			}
 		})
-	}
+		t.Run("empty value", func(t *testing.T) {
+			emptyString := ""
+			newEnabled := false
+			if err := rivalTagService.UpdateRivalTag(&vo.RivalTagUpdateParam{
+				ID:      tag.ID,
+				Symbol:  &emptyString,
+				Enabled: &newEnabled,
+			}); err != nil {
+				t.Fatalf("UpdateRivalTag: %s", err)
+			}
+			if newTag, err := rivalTagService.FindRivalTagByID(tag.ID); err != nil {
+				t.Fatalf("FindRivalTagByID: %s", err)
+			} else {
+				if newTag.TagName == emptyString {
+					t.Fatalf("expected to be %s, got %s", tag.TagName, newTag.TagName)
+				}
+				if newTag.Symbol != emptyString {
+					t.Fatalf("expected to be empty string, got %s", newTag.Symbol)
+				}
+				if newTag.Enabled != newEnabled {
+					t.Fatalf("expected to be false, got %v", newTag.Enabled)
+				}
+			}
+		})
+	})
 }

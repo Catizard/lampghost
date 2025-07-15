@@ -2,6 +2,7 @@ package service
 
 import (
 	"sync"
+	"time"
 
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
@@ -14,7 +15,16 @@ import (
 var (
 	defaultSongHashCache     *entity.SongHashCache = nil
 	defaultSongHashCacheLock sync.Mutex            = sync.Mutex{}
+	maximumEndRecordTime     time.Time
 )
+
+func init() {
+	var err error
+	maximumEndRecordTime, err = time.Parse("2006-01-02", "9999-01-01")
+	if err != nil {
+		panic(err)
+	}
+}
 
 type RivalSongDataService struct {
 	db *gorm.DB
@@ -92,10 +102,14 @@ func findRivalSongDataListWithRival(tx *gorm.DB, filter *vo.RivalSongDataVo) (ou
 
 	partial := tx.Table("rival_song_data").Scopes(scopeRivalSongDataFilter(filter))
 	partial = partial.Joins(`left join (
-		select max(clear) as Lamp, count(1) as PlayCount, rsl.sha256, rsl.minbp as MinBP
-		from rival_score_log rsl
-		where rsl.rival_id = ?
-		group by rsl.sha256
+    select rsl.clear as Lamp, rsl.PlayCount, rsl.minbp as MinBP, rsl.sha256
+    from (
+      select rsl.clear, rsl.minbp, ROW_NUMBER() OVER w as rn, COUNT(1) OVER w as PlayCount, rsl.rival_id, rsl.sha256
+      from rival_score_log rsl
+			where rsl.rival_id = ?
+      WINDOW w AS (PARTITION BY rsl.sha256 ORDER BY rsl.clear desc, rsl.minbp asc)
+    ) as rsl
+    where rsl.rn = 1
 	) as rsl on rsl.sha256 = rival_song_data.sha256`, filter.RivalId)
 
 	partial = partial.Joins(`left join (
@@ -105,22 +119,20 @@ func findRivalSongDataListWithRival(tx *gorm.DB, filter *vo.RivalSongDataVo) (ou
 		group by sha256
 	) as rsdl on rsdl.sha256 = rsl.sha256`, filter.RivalId)
 	if filter.GhostRivalID > 0 {
-		// TODO: How to do this???
+		endRecordTime := maximumEndRecordTime
 		if !filter.EndGhostRecordTime.IsZero() {
-			partial = partial.Joins(`left join (
-			  select max(clear) as Lamp, count(1) as PlayCount, rsl.sha256, rsl.minbp as MinBP
-			  from rival_score_log rsl
-			  where rsl.rival_id = ? and rsl.record_time <= ?
-			  group by rsl.sha256
-		    ) as ghost_rsl on ghost_rsl.sha256 = rival_song_data.sha256`, filter.GhostRivalID, filter.EndGhostRecordTime)
-		} else {
-			partial = partial.Joins(`left join (
-			  select max(clear) as Lamp, count(1) as PlayCount, rsl.sha256, rsl.minbp as MinBP
-			  from rival_score_log rsl
-			  where rsl.rival_id = ?
-			  group by rsl.sha256
-		  ) as ghost_rsl on ghost_rsl.sha256 = rival_song_data.sha256`, filter.GhostRivalID)
+			endRecordTime = filter.EndGhostRecordTime
 		}
+		partial = partial.Joins(`left join (
+			select rsl.clear as Lamp, rsl.PlayCount, rsl.minbp as MinBP, rsl.sha256
+      from (
+        select rsl.clear, rsl.minbp, ROW_NUMBER() OVER w as rn, COUNT(1) OVER w as PlayCount, rsl.rival_id, rsl.sha256
+        from rival_score_log rsl
+				where rsl.rival_id = ?
+        WINDOW w AS (PARTITION BY rsl.sha256 ORDER BY rsl.clear desc, rsl.minbp asc)
+      ) as rsl
+      where rsl.rn = 1 and rsl.record_time <= ?
+		) as ghost_rsl on ghost_rsl.sha256 = rival_song_data.sha256`, filter.GhostRivalID, endRecordTime)
 	}
 
 	fields := `

@@ -67,10 +67,10 @@ func (d *wriggleDownloadSource) AllowBatchDownload() bool {
 
 // Wriggle server models
 type mResp struct {
-	DiskSizeBytes uint32
-	FileHash      string
+	DiskSizeBytes uint32 `json:"disk_size_bytes"`
+	FileHash      string `json:"file_hash"`
 	Hashes        map[string]string
-	ModTime       string
+	ModTime       string `json:"mod_time"`
 	Name          string
 	Error         string
 }

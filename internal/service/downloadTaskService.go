@@ -322,7 +322,7 @@ func (s *DownloadTaskService) SubmitSingleMD5DownloadTask(md5 string, taskName *
 			if task.UniqueSymbol == downloadInfo.UniqueSymbol {
 				log.Infof("skipping download task due to have same unique symbol: %s", task.UniqueSymbol)
 				s.unlock()
-				return nil
+				return eris.New("duplicated download task")
 			}
 		}
 	}

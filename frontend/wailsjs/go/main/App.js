@@ -114,10 +114,6 @@ export function FindDiffTableHeaderList() {
   return window['go']['main']['App']['FindDiffTableHeaderList']();
 }
 
-export function FindDiffTableHeaderListWithRival(arg1) {
-  return window['go']['main']['App']['FindDiffTableHeaderListWithRival'](arg1);
-}
-
 export function FindDiffTableHeaderTree(arg1) {
   return window['go']['main']['App']['FindDiffTableHeaderTree'](arg1);
 }
@@ -294,20 +290,12 @@ export function QueryDiffTableInfoById(arg1) {
   return window['go']['main']['App']['QueryDiffTableInfoById'](arg1);
 }
 
-export function QueryDiffTableInfoWithRival(arg1, arg2) {
-  return window['go']['main']['App']['QueryDiffTableInfoWithRival'](arg1, arg2);
-}
-
 export function QueryFolderContentWithRival(arg1) {
   return window['go']['main']['App']['QueryFolderContentWithRival'](arg1);
 }
 
 export function QueryLatestVersion() {
   return window['go']['main']['App']['QueryLatestVersion']();
-}
-
-export function QueryLevelLayeredDiffTableInfoByID(arg1) {
-  return window['go']['main']['App']['QueryLevelLayeredDiffTableInfoByID'](arg1);
 }
 
 export function QueryMainUser() {

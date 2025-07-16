@@ -236,46 +236,15 @@ func (s *DiffTableService) UpdateDiffTableHeader(param *vo.DiffTableHeaderVo) er
 	return s.db.Debug().Updates(param.Entity()).Error
 }
 
-// Query all difficult table datas
-//
-// Returns difficult header and its contents
 func (s *DiffTableService) FindDiffTableHeaderList(filter *vo.DiffTableHeaderVo) ([]*dto.DiffTableHeaderDto, int, error) {
 	headers, _, err := findDiffTableHeaderList(s.db, filter)
 	if err != nil {
 		return nil, 0, err
 	}
-	headerIds := Map(headers, func(item *entity.DiffTableHeader, index int) uint {
-		return item.ID
-	})
-	contents, _, err := findDiffTableDataList(s.db, &vo.DiffTableDataVo{HeaderIDs: headerIds})
-	if err != nil {
-		return nil, 0, err
-	}
-
 	ret := Map(headers, func(header *entity.DiffTableHeader, _ int) *dto.DiffTableHeaderDto {
-		return dto.NewDiffTableHeaderDto(header, Filter(contents, func(content *dto.DiffTableDataDto, _ int) bool {
-			return content.HeaderID == header.ID
-		}))
+		return dto.NewDiffTableHeaderDto(header, make([]*dto.DiffTableDataDto, 0))
 	})
 	return ret, len(ret), nil
-}
-
-// Extend function for FindDiffTableHeaderList
-//
-// Adds player related field (e.g PlayCount, Lamp status)
-func (s *DiffTableService) FindDiffTableHeaderListWithRival(rivalID uint) ([]*dto.DiffTableHeaderDto, int, error) {
-	headers, _, err := s.FindDiffTableHeaderList(nil)
-	if err != nil {
-		return nil, 0, err
-	}
-	sha256ScoreLogsMap, err := findRivalScoreLogSha256Map(s.db, &vo.RivalScoreLogVo{RivalId: rivalID})
-	if err != nil {
-		return nil, 0, err
-	}
-	for _, header := range headers {
-		mergeRivalRelatedData(sha256ScoreLogsMap, header.Contents, false)
-	}
-	return headers, len(headers), nil
 }
 
 // Query difficult table data as tree
@@ -444,26 +413,6 @@ func (s *DiffTableService) DelDiffTableHeader(ID uint) error {
 // Returns one header with detailed contents, ensure every content's hash field is compitable
 func (s *DiffTableService) QueryDiffTableInfoByID(ID uint) (*dto.DiffTableHeaderDto, error) {
 	return queryDiffTableInfoByID(s.db, ID)
-}
-
-// Extend function for QueryDiffTableInfoByID
-//
-// Adds player related field (e.g PlayCount, Lamp status)
-func (s *DiffTableService) QueryDiffTableInfoByIDWithRival(ID uint, rivalID uint) (*dto.DiffTableHeaderDto, error) {
-	header, err := s.QueryDiffTableInfoByID(ID)
-	if err != nil {
-		return nil, err
-	}
-	sha256ScoreLogsMap, err := findRivalScoreLogSha256Map(s.db, &vo.RivalScoreLogVo{RivalId: rivalID})
-	if err != nil {
-		return nil, err
-	}
-	mergeRivalRelatedData(sha256ScoreLogsMap, header.Contents, false)
-	return header, nil
-}
-
-func (s *DiffTableService) QueryLevelLayeredDiffTableInfoByID(ID uint) (*dto.DiffTableHeaderDto, error) {
-	return queryLevelLayeredDiffTableInfoById(s.db, ID)
 }
 
 // Query specific difficult table's one level data contents with player related field (e.g PlayCount, Lamp status...)
@@ -660,29 +609,6 @@ func queryDiffTableInfoByID(tx *gorm.DB, ID uint) (*dto.DiffTableHeaderDto, erro
 		return nil, err
 	}
 	return dto.NewDiffTableHeaderDto(&header, contents), nil
-}
-
-// Merge player related data onto DiffTableDataDto (e.g PlayCount LampStatus...)
-// TODO: We can actaully combine "query rival's related data" and "merge rival's data with DiffTableDataDto" two steps together
-// The obstacle is mainly FindDiffTableHeaderListWithRival function, which requires redesign the data loading sequence
-//
-// This function would modify data in place rather than return a new array
-func mergeRivalRelatedData(sha256ScoreLogsMap map[string][]*dto.RivalScoreLogDto, contents []*dto.DiffTableDataDto, isGhostRival bool) error {
-	for i, content := range contents {
-		if logs, ok := sha256ScoreLogsMap[content.Sha256]; ok {
-			contents[i].PlayCount = len(logs)
-			for _, log := range logs {
-				if isGhostRival {
-					contents[i].GhostLamp = max(content.GhostLamp, int(log.Clear))
-				} else {
-					contents[i].Lamp = max(content.Lamp, int(log.Clear))
-				}
-			}
-		} else {
-			contents[i].PlayCount = 0
-		}
-	}
-	return nil
 }
 
 func findDiffTableHeaderList(tx *gorm.DB, filter *vo.DiffTableHeaderVo) ([]*entity.DiffTableHeader, int, error) {

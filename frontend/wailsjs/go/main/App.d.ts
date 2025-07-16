@@ -63,8 +63,6 @@ export function FindCustomDiffTableList(arg1:vo.CustomDiffTableVo):Promise<resul
 
 export function FindDiffTableHeaderList():Promise<result.RtnDataList>;
 
-export function FindDiffTableHeaderListWithRival(arg1:number):Promise<result.RtnDataList>;
-
 export function FindDiffTableHeaderTree(arg1:vo.DiffTableHeaderVo):Promise<result.RtnDataList>;
 
 export function FindDiffTableHeaderTreeWithRival(arg1:vo.DiffTableHeaderVo):Promise<result.RtnDataList>;
@@ -153,13 +151,9 @@ export function QueryDiffTableDataWithRival(arg1:vo.DiffTableHeaderVo):Promise<r
 
 export function QueryDiffTableInfoById(arg1:number):Promise<result.RtnData>;
 
-export function QueryDiffTableInfoWithRival(arg1:number,arg2:number):Promise<result.RtnData>;
-
 export function QueryFolderContentWithRival(arg1:vo.FolderContentVo):Promise<result.RtnPage>;
 
 export function QueryLatestVersion():Promise<result.RtnMessage>;
-
-export function QueryLevelLayeredDiffTableInfoByID(arg1:number):Promise<result.RtnData>;
 
 export function QueryMainUser():Promise<result.RtnData>;
 

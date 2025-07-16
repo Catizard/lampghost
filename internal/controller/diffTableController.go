@@ -78,15 +78,6 @@ func (ctl *DiffTableController) FindDiffTableHeaderList() result.RtnDataList {
 	return result.NewRtnDataList(rows)
 }
 
-func (ctl *DiffTableController) FindDiffTableHeaderListWithRival(rivalID uint) result.RtnDataList {
-	log.Info("[Controller] calling DiffTableController.FindDiffTableHeaderlistWithRival")
-	rows, _, err := ctl.diffTableService.FindDiffTableHeaderListWithRival(rivalID)
-	if err != nil {
-		log.Errorf("[DiffTableController] returning err: %v", err)
-	}
-	return result.NewRtnDataList(rows)
-}
-
 func (ctl *DiffTableController) FindDiffTableHeaderTree(filter *vo.DiffTableHeaderVo) result.RtnDataList {
 	log.Info("[Controller] calling DiffTableController.FindDiffTableHeaderTree")
 	rows, _, err := ctl.diffTableService.FindDiffTableHeaderTree(filter)
@@ -117,16 +108,6 @@ func (ctl *DiffTableController) QueryDiffTableInfoById(ID uint) result.RtnData {
 	return result.NewRtnData(data)
 }
 
-func (ctl *DiffTableController) QueryDiffTableInfoWithRival(ID uint, rivalID uint) result.RtnData {
-	log.Info("[Controller] calling DiffTableController.QueryDiffTableInfoWithRival")
-	data, err := ctl.diffTableService.QueryDiffTableInfoByIDWithRival(ID, rivalID)
-	if err != nil {
-		log.Errorf("[DiffTableController] returning err: %v", err)
-		return result.NewErrorData(err)
-	}
-	return result.NewRtnData(data)
-}
-
 func (ctl *DiffTableController) QueryDiffTableDataWithRival(filter *vo.DiffTableHeaderVo) result.RtnPage {
 	log.Info("[Controller] calling DiffTableController.QueryDiffTableDataWithRival")
 	rows, _, err := ctl.diffTableService.QueryDiffTableDataWithRival(filter)
@@ -135,16 +116,6 @@ func (ctl *DiffTableController) QueryDiffTableDataWithRival(filter *vo.DiffTable
 		return result.NewErrorPage(err)
 	}
 	return result.NewRtnPage(*filter.Pagination, rows)
-}
-
-func (ctl *DiffTableController) QueryLevelLayeredDiffTableInfoByID(ID uint) result.RtnData {
-	log.Info("[Controller] calling QueryLevelLayeredDiffTableInfoById")
-	data, err := ctl.diffTableService.QueryLevelLayeredDiffTableInfoByID(ID)
-	if err != nil {
-		log.Errorf("[DiffTableController] returning err: %v", err)
-		return result.NewErrorData(err)
-	}
-	return result.NewRtnData(data)
 }
 
 func (ctl *DiffTableController) UpdateHeaderOrder(headerIDs []uint) result.RtnMessage {

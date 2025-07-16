@@ -382,10 +382,6 @@ export function RestartDownloadTask(arg1) {
   return window['go']['main']['App']['RestartDownloadTask'](arg1);
 }
 
-export function RevertRivalTagEnabledState(arg1) {
-  return window['go']['main']['App']['RevertRivalTagEnabledState'](arg1);
-}
-
 export function RunServer() {
   return window['go']['main']['App']['RunServer']();
 }

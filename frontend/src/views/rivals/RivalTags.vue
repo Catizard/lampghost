@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { DeleteRivalTagByID, QueryRivalTagPageList, RevertRivalTagEnabledState } from '@wailsjs/go/main/App';
+import { DeleteRivalTagByID, QueryRivalTagPageList } from '@wailsjs/go/main/App';
 import { dto } from '@wailsjs/go/models';
 import { DataTableColumns, NButton, NDropdown, useDialog } from 'naive-ui';
 import { h, reactive, Ref, ref, watch } from 'vue';
@@ -131,17 +131,6 @@ function deleteTag(tag: dto.RivalTagDto) {
         }).catch(err => window.$notifyError(err));
     }
   })
-}
-
-function revertTagEnabledState(tag: dto.RivalTagDto) {
-  RevertRivalTagEnabledState(tag.ID)
-    .then(result => {
-      if (result.Code != 200) {
-        return Promise.reject(result.Msg);
-      }
-      loadData();
-    }).catch(err => window.$notifyError(err));
-  ;
 }
 
 // Watch: Whenever changing current rival, reset current page to the first one

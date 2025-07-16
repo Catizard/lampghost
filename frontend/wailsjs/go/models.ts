@@ -2198,6 +2198,7 @@ export namespace vo {
 	    Pagination?: entity.Page;
 	    NoIgnoreEnabled: boolean;
 	    RecordTimestamp?: number;
+	    IDs: number[];
 	
 	    static createFrom(source: any = {}) {
 	        return new RivalTagVo(source);
@@ -2218,6 +2219,7 @@ export namespace vo {
 	        this.Pagination = this.convertValues(source["Pagination"], entity.Page);
 	        this.NoIgnoreEnabled = source["NoIgnoreEnabled"];
 	        this.RecordTimestamp = source["RecordTimestamp"];
+	        this.IDs = source["IDs"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

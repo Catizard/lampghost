@@ -197,8 +197,6 @@ export function ReloadRivalSongData():Promise<result.RtnMessage>;
 
 export function RestartDownloadTask(arg1:number):Promise<result.RtnMessage>;
 
-export function RevertRivalTagEnabledState(arg1:number):Promise<result.RtnMessage>;
-
 export function RunServer():Promise<void>;
 
 export function SetScoreLogFilePath(arg1:string):Promise<void>;

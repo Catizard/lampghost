@@ -315,11 +315,15 @@ func (s *DownloadTaskService) SubmitSingleMD5DownloadTask(md5 string, taskName *
 		return eris.Wrap(err, "build download url")
 	}
 	s.lock()
-	for _, task := range s.tasks {
-		if task.UniqueSymbol == downloadInfo.UniqueSymbol {
-			// Skip duplicate based on unique symbol
-			s.unlock()
-			return nil
+	if downloadInfo.UniqueSymbol == "" {
+		log.Warnf("download task's unique symbol is empty string")
+	} else {
+		for _, task := range s.tasks {
+			if task.UniqueSymbol == downloadInfo.UniqueSymbol {
+				log.Infof("skipping download task due to have same unique symbol: %s", task.UniqueSymbol)
+				s.unlock()
+				return nil
+			}
 		}
 	}
 	s.unlock()

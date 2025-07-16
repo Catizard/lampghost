@@ -216,13 +216,30 @@ func (s *InternalServer) rivalsHandler(w http.ResponseWriter, r *http.Request) {
 	if n == 0 {
 		fmt.Fprintf(w, "[]")
 	}
+	rivalTagIDs := make([]uint, 0)
+	for _, rival := range rivals {
+		if rival.LockTagID != 0 {
+			rivalTagIDs = append(rivalTagIDs, rival.LockTagID)
+		}
+	}
+	lockTags, _, err := s.rivalTagService.FindRivalTagList(&vo.RivalTagVo{IDs: rivalTagIDs})
+	if err != nil {
+		http.Error(w, fmt.Sprintf("failed to query rival tags: %s", err), 500)
+		return
+	}
 
 	ret := Map(rivals, func(rival *dto.RivalInfoDto, _ int) *entity.IRPlayer {
-		return &entity.IRPlayer{
+		playerData := &entity.IRPlayer{
 			ID:   rival.ID,
 			Name: rival.Name,
 			Rank: fmt.Sprintf("%d", rival.LockTagID),
 		}
+		for _, lockTag := range lockTags {
+			if lockTag.ID == rival.LockTagID && lockTag.Symbol != "" {
+				playerData.Name = fmt.Sprintf("%s(%s)", rival.Name, lockTag.Symbol)
+			}
+		}
+		return playerData
 	})
 	data, err := json.Marshal(ret)
 	if err != nil {

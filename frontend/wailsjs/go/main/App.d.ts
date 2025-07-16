@@ -79,6 +79,8 @@ export function FindFolderTree(arg1:vo.FolderVo):Promise<result.RtnDataList>;
 
 export function FindRivalInfoList():Promise<result.RtnDataList>;
 
+export function FindRivalTagByID(arg1:number):Promise<result.RtnData>;
+
 export function FindRivalTagList(arg1:vo.RivalTagVo):Promise<result.RtnDataList>;
 
 export function GENERATE_RIVAL_SCORE_LOG():Promise<dto.RivalScoreLogDto>;
@@ -228,5 +230,7 @@ export function UpdateHeaderOrder(arg1:Array<number>):Promise<result.RtnMessage>
 export function UpdateRivalInfo(arg1:vo.RivalInfoVo):Promise<result.RtnMessage>;
 
 export function UpdateRivalReverseImportInfo(arg1:vo.RivalInfoVo):Promise<result.RtnMessage>;
+
+export function UpdateRivalTag(arg1:vo.RivalTagUpdateParam):Promise<result.RtnMessage>;
 
 export function WriteConfig(arg1:config.ApplicationConfig):Promise<result.RtnMessage>;

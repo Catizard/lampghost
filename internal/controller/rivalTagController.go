@@ -31,6 +31,16 @@ func (ctl *RivalTagController) FindRivalTagList(filter *vo.RivalTagVo) result.Rt
 	return result.NewRtnDataList(rows)
 }
 
+func (ctl *RivalTagController) FindRivalTagByID(rivalTagID uint) result.RtnData {
+	log.Info("[Controller] calling RivalTagController.FindRivalTagByID")
+	if data, err := ctl.rivalTagService.FindRivalTagByID(rivalTagID); err != nil {
+		log.Errorf("[RivalTagController] returning err: %v", err)
+		return result.NewErrorData(err)
+	} else {
+		return result.NewRtnData(data)
+	}
+}
+
 func (ctl *RivalTagController) QueryRivalTagPageList(filter *vo.RivalTagVo) result.RtnPage {
 	log.Info("[Controller] Calling RivalTagController.QueryRivalTagPageList")
 	rows, _, err := ctl.rivalTagService.FindRivalTagList(filter)
@@ -64,10 +74,9 @@ func (ctl *RivalTagController) DeleteRivalTagByID(rivalTagID uint) result.RtnMes
 	return result.SUCCESS
 }
 
-func (ctl *RivalTagController) RevertRivalTagEnabledState(rivalTagID uint) result.RtnMessage {
-	log.Info("[Controller] Calling RivalTagController.RevertRivalTagEnabledState")
-	err := ctl.rivalTagService.RevertRivalTagEnabledState(rivalTagID)
-	if err != nil {
+func (ctl *RivalTagController) UpdateRivalTag(param *vo.RivalTagUpdateParam) result.RtnMessage {
+	log.Info("[Controller] calling RivalTagController.UpdateRivalTag")
+	if err := ctl.rivalTagService.UpdateRivalTag(param); err != nil {
 		log.Errorf("[RivalTagController] returning err: %v", err)
 		return result.NewErrorMessage(err)
 	}

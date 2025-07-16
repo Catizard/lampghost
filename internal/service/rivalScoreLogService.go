@@ -113,11 +113,14 @@ func findRivalScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.Riva
 	// TODO: left join on rival_song_data is the bottleneck, how to replace it?
 	partial = partial.Debug().Joins("left join (select * from rival_song_data group by sha256) as sd on rival_score_log.sha256 = sd.sha256").Scopes(
 		scopeRivalScoreLogFilter(filter),
-		pagination(filter.Pagination),
 	)
-	if filter.SongNameLike != nil && *filter.SongNameLike != "" {
-		partial = partial.Where("sd.title like ('%' || ? || '%')", filter.SongNameLike)
+	if filter != nil {
+		partial = partial.Scopes(pagination(filter.Pagination))
+		if filter.SongNameLike != nil && *filter.SongNameLike != "" {
+			partial = partial.Where("sd.title like ('%' || ? || '%')", filter.SongNameLike)
+		}
 	}
+
 	if err := partial.Find(&out).Error; err != nil {
 		return nil, 0, err
 	}

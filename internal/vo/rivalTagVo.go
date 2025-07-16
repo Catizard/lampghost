@@ -15,6 +15,9 @@ type RivalTagVo struct {
 	Generated  bool
 	Enabled    bool
 	RecordTime time.Time
+	Symbol     string
+
+	// Pagination
 	Pagination *entity.Page
 
 	// When flagged, ignore 'Enabled' field in filter statement
@@ -22,6 +25,8 @@ type RivalTagVo struct {
 	NoIgnoreEnabled bool
 
 	RecordTimestamp *int64 // overwrites to RecordTime
+
+	IDs []uint
 }
 
 func NewRivalTagVo(rivalTag *entity.RivalTag) *RivalTagVo {
@@ -37,6 +42,7 @@ func NewRivalTagVo(rivalTag *entity.RivalTag) *RivalTagVo {
 		Generated:  rivalTag.Generated,
 		Enabled:    rivalTag.Enabled,
 		RecordTime: rivalTag.RecordTime,
+		Symbol:     rivalTag.Symbol,
 	}
 }
 
@@ -53,5 +59,19 @@ func (rivalTag *RivalTagVo) Entity() *entity.RivalTag {
 		Generated:  rivalTag.Generated,
 		Enabled:    rivalTag.Enabled,
 		RecordTime: rivalTag.RecordTime,
+		Symbol:     rivalTag.Symbol,
 	}
+}
+
+type RivalTagUpdateParam struct {
+	ID              uint
+	TagName         *string
+	Enabled         *bool
+	RecordTime      time.Time
+	RecordTimestamp *int64 `gorm:"-"` // Need to be converted by invoke side
+	Symbol          *string
+}
+
+func (RivalTagUpdateParam) TableName() string {
+	return "rival_tag"
 }

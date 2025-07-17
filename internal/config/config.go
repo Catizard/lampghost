@@ -1,11 +1,13 @@
 package config
 
 import (
+	"io"
 	"os"
 	"path/filepath"
 	"sync"
 
 	"github.com/Catizard/lampghost_wails/internal/config/download"
+	"github.com/charmbracelet/log"
 	"github.com/rotisserie/eris"
 	"github.com/spf13/viper"
 )
@@ -48,6 +50,12 @@ func init() {
 	viper.SetDefault("MaximumDownloadCount", 5)
 	viper.SetDefault("EnableAutoReload", 1)
 	viper.SafeWriteConfig()
+	// Setup logger
+	if logFile, err := os.OpenFile(WorkingDirectory+"lampghost.log", os.O_CREATE|os.O_WRONLY, 0644); err != nil {
+		panic(err)
+	} else {
+		log.SetOutput(io.MultiWriter(logFile, os.Stdout))
+	}
 }
 
 type ApplicationConfig struct {

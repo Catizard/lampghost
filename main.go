@@ -41,7 +41,7 @@ func main() {
 			WebviewIsTransparent: true,
 		},
 		LogLevel: 3,
-		Logger:   &logger.Logger{},
+		Logger:   &logger.WailsLogger{},
 	})
 	if err != nil {
 		println("Error:", err.Error())

@@ -1,35 +1,36 @@
 package logger
 
-import "github.com/charmbracelet/log"
+import (
+	"github.com/charmbracelet/log"
+)
 
-// A simple wrapper of charmbracelet/log, to hijack the wails' logger
-type Logger struct {
-}
+// Hijack the wails' logger
+type WailsLogger struct{}
 
-func (l *Logger) Print(msg string) {
+func (l *WailsLogger) Print(msg string) {
 	log.Print(msg)
 }
 
-func (l *Logger) Trace(msg string) {
+func (l *WailsLogger) Trace(msg string) {
 	log.Debug(msg)
 }
 
-func (l *Logger) Debug(msg string) {
+func (l *WailsLogger) Debug(msg string) {
 	log.Debug(msg)
 }
 
-func (l *Logger) Info(msg string) {
+func (l *WailsLogger) Info(msg string) {
 	log.Info(msg)
 }
 
-func (l *Logger) Warning(msg string) {
+func (l *WailsLogger) Warning(msg string) {
 	log.Warn(msg)
 }
 
-func (l *Logger) Error(msg string) {
+func (l *WailsLogger) Error(msg string) {
 	log.Error(msg)
 }
 
-func (l *Logger) Fatal(msg string) {
+func (l *WailsLogger) Fatal(msg string) {
 	log.Error(msg)
 }

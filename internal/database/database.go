@@ -9,6 +9,7 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 // database auto migrate definition
@@ -87,7 +88,10 @@ func migrates(db *gorm.DB) error {
 }
 
 func NewDatabase(config *config.DatabaseConfig) (db *gorm.DB, err error) {
-	if db, err = gorm.Open(sqlite.Open(config.DSN), &gorm.Config{}); err != nil {
+	newLogger := logger.New(log.Default(), logger.Config{})
+	if db, err = gorm.Open(sqlite.Open(config.DSN), &gorm.Config{
+		Logger: newLogger,
+	}); err != nil {
 		return nil, err
 	}
 	if err := migrates(db); err != nil {

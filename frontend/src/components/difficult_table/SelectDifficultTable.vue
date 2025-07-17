@@ -3,16 +3,18 @@
 </template>
 
 <script setup lang="ts">
+import { useSelectMemo } from '@/stores/selectMemo';
 import { FindDiffTableHeaderList } from '@wailsjs/go/main/App';
 import { dto, result } from '@wailsjs/go/models';
 import { SelectOption } from 'naive-ui';
-import { onMounted, Ref, ref } from 'vue';
+import { onMounted, Ref, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 const loading = ref(false);
 const tableId = defineModel<number | null>("value");
 const tableOptions: Ref<SelectOption[]> = ref([]);
+const selectMemoStore = useSelectMemo();
 
 interface Props {
   slientWhenNoTable?: boolean
@@ -38,7 +40,12 @@ function loadData() {
           value: header.ID,
         } as SelectOption;
       });
-      tableId.value = tableOptions.value[0].value as number;
+      const memoId = selectMemoStore.$state.difficultTableId;
+      if (memoId != null && memoId != 0 && result.Rows.find((header: dto.DiffTableHeaderDto) => header.ID == memoId)) {
+        tableId.value = memoId
+      } else {
+        tableId.value = tableOptions.value[0].value as number;
+      }
     })
     .catch(err => window.$notifyError(err))
     .finally(() => loading.value = false);
@@ -46,5 +53,9 @@ function loadData() {
 
 onMounted(() => {
   loadData();
+});
+
+watch(tableId, newId => {
+  selectMemoStore.setDifficultTableId(newId);
 });
 </script>

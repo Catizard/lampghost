@@ -378,10 +378,6 @@ export function SetScoreLogFilePath(arg1) {
   return window['go']['main']['App']['SetScoreLogFilePath'](arg1);
 }
 
-export function SubmitDownloadTask(arg1, arg2) {
-  return window['go']['main']['App']['SubmitDownloadTask'](arg1, arg2);
-}
-
 export function SubmitSingleMD5DownloadTask(arg1, arg2) {
   return window['go']['main']['App']['SubmitSingleMD5DownloadTask'](arg1, arg2);
 }

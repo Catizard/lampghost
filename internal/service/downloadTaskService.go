@@ -103,7 +103,7 @@ func (s *DownloadTaskService) pushupState() {
 		tasks, n, err := s.FindDownloadTaskList()
 		if err != nil {
 			log.Errorf("cannot pushup download task state: %s", err)
-		} else if n > 0 {
+		} else if n > 0 && s.ctx != nil {
 			runtime.EventsEmit(s.ctx, "DownloadTask:pushup", tasks)
 		}
 		time.Sleep(1 * time.Second)
@@ -287,19 +287,13 @@ func (s *DownloadTaskService) tryKickingWaitTask() {
 			final:  true,
 			err:    nil,
 		}
-		runtime.EventsEmit(s.ctx, "global:notify", dto.NotificationDto{
-			Type:    "success",
-			Content: fmt.Sprintf("%s download successfully", filename),
-		})
+		if s.ctx != nil {
+			runtime.EventsEmit(s.ctx, "global:notify", dto.NotificationDto{
+				Type:    "success",
+				Content: fmt.Sprintf("%s download successfully", filename),
+			})
+		}
 	}()
-}
-
-// Submit a new download task
-func (s *DownloadTaskService) SubmitDownloadTask(url string, taskName *string) error {
-	currentTaskID := s.taskID
-	currentTaskID++
-	intermediateFileName := fmt.Sprintf("%d.crdownload", currentTaskID)
-	return s.submitSingleDownloadTask(currentTaskID, url, intermediateFileName, "", taskName)
 }
 
 func (s *DownloadTaskService) SubmitSingleMD5DownloadTask(md5 string, taskName *string) error {
@@ -314,6 +308,7 @@ func (s *DownloadTaskService) SubmitSingleMD5DownloadTask(md5 string, taskName *
 	if err != nil {
 		return eris.Wrap(err, "build download url")
 	}
+	log.Debugf("unique symbol: %s", downloadInfo.UniqueSymbol)
 	s.lock()
 	if downloadInfo.UniqueSymbol == "" {
 		log.Warnf("download task's unique symbol is empty string")
@@ -331,10 +326,10 @@ func (s *DownloadTaskService) SubmitSingleMD5DownloadTask(md5 string, taskName *
 	currentTaskID := s.taskID
 	s.taskID++
 	intermediateFileName := fmt.Sprintf("%d.crdownload", currentTaskID)
-	return s.submitSingleDownloadTask(currentTaskID, downloadInfo.DownloadURL, intermediateFileName, downloadInfo.FileName, taskName)
+	return s.submitSingleDownloadTask(currentTaskID, downloadInfo, intermediateFileName, taskName)
 }
 
-func (s *DownloadTaskService) submitSingleDownloadTask(id uint, url, intermediateFileName, fallbackName string, taskName *string) error {
+func (s *DownloadTaskService) submitSingleDownloadTask(id uint, downloadInfo download.DownloadInfo, intermediateFileName string, taskName *string) error {
 	if err := s.config.EnableDownload(); err != nil {
 		return err
 	}
@@ -346,13 +341,14 @@ func (s *DownloadTaskService) submitSingleDownloadTask(id uint, url, intermediat
 		Model: gorm.Model{
 			ID: id,
 		},
-		URL:                  url,
+		URL:                  downloadInfo.DownloadURL,
 		Status:               &status,
 		IntermediateFilePath: intermediateFilePath,
-		FallbackName:         fallbackName,
+		FallbackName:         downloadInfo.FileName,
 		TaskName:             taskName,
 		DownloadSize:         0,
 		ContentLength:        0,
+		UniqueSymbol:         downloadInfo.UniqueSymbol,
 	}
 	s.tasks = append(s.tasks, &task)
 	s.waitTasks = append(s.waitTasks, &task)

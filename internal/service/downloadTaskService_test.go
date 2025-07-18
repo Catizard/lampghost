@@ -28,30 +28,6 @@ func untilTaskFinished(service *service.DownloadTaskService, ch chan<- int) {
 	}
 }
 
-func TestSubmitDownloadTask(t *testing.T) {
-	log.SetLevel(log.DebugLevel)
-	t.Run("SmokeTest", func(t *testing.T) {
-		if SKIP_DOWNLOAD_FLAG {
-			t.SkipNow()
-		}
-		db, err := database.NewMemoryDatabase()
-		if err != nil {
-			t.Fatalf("db: %s", err)
-		}
-		config, err := config.ReadConfig()
-		if err != nil {
-			t.Fatalf("config: %s", err)
-		}
-		downloadTaskService := service.NewDownloadTaskService(db, config, nil)
-		if err := downloadTaskService.SubmitDownloadTask("https://bms.wrigglebug.xyz/download/package/d837d90c1eeef5efbb5422dacbd3b76e", nil); err != nil {
-			t.Fatalf("download: %s", err)
-		}
-		ch := make(chan int)
-		go untilTaskFinished(downloadTaskService, ch)
-		<-ch
-	})
-}
-
 func TestSubmitSingleMD5DownloadTask(t *testing.T) {
 	log.SetLevel(log.DebugLevel)
 	t.Run("SmokeTest", func(t *testing.T) {

@@ -4,7 +4,7 @@
     :positive-text="t('button.submit')" :negative-text="t('button.cancel')" @positive-click="handlePositiveClick"
     @negative-click="handleNegativeClick" closable @close="() => { show = false }">
     <n-flex justify="space-between">
-      <n-select v-model:value="currentCustomTableID" :options="customTableOptions" style="width: 200px;" />
+      <SelectCustomTable v-model:value="currentCustomTableID" style="width: 200px;" ignoreDefaultTable />
       <!-- <n-button type="primary" @click="handleClickAddFolder">{{ t('button.addDifficultFolder') }}</n-button> -->
     </n-flex>
     <SelectUnboundFolder ref="selectUnboundFolderRef" type="folder" v-model:checkedFolderIds="checkedFolderIds"
@@ -20,8 +20,7 @@ import { dto } from '@wailsjs/go/models';
 import { useI18n } from 'vue-i18n';
 import FolderAddForm from '../folder/FolderAddForm.vue';
 import SelectUnboundFolder from '../folder/SelectUnboundFolder.vue';
-import { SelectOption } from 'naive-ui';
-import { FindCustomDiffTableList } from '@wailsjs/go/main/App';
+import SelectCustomTable from '@/components/custom_table/SelectCustomTable.vue';
 
 const { t } = useI18n();
 const show = defineModel<boolean>("show");
@@ -39,36 +38,6 @@ let checkedFolderIds: Ref<number[]> = ref([]);
 const selectUnboundFolderRef: Ref<InstanceType<typeof SelectUnboundFolder>> = ref(null);
 
 const currentCustomTableID: Ref<number | null> = ref(null);
-const customTableOptions: Ref<SelectOption[]> = ref([]);
-async function loadCustomTableOptions() {
-  loading.value = true;
-  try {
-    const result = await FindCustomDiffTableList({
-      IgnoreDefaultTable: true
-    } as any)
-    if (result.Code != 200) {
-      throw result.Msg;
-    }
-    if (result.Rows.length == 0) {
-      throw t('message.noTableError');
-    }
-    customTableOptions.value = result.Rows.map((row: dto.CustomDiffTableDto): SelectOption => {
-      return {
-        label: row.Name,
-        value: row.ID
-      }
-    });
-    currentCustomTableID.value = customTableOptions.value[0].value as number;
-    console.log('setting custom table id to ', currentCustomTableID.value);
-  } catch (e) {
-    window.$notifyError(e);
-  }
-  loading.value = false;
-}
-
-function handleClickAddFolder() {
-  showAddModal.value = true;
-}
 
 function reload() {
   selectUnboundFolderRef.value.reload();
@@ -76,7 +45,6 @@ function reload() {
 
 watch(show, (newValue, oldValue) => {
   if (newValue == true) {
-    loadCustomTableOptions();
     watch(selectUnboundFolderRef, (r) => {
       r.reload();
     }, { once: true });

@@ -4,7 +4,8 @@
 
 ## 什么是 LampGhost?
 
-![showcase](./doc/showcase.png)
+![showcase1](./doc/showcase1.png)
+![showcase2](./doc/showcase2.png)
 
 `LampGhost`是一个**离线**并且**跨平台**的`beatoraja`存档查看，收藏夹管理以及点灯情况对比查看的工具。它支持以下功能：
 

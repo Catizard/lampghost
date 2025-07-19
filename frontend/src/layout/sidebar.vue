@@ -172,9 +172,11 @@ const menuOptions: MenuOption[] = [
   height: 32px;
 }
 
+/*
 :deep(.n-menu > .n-menu-item:last-child) {
   position: absolute;
   bottom: 10px;
   width: 100%;
 }
+*/
 </style>

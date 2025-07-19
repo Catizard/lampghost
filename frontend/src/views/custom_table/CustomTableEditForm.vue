@@ -4,10 +4,10 @@
     @negative-click="handleNegativeClick" :mask-closable="false">
     <n-form ref="formRef" :model="formData" :rules="rules">
       <n-form-item :label="t('form.labelName')" path="Name">
-        <n-input v-model:value="formData.Name" clearable />
+        <n-input v-model:value="formData.Name" :placeholder="t('form.placeholderName')" clearable />
       </n-form-item>
       <n-form-item :label="t('form.labelSymbol')" path="Symbol">
-        <n-input v-model:value="formData.Symbol" clearable />
+        <n-input v-model:value="formData.Symbol" :placeholder="t('form.placeholderCustomTableSymbol')" clearable />
       </n-form-item>
     </n-form>
   </n-modal>

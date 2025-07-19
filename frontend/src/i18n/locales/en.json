@@ -74,7 +74,8 @@
     "joinQQGroup": "Join QQ Group",
     "addCustomTag": "Add Custom Tag",
     "addCustomCourse": "Add Custom Course",
-    "addToCustomCourse": "Select Song"
+    "addToCustomCourse": "Select Song",
+    "sortCourses": "Sort Courses"
   },
   "form": {
     "labelLanguage": "Language",
@@ -189,7 +190,7 @@
     "playerIRImportManagement": "Player IR Import Management",
     "playerTags": "Player Tags",
     "addPlayerTag": "Add Custom Tag",
-    "playCount": "游玩次数",
+    "playCount": "Play Count",
     "initUser": "Initialize User",
     "initTable": "Initialize Table",
     "skipInitTable": "Skip Table Initialization",
@@ -226,7 +227,8 @@
     "addCustomCourse": "Add Custom Course",
     "refactorCustomCourseDataOrder": "Refactor Course Play Order",
     "selectSongFromFolder": "Select Song",
-    "editCustomCourse": "Edit Custom Course"
+    "editCustomCourse": "Edit Custom Course",
+    "refactorCustomCourseOrder": "Refactor Custom Courses' Order"
   },
   "hint": {
     "initUser": "Configure your own save files location",

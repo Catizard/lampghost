@@ -10,6 +10,9 @@
       <n-button :disabled="currentCustomTableID == null" type="primary" @click="showAddModel = true">
         {{ t('button.addCustomCourse') }}
       </n-button>
+      <n-button :disabled="currentCustomTableID == null" type="info" @click="sortCourseSettings.show = true">
+        {{ t('button.sortCourses') }}
+      </n-button>
     </n-flex>
   </n-flex>
   <n-spin :show="loading">
@@ -20,19 +23,22 @@
   <CustomCourseEditForm ref="editFormRef" @refresh="loadData" />
   <SelectSongFromFolder :customTableId="currentCustomTableID" @select="handleSelectSong"
     v-model:show="showSelectSongFromFolder" />
-  <SortTableModal v-model:show="sortTableSettings.show" :query-func="sortTableSettings.queryFunc"
-    @select="sortTableSettings.handleUpdateSort" :title="sortTableSettings.title"
-    :labelField="sortTableSettings.labelField" :keyField="sortTableSettings.keyField" />
+  <SortTableModal v-model:show="sortCourseSettings.show" :query-func="sortCourseSettings.queryFunc"
+    @select="sortCourseSettings.handleUpdateSort" :title="sortCourseSettings.title"
+    :labelField="sortCourseSettings.labelField" :keyField="sortCourseSettings.keyField" />
+  <SortTableModal v-model:show="sortSongSettings.show" :query-func="sortSongSettings.queryFunc"
+    @select="sortSongSettings.handleUpdateSort" :title="sortSongSettings.title"
+    :labelField="sortSongSettings.labelField" :keyField="sortSongSettings.keyField" />
 </template>
 
 <script setup lang="ts">
 import { h, reactive, ref, Ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import SelectCustomTable from '@/components/custom_table/SelectCustomTable.vue';
-import { dto } from '@wailsjs/go/models';
+import { dto, result } from '@wailsjs/go/models';
 import { DataTableColumns, NButton, NDropdown, useDialog } from 'naive-ui';
 import CustomCourseDetail from './CustomCourseDetail.vue';
-import { BindFolderContentToCustomCourse, DeleteCustomCourse, FindCustomCourseList, QueryCustomCourseSongListWithRival, UpdateCustomCourseDataOrder } from '@wailsjs/go/main/App';
+import { BindFolderContentToCustomCourse, DeleteCustomCourse, FindCustomCourseList, QueryCustomCourseSongListWithRival, UpdateCustomCourseDataOrder, UpdateCustomCourseOrder } from '@wailsjs/go/main/App';
 import CustomCourseAddForm from './CustomCourseAddForm.vue';
 import SelectSongFromFolder from '@/components/folder/SelectSongFromFolder.vue';
 import SortTableModal from '@/components/SortTableModal.vue';
@@ -97,7 +103,7 @@ const columns: DataTableColumns<dto.CustomCourseDto> = [
             switch (key) {
               case 'Bind': showSelectSongFromFolder.value = true; break;
               case "Edit": editFormRef.value.open(row.ID); break;
-              case 'Sort': sortTableSettings.show = true; break;
+              case 'Sort': sortSongSettings.show = true; break;
               case 'Delete':
                 dialog.warning({
                   title: t('deleteDialog.title'),
@@ -157,7 +163,29 @@ function handleSelectSong(checkedRowKeys: number[]) {
     .finally(() => loading.value = false);
 }
 
-const sortTableSettings = reactive({
+const sortCourseSettings = reactive({
+  show: false,
+  queryFunc: () => {
+    return FindCustomCourseList({
+      CustomTableId: currentCustomTableID.value
+    } as any);
+  },
+  handleUpdateSort: (ids: number[]) => {
+    loading.value = true;
+    UpdateCustomCourseOrder(ids).then(result => {
+      if (result.Code != 200) {
+        return Promise.reject(result.Msg);
+      }
+      loadData();
+    }).catch(err => window.$notifyError(err))
+      .finally(() => loading.value = false);
+  },
+  title: t('title.refactorCustomCourseOrder'),
+  labelField: "Name",
+  keyField: "ID"
+})
+
+const sortSongSettings = reactive({
   show: false,
   queryFunc: () => {
     return QueryCustomCourseSongListWithRival({
@@ -171,6 +199,7 @@ const sortTableSettings = reactive({
       if (result.Code != 200) {
         return Promise.reject(result.Msg);
       }
+      rowVersion[currentCustomCourseID.value] = (rowVersion[currentCustomCourseID.value] || 0) + 1;
     }).catch(err => window.$notifyError(err))
       .finally(() => loading.value = false);
   },

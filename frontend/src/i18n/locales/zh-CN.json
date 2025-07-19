@@ -74,7 +74,8 @@
     "gotoDocument": "在浏览器中打开使用文档",
     "joinQQGroup": "加入QQ群",
     "addCustomCourse": "添加自定义段位",
-    "addToCustomCourse": "选择歌曲"
+    "addToCustomCourse": "选择歌曲",
+    "sortCourses": "段位排序"
   },
   "form": {
     "labelLanguage": "语言",
@@ -120,7 +121,8 @@
     "placeholderInternalServerPort": "请输入内部服务器端口号",
     "placeholderSeparateDownloadMD5": "请输入下载地址",
     "placeholderDownloadDirectory": "请输入下载路径",
-    "placeholderDefaultsToEmpty": "默认为空"
+    "placeholderDefaultsToEmpty": "默认为空",
+    "labelEnable": "启用"
   },
   "rule": {
     "missingName": "名称不能为空",
@@ -129,7 +131,7 @@
     "missingScorelogPath": "scorelog.db文件路径不可为空",
     "missingScoredatalogPath": "scoredatalog.db文件路径不可为空",
     "missingTagRecordTime": "标签时间不可为空",
-    "missingAddress": "Address cannot be empty"
+    "missingAddress": "地址不能为空"
   },
   "deleteDialog": {
     "title": "确定要删除吗?",
@@ -224,7 +226,9 @@
     "customTableCourses": "设计段位",
     "addCustomCourse": "添加自定义段位",
     "refactorCustomCourseDataOrder": "修改段位歌曲排序",
-    "selectSongFromFolder": "选择歌曲"
+    "selectSongFromFolder": "选择歌曲",
+    "editCustomCourse": "修改自定义段位",
+    "refactorCustomCourseOrder": "修改自定义段位排序"
   },
   "hint": {
     "initUser": "配置你的存档文件路径",

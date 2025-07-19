@@ -4,7 +4,8 @@ English | [简体中文](./README.zh-CN.md)
 
 ## What is LampGhost?
 
-![showcase](./doc/showcase.png)
+![showcase1](./doc/showcase1.png)
+![showcase2](./doc/showcase2.png)
 
 `LampGhost` is an **offline** and **cross-platform** `beatoraja` save file viewer, favorite folder manager and provides lamp diff view . It supports:
 

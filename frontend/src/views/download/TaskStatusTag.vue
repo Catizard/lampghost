@@ -25,7 +25,10 @@ const props = defineProps<{
 	errorMsg?: string,
 }>();
 
-function intoType(): "info" | "error" | "warning" | "primary" {
+function intoType(): "default" | "info" | "error" | "warning" | "primary" {
+	if (props.status == DownloadTaskStatus.PREPARE) {
+		return "default";
+	}
 	if (props.status == DownloadTaskStatus.ERROR) {
 		return "error";
 	}

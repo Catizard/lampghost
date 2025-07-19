@@ -9,7 +9,7 @@
 			<n-radio-button key="progressing" value="progressing" :label="t('button.progressing')" />
 			<n-radio-button key="completed" value="completed" :label="t('button.completed')" />
 		</n-radio-group>
-		<n-progress type="line" :percentage="progress" />
+		{{ downloadProgress }}
 	</n-flex>
 	<n-data-table :loading="loading" :columns="columns" :data='status == "progressing" ? progressing : completed'
 		:row-key="(row: entity.DownloadTask) => row.ID" :pagination="pagination" />
@@ -53,14 +53,14 @@ onUnmounted(() => {
 	}
 });
 
-const progress = computed(() => {
-	const c = completed.value.length, p  = progressing.value.length;
-	if (c + p > 0) {
-		return c / (c + p) * 100;
-	} else {
-		return 100;
-	}
-})
+const downloadProgress = computed(() => {
+	const c = completed.value.length, p = progressing.value.length;
+	return t('message.downloadProgress', {
+		success: c,
+		count: c + p,
+		progress: (c + p) == 0 ? 100 : c / (c + p)
+	});;
+});
 
 const columns: DataTableColumns<entity.DownloadTask> = [
 	{

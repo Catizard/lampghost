@@ -27,7 +27,8 @@
     "loadFolderDataError": "读取收藏夹信息失败: {msg}",
     "supplyMissingBMS": "确定要添加所有缺少的BMS吗?",
     "setClipboardSuccess": "成功复制导入链接",
-    "setClipboardError": "复制导入链接失败，错误原因: {msg}"
+    "setClipboardError": "复制导入链接失败，错误原因: {msg}",
+    "downloadProgress": "当前进行的任务 {success}/{count}, 进度: {progress}%"
   },
   "button": {
     "add": "新增",

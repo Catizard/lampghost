@@ -75,7 +75,9 @@
     "addCustomTag": "Add Custom Tag",
     "addCustomCourse": "Add Custom Course",
     "addToCustomCourse": "Select Song",
-    "sortCourses": "Sort Courses"
+    "sortCourses": "Sort Courses",
+    "progressing": "Progressing",
+    "completed": "Completed"
   },
   "form": {
     "labelLanguage": "Language",

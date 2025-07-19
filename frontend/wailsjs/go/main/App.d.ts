@@ -105,7 +105,7 @@ export function GENERATOR_CUSTOM_DIFF_TABLE_DTO():Promise<dto.CustomDiffTableDto
 
 export function GENERATOR_DOWNLOAD_SOURCE():Promise<download.DownloadSource>;
 
-export function GENERATOR_DOWNLOAD_TASK():Promise<download.DownloadSource>;
+export function GENERATOR_DOWNLOAD_TASK():Promise<entity.DownloadTask>;
 
 export function GENERATOR_FOLDER():Promise<entity.Folder>;
 

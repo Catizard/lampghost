@@ -75,7 +75,9 @@
     "joinQQGroup": "加入QQ群",
     "addCustomCourse": "添加自定义段位",
     "addToCustomCourse": "选择歌曲",
-    "sortCourses": "段位排序"
+    "sortCourses": "段位排序",
+    "progressing": "进行中",
+    "completed": "已完成"
   },
   "form": {
     "labelLanguage": "语言",

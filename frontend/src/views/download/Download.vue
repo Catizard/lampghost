@@ -4,14 +4,19 @@
 			<n-text type="primary"> {{ t('title.downloadTask') }}</n-text>
 		</n-h1>
 	</n-flex>
-	<n-data-table :loading="loading" :columns="columns" :data="data" :row-key="(row: entity.DownloadTask) => row.ID" />
+	<n-radio-group v-model:value="status" name="downloadStatusRadioGroup">
+		<n-radio-button key="progressing" value="progressing" :label="t('button.progressing')" />
+		<n-radio-button key="completed" value="completed" :label="t('button.completed')" />
+	</n-radio-group>
+	<n-data-table :loading="loading" :columns="columns" :data='status == "progressing" ? progressing : completed' :row-key="(row: entity.DownloadTask) => row.ID"
+		:pagination="pagination" />
 </template>
 
 <script lang="ts" setup>
 import { entity } from '@wailsjs/go/models';
 import { ClipboardSetText, EventsOn } from '@wailsjs/runtime/runtime';
 import { DataTableColumns, NButton, NDropdown, NEllipsis } from 'naive-ui';
-import { h, onMounted, onUnmounted, ref, Ref } from 'vue';
+import { h, onMounted, onUnmounted, reactive, ref, Ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import TaskStatusTag from './TaskStatusTag.vue';
 import { DownloadTaskStatus } from '@/constants/downloadTaskStatus';
@@ -22,11 +27,14 @@ const { t } = useI18n();
 const loading = ref(false);
 
 let cancel: () => void = null;
-const data: Ref<entity.DownloadTask[]> = ref([]);
+const progressing: Ref<entity.DownloadTask[]> = ref([]);
+const completed: Ref<entity.DownloadTask[]> = ref([]);
+const status = ref<"progressing" | "completed">("progressing");
 
 onMounted(() => {
 	cancel = EventsOn("DownloadTask:pushup", ((tasks: entity.DownloadTask[]) => {
-		data.value = [...tasks];
+		completed.value = [...tasks.filter((task: entity.DownloadTask) => DownloadTaskStatus.from(task.Status) == DownloadTaskStatus.SUCCESS)];
+		progressing.value = [...tasks.filter((task: entity.DownloadTask) => DownloadTaskStatus.from(task.Status) != DownloadTaskStatus.SUCCESS)];
 	}));
 });
 
@@ -35,7 +43,6 @@ onUnmounted(() => {
 		cancel();
 	}
 });
-
 
 const columns: DataTableColumns<entity.DownloadTask> = [
 	{
@@ -97,6 +104,20 @@ const columns: DataTableColumns<entity.DownloadTask> = [
 		}
 	}
 ];
+const pagination = reactive({
+	page: 1,
+	pageSize: 10,
+	pageCount: 0,
+	showSizePicker: true,
+	pageSizes: [10, 20, 50],
+	onChange: (page: number) => {
+		pagination.page = page;
+	},
+	onUpdatePageSize: (pageSize: number) => {
+		pagination.pageSize = pageSize;
+		pagination.page = 1;
+	}
+});
 
 function restartDownloadTask(ID: number) {
 	RestartDownloadTask(ID)

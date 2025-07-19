@@ -996,6 +996,63 @@ export namespace entity {
 		    return a;
 		}
 	}
+	export class DownloadTask {
+	    ID: number;
+	    // Go type: time
+	    CreatedAt: any;
+	    // Go type: time
+	    UpdatedAt: any;
+	    // Go type: gorm
+	    DeletedAt: any;
+	    URL: string;
+	    UniqueSymbol: string;
+	    Status?: number;
+	    IntermediateFilePath: string;
+	    TaskName?: string;
+	    FallbackName: string;
+	    DownloadSize: number;
+	    ContentLength: number;
+	    ErrorMessage: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new DownloadTask(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.ID = source["ID"];
+	        this.CreatedAt = this.convertValues(source["CreatedAt"], null);
+	        this.UpdatedAt = this.convertValues(source["UpdatedAt"], null);
+	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
+	        this.URL = source["URL"];
+	        this.UniqueSymbol = source["UniqueSymbol"];
+	        this.Status = source["Status"];
+	        this.IntermediateFilePath = source["IntermediateFilePath"];
+	        this.TaskName = source["TaskName"];
+	        this.FallbackName = source["FallbackName"];
+	        this.DownloadSize = source["DownloadSize"];
+	        this.ContentLength = source["ContentLength"];
+	        this.ErrorMessage = source["ErrorMessage"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	export class Folder {
 	    ID: number;
 	    // Go type: time

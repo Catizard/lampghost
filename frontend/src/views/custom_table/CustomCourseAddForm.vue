@@ -54,7 +54,8 @@ function handlePositiveClick(): boolean {
       show.value = false;
       emit('refresh');
     })
-    .catch((err) => { });
+    .catch((err) => { })
+    .finally(() => loading.value = false);
   return false;
 }
 

@@ -132,7 +132,7 @@ func (s *InternalServer) tableHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			export.Courses[0] = append(export.Courses[0], dto.DiffTableCourseExportDto{
 				Name:       rawCourse.Name,
-				Constraint: []string{},
+				Constraint: strings.Split(rawCourse.Constraints, ","),
 				Md5:        md5s,
 			})
 		}

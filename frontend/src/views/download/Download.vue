@@ -4,19 +4,22 @@
 			<n-text type="primary"> {{ t('title.downloadTask') }}</n-text>
 		</n-h1>
 	</n-flex>
-	<n-radio-group v-model:value="status" name="downloadStatusRadioGroup">
-		<n-radio-button key="progressing" value="progressing" :label="t('button.progressing')" />
-		<n-radio-button key="completed" value="completed" :label="t('button.completed')" />
-	</n-radio-group>
-	<n-data-table :loading="loading" :columns="columns" :data='status == "progressing" ? progressing : completed' :row-key="(row: entity.DownloadTask) => row.ID"
-		:pagination="pagination" />
+	<n-flex justify="space-between">
+		<n-radio-group v-model:value="status" name="downloadStatusRadioGroup">
+			<n-radio-button key="progressing" value="progressing" :label="t('button.progressing')" />
+			<n-radio-button key="completed" value="completed" :label="t('button.completed')" />
+		</n-radio-group>
+		<n-progress type="line" :percentage="progress" />
+	</n-flex>
+	<n-data-table :loading="loading" :columns="columns" :data='status == "progressing" ? progressing : completed'
+		:row-key="(row: entity.DownloadTask) => row.ID" :pagination="pagination" />
 </template>
 
 <script lang="ts" setup>
 import { entity } from '@wailsjs/go/models';
 import { ClipboardSetText, EventsOn } from '@wailsjs/runtime/runtime';
 import { DataTableColumns, NButton, NDropdown, NEllipsis } from 'naive-ui';
-import { h, onMounted, onUnmounted, reactive, ref, Ref } from 'vue';
+import { computed, h, onMounted, onUnmounted, reactive, ref, Ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import TaskStatusTag from './TaskStatusTag.vue';
 import { DownloadTaskStatus } from '@/constants/downloadTaskStatus';
@@ -33,6 +36,12 @@ const status = ref<"progressing" | "completed">("progressing");
 
 onMounted(() => {
 	cancel = EventsOn("DownloadTask:pushup", ((tasks: entity.DownloadTask[]) => {
+		tasks.sort((a: entity.DownloadTask, b: entity.DownloadTask): number => {
+			return DownloadTaskStatus.compare(
+				DownloadTaskStatus.from(a.Status),
+				DownloadTaskStatus.from(b.Status)
+			);
+		});
 		completed.value = [...tasks.filter((task: entity.DownloadTask) => DownloadTaskStatus.from(task.Status) == DownloadTaskStatus.SUCCESS)];
 		progressing.value = [...tasks.filter((task: entity.DownloadTask) => DownloadTaskStatus.from(task.Status) != DownloadTaskStatus.SUCCESS)];
 	}));
@@ -44,10 +53,18 @@ onUnmounted(() => {
 	}
 });
 
+const progress = computed(() => {
+	const c = completed.value.length, p  = progressing.value.length;
+	if (c + p > 0) {
+		return c / (c + p) * 100;
+	} else {
+		return 100;
+	}
+})
+
 const columns: DataTableColumns<entity.DownloadTask> = [
 	{
-		title: t('column.taskName'),
-		key: "TaskName",
+		title: t('column.taskName'), key: "TaskName", ellipsis: { tooltip: true },
 		render(row: entity.DownloadTask) {
 			return h(
 				'div',
@@ -67,13 +84,13 @@ const columns: DataTableColumns<entity.DownloadTask> = [
 		}
 	},
 	{
-		title: t('column.progress'), key: "progress",
+		title: t('column.progress'), key: "progress", width: "220px",
 		render(row: entity.DownloadTask) {
 			return `${humanFileSize(row.DownloadSize, true)}/${humanFileSize(row.ContentLength, true)}(${(row.DownloadSize / row.ContentLength * 100).toFixed(2)}%)`;
 		}
 	},
 	{
-		title: t('column.status'), key: "status",
+		title: t('column.status'), key: "status", width: "125px",
 		render(row: entity.DownloadTask) {
 			return h(
 				TaskStatusTag,
@@ -82,7 +99,7 @@ const columns: DataTableColumns<entity.DownloadTask> = [
 		}
 	},
 	{
-		title: t('column.actions'), key: "actions",
+		title: t('column.actions'), key: "actions", width: "75px",
 		render(row: entity.DownloadTask) {
 			return h(
 				NDropdown,

@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
+	"strings"
 
 	"github.com/Catizard/lampghost_wails/internal/config"
 	"github.com/Catizard/lampghost_wails/internal/controller"
@@ -12,6 +14,7 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/service"
 	"github.com/charmbracelet/log"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
+	"golang.design/x/clipboard"
 )
 
 // App struct
@@ -163,6 +166,16 @@ func (a *App) OpenDirectoryDialog(title string) result.RtnData {
 		return result.NewErrorData(err)
 	}
 	return result.NewRtnData(fp)
+}
+
+func (a *App) CopyImageToClipboard(b64 string) result.RtnMessage {
+	data := strings.TrimPrefix(b64, "data:image/png;base64,")
+	out, err := base64.StdEncoding.DecodeString(data)
+	if err != nil {
+		return result.NewErrorMessage(err)
+	}
+	<-clipboard.Write(clipboard.FmtImage, out)
+	return result.SUCCESS
 }
 
 func (a *App) GENERATOR_NOTIFICATION_DTO() *dto.NotificationDto { return nil }

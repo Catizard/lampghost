@@ -1,6 +1,6 @@
 <template>
   <n-modal :loading="loading" v-model:show="show" preset="dialog" :title="t('title.editPlayerReverseImport')"
-    :positive-text="t('button.submit')" :negative-text="t('button.submit')" @positive-click="handlePositiveClick"
+    :positive-text="t('button.submit')" :negative-text="t('button.cancel')" @positive-click="handlePositiveClick"
     @negative-click="handleNegativeClick" :mask-closable="false">
     <n-form ref="formRef" :model="formData">
       <n-form-item :label="t('form.labelReverseImport')" path="ReverseImport">

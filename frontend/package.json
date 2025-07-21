@@ -13,6 +13,7 @@
     "apexcharts": "^4.1.0",
     "dayjs": "^1.11.13",
     "highlight.js": "^11.11.1",
+    "html2canvas": "^1.4.1",
     "pinia": "^3.0.2",
     "sortablejs": "^1.15.0",
     "url": "^0.11.4",

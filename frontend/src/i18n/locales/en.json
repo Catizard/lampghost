@@ -78,7 +78,9 @@
     "addToCustomCourse": "Select Song",
     "sortCourses": "Sort Courses",
     "progressing": "Progressing",
-    "completed": "Completed"
+    "completed": "Completed",
+    "copy": "Copy",
+    "copyToClipboard": "Copy to Clipboard"
   },
   "form": {
     "labelLanguage": "Language",
@@ -231,7 +233,8 @@
     "refactorCustomCourseDataOrder": "Refactor Course Play Order",
     "selectSongFromFolder": "Select Song",
     "editCustomCourse": "Edit Custom Course",
-    "refactorCustomCourseOrder": "Refactor Custom Courses' Order"
+    "refactorCustomCourseOrder": "Refactor Custom Courses' Order",
+    "preview": "Preview"
   },
   "hint": {
     "initUser": "Configure your own save files location",

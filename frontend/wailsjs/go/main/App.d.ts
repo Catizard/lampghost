@@ -33,6 +33,8 @@ export function CancelDownloadTask(arg1:number):Promise<result.RtnMessage>;
 
 export function ChooseBeatorajaDirectory():Promise<result.RtnData>;
 
+export function CopyImageToClipboard(arg1:string):Promise<result.RtnMessage>;
+
 export function DelDiffTableHeader(arg1:number):Promise<result.RtnMessage>;
 
 export function DelFolder(arg1:number):Promise<result.RtnMessage>;

@@ -78,7 +78,9 @@
     "addToCustomCourse": "选择歌曲",
     "sortCourses": "段位排序",
     "progressing": "进行中",
-    "completed": "已完成"
+    "completed": "已完成",
+    "copy": "复制",
+    "copyToClipboard": "复制到剪贴板"
   },
   "form": {
     "labelLanguage": "语言",

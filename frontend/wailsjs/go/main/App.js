@@ -54,6 +54,10 @@ export function ChooseBeatorajaDirectory() {
   return window['go']['main']['App']['ChooseBeatorajaDirectory']();
 }
 
+export function CopyImageToClipboard(arg1) {
+  return window['go']['main']['App']['CopyImageToClipboard'](arg1);
+}
+
 export function DelDiffTableHeader(arg1) {
   return window['go']['main']['App']['DelDiffTableHeader'](arg1);
 }

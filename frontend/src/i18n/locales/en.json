@@ -26,8 +26,8 @@
     "confirmToDelete": "Do you really want to delete?",
     "loadFolderDataError": "Failed to load folder data, error message: {msg}",
     "supplyMissingBMS": "Do you really want to supply all missing BMS?",
-    "setClipboardSuccess": "Copied import link to clipboard successfully",
-    "setClipboardError": "Failed to copy import link to clipboard, error: {msg}",
+    "setClipboardSuccess": "Copied to clipboard successfully",
+    "setClipboardError": "Failed to copy to clipboard, error: {msg}",
     "downloadProgress": "Current downloading: {success}/{count}, progress: {progress}%"
   },
   "button": {

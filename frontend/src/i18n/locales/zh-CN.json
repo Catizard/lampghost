@@ -26,8 +26,8 @@
     "confirmToDelete": "确定删除吗?",
     "loadFolderDataError": "读取收藏夹信息失败: {msg}",
     "supplyMissingBMS": "确定要添加所有缺少的BMS吗?",
-    "setClipboardSuccess": "成功复制导入链接",
-    "setClipboardError": "复制导入链接失败，错误原因: {msg}",
+    "setClipboardSuccess": "成功复制到剪贴板",
+    "setClipboardError": "复制失败，错误原因: {msg}",
     "downloadProgress": "当前进行的任务 {success}/{count}, 进度: {progress}%"
   },
   "button": {
@@ -233,7 +233,8 @@
     "refactorCustomCourseDataOrder": "修改段位歌曲排序",
     "selectSongFromFolder": "选择歌曲",
     "editCustomCourse": "修改自定义段位",
-    "refactorCustomCourseOrder": "修改自定义段位排序"
+    "refactorCustomCourseOrder": "修改自定义段位排序",
+    "preview": "预览"
   },
   "hint": {
     "initUser": "配置你的存档文件路径",

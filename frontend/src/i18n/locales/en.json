@@ -111,6 +111,7 @@
     "labelRecordTime": "Record Time",
     "labelPreviewSite": "Preview Source",
     "labelEnable": "Enabled",
+    "labelLR2": "LR2",
     "placeholderName": "Please input name",
     "placeholderUserName": "Please input your name",
     "placeholderSongdataPath": "Please input /beatoraja path/songdata.db file path",

@@ -303,7 +303,7 @@ export namespace dto {
 	    NoTagBuild?: number;
 	    Contents: DiffTableDataDto[];
 	    SortedLevels: string[];
-	    LevelLayeredContents: Record<string, DiffTableDataDto[]>;
+	    LevelLayeredContents: Record<string, Array<DiffTableDataDto>>;
 	    Level: string;
 	    Children: DiffTableHeaderDto[];
 	    LampCount: Record<number, number>;
@@ -328,7 +328,7 @@ export namespace dto {
 	        this.NoTagBuild = source["NoTagBuild"];
 	        this.Contents = this.convertValues(source["Contents"], DiffTableDataDto);
 	        this.SortedLevels = source["SortedLevels"];
-	        this.LevelLayeredContents = this.convertValues(source["LevelLayeredContents"], DiffTableDataDto[], true);
+	        this.LevelLayeredContents = this.convertValues(source["LevelLayeredContents"], Array<DiffTableDataDto>, true);
 	        this.Level = source["Level"];
 	        this.Children = this.convertValues(source["Children"], DiffTableHeaderDto);
 	        this.LampCount = source["LampCount"];
@@ -562,6 +562,7 @@ export namespace dto {
 	    DeletedAt: any;
 	    RivalId: number;
 	    Sha256: string;
+	    Md5: string;
 	    Mode: string;
 	    Clear: number;
 	    OldClear: number;
@@ -573,7 +574,6 @@ export namespace dto {
 	    OldMinbp: number;
 	    // Go type: time
 	    RecordTime: any;
-	    Md5: string;
 	    RivalSongDataID: number;
 	    Title: string;
 	    TableTags: DiffTableTagDto[];
@@ -593,6 +593,7 @@ export namespace dto {
 	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
 	        this.RivalId = source["RivalId"];
 	        this.Sha256 = source["Sha256"];
+	        this.Md5 = source["Md5"];
 	        this.Mode = source["Mode"];
 	        this.Clear = source["Clear"];
 	        this.OldClear = source["OldClear"];
@@ -603,7 +604,6 @@ export namespace dto {
 	        this.Minbp = source["Minbp"];
 	        this.OldMinbp = source["OldMinbp"];
 	        this.RecordTime = this.convertValues(source["RecordTime"], null);
-	        this.Md5 = source["Md5"];
 	        this.RivalSongDataID = source["RivalSongDataID"];
 	        this.Title = source["Title"];
 	        this.TableTags = this.convertValues(source["TableTags"], DiffTableTagDto);
@@ -2016,6 +2016,7 @@ export namespace vo {
 	    DeletedAt: any;
 	    RivalId: number;
 	    Sha256: string;
+	    Md5: string;
 	    Mode: string;
 	    Clear: number;
 	    OldClear: number;
@@ -2054,6 +2055,7 @@ export namespace vo {
 	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
 	        this.RivalId = source["RivalId"];
 	        this.Sha256 = source["Sha256"];
+	        this.Md5 = source["Md5"];
 	        this.Mode = source["Mode"];
 	        this.Clear = source["Clear"];
 	        this.OldClear = source["OldClear"];

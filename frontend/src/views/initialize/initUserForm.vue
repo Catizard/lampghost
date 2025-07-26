@@ -10,6 +10,7 @@
       <n-radio-group v-model:value="importStrategy" name="radiogroup">
         <n-radio-button key="directory" value="directory" :label="t('form.labelBeatorajaDirectory')" />
         <n-radio-button key="separate" value="separate" :label="t('form.labelSeparateFiles')" />
+        <n-radio-button key="lr2" value="lr2" :label="t('form.labelLR2')" />
       </n-radio-group>
       <template v-if="importStrategy == 'directory'">
         <div style="margin-top: 10px;">

@@ -83,6 +83,8 @@ export function FindRivalTagByID(arg1:number):Promise<result.RtnData>;
 
 export function FindRivalTagList(arg1:vo.RivalTagVo):Promise<result.RtnDataList>;
 
+export function FindSongDirectories():Promise<result.RtnDataList>;
+
 export function GENERATE_RIVAL_SCORE_LOG():Promise<dto.RivalScoreLogDto>;
 
 export function GENERATE_RIVAL_SONG_DATA_DTO():Promise<dto.RivalSongDataDto>;
@@ -194,6 +196,8 @@ export function ReloadRivalSongData():Promise<result.RtnMessage>;
 export function RestartDownloadTask(arg1:number):Promise<result.RtnMessage>;
 
 export function RunServer():Promise<void>;
+
+export function SaveSongDirectories(arg1:Array<string>):Promise<result.RtnMessage>;
 
 export function SetScoreLogFilePath(arg1:string):Promise<void>;
 

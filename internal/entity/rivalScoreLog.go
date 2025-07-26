@@ -10,6 +10,7 @@ type RivalScoreLog struct {
 	gorm.Model
 	RivalId    uint
 	Sha256     string `gorm:"index"`
+	Md5        string // DON'T USE THIS FIELD
 	Mode       string
 	Clear      int32
 	OldClear   int32
@@ -39,5 +40,17 @@ func FromRawScoreLogToRivalScoreLog(scorelog *ScoreLog) RivalScoreLog {
 		Minbp:      scorelog.Minbp,
 		OldMinbp:   scorelog.OldMinbp,
 		RecordTime: time.Unix(scorelog.TimeStamp, 0).Local(),
+	}
+}
+
+func FromRawLR2LogToRivalScoreLog(lr2Log *LR2Log) RivalScoreLog {
+	return RivalScoreLog{
+		Md5:        lr2Log.MD5,
+		Mode:       "0", // TODO: Cannot figure out play mode here
+		Clear:      int32(ConvLR2Clear(lr2Log.Clear)),
+		RecordTime: time.Unix(int64(lr2Log.RowID), 0),
+		OldClear:   0, // NOTE: LR2 doesn't provide old clear
+		Combo:      int32(lr2Log.MaxCombo),
+		Minbp:      int32(lr2Log.Minbp),
 	}
 }

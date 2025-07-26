@@ -3,13 +3,14 @@ module github.com/Catizard/lampghost_wails
 go 1.24.5
 
 require (
+	github.com/Catizard/bmscanner v0.1.0
 	github.com/charmbracelet/log v0.4.0
 	github.com/glebarez/sqlite v1.11.0
 	github.com/rotisserie/eris v0.5.4
 	github.com/samber/lo v1.50.0
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.10.0
-	github.com/wailsapp/wails/v2 v2.10.2
+	github.com/wailsapp/wails/v2 v2.10.1
 	golang.design/x/clipboard v0.7.1
 	gorm.io/gorm v1.25.12
 )
@@ -19,7 +20,6 @@ require (
 	github.com/cloudflare/circl v1.6.1 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/pprof v0.0.0-20250423184734-337e5dd93bb4 // indirect
-	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/icholy/digest v1.1.0 // indirect

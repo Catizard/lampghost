@@ -110,6 +110,10 @@
     "labelEnableAutoReload": "是否自动更新存档文件",
     "labelTagRecordTime": "标签时间",
     "labelPreviewSite": "预览来源",
+    "labelEnable": "启用",
+    "labelLR2": "LR2",
+    "labelUserDBPath": "用户数据库文件路径",
+    "labelScanBMSFiles": "扫描BMS文件",
     "placeholderName": "请输入名称",
     "placeholderUserName": "请输入用户名",
     "placeholderSongdataPath": "请输入/beatoraja path/songdata.db文件路径",
@@ -127,7 +131,7 @@
     "placeholderSeparateDownloadMD5": "请输入下载地址",
     "placeholderDownloadDirectory": "请输入下载路径",
     "placeholderDefaultsToEmpty": "默认为空",
-    "labelEnable": "启用"
+    "placeholderUserDBPath": "请输入/LR2 path/*Player Name*.db文件路径"
   },
   "rule": {
     "missingName": "名称不能为空",

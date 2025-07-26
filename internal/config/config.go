@@ -143,6 +143,12 @@ func GetDSN() string {
 	return WorkingDirectory + DBFileName
 }
 
+// LampGhost can build the 'songdata.db' itself, this feature is
+// prepared for the users that not use beatoraja, especially LR2 users
+func GetSelfGeneratedSongDataPath() string {
+	return WorkingDirectory + "songdata.db"
+}
+
 func JoinWorkingDirectory(relativePath string) string {
 	return WorkingDirectory + relativePath
 }

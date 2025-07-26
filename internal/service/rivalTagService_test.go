@@ -50,6 +50,7 @@ func TestSha256CoursesTagBuild(t *testing.T) {
 	require.Nil(t, db.Create(&entity.RivalInfo{
 		Name:     "-",
 		MainUser: true,
+		Type:     entity.RIVAL_TYPE_BEATORAJA,
 	}).Error)
 	require.Nil(t, db.Create(&entity.RivalScoreLog{
 		RivalId:    1,

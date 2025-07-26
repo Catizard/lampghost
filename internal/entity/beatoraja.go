@@ -1,5 +1,9 @@
 package entity
 
+import (
+	"github.com/Catizard/bmscanner"
+)
+
 // Beatoraja related database entity definition
 type ScoreLog struct {
 	Sha256    string
@@ -53,6 +57,18 @@ type SongData struct {
 
 func (SongData) TableName() string {
 	return "song"
+}
+
+func NewSongDataFromBMSModel(model *bmscanner.BMSModel) *SongData {
+	return &SongData{
+		Md5:       model.MD5,
+		Sha256:    model.SHA256,
+		Genre:     model.Genre,
+		Title:     model.Title,
+		SubTitle:  model.SubTitle,
+		Artist:    model.Artist,
+		SubArtist: model.SubArtist,
+	}
 }
 
 type ScoreDataLog struct {

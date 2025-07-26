@@ -9,6 +9,7 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/controller"
 	"github.com/Catizard/lampghost_wails/internal/database"
 	"github.com/Catizard/lampghost_wails/internal/dto"
+	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/result"
 	"github.com/Catizard/lampghost_wails/internal/server"
 	"github.com/Catizard/lampghost_wails/internal/service"
@@ -21,6 +22,7 @@ import (
 type App struct {
 	ctx context.Context
 	*controller.ConfigController
+	*controller.SongDirectoryController
 	*controller.RivalInfoController
 	*controller.RivalTagController
 	*controller.RivalScoreLogController
@@ -56,6 +58,8 @@ func NewApp() *App {
 	monitorService, notifySyncChan := service.NewMonitorService(conf)
 
 	// rival module
+	songDirectoryService := service.NewSongDirectoryService(db)
+	songDirectoryController := controller.NewSongDirectoryController(songDirectoryService)
 	rivalInfoService := service.NewRivalInfoService(db, monitorService, notifySyncChan)
 	rivalTagService := service.NewRivalTagService(db)
 	rivalScoreLogService := service.NewRivalScoreLogService(db)
@@ -68,7 +72,7 @@ func NewApp() *App {
 	rivalSongDataController := controller.NewRivalSongDataController(rivalSongDataService)
 
 	// Set up the initial scorelog path
-	if mainUser, err := rivalInfoService.QueryMainUser(); err == nil && mainUser != nil {
+	if mainUser, err := rivalInfoService.QueryMainUser(); err == nil && mainUser != nil && mainUser.Type != entity.RIVAL_TYPE_LR2 {
 		monitorService.SetScoreLogFilePath(*mainUser.ScoreLogPath)
 	}
 
@@ -104,6 +108,7 @@ func NewApp() *App {
 	return &App{
 		nil,
 		configController,
+		songDirectoryController,
 		rivalInfoController,
 		rivalTagController,
 		rivalScoreLogController,

@@ -303,7 +303,7 @@ export namespace dto {
 	    NoTagBuild?: number;
 	    Contents: DiffTableDataDto[];
 	    SortedLevels: string[];
-	    LevelLayeredContents: Record<string, Array<DiffTableDataDto>>;
+	    LevelLayeredContents: Record<string, DiffTableDataDto[]>;
 	    Level: string;
 	    Children: DiffTableHeaderDto[];
 	    LampCount: Record<number, number>;
@@ -328,7 +328,7 @@ export namespace dto {
 	        this.NoTagBuild = source["NoTagBuild"];
 	        this.Contents = this.convertValues(source["Contents"], DiffTableDataDto);
 	        this.SortedLevels = source["SortedLevels"];
-	        this.LevelLayeredContents = this.convertValues(source["LevelLayeredContents"], Array<DiffTableDataDto>, true);
+	        this.LevelLayeredContents = this.convertValues(source["LevelLayeredContents"], DiffTableDataDto[], true);
 	        this.Level = source["Level"];
 	        this.Children = this.convertValues(source["Children"], DiffTableHeaderDto);
 	        this.LampCount = source["LampCount"];
@@ -502,6 +502,7 @@ export namespace dto {
 	    // Go type: gorm
 	    DeletedAt: any;
 	    Name: string;
+	    Type: string;
 	    ScoreLogPath?: string;
 	    SongDataPath?: string;
 	    ScoreDataLogPath?: string;
@@ -523,6 +524,7 @@ export namespace dto {
 	        this.UpdatedAt = this.convertValues(source["UpdatedAt"], null);
 	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
 	        this.Name = source["Name"];
+	        this.Type = source["Type"];
 	        this.ScoreLogPath = source["ScoreLogPath"];
 	        this.SongDataPath = source["SongDataPath"];
 	        this.ScoreDataLogPath = source["ScoreDataLogPath"];
@@ -1177,6 +1179,7 @@ export namespace entity {
 	    // Go type: gorm
 	    DeletedAt: any;
 	    Name: string;
+	    Type: string;
 	    ScoreLogPath?: string;
 	    SongDataPath?: string;
 	    ScoreDataLogPath?: string;
@@ -1196,6 +1199,7 @@ export namespace entity {
 	        this.UpdatedAt = this.convertValues(source["UpdatedAt"], null);
 	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
 	        this.Name = source["Name"];
+	        this.Type = source["Type"];
 	        this.ScoreLogPath = source["ScoreLogPath"];
 	        this.SongDataPath = source["SongDataPath"];
 	        this.ScoreDataLogPath = source["ScoreDataLogPath"];
@@ -1834,6 +1838,7 @@ export namespace vo {
 	    ScoreLogPath?: string;
 	    SongDataPath?: string;
 	    ScoreDataLogPath?: string;
+	    BMSDirectories: string[];
 	
 	    static createFrom(source: any = {}) {
 	        return new InitializeRivalInfoVo(source);
@@ -1849,6 +1854,7 @@ export namespace vo {
 	        this.ScoreLogPath = source["ScoreLogPath"];
 	        this.SongDataPath = source["SongDataPath"];
 	        this.ScoreDataLogPath = source["ScoreDataLogPath"];
+	        this.BMSDirectories = source["BMSDirectories"];
 	    }
 	}
 	export class RivalInfoVo {
@@ -1860,6 +1866,7 @@ export namespace vo {
 	    // Go type: gorm
 	    DeletedAt: any;
 	    Name: string;
+	    Type: string;
 	    ScoreLogPath?: string;
 	    SongDataPath?: string;
 	    ScoreDataLogPath?: string;
@@ -1882,6 +1889,7 @@ export namespace vo {
 	        this.UpdatedAt = this.convertValues(source["UpdatedAt"], null);
 	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
 	        this.Name = source["Name"];
+	        this.Type = source["Type"];
 	        this.ScoreLogPath = source["ScoreLogPath"];
 	        this.SongDataPath = source["SongDataPath"];
 	        this.ScoreDataLogPath = source["ScoreDataLogPath"];

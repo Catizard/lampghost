@@ -70,6 +70,10 @@ func migrates(db *gorm.DB) error {
 		return err
 	}
 
+	if err := db.Table("song_directory").AutoMigrate(&entity.SongDirectory{}); err != nil {
+		return err
+	}
+
 	// I cannot find a better solution
 	var defaultCustomTable entity.CustomDiffTable
 	defaultCustomTable.ID = 1
@@ -99,6 +103,21 @@ func NewDatabase(config *config.DatabaseConfig) (db *gorm.DB, err error) {
 	}
 	log.Debugf("Initialized database at %s\n", config.DSN)
 	return db, err
+}
+
+// Open the connection to self generated songdata.db file
+func NewSelfGeneratedSongDataDatabase(purge bool) (db *gorm.DB, err error) {
+	fp := config.GetSelfGeneratedSongDataPath()
+	if purge {
+		os.Remove(fp)
+	}
+	if db, err = gorm.Open(sqlite.Open(fp)); err != nil {
+		return nil, err
+	}
+	if err := db.AutoMigrate(&entity.SongData{}); err != nil {
+		return nil, err
+	}
+	return
 }
 
 // Create a memory database for tests

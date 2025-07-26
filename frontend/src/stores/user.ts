@@ -9,6 +9,7 @@ export const useUserStore = defineStore("userStore", {
   },
   getters: {
     id: (state) => state.user.ID,
+    isLR2User: (state) => state.user.Type == "LR2"
   },
   actions: {
     setter(user: dto.RivalInfoDto) {

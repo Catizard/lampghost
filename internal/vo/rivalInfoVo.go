@@ -3,6 +3,7 @@ package vo
 import (
 	"path"
 
+	"github.com/Catizard/lampghost_wails/internal/config"
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/charmbracelet/log"
 	"gorm.io/gorm"
@@ -11,6 +12,7 @@ import (
 type RivalInfoVo struct {
 	gorm.Model
 	Name             string
+	Type             string
 	ScoreLogPath     *string
 	SongDataPath     *string
 	ScoreDataLogPath *string
@@ -34,6 +36,7 @@ func (rivalInfo *RivalInfoVo) Entity() *entity.RivalInfo {
 			DeletedAt: rivalInfo.DeletedAt,
 		},
 		Name:             rivalInfo.Name,
+		Type:             rivalInfo.Type,
 		ScoreLogPath:     rivalInfo.ScoreLogPath,
 		SongDataPath:     rivalInfo.SongDataPath,
 		ScoreDataLogPath: rivalInfo.ScoreDataLogPath,
@@ -49,23 +52,26 @@ func (rivalInfo *RivalInfoVo) Entity() *entity.RivalInfo {
 type InitializeRivalInfoVo struct {
 	Name                   string
 	Locale                 *string
-	ImportStrategy         string // constants: "directory" | "separate"
+	ImportStrategy         string `json:"ImportStrategy"` // constants: "directory" | "separate" | "LR2"
 	BeatorajaDirectoryPath string
 	PlayerDirectory        string
 	ScoreLogPath           *string
 	SongDataPath           *string
 	ScoreDataLogPath       *string
+	BMSDirectories         []string `json:"BMSDirectories"` // replacement of SongDataPath
 }
 
 func (rivalInfo *InitializeRivalInfoVo) Into() *entity.RivalInfo {
-	if rivalInfo.ImportStrategy == "separate" {
+	switch rivalInfo.ImportStrategy {
+	case "separate":
 		return &entity.RivalInfo{
 			Name:             rivalInfo.Name,
+			Type:             entity.RIVAL_TYPE_BEATORAJA,
 			SongDataPath:     rivalInfo.SongDataPath,
 			ScoreLogPath:     rivalInfo.ScoreLogPath,
 			ScoreDataLogPath: rivalInfo.ScoreDataLogPath,
 		}
-	} else {
+	case "directory":
 		// NOTE: we don't need to do much verification here
 		log.Debugf("beatoraja: %v", rivalInfo.BeatorajaDirectoryPath)
 		songdataPath := path.Join(rivalInfo.BeatorajaDirectoryPath, "songdata.db")
@@ -75,9 +81,22 @@ func (rivalInfo *InitializeRivalInfoVo) Into() *entity.RivalInfo {
 		scoredatalogPath := path.Join(saveFilePath, "scoredatalog.db")
 		return &entity.RivalInfo{
 			Name:             rivalInfo.Name,
+			Type:             entity.RIVAL_TYPE_BEATORAJA,
 			SongDataPath:     &songdataPath,
 			ScoreLogPath:     &scorelogPath,
 			ScoreDataLogPath: &scoredatalogPath,
 		}
+	case "LR2":
+		selfGeneratedSongDataPath := config.GetSelfGeneratedSongDataPath()
+		return &entity.RivalInfo{
+			Name:             rivalInfo.Name,
+			Type:             entity.RIVAL_TYPE_LR2,
+			ScoreLogPath:     rivalInfo.ScoreLogPath,
+			ScoreDataLogPath: rivalInfo.ScoreDataLogPath,
+			SongDataPath:     &selfGeneratedSongDataPath,
+		}
+	default:
+		log.Errorf("unexpected import strategy: %s", rivalInfo.ImportStrategy)
+		return nil
 	}
 }

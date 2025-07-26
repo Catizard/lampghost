@@ -5,6 +5,7 @@ import (
 
 	"github.com/Catizard/lampghost_wails/internal/config"
 	"github.com/Catizard/lampghost_wails/internal/database"
+	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/service"
 	"github.com/Catizard/lampghost_wails/internal/vo"
 	"github.com/rotisserie/eris"
@@ -15,6 +16,7 @@ var (
 	EmptyScoreLogPath     = "./testdata/empty_scorelog.db"
 	EmptySongDataPath     = "./testdata/empty_songdata.db"
 	EmptyScoreDataLogPath = "./testdata/empty_scoredatalog.db"
+	EmptyUserPath         = "./testdata/empty_user.db"
 
 	RealScoreLogPath     = "./testdata/scorelog.db"
 	RealSongDataPath     = "./testdata/songdata.db"
@@ -36,6 +38,7 @@ func newNamedEmptyUser(name string, noScoreLog, noSongData, noScoreDataLog bool)
 	}
 	return &vo.RivalInfoVo{
 		Name:             name,
+		Type:             entity.RIVAL_TYPE_BEATORAJA,
 		ScoreLogPath:     scoreLogPath,
 		SongDataPath:     songDataPath,
 		ScoreDataLogPath: scoreDataLogPath,
@@ -142,7 +145,7 @@ func newRivalInfoService(db *gorm.DB) *service.RivalInfoService {
 	return service.NewRivalInfoService(db, monitorService, syncChan)
 }
 
-func TestInitializeMainUser(t *testing.T) {
+func TestInitializeBeatorajaUser(t *testing.T) {
 	t.Run("FastFailOnMissingFilePath", func(t *testing.T) {
 		db, err := database.NewMemoryDatabase()
 		if err != nil {
@@ -186,7 +189,7 @@ func TestInitializeMainUser(t *testing.T) {
 		}
 	})
 	t.Run("RealFiles", func(t *testing.T) {
-		var tests = []struct {
+		tests := []struct {
 			name  string
 			input *vo.InitializeRivalInfoVo
 			skip  error
@@ -220,6 +223,25 @@ func TestInitializeMainUser(t *testing.T) {
 	})
 }
 
+func TestInitializeLR2User(t *testing.T) {
+	db, err := database.NewMemoryDatabase()
+	if err != nil {
+		t.Fatalf("db: %s", err)
+	}
+	rivalInfoService := newRivalInfoService(db)
+	t.Run("SmokeTest", func(t *testing.T) {
+		if err := rivalInfoService.InitializeMainUser(&vo.InitializeRivalInfoVo{
+			Name:             "test",
+			ImportStrategy:   "LR2",
+			ScoreLogPath:     &EmptyUserPath,
+			ScoreDataLogPath: &EmptyUserPath,
+			BMSDirectories:   make([]string, 0),
+		}); err != nil {
+			t.Fatalf("initialize main user: %s", eris.ToString(err, true))
+		}
+	})
+}
+
 func TestAddUser(t *testing.T) {
 	t.Run("FastFailOnWrongFields", func(t *testing.T) {
 		db, err := database.NewMemoryDatabase()
@@ -228,7 +250,7 @@ func TestAddUser(t *testing.T) {
 		}
 		rivalInfoService := newRivalInfoService(db)
 
-		var tests = []struct {
+		tests := []struct {
 			name  string
 			input *vo.RivalInfoVo
 		}{
@@ -265,7 +287,7 @@ func TestAddUser(t *testing.T) {
 			t.Fatalf("db: %s", err)
 		}
 		rivalInfoService := newRivalInfoService(db)
-		var tests = []struct {
+		tests := []struct {
 			name  string
 			input *vo.RivalInfoVo
 		}{
@@ -281,10 +303,9 @@ func TestAddUser(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				if err := rivalInfoService.AddRivalInfo(tt.input); err != nil {
-					t.Fatalf("add rival: %s", err)
+					t.Fatalf("add rival: %s", eris.ToString(err, true))
 				}
 			})
-
 		}
 	})
 }
@@ -296,7 +317,7 @@ func TestUpdateUser(t *testing.T) {
 			t.Fatalf("db: %s", err)
 		}
 		rivalInfoService := newRivalInfoService(db)
-		var tests = []struct {
+		tests := []struct {
 			name  string
 			input *vo.RivalInfoVo
 		}{

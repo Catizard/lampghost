@@ -10,6 +10,7 @@
       <n-radio-group v-model:value="importStrategy" name="radiogroup">
         <n-radio-button key="directory" value="directory" :label="t('form.labelBeatorajaDirectory')" />
         <n-radio-button key="separate" value="separate" :label="t('form.labelSeparateFiles')" />
+        <n-radio-button key="LR2" value="LR2" :label="t('form.labelLR2')" />
       </n-radio-group>
       <template v-if="importStrategy == 'directory'">
         <div style="margin-top: 10px;">
@@ -44,6 +45,23 @@
           <n-input v-model:value="formData.scoredatalogPath" :placeholder="t('form.placeholderScoredatalogPath')" />
         </n-form-item>
       </template>
+      <template v-if="importStrategy == 'LR2'">
+        <n-flex justify="space-between">
+          <n-form-item :label="t('form.labelScanBMSFiles')" style="margin-top: 10px;">
+            <DirectoryTable v-model:directories="formData.BMSDirectories" />
+          </n-form-item>
+          <n-button type="primary" @click="chooseBMSDirectory">
+            {{ t('button.chooseDirectory') }}
+          </n-button>
+        </n-flex>
+        <n-form-item :label="t('form.labelUserDBPath')" path="scorelogPath">
+          <n-button type="info" @click="chooseFile('Choose user database file', 'scorelogPath')">
+            {{ t('button.chooseFile') }}
+          </n-button>
+          <n-divider vertical />
+          <n-input v-model:value="formData.scorelogPath" :placeholder="t('form.placeholderUserDBPath')" />
+        </n-form-item>
+      </template>
       <n-form-item>
         <n-button :loading="loading" attr-type="button" @click="handleSubmit" type="primary">
           {{ t('button.submit') }}
@@ -56,9 +74,10 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
 import { ref, watch, reactive, Ref } from "vue";
-import { ChooseBeatorajaDirectory, InitializeMainUser, OpenFileDialog } from "@wailsjs/go/main/App";
+import { ChooseBeatorajaDirectory, InitializeMainUser, OpenDirectoryDialog, OpenFileDialog } from "@wailsjs/go/main/App";
 import { SelectOption } from 'naive-ui';
 import { dto } from '@wailsjs/go/models';
+import DirectoryTable from './directoryTable.vue';
 
 const { t } = useI18n();
 const globalI18n = useI18n({ useScope: 'global' });
@@ -67,7 +86,7 @@ const props = defineProps<{
   moveOn: () => void
 }>();
 
-const importStrategy: Ref<"directory" | "separate"> = ref("directory");
+const importStrategy: Ref<"directory" | "separate" | "LR2"> = ref("directory");
 
 // target == "scorelogPath" | "songdataPath" | "scoredatalogPath"
 function chooseFile(title: string, target: "scorelogPath" | "songdataPath" | "scoredatalogPath") {
@@ -107,6 +126,16 @@ function chooseBeatorajaDirectory() {
     }).catch(err => window.$notifyError(err));
 }
 
+function chooseBMSDirectory() {
+  OpenDirectoryDialog(t('title.chooseBMSDirectory')).then(result => {
+    if (result.Code != 200) {
+      return Promise.reject(result.Msg);
+    }
+    const path = result.Data;
+    formData.BMSDirectories.push(path);
+  }).catch(err => window.$notifyError(err))
+}
+
 const loading = ref(false);
 const formRef = ref(null);
 const formData = reactive({
@@ -117,6 +146,7 @@ const formData = reactive({
   name: "",
   beatorajaDirectoryPath: "",
   playerDirectory: "",
+  BMSDirectories: [],
 });
 
 const localeOptions = [
@@ -160,7 +190,7 @@ const rules = {
 
 function handleSubmit(e) {
   e.preventDefault();
-  formRef.value?.validate((errors) => {
+  formRef.value?.validate(async (errors) => {
     if (errors) {
       console.error(errors);
     } else {
@@ -174,17 +204,24 @@ function handleSubmit(e) {
         BeatorajaDirectoryPath: formData.beatorajaDirectoryPath,
         PlayerDirectory: formData.playerDirectory,
         ImportStrategy: importStrategy.value,
-        Locale: globalI18n.locale.value,
+        BMSDirectories: [],
       };
-      InitializeMainUser(rivalInfo as any)
-        .then((result) => {
-          if (result.Code != 200) {
-            return Promise.reject(result.Msg);
-          }
-          props.moveOn();
-        })
-        .catch(err => window.$notifyError(err))
-        .finally(() => loading.value = false);
+      if (importStrategy.value == "LR2") {
+        rivalInfo.ScoreDataLogPath = rivalInfo.ScoreLogPath;
+        formData.BMSDirectories.forEach(p => rivalInfo.BMSDirectories.push(p));
+      }
+      console.log('param: ', rivalInfo);
+      try {
+        const result = await InitializeMainUser(rivalInfo as any);
+        if (result.Code != 200) {
+          throw result.Msg;
+        }
+        props.moveOn();
+      } catch (err) {
+        window.$notifyError(err);
+      } finally {
+        loading.value = false;
+      }
     }
   });
 }

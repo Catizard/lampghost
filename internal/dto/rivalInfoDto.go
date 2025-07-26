@@ -9,6 +9,7 @@ type RivalInfoDto struct {
 	gorm.Model
 
 	Name             string
+	Type             string
 	ScoreLogPath     *string
 	SongDataPath     *string
 	ScoreDataLogPath *string
@@ -31,6 +32,7 @@ func NewRivalInfoDto(rival *entity.RivalInfo) *RivalInfoDto {
 			DeletedAt: rival.DeletedAt,
 		},
 		Name:             rival.Name,
+		Type:             rival.Type,
 		ScoreLogPath:     rival.ScoreLogPath,
 		SongDataPath:     rival.SongDataPath,
 		ScoreDataLogPath: rival.ScoreDataLogPath,
@@ -44,6 +46,7 @@ func NewRivalInfoDto(rival *entity.RivalInfo) *RivalInfoDto {
 func (rival *RivalInfoDto) Entity() *entity.RivalInfo {
 	return &entity.RivalInfo{
 		Name:             rival.Name,
+		Type:             rival.Type,
 		PlayCount:        rival.PlayCount,
 		ScoreLogPath:     rival.ScoreLogPath,
 		SongDataPath:     rival.SongDataPath,

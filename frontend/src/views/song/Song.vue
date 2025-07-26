@@ -8,7 +8,12 @@
     <n-flex justify="space-between">
       <n-input :placeholder="t('form.placeholderSearchSongOrSabunName')" v-model:value="searchNameLike"
         @keyup.enter="loadData()" style="width: 350px;" />
-      <n-button type="info" @click="reloadSongData">{{ t('button.reload') }}</n-button>
+      <n-flex>
+        <n-button v-if="userStore.isLR2User" type="primary" @click="editFormRef.open()">
+          {{ t('button.editSongDirectories') }}
+        </n-button>
+        <n-button type="info" @click="reloadSongData">{{ t('button.reload') }}</n-button>
+      </n-flex>
     </n-flex>
     <n-data-table remote :columns="columns" :data="data" :pagination="pagination" :bordered="false"
       :row-key="row => row.ID" />
@@ -16,6 +21,7 @@
   <select-folder v-model:show="showFolderSelection" :sha256="candidateSongInfo?.Sha256" @submit="handleSubmit" />
   <select-difficult v-model:show="showDifficultSelection" :sha256="candidateSongInfo?.Sha256" @submit="handleSubmit" />
   <ChartPreview ref="chartPreviewRef" />
+  <SongDirectoryEditForm ref="editFormRef" />
 </template>
 
 <script setup lang="ts">
@@ -28,12 +34,14 @@ import ChartPreview from '@/components/ChartPreview.vue';
 import SelectFolder from '../folder/SelectFolder.vue';
 import SelectDifficult from '../custom_table/SelectDifficult.vue';
 import { useUserStore } from '@/stores/user';
+import SongDirectoryEditForm from './SongDirectoryEditForm.vue';
 
 const { t } = useI18n();
 
 const loading = ref(false);
 const userStore = useUserStore();
 const chartPreviewRef = ref<InstanceType<typeof ChartPreview>>(null);
+const editFormRef = ref<InstanceType<typeof SongDirectoryEditForm>>(null);
 
 const searchNameLike: Ref<string | null> = ref(null);
 const columns: DataTableColumns<dto.RivalSongDataDto> = [

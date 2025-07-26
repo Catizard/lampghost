@@ -154,6 +154,10 @@ export function FindRivalTagList(arg1) {
   return window['go']['main']['App']['FindRivalTagList'](arg1);
 }
 
+export function FindSongDirectories() {
+  return window['go']['main']['App']['FindSongDirectories']();
+}
+
 export function GENERATE_RIVAL_SCORE_LOG() {
   return window['go']['main']['App']['GENERATE_RIVAL_SCORE_LOG']();
 }
@@ -376,6 +380,10 @@ export function RestartDownloadTask(arg1) {
 
 export function RunServer() {
   return window['go']['main']['App']['RunServer']();
+}
+
+export function SaveSongDirectories(arg1) {
+  return window['go']['main']['App']['SaveSongDirectories'](arg1);
 }
 
 export function SetScoreLogFilePath(arg1) {

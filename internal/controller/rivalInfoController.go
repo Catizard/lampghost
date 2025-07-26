@@ -9,6 +9,7 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/service"
 	"github.com/Catizard/lampghost_wails/internal/vo"
 	"github.com/charmbracelet/log"
+	"github.com/rotisserie/eris"
 )
 
 type RivalInfoController struct {
@@ -29,7 +30,7 @@ func (ctl *RivalInfoController) InitializeMainUser(rivalInfo *vo.InitializeRival
 	log.Info("[Controller] calling RivalInfoController.InitializeMainUser")
 	err := ctl.rivalInfoService.InitializeMainUser(rivalInfo)
 	if err != nil {
-		log.Errorf("[RivalController] returning err: %v", err)
+		log.Errorf("[RivalController] returning err: %v", eris.ToString(err, true))
 		return result.NewErrorMessage(err)
 	}
 	return result.SUCCESS

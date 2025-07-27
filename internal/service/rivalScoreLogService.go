@@ -185,6 +185,9 @@ func findRivalScoreLogSha256Map(tx *gorm.DB, filter *vo.RivalScoreLogVo) (map[st
 func groupingScoreLogsBySha256(scoreLogs []*dto.RivalScoreLogDto) map[string][]*dto.RivalScoreLogDto {
 	sha256ScoreLogsMap := make(map[string][]*dto.RivalScoreLogDto)
 	for _, scoreLog := range scoreLogs {
+		if scoreLog.Sha256 == "" {
+			continue
+		}
 		if _, ok := sha256ScoreLogsMap[scoreLog.Sha256]; !ok {
 			sha256ScoreLogsMap[scoreLog.Sha256] = make([]*dto.RivalScoreLogDto, 0)
 		}
@@ -275,6 +278,7 @@ func scopeRivalScoreLogFilter(filter *vo.RivalScoreLogVo) func(db *gorm.DB) *gor
 		}
 		moved := db.Where(filter.Entity())
 		// Extra filters
+		moved = moved.Where("rival_score_log.sha256 != \"\"")
 		if filter.OnlyCourseLogs {
 			moved = moved.Where("length(rival_score_log.sha256) > 64")
 		}

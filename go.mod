@@ -5,6 +5,7 @@ go 1.24
 toolchain go1.24.4
 
 require (
+	github.com/Catizard/bmscanner v0.1.0
 	github.com/charmbracelet/log v0.4.0
 	github.com/glebarez/sqlite v1.11.0
 	github.com/rotisserie/eris v0.5.4

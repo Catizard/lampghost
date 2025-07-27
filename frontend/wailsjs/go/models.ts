@@ -502,6 +502,7 @@ export namespace dto {
 	    // Go type: gorm
 	    DeletedAt: any;
 	    Name: string;
+	    Type: string;
 	    ScoreLogPath?: string;
 	    SongDataPath?: string;
 	    ScoreDataLogPath?: string;
@@ -523,6 +524,7 @@ export namespace dto {
 	        this.UpdatedAt = this.convertValues(source["UpdatedAt"], null);
 	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
 	        this.Name = source["Name"];
+	        this.Type = source["Type"];
 	        this.ScoreLogPath = source["ScoreLogPath"];
 	        this.SongDataPath = source["SongDataPath"];
 	        this.ScoreDataLogPath = source["ScoreDataLogPath"];
@@ -562,7 +564,6 @@ export namespace dto {
 	    DeletedAt: any;
 	    RivalId: number;
 	    Sha256: string;
-	    Md5: string;
 	    Mode: string;
 	    Clear: number;
 	    OldClear: number;
@@ -574,6 +575,7 @@ export namespace dto {
 	    OldMinbp: number;
 	    // Go type: time
 	    RecordTime: any;
+	    Md5: string;
 	    RivalSongDataID: number;
 	    Title: string;
 	    TableTags: DiffTableTagDto[];
@@ -593,7 +595,6 @@ export namespace dto {
 	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
 	        this.RivalId = source["RivalId"];
 	        this.Sha256 = source["Sha256"];
-	        this.Md5 = source["Md5"];
 	        this.Mode = source["Mode"];
 	        this.Clear = source["Clear"];
 	        this.OldClear = source["OldClear"];
@@ -604,6 +605,7 @@ export namespace dto {
 	        this.Minbp = source["Minbp"];
 	        this.OldMinbp = source["OldMinbp"];
 	        this.RecordTime = this.convertValues(source["RecordTime"], null);
+	        this.Md5 = source["Md5"];
 	        this.RivalSongDataID = source["RivalSongDataID"];
 	        this.Title = source["Title"];
 	        this.TableTags = this.convertValues(source["TableTags"], DiffTableTagDto);
@@ -1177,6 +1179,7 @@ export namespace entity {
 	    // Go type: gorm
 	    DeletedAt: any;
 	    Name: string;
+	    Type: string;
 	    ScoreLogPath?: string;
 	    SongDataPath?: string;
 	    ScoreDataLogPath?: string;
@@ -1196,6 +1199,7 @@ export namespace entity {
 	        this.UpdatedAt = this.convertValues(source["UpdatedAt"], null);
 	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
 	        this.Name = source["Name"];
+	        this.Type = source["Type"];
 	        this.ScoreLogPath = source["ScoreLogPath"];
 	        this.SongDataPath = source["SongDataPath"];
 	        this.ScoreDataLogPath = source["ScoreDataLogPath"];
@@ -1834,6 +1838,7 @@ export namespace vo {
 	    ScoreLogPath?: string;
 	    SongDataPath?: string;
 	    ScoreDataLogPath?: string;
+	    BMSDirectories: string[];
 	
 	    static createFrom(source: any = {}) {
 	        return new InitializeRivalInfoVo(source);
@@ -1849,6 +1854,7 @@ export namespace vo {
 	        this.ScoreLogPath = source["ScoreLogPath"];
 	        this.SongDataPath = source["SongDataPath"];
 	        this.ScoreDataLogPath = source["ScoreDataLogPath"];
+	        this.BMSDirectories = source["BMSDirectories"];
 	    }
 	}
 	export class RivalInfoVo {
@@ -1860,6 +1866,7 @@ export namespace vo {
 	    // Go type: gorm
 	    DeletedAt: any;
 	    Name: string;
+	    Type: string;
 	    ScoreLogPath?: string;
 	    SongDataPath?: string;
 	    ScoreDataLogPath?: string;
@@ -1882,6 +1889,7 @@ export namespace vo {
 	        this.UpdatedAt = this.convertValues(source["UpdatedAt"], null);
 	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
 	        this.Name = source["Name"];
+	        this.Type = source["Type"];
 	        this.ScoreLogPath = source["ScoreLogPath"];
 	        this.SongDataPath = source["SongDataPath"];
 	        this.ScoreDataLogPath = source["ScoreDataLogPath"];
@@ -2016,7 +2024,6 @@ export namespace vo {
 	    DeletedAt: any;
 	    RivalId: number;
 	    Sha256: string;
-	    Md5: string;
 	    Mode: string;
 	    Clear: number;
 	    OldClear: number;
@@ -2055,7 +2062,6 @@ export namespace vo {
 	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
 	        this.RivalId = source["RivalId"];
 	        this.Sha256 = source["Sha256"];
-	        this.Md5 = source["Md5"];
 	        this.Mode = source["Mode"];
 	        this.Clear = source["Clear"];
 	        this.OldClear = source["OldClear"];

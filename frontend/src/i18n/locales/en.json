@@ -112,6 +112,8 @@
     "labelPreviewSite": "Preview Source",
     "labelEnable": "Enabled",
     "labelLR2": "LR2",
+    "labelUserDBPath": "User Database File Path",
+    "labelScanBMSFiles": "Scan BMS Files",
     "placeholderName": "Please input name",
     "placeholderUserName": "Please input your name",
     "placeholderSongdataPath": "Please input /beatoraja path/songdata.db file path",
@@ -128,7 +130,8 @@
     "placeholderDefaultsToEmpty": "Defaults to empty",
     "placeholderSeparateDownloadMD5": "Please input download url",
     "placeholderDownloadDirectory": "Please input download directory",
-    "placeholderRecordTime": "Please input record time"
+    "placeholderRecordTime": "Please input record time",
+    "placeholderUserDBPath": "Please input /LR2 path/*Player Name*.db file path"
   },
   "rule": {
     "missingName": "Name cannot be empty",

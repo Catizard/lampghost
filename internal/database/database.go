@@ -101,6 +101,21 @@ func NewDatabase(config *config.DatabaseConfig) (db *gorm.DB, err error) {
 	return db, err
 }
 
+// Open the connection to self generated songdata.db file
+func NewSelfGeneratedSongDataDatabase(purge bool) (db *gorm.DB, err error) {
+	fp := config.GetSelfGeneratedSongDataPath()
+	if purge {
+		os.Remove(fp)
+	}
+	if db, err = gorm.Open(sqlite.Open(fp)); err != nil {
+		return nil, err
+	}
+	if err := db.AutoMigrate(&entity.SongData{}); err != nil {
+		return nil, err
+	}
+	return
+}
+
 // Create a memory database for tests
 func NewMemoryDatabase() (db *gorm.DB, err error) {
 	if db, err = gorm.Open(sqlite.Open(":memory:")); err != nil {

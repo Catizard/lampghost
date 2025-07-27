@@ -183,7 +183,8 @@
     "externalTag": "外部难度表标签",
     "taskName": "任务名称(点击复制)",
     "progress": "下载进度",
-    "status": "状态"
+    "status": "状态",
+    "symbol": "标志"
   },
   "title": {
     "tableManagement": "难度表管理",

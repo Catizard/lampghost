@@ -7,7 +7,7 @@
 				<n-input v-model:value="formData.Name" :placeholder="t('form.placeholderUserName')" />
 			</n-form-item>
 			<n-form-item :label="t('form.labelScorelogPath')" path="ScoreLogPath">
-				<n-button :disabled="!formData.MainUser" type="info" @click="chooseFile('Choose scorelog.db', 'scorelogPath')">
+				<n-button type="info" @click="chooseFile('Choose scorelog.db', 'scorelogPath')">
 					{{ t('button.chooseFile') }}
 				</n-button>
 				<n-divider vertical />

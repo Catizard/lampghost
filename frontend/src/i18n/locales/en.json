@@ -183,7 +183,8 @@
     "externalTag": "External Tag",
     "taskName": "Task Name(Click to Copy)",
     "progress": "Progress",
-    "status": "Status"
+    "status": "Status",
+    "symbol": "Symbol"
   },
   "title": {
     "tableManagement": "Table Management",

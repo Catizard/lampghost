@@ -234,7 +234,8 @@
     "selectSongFromFolder": "Select Song",
     "editCustomCourse": "Edit Custom Course",
     "refactorCustomCourseOrder": "Refactor Custom Courses' Order",
-    "preview": "Preview"
+    "preview": "Preview",
+    "previewRecentTimeline": "Preview Recent Activity"
   },
   "hint": {
     "initUser": "Configure your own save files location",

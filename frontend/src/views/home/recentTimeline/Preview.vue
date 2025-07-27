@@ -1,5 +1,5 @@
 <template>
-  <n-modal :loading="loading" v-model:show="show" preset="dialog" :title="t('title.preview')"
+  <n-modal :loading="loading" v-model:show="show" preset="dialog" :title="t('title.previewRecentTimeline')"
     :positive-text="t('button.copy')" :negative-text="t('button.cancel')" @positive-click="handlePositiveClick"
     @negative-click="handleNegativeClick" :mask-closable="false" style="width: 85vw;">
     <TimelineContent ref="timelineContentRef" :nodes="timelineNodes" />

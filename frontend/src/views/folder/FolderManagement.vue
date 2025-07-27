@@ -4,6 +4,7 @@
 			<n-text type="primary">{{ t('title.folder') }}</n-text>
 		</n-h1>
 		<n-flex justify="end">
+			<n-button type="info" @click="copyLink">{{ t('button.link') }}</n-button>
 			<n-button type="primary" @click="showAddModal = true">{{ t('button.addFavoriteFolder') }}</n-button>
 		</n-flex>
 	</n-flex>
@@ -17,6 +18,7 @@ import { NButton, } from "naive-ui";
 import { useI18n } from "vue-i18n";
 import FolderAddForm from "./FolderAddForm.vue";
 import FolderTable from "./FolderTable.vue";
+import { ClipboardSetText } from "@wailsjs/runtime/runtime";
 
 const i18n = useI18n();
 const { t } = i18n;
@@ -26,5 +28,14 @@ const folderTableRef = ref<InstanceType<typeof FolderTable>>(null);
 
 function reload() {
 	folderTableRef.value.loadData();
+}
+
+function copyLink() {
+	try {
+		ClipboardSetText(`http://localhost:7391/table/lampghost.json`)
+		window.$notifySuccess(t('message.setClipboardSuccess'));
+	} catch (e) {
+		window.$notifyError(t('message.setClipboardError', { msg: String(e) }));
+	}
 }
 </script>

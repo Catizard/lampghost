@@ -234,7 +234,8 @@
     "selectSongFromFolder": "选择歌曲",
     "editCustomCourse": "修改自定义段位",
     "refactorCustomCourseOrder": "修改自定义段位排序",
-    "preview": "预览"
+    "preview": "预览",
+    "previewRecentTimeline": "最近游玩预览"
   },
   "hint": {
     "initUser": "配置你的存档文件路径",

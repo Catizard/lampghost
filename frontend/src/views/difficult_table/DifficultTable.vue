@@ -4,7 +4,7 @@
       <n-text type="primary">{{ t('title.tableManagement') }}</n-text>
     </n-h1>
     <n-flex justify="end">
-      <n-button :loading="loading" type="info" @click="showSortModal = true">
+      <n-button :loading="loading" type="info" @click="sortTableSettings.show = true">
         {{ t('button.sort') }}
       </n-button>
       <n-button :loading="loading" type="primary" @click="showAddModal = true">
@@ -42,7 +42,6 @@ import SortTableModal from "@/components/SortTableModal.vue";
 
 const i18n = useI18n();
 const { t } = i18n;
-const showSortModal = ref(false);
 const showAddModal = ref(false);
 const editFormRef = ref<InstanceType<typeof DifficultTableEditForm>>(null);
 
@@ -61,6 +60,7 @@ const sortTableSettings = reactive({
       if (result.Code != 200) {
         return Promise.reject(result.Msg);
       }
+      loadDiffTableData();
     }).catch(err => window.$notifyError(err))
       .finally(() => loading.value = false);
   },

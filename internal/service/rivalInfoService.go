@@ -119,8 +119,10 @@ func (s *RivalInfoService) InitializeMainUser(rivalInfo *vo.InitializeRivalInfoV
 		return err
 	}
 
-	if err := s.monitorService.SetScoreLogFilePath(*insertRivalInfo.ScoreLogPath); err != nil {
-		log.Errorf("monitor: cannot setup monitor service: %s", err)
+	if insertRivalInfo.Type != entity.RIVAL_TYPE_LR2 {
+		if err := s.monitorService.SetScoreLogFilePath(*insertRivalInfo.ScoreLogPath); err != nil {
+			log.Errorf("monitor: cannot setup monitor service: %s", err)
+		}
 	}
 	return nil
 }

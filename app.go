@@ -9,6 +9,7 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/controller"
 	"github.com/Catizard/lampghost_wails/internal/database"
 	"github.com/Catizard/lampghost_wails/internal/dto"
+	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/result"
 	"github.com/Catizard/lampghost_wails/internal/server"
 	"github.com/Catizard/lampghost_wails/internal/service"
@@ -68,7 +69,7 @@ func NewApp() *App {
 	rivalSongDataController := controller.NewRivalSongDataController(rivalSongDataService)
 
 	// Set up the initial scorelog path
-	if mainUser, err := rivalInfoService.QueryMainUser(); err == nil && mainUser != nil {
+	if mainUser, err := rivalInfoService.QueryMainUser(); err == nil && mainUser != nil && mainUser.Type != entity.RIVAL_TYPE_LR2 {
 		monitorService.SetScoreLogFilePath(*mainUser.ScoreLogPath)
 	}
 

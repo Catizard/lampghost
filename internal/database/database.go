@@ -70,6 +70,10 @@ func migrates(db *gorm.DB) error {
 		return err
 	}
 
+	if err := db.Table("song_directory").AutoMigrate(&entity.SongDirectory{}); err != nil {
+		return err
+	}
+
 	// I cannot find a better solution
 	var defaultCustomTable entity.CustomDiffTable
 	defaultCustomTable.ID = 1

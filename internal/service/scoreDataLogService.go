@@ -35,7 +35,7 @@ func (s *ScoreDataLogService) LoadScoreDataLog(rivalID uint, songHashCache *enti
 		}
 		return rivalScoreDataLog, len(rivalScoreDataLog), nil
 	case entity.RIVAL_TYPE_LR2:
-		rawLogs, err := loadLR2Log(scoreDataLogPath, maximumTimestamp)
+		rawLogs, err := loadLR2Log(scoreDataLogPath)
 		if err != nil {
 			return nil, 0, err
 		}

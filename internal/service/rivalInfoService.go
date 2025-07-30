@@ -210,12 +210,7 @@ func (s *RivalInfoService) FindRivalInfoList(filter *vo.RivalInfoVo) ([]*dto.Riv
 }
 
 func (s *RivalInfoService) FindRivalInfoByID(rivalID uint) (*entity.RivalInfo, error) {
-	out := entity.RivalInfo{}
-	if err := s.db.First(&out, rivalID).Error; err != nil {
-		log.Debugf("[RivalInfoService] FindRivalInfoByID with ID=%d failed: %v\n", rivalID, err)
-		return nil, err
-	}
-	return &out, nil
+	return findRivalInfoByID(s.db, rivalID)
 }
 
 // Reload one rival's data, using different strategy based on fullyReload's value
@@ -489,6 +484,11 @@ func findRivalInfoList(tx *gorm.DB, filter *vo.RivalInfoVo) ([]*dto.RivalInfoDto
 	return out, len(out), nil
 }
 
+func findRivalInfoByID(tx *gorm.DB, ID uint) (out *entity.RivalInfo, err error) {
+	err = tx.First(&out, ID).Error
+	return
+}
+
 func selectRivalInfoCount(tx *gorm.DB, filter *vo.RivalInfoVo) (int64, error) {
 	var count int64
 	if err := tx.Model(&entity.RivalInfo{}).Scopes(scopeRivalInfoFilter(filter)).Count(&count).Error; err != nil {
@@ -600,7 +600,7 @@ func syncRivalData(tx *gorm.DB, rivalInfo *entity.RivalInfo) (err error) {
 // And these tables' data would be updated
 //  1. rival_score_log (incrementally added)
 //  2. rival_score_data_log (incrementally added)
-//  3. rival_tag (keep to old data as much as possible)
+//  3. rival_tag (keep the old data as much as possible)
 //
 // NOTE: This function wouldn't read `songdata.db` file, therefore there
 // is no need to invalidate the default song cache

@@ -37,7 +37,10 @@ func (s *ScoreLogService) LoadScoreLog(rivalID uint, songHashCache *entity.SongH
 		}
 		return rivalScoreLog, len(rivalScoreLog), nil
 	case entity.RIVAL_TYPE_LR2:
-		rawLogs, err := loadLR2Log(scoreLogPath, maximumTimestamp)
+		// NOTE: LR2's table doesn't record when did the record set, therefore, it's impossible
+		// to load the LR2's database incrementally. This is the reason why 'maximumTimestamp'
+		// is ignored here
+		rawLogs, err := loadLR2Log(scoreLogPath)
 		if err != nil {
 			return nil, 0, err
 		}
@@ -83,20 +86,11 @@ func findBeatorajaScoreLogList(tx *gorm.DB, maximumTimestamp *int64) ([]*entity.
 	return logs, len(logs), nil
 }
 
-func findLR2LogList(tx *gorm.DB, maximumTimestamp *int64) ([]*entity.LR2Log, int, error) {
+func findLR2LogList(tx *gorm.DB) ([]*entity.LR2Log, int, error) {
 	var logs []*entity.LR2Log
 	moved := tx
-	if maximumTimestamp != nil {
-		moved = moved.Where("row_id > ?", maximumTimestamp)
-	}
 	if err := moved.Select("*, oid as row_id").Find(&logs).Error; err != nil {
 		return nil, 0, err
-	}
-	for i, rawLog := range logs {
-		if i > 5 {
-			break
-		}
-		log.Debugf("%d -> %v", i, *rawLog)
 	}
 	return logs, len(logs), nil
 }
@@ -125,7 +119,7 @@ func loadBeatorajaScoreLog(scoreLogPath string, maximumTimestamp *int64) ([]*ent
 }
 
 // Read one `user.db` (LR2) file into memory
-func loadLR2Log(userDBPath string, maximumTimestamp *int64) ([]*entity.LR2Log, error) {
+func loadLR2Log(userDBPath string) ([]*entity.LR2Log, error) {
 	if userDBPath == "" {
 		return nil, eris.New("assert: user.db path cannot be empty")
 	}
@@ -139,7 +133,7 @@ func loadLR2Log(userDBPath string, maximumTimestamp *int64) ([]*entity.LR2Log, e
 	if err != nil {
 		return nil, eris.Wrap(err, "open user.db")
 	}
-	rawLR2Log, n, err := findLR2LogList(userDB, maximumTimestamp)
+	rawLR2Log, n, err := findLR2LogList(userDB)
 	if err != nil {
 		return nil, err
 	}

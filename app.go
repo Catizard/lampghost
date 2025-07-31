@@ -22,6 +22,7 @@ import (
 type App struct {
 	ctx context.Context
 	*controller.ConfigController
+	*controller.SongDirectoryController
 	*controller.RivalInfoController
 	*controller.RivalTagController
 	*controller.RivalScoreLogController
@@ -57,6 +58,8 @@ func NewApp() *App {
 	monitorService, notifySyncChan := service.NewMonitorService(conf)
 
 	// rival module
+	songDirectoryService := service.NewSongDirectoryService(db)
+	songDirectoryController := controller.NewSongDirectoryController(songDirectoryService)
 	rivalInfoService := service.NewRivalInfoService(db, monitorService, notifySyncChan)
 	rivalTagService := service.NewRivalTagService(db)
 	rivalScoreLogService := service.NewRivalScoreLogService(db)
@@ -105,6 +108,7 @@ func NewApp() *App {
 	return &App{
 		nil,
 		configController,
+		songDirectoryController,
 		rivalInfoController,
 		rivalTagController,
 		rivalScoreLogController,

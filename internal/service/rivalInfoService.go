@@ -91,6 +91,9 @@ func (s *RivalInfoService) InitializeMainUser(rivalInfo *vo.InitializeRivalInfoV
 		return eris.New("cannot have two main user, what are you doing?")
 	}
 	if len(rivalInfo.BMSDirectories) > 0 && rivalInfo.ImportStrategy == "LR2" {
+		if err := saveSongDirectories(s.db, rivalInfo.BMSDirectories); err != nil {
+			return eris.Wrap(err, "save directories")
+		}
 		songDataDB, err := database.NewSelfGeneratedSongDataDatabase(true)
 		if err != nil {
 			return eris.Wrap(err, "open database")

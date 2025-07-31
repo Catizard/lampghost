@@ -255,15 +255,18 @@ func (s *RivalInfoService) SyncRivalData(rivalInfo *entity.RivalInfo) error {
 	})
 }
 
-// Extension to SyncRivalData, which only reloads part of the scorelog.db file
-// More specifically, only reloads the log that is recorded after rival's last log
+// Extension to SyncRivalData, which only reloads part of the scorelog.db and
+// scoredatalog.db file (if provided, or main user only). While songdata.db won't be read
+// More specifically, only reloads the log that is set after rival's last log
+// that recorded in lampghost
 //
 // Requirements:
 //  1. rivalInfo's id > 0
 //  2. rivalInfo's scorelog path must not be empty
 //
-// Special Cases:
-// If no record belong to passed rival, fallback to fully reload
+// NOTE: This function's motivation is giving user a sync way that won't reload
+// the songdata.db file but only the play log files. Since songdata.db won't have
+// much changes often
 func (s *RivalInfoService) IncrementalSyncRivalData(rivalInfo *entity.RivalInfo) error {
 	if rivalInfo == nil {
 		return fmt.Errorf("incrementalSyncRivalData: rivalInfo cannot be nil")
@@ -600,12 +603,12 @@ func syncRivalData(tx *gorm.DB, rivalInfo *entity.RivalInfo) (err error) {
 //  2. scoredatalog.db (if provides)
 //
 // And these tables' data would be updated
-//  1. rival_score_log (incrementally added)
-//  2. rival_score_data_log (incrementally added)
+//  1. rival_score_log (incrementally added for beatoraja)
+//  2. rival_score_data_log (incrementally added for beatoraja)
 //  3. rival_tag (keep the old data as much as possible)
 //
-// NOTE: This function wouldn't read `songdata.db` file, therefore there
-// is no need to invalidate the default song cache
+// NOTE: For LR2 user, rival_score_log and rival_score_data_log would be regenerated because
+// LR2's database doesn't provide record's time
 //
 // NOTE: This function would degenerate to fully reload if:
 //  1. rival_score_log is empty
@@ -633,17 +636,40 @@ func incrementalSyncRivalData(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
 	if err != nil {
 		return err
 	}
-	if err := appendScoreLog(tx, rawScoreLog); err != nil {
+	rivalType, err := queryUserType(tx, rivalInfo.ID)
+	if err != nil {
 		return err
 	}
+	switch rivalType {
+	case entity.RIVAL_TYPE_BEATORAJA:
+		if err := appendScoreLog(tx, rawScoreLog); err != nil {
+			return err
+		}
+	case entity.RIVAL_TYPE_LR2:
+		if err = syncScoreLog(tx, rawScoreLog, rivalInfo.ID); err != nil {
+			return err
+		}
+	default:
+		return eris.Errorf("unexpected rival type: %s", rivalType)
+	}
+
 	scoreDataLogService := NewScoreDataLogService(rivalInfo.Type)
 	scoreDataLogMaximumRecordTimestamp := lastRivalScoreDataLog.RecordTime.Unix()
 	rivalScoreDataLog, _, err := scoreDataLogService.LoadScoreDataLog(rivalInfo.ID, songHashCache, *rivalInfo.ScoreDataLogPath, &scoreDataLogMaximumRecordTimestamp)
 	if err != nil {
 		return eris.Wrap(err, "load score data log")
 	}
-	if err := appendScoreDataLog(tx, rivalScoreDataLog); err != nil {
-		return err
+	switch rivalType {
+	case entity.RIVAL_TYPE_BEATORAJA:
+		if err := appendScoreDataLog(tx, rivalScoreDataLog); err != nil {
+			return err
+		}
+	case entity.RIVAL_TYPE_LR2:
+		if err = syncScoreDataLog(tx, rivalScoreDataLog, rivalInfo.ID); err != nil {
+			return err
+		}
+	default:
+		return eris.Errorf("unexpected rival type: %s", rivalType)
 	}
 	return syncRivalTag(tx, rivalInfo.ID)
 }
@@ -723,6 +749,14 @@ func queryMainUser(tx *gorm.DB) (*entity.RivalInfo, error) {
 		return nil, err
 	}
 	return &out, nil
+}
+
+func queryUserType(tx *gorm.DB, rivalID uint) (t string, err error) {
+	r, err := findRivalInfoByID(tx, rivalID)
+	if err != nil {
+		return "", err
+	}
+	return r.Type, nil
 }
 
 // Update one rival info

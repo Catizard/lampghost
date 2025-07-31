@@ -411,7 +411,7 @@ func (s *RivalInfoService) UpdateRivalInfo(rivalInfo *vo.RivalInfoVo) error {
 		if rivalInfo.ScoreDataLogPath != nil && (prev.ScoreDataLogPath == nil || *prev.ScoreDataLogPath != *rivalInfo.ScoreDataLogPath) {
 			shouldFullyReload = true
 		}
-		if changedScorelogPath {
+		if prev.MainUser && changedScorelogPath {
 			s.monitorService.SetScoreLogFilePath(*rivalInfo.ScoreLogPath)
 		}
 		return updateRivalInfo(tx, shouldFullyReload, rivalInfo.Entity())

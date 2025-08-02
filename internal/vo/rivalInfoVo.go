@@ -52,13 +52,13 @@ func (rivalInfo *RivalInfoVo) Entity() *entity.RivalInfo {
 type InitializeRivalInfoVo struct {
 	Name                   string
 	Locale                 *string
-	ImportStrategy         string // constants: "directory" | "separate" | "LR2"
+	ImportStrategy         string `json:"ImportStrategy"` // constants: "directory" | "separate" | "LR2"
 	BeatorajaDirectoryPath string
 	PlayerDirectory        string
 	ScoreLogPath           *string
 	SongDataPath           *string
 	ScoreDataLogPath       *string
-	BMSDirectories         []string // replacement of SongDataPath
+	BMSDirectories         []string `json:"BMSDirectories"` // replacement of SongDataPath
 }
 
 func (rivalInfo *InitializeRivalInfoVo) Into() *entity.RivalInfo {
@@ -96,6 +96,7 @@ func (rivalInfo *InitializeRivalInfoVo) Into() *entity.RivalInfo {
 			SongDataPath:     &selfGeneratedSongDataPath,
 		}
 	default:
-		panic("unexpected initialize strategy: " + rivalInfo.ImportStrategy)
+		log.Errorf("unexpected import strategy: %s", rivalInfo.ImportStrategy)
+		return nil
 	}
 }

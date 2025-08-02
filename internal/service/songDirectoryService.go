@@ -1,7 +1,10 @@
 package service
 
 import (
+	"path"
+
 	"github.com/Catizard/lampghost_wails/internal/entity"
+	"github.com/rotisserie/eris"
 	"gorm.io/gorm"
 )
 
@@ -22,11 +25,18 @@ func (s *SongDirectoryService) SaveSongDirectories(songDirectories []string) err
 }
 
 func saveSongDirectories(tx *gorm.DB, songDirectories []string) error {
-	if err := tx.Unscoped().Delete(&entity.SongDirectory{}).Error; err != nil {
-		return err
+	if err := tx.Unscoped().Where("1=1").Delete(&entity.SongDirectory{}).Error; err != nil {
+		return eris.Wrap(err, "delete")
 	}
-	if err := tx.CreateInBatches(songDirectories, DEFAULT_BATCH_SIZE).Error; err != nil {
-		return err
+	directories := make([]*entity.SongDirectory, 0)
+	for _, p := range songDirectories {
+		directories = append(directories, &entity.SongDirectory{
+			DirectoryPath: p,
+			DirectoryName: path.Base(p),
+		})
+	}
+	if err := tx.Model(&entity.SongDirectory{}).CreateInBatches(directories, DEFAULT_BATCH_SIZE).Error; err != nil {
+		return eris.Wrap(err, "create")
 	}
 	return nil
 }

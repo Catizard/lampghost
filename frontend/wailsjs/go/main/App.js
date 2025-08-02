@@ -378,6 +378,10 @@ export function RunServer() {
   return window['go']['main']['App']['RunServer']();
 }
 
+export function SaveSongDirectories(arg1) {
+  return window['go']['main']['App']['SaveSongDirectories'](arg1);
+}
+
 export function SetScoreLogFilePath(arg1) {
   return window['go']['main']['App']['SetScoreLogFilePath'](arg1);
 }

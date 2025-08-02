@@ -190,7 +190,7 @@ const rules = {
 
 function handleSubmit(e) {
   e.preventDefault();
-  formRef.value?.validate((errors) => {
+  formRef.value?.validate(async (errors) => {
     if (errors) {
       console.error(errors);
     } else {
@@ -204,21 +204,24 @@ function handleSubmit(e) {
         BeatorajaDirectoryPath: formData.beatorajaDirectoryPath,
         PlayerDirectory: formData.playerDirectory,
         ImportStrategy: importStrategy.value,
-        Locale: globalI18n.locale.value,
-        BMSDirectories: formData.BMSDirectories
+        BMSDirectories: [],
       };
-      if (rivalInfo.ImportStrategy == "LR2") {
+      if (importStrategy.value == "LR2") {
         rivalInfo.ScoreDataLogPath = rivalInfo.ScoreLogPath;
+        formData.BMSDirectories.forEach(p => rivalInfo.BMSDirectories.push(p));
       }
-      InitializeMainUser(rivalInfo as any)
-        .then((result) => {
-          if (result.Code != 200) {
-            return Promise.reject(result.Msg);
-          }
-          props.moveOn();
-        })
-        .catch(err => window.$notifyError(err))
-        .finally(() => loading.value = false);
+      console.log('param: ', rivalInfo);
+      try {
+        const result = await InitializeMainUser(rivalInfo as any);
+        if (result.Code != 200) {
+          throw result.Msg;
+        }
+        props.moveOn();
+      } catch (err) {
+        window.$notifyError(err);
+      } finally {
+        loading.value = false;
+      }
     }
   });
 }

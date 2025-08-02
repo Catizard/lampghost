@@ -7,3 +7,7 @@ type SongDirectory struct {
 	DirectoryPath string
 	DirectoryName string
 }
+
+func (SongDirectory) TableName() string {
+	return "song_directory"
+}

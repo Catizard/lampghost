@@ -195,6 +195,8 @@ export function RestartDownloadTask(arg1:number):Promise<result.RtnMessage>;
 
 export function RunServer():Promise<void>;
 
+export function SaveSongDirectories(arg1:Array<string>):Promise<result.RtnMessage>;
+
 export function SetScoreLogFilePath(arg1:string):Promise<void>;
 
 export function SubmitSingleMD5DownloadTask(arg1:string,arg2:any):Promise<result.RtnMessage>;

@@ -73,6 +73,9 @@ func (s *RivalInfoService) InjectContext(ctx context.Context) {
 
 // TODO: I think it's better to change the signature to InitializeMainUser(conf, rivalInfo)
 func (s *RivalInfoService) InitializeMainUser(rivalInfo *vo.InitializeRivalInfoVo) error {
+	if rivalInfo.ImportStrategy == "" {
+		return eris.New("init main user: import strategy cannot be empty")
+	}
 	if rivalInfo.Locale != nil && *rivalInfo.Locale != "" {
 		conf, err := config.ReadConfig()
 		if err != nil {

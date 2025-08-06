@@ -1,8 +1,6 @@
 module github.com/Catizard/lampghost_wails
 
-go 1.24
-
-toolchain go1.24.4
+go 1.24.5
 
 require (
 	github.com/charmbracelet/log v0.4.0

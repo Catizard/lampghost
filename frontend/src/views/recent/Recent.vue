@@ -29,11 +29,13 @@ import dayjs from 'dayjs';
 import TableTags from '@/components/TableTags.vue';
 import SelectDifficult from '../custom_table/SelectDifficult.vue';
 import ChartPreview from '@/components/ChartPreview.vue';
+import { useUserStore } from '@/stores/user';
 
 const i18n = useI18n();
 const { t } = i18n;
 
 const loading = ref<boolean>(false);
+const userStore = useUserStore();
 const showFolderSelection = ref<boolean>(false);
 const showDifficultSelection = ref<boolean>(false);
 const searchNameLike: Ref<string | null> = ref(null);
@@ -134,9 +136,8 @@ function createColumns(): DataTableColumns<dto.RivalScoreLogDto> {
 
 function loadData() {
   loading.value = true;
-  // TODO: remove magical 1 here
   let arg: vo.RivalScoreLogVo = {
-    RivalID: 1,
+    RivalID: userStore.id,
     Pagination: pagination,
     SongNameLike: searchNameLike.value,
     NoCourseLog: true,

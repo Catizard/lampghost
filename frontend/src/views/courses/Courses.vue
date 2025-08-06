@@ -26,11 +26,13 @@ import CourseTableDetail from './CourseTableDetail.vue';
 import SelectDifficultTable from '@/components/difficult_table/SelectDifficultTable.vue';
 import SelectRivalTag from '@/components/rivals/SelectRivalTag.vue';
 import SelectRival from '@/components/rivals/SelectRival.vue';
+import { useUserStore } from '@/stores/user';
 
 const i18n = useI18n();
 const { t } = i18n;
 
 const loading = ref(false);
+const userStore = useUserStore();
 const columns = createColumns();
 const pagination = reactive({
   page: 1,
@@ -97,10 +99,9 @@ const currentRivalTagID: Ref<number | null> = ref(null);
 
 function loadData() {
   loading.value = true;
-  // TODO: remove magical 1
   FindCourseInfoListWithRival({
     HeaderID: currentDiffTableID.value,
-    RivalID: 1
+    RivalID: userStore.id,
   } as any).then(result => {
     if (result.Code != 200) {
       return Promise.reject(result.Msg)

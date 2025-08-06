@@ -25,9 +25,11 @@ import { ClearType, ClearTypeDef, DefaultClearTypeColorStyle } from '@/constants
 import SelectRivalTag from '@/components/rivals/SelectRivalTag.vue';
 import SelectDifficultTable from '@/components/difficult_table/SelectDifficultTable.vue';
 import SelectRival from '@/components/rivals/SelectRival.vue';
+import { useUserStore } from '@/stores/user';
 
 const i18n = useI18n();
 const { t } = i18n;
+const userStore = useUserStore();
 
 const currentDiffTableID: Ref<number | null> = ref(null);
 
@@ -96,7 +98,7 @@ function rowClassName(row: dto.DiffTableHeaderDto): string {
   for (const [k, v] of Object.entries(ClearType).reverse()) {
     sum += row.LampCount[k] ?? 0;
     if (sum == row.SongCount && v != ClearType.Failed) {
-      // I don't have a better idea for managing this  
+      // I don't have a better idea for managing this
       const def: ClearTypeDef = DefaultClearTypeColorStyle[k];
       console.log('row: ', row.Level, 'picking', def.text);
       return def.text;
@@ -111,8 +113,7 @@ const levelTableLoading = ref<boolean>(false);
 const levelData = new Map<string, Array<dto.DiffTableDataDto>>();
 function loadLevelTableData(difftableID: string | number) {
   levelTableLoading.value = true;
-  // TODO: remove magic one
-  FindDiffTableHeaderTreeWithRival({ ID: difftableID as number, RivalID: 1 } as any)
+  FindDiffTableHeaderTreeWithRival({ ID: difftableID as number, RivalID: userStore.id } as any)
     .then(result => {
       if (result.Code != 200) {
         return Promise.reject(result.Msg);

@@ -27,10 +27,12 @@ import { useI18n } from 'vue-i18n';
 import ChartPreview from '@/components/ChartPreview.vue';
 import SelectFolder from '../folder/SelectFolder.vue';
 import SelectDifficult from '../custom_table/SelectDifficult.vue';
+import { useUserStore } from '@/stores/user';
 
 const { t } = useI18n();
 
 const loading = ref(false);
+const userStore = useUserStore();
 const chartPreviewRef = ref<InstanceType<typeof ChartPreview>>(null);
 
 const searchNameLike: Ref<string | null> = ref(null);
@@ -85,9 +87,8 @@ const pagination = reactive({
 async function loadData() {
   loading.value = true;
   try {
-    // TODO: Remove magical 1 here
     let arg: vo.RivalSongDataVo = {
-      RivalID: 1,
+      RivalID: userStore.id,
       TitleLike: searchNameLike.value,
       Pagination: pagination
     } as any;

@@ -19,10 +19,12 @@ import { WarningOutline } from '@vicons/ionicons5';
 import { BrowserOpenURL } from '@wailsjs/runtime/runtime';
 import SelectDifficult from '../custom_table/SelectDifficult.vue';
 import dayjs from 'dayjs';
+import { useUserStore } from '@/stores/user';
 
 const i18n = useI18n();
 const { t } = i18n;
 const loading = ref<boolean>(false);
+const userStore = useUserStore();
 
 const props = defineProps<{
   headerId?: number
@@ -74,7 +76,7 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
       return h(
         NTooltip,
         { trigger: "hover" },
-        { 
+        {
           trigger: () => dayjs(row.LastPlayedTimestamp * 1000).format("YYYY-MM-DD"),
           default: () => dayjs(row.LastPlayedTimestamp * 1000).format("YYYY-MM-DD HH:mm:ss")
         }
@@ -126,11 +128,10 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
 let data: Ref<Array<dto.DiffTableDataDto>> = ref([]);
 function loadData() {
   loading.value = true;
-  // TODO: remove magic 1
   QueryDiffTableDataWithRival({
     ID: props.headerId,
     Level: props.level,
-    RivalID: 1,
+    RivalID: userStore.id,
     GhostRivalID: props.ghostRivalId ?? 0,
     GhostRivalTagID: props.ghostRivalTagId ?? 0,
     Pagination: pagination,

@@ -6,6 +6,7 @@
 
 <script lang="ts" setup>
 import ClearTag from '@/components/ClearTag.vue';
+import { useUserStore } from '@/stores/user';
 import { DeleteCustomCourseData, QueryCustomCourseSongListWithRival } from '@wailsjs/go/main/App';
 import { dto } from '@wailsjs/go/models';
 import { DataTableColumns, NButton, useDialog } from 'naive-ui';
@@ -13,6 +14,7 @@ import { h, onMounted, Ref, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const loading = ref(false);
+const userStore = useUserStore();
 const { t } = useI18n();
 const dialog = useDialog();
 
@@ -65,10 +67,9 @@ const columns: DataTableColumns<dto.RivalSongDataDto> = [
 
 function loadData() {
   loading.value = true;
-  // TODO: Remove magical 1
   QueryCustomCourseSongListWithRival({
     ID: props.customCourseId,
-    RivalID: 1
+    RivalID: userStore.id,
   } as any).then(result => {
     if (result.Code != 200) {
       return Promise.reject(result.Msg);

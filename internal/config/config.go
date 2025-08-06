@@ -10,7 +10,6 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/rotisserie/eris"
 	"github.com/spf13/viper"
-	"golang.design/x/clipboard"
 )
 
 const (
@@ -56,10 +55,6 @@ func init() {
 		panic(err)
 	} else {
 		log.SetOutput(io.MultiWriter(logFile, os.Stdout))
-	}
-	// Setup clipboard
-	if err := clipboard.Init(); err != nil {
-		panic(err)
 	}
 }
 

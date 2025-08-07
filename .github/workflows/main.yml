@@ -30,14 +30,6 @@ jobs:
     runs-on: ${{ matrix.build.os }}
 
     steps:
-      - name: Initialize xvfb
-        if: ${{ matrix.build.os == 'ubuntu-latest' }}
-        run: |
-          sudo apt install -y xvfb
-          Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-          export DISPLAY=':99.0'
-          echo $DISPLAY
-
       - name: Checkout
         uses: actions/checkout@v2
         with:
@@ -46,7 +38,6 @@ jobs:
       - name: Build wails
         uses: dAppServer/wails-build-action@main
         with:
-          DISPLAY: ":99.0"
           build-name: ${{ matrix.build.name }}
           build-platform: ${{ matrix.build.platform }}
           package: true

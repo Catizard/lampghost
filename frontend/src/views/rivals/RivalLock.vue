@@ -62,7 +62,7 @@ function createColumns(): DataTableColumns<dto.RivalInfoDto> {
       title: t('column.actions'), key: "action", width: "100px",
       render(row: dto.RivalInfoDto): VNode {
         return h(NButton, {
-          type: "primary",
+          type: "info",
           size: "small",
           onClick: () => editFormRef.value.open(row.ID),
         }, { default: () => t('button.edit') });

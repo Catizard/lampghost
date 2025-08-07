@@ -8,11 +8,11 @@
     <n-flex justify="space-between">
       <SelectCustomTable v-model:value="currentCustomTableID" style="width: 200px;" ignoreDefaultTable />
       <n-flex justify="end">
+        <n-button :disabled="currentCustomTableID == null" type="info" @click="showSortTable = true">
+          {{ t('button.sort') }}
+        </n-button>
         <n-button :disabled="currentCustomTableID == null" type="primary" @click="showAddModal = true">
           {{ t('button.addDifficultFolder') }}
-        </n-button>
-        <n-button :disabled="currentCustomTableID == null" type="info" @click="showSortTable = true">
-          {{ t('button.sortLevels') }}
         </n-button>
       </n-flex>
     </n-flex>

@@ -6,9 +6,9 @@
       </n-h1>
     </n-flex>
     <n-flex justify="space-between">
-      <n-input :placeholder="t('form.placeholderSearchSongOrSabunName')" v-model:value="searchNameLike" @keyup.enter="loadData()"
-        style="width: 350px;" />
-      <n-button type="primary" @click="reloadSongData">{{ t('button.reload') }}</n-button>
+      <n-input :placeholder="t('form.placeholderSearchSongOrSabunName')" v-model:value="searchNameLike"
+        @keyup.enter="loadData()" style="width: 350px;" />
+      <n-button type="info" @click="reloadSongData">{{ t('button.reload') }}</n-button>
     </n-flex>
     <n-data-table remote :columns="columns" :data="data" :pagination="pagination" :bordered="false"
       :row-key="row => row.ID" />

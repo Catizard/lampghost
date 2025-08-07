@@ -7,11 +7,11 @@
   <n-flex justify="space-between">
     <SelectCustomTable v-model:value="currentCustomTableID" style="width: 200px;" ignoreDefaultTable />
     <n-flex justify="end">
-      <n-button :disabled="currentCustomTableID == null" type="primary" @click="showAddModel = true">
-        {{ t('button.addCustomCourse') }}
-      </n-button>
       <n-button :disabled="currentCustomTableID == null" type="info" @click="sortCourseSettings.show = true">
         {{ t('button.sortCourses') }}
+      </n-button>
+      <n-button :disabled="currentCustomTableID == null" type="primary" @click="showAddModel = true">
+        {{ t('button.addCustomCourse') }}
       </n-button>
     </n-flex>
   </n-flex>

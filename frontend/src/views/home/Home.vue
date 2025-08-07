@@ -13,7 +13,7 @@
         <n-divider />
         {{ t("column.lastSyncTime") }}: {{ playerData.lastUpdate }}
         <n-divider />
-        <n-button @click="handleSyncClick" :loading="syncLoading" style="width: 80%; white-space: normal;">
+        <n-button type="info" @click="handleSyncClick" :loading="syncLoading" style="width: 80%; white-space: normal;">
           {{ t("button.reloadSaveFile") }}
         </n-button>
       </n-flex>

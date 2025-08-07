@@ -8,7 +8,7 @@
         {{ t('button.sort') }}
       </n-button>
       <n-button :loading="loading" type="primary" @click="showAddModal = true">
-        {{ t('button.add') }}
+        {{ t('button.addDifficultTable') }}
       </n-button>
     </n-flex>
   </n-flex>

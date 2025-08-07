@@ -50,7 +50,6 @@
     "link": "Copy Import Link",
     "addCustomTable": "Add Custom Table",
     "addToFavoriteFolder": "Add to Folder",
-    "addTable": "Add Table",
     "supplyMissingBMS": "Supply all missing BMS",
     "addToCustomTable": "Add to Custom Table",
     "restart": "Restart",
@@ -80,7 +79,8 @@
     "progressing": "Progressing",
     "completed": "Completed",
     "copy": "Copy",
-    "copyToClipboard": "Copy to Clipboard"
+    "copyToClipboard": "Copy to Clipboard",
+    "addDifficultTable": "Add Difficult Table"
   },
   "form": {
     "labelLanguage": "Language",

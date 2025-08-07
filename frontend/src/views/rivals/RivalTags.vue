@@ -19,8 +19,8 @@
 <script setup lang="ts">
 import { DeleteRivalTagByID, QueryRivalTagPageList } from '@wailsjs/go/main/App';
 import { dto } from '@wailsjs/go/models';
-import { DataTableColumns, NButton, NDropdown, useDialog } from 'naive-ui';
-import { h, reactive, Ref, ref, watch } from 'vue';
+import { DataTableColumns, NButton, NDropdown, NFlex, useDialog } from 'naive-ui';
+import { h, reactive, Ref, ref, VNode, watch } from 'vue';
 import dayjs from 'dayjs';
 import { useI18n } from 'vue-i18n';
 import YesNotTag from '@/components/YesNotTag.vue';
@@ -57,21 +57,28 @@ const columns: DataTableColumns<dto.RivalTagDto> = [
   },
   {
     title: t('column.actions'), key: "Actions",
-    width: "100px",
-    render: (row: dto.RivalTagDto) => {
-      return h(NDropdown, {
-        trigger: "hover",
-        options: [
-          { label: t('button.edit'), key: "Edit", },
-          { label: t('button.delete'), key: "Delete", disabled: !row.Generated }
-        ],
-        onSelect(key: string) {
-          switch (key) {
-            case "Edit": editFormRef.value.open(row.ID); break;
-            case "Delete": deleteTag(row); break;
+    width: "210px",
+    render(row: dto.RivalTagDto): VNode {
+      return h(
+        NFlex,
+        {},
+        {
+          default: () => {
+            return [
+              h(NButton, {
+                type: "info",
+                size: "small",
+                onClick: () => editFormRef.value.open(row.ID)
+              }, { default: () => t('button.edit') }),
+              h(NButton, {
+                type: "error",
+                size: "small",
+                onClick: () => deleteTag(row),
+              }, { default: () => t('button.delete') })
+            ];
           }
-        },
-      }, { default: () => h(NButton, null, { default: () => '...' }) });
+        }
+      )
     }
   }
 ];

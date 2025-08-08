@@ -87,6 +87,7 @@
     "labelName": "Name",
     "labelSymbol": "Symbol",
     "labelUserName": "Your user name",
+    "labelRivalName": "Rival Name",
     "labelSongdataPath": "songdata.db file path",
     "labelScorelogPath": "scorelog.db file path",
     "labelScoredatalogPath": "scoredatalog.db file path",
@@ -116,6 +117,7 @@
     "labelScanBMSFiles": "Scan BMS Files",
     "placeholderName": "Please input name",
     "placeholderUserName": "Please input your name",
+    "placeholderRivalName": "Please input rival name",
     "placeholderSongdataPath": "Please input /beatoraja path/songdata.db file path",
     "placeholderScorelogPath": "Please input /beatoraja path/*Player Name*/scorelog.db file path",
     "placeholderScoredatalogPath": "Please input /beatoraja path/*Player Name*/scoredatalog.db file path",
@@ -131,7 +133,7 @@
     "placeholderSeparateDownloadMD5": "Please input download url",
     "placeholderDownloadDirectory": "Please input download directory",
     "placeholderRecordTime": "Please input record time",
-    "placeholderUserDBPath": "Please input /LR2 path/*Player Name*.db file path"
+    "placeholderUserDBPath": "Please input /LR2 path/database/*Player Name*.db file path"
   },
   "rule": {
     "missingName": "Name cannot be empty",
@@ -188,7 +190,7 @@
     "taskName": "Task Name(Click to Copy)",
     "progress": "Progress",
     "status": "Status",
-    "symbol": "Symbol"
+    "symbol": "Symbolen.json"
   },
   "title": {
     "tableManagement": "Table Management",

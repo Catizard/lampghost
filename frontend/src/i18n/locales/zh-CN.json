@@ -87,6 +87,7 @@
     "labelName": "名称",
     "labelSymbol": "标志",
     "labelUserName": "用户名称",
+    "labelRivalName": "玩家名称",
     "labelSongdataPath": "songdata.db文件路径",
     "labelScorelogPath": "scorelog.db文件路径",
     "labelScoredatalogPath": "scoredatalog.db文件路径",
@@ -115,7 +116,8 @@
     "labelUserDBPath": "用户数据库文件路径",
     "labelScanBMSFiles": "扫描BMS文件",
     "placeholderName": "请输入名称",
-    "placeholderUserName": "请输入用户名",
+    "placeholderUserName": "请输入用户名称",
+    "placeholderRivalName": "请输入玩家名称",
     "placeholderSongdataPath": "请输入/beatoraja path/songdata.db文件路径",
     "placeholderScorelogPath": "请输入/beatoraja path/*Player Name*/scorelog.db文件路径",
     "placeholderScoredatalogPath": "请输入/beatoraja path/*Player Name*/scoredatalog.db文件路径",
@@ -131,7 +133,7 @@
     "placeholderSeparateDownloadMD5": "请输入下载地址",
     "placeholderDownloadDirectory": "请输入下载路径",
     "placeholderDefaultsToEmpty": "默认为空",
-    "placeholderUserDBPath": "请输入/LR2 path/*Player Name*.db文件路径"
+    "placeholderUserDBPath": "请输入/LR2 path/database/*Player Name*.db文件路径"
   },
   "rule": {
     "missingName": "名称不能为空",

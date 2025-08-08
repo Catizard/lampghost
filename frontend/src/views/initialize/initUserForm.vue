@@ -132,7 +132,9 @@ function chooseBMSDirectory() {
       return Promise.reject(result.Msg);
     }
     const path = result.Data;
-    formData.BMSDirectories.push(path);
+    if (path != "") {
+      formData.BMSDirectories.push(path);
+    }
   }).catch(err => window.$notifyError(err))
 }
 

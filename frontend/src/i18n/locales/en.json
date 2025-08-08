@@ -80,7 +80,8 @@
     "completed": "Completed",
     "copy": "Copy",
     "copyToClipboard": "Copy to Clipboard",
-    "addDifficultTable": "Add Difficult Table"
+    "addDifficultTable": "Add Difficult Table",
+    "editSongDirectories": "Edit BMS Directories"
   },
   "form": {
     "labelLanguage": "Language",
@@ -242,7 +243,9 @@
     "editCustomCourse": "Edit Custom Course",
     "refactorCustomCourseOrder": "Refactor Custom Courses' Order",
     "preview": "Preview",
-    "previewRecentTimeline": "Preview Recent Activity"
+    "previewRecentTimeline": "Preview Recent Activity",
+    "supplyMissingBMSFromTable": "Supply Missing BMS",
+    "editSongDirectories": "Edit BMS Directories"
   },
   "hint": {
     "initUser": "Configure your own save files location",

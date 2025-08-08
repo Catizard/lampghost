@@ -50,7 +50,7 @@
     "link": "复制导入链接",
     "addCustomTable": "新增自定义难度表",
     "addToFavoriteFolder": "添加至收藏夹",
-    "supplyMissingBMS": "补充所有缺少的BMS",
+    "supplyMissingBMS": "补充缺少的BMS",
     "addToCustomTable": "添加至自定义难度表",
     "restart": "重新开始",
     "addFavoriteFolder": "新增收藏夹",
@@ -80,7 +80,8 @@
     "completed": "已完成",
     "copy": "复制",
     "copyToClipboard": "复制到剪贴板",
-    "addDifficultTable": "新增难度表"
+    "addDifficultTable": "新增难度表",
+    "editSongDirectories": "编辑BMS目录"
   },
   "form": {
     "labelLanguage": "语言",
@@ -242,7 +243,9 @@
     "editCustomCourse": "修改自定义段位",
     "refactorCustomCourseOrder": "修改自定义段位排序",
     "preview": "预览",
-    "previewRecentTimeline": "最近游玩预览"
+    "previewRecentTimeline": "最近游玩预览",
+    "supplyMissingBMSFromTable": "补充缺失BMS",
+    "editSongDirectories": "编辑BMS目录"
   },
   "hint": {
     "initUser": "配置你的存档文件路径",

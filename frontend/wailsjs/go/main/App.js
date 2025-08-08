@@ -250,6 +250,10 @@ export function GENERATOR_RIVAL_INFO_DTO() {
   return window['go']['main']['App']['GENERATOR_RIVAL_INFO_DTO']();
 }
 
+export function GENERATOR_SONG_DIRECTORY() {
+  return window['go']['main']['App']['GENERATOR_SONG_DIRECTORY']();
+}
+
 export function GENERATOR_TABLE_DATA() {
   return window['go']['main']['App']['GENERATOR_TABLE_DATA']();
 }

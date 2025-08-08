@@ -131,6 +131,8 @@ export function GENERATOR_RIVAL_INFO():Promise<entity.RivalInfo>;
 
 export function GENERATOR_RIVAL_INFO_DTO():Promise<dto.RivalInfoDto>;
 
+export function GENERATOR_SONG_DIRECTORY():Promise<entity.SongDirectory>;
+
 export function GENERATOR_TABLE_DATA():Promise<dto.DiffTableDataDto>;
 
 export function GENERATOR_TABLE_HEADER():Promise<entity.DiffTableHeader>;

@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/result"
 	"github.com/Catizard/lampghost_wails/internal/service"
 	"github.com/charmbracelet/log"
@@ -35,3 +36,5 @@ func (ctl *SongDirectoryController) FindSongDirectories() result.RtnDataList {
 	}
 	return result.NewRtnDataList(rows)
 }
+
+func (ctl *SongDirectoryController) GENERATOR_SONG_DIRECTORY() *entity.SongDirectory { return nil }

@@ -69,6 +69,8 @@ export function FindDiffTableHeaderTree(arg1:vo.DiffTableHeaderVo):Promise<resul
 
 export function FindDiffTableHeaderTreeWithRival(arg1:vo.DiffTableHeaderVo):Promise<result.RtnDataList>;
 
+export function FindDiffTableLevelList(arg1:number):Promise<result.RtnDataList>;
+
 export function FindDownloadTaskList():Promise<result.RtnDataList>;
 
 export function FindFolderContentList(arg1:vo.FolderContentVo):Promise<result.RtnDataList>;
@@ -203,7 +205,7 @@ export function SetScoreLogFilePath(arg1:string):Promise<void>;
 
 export function SubmitSingleMD5DownloadTask(arg1:string,arg2:any):Promise<result.RtnMessage>;
 
-export function SupplyMissingBMSFromTable(arg1:number):Promise<result.RtnMessage>;
+export function SupplyMissingBMSFromTable(arg1:number,arg2:Array<string>):Promise<result.RtnMessage>;
 
 export function SyncRivalTag(arg1:number):Promise<result.RtnMessage>;
 

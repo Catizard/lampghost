@@ -86,11 +86,11 @@ func scopeFolderContentFilter(filter *vo.FolderContentVo) func(db *gorm.DB) *gor
 			return db
 		}
 		moved := db.Where(filter.Entity())
-		moved = db.Scopes(
+		// Add extra filter here
+		moved = moved.Scopes(
 			scopeInIDs(filter.IDs),
 			scopeInFolderIDs(filter.FolderIDs),
 		)
-		// Add extra filter here
 		return moved
 	}
 }

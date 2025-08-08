@@ -7,6 +7,7 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/service"
 	"github.com/Catizard/lampghost_wails/internal/vo"
 	"github.com/charmbracelet/log"
+	"github.com/rotisserie/eris"
 )
 
 type DiffTableController struct {
@@ -73,6 +74,16 @@ func (ctl *DiffTableController) FindDiffTableHeaderList() result.RtnDataList {
 	rows, _, err := ctl.diffTableService.FindDiffTableHeaderList(nil)
 	if err != nil {
 		log.Errorf("[DiffTableController] returning error: %v", err)
+		return result.NewErrorDataList(err)
+	}
+	return result.NewRtnDataList(rows)
+}
+
+func (ctl *DiffTableController) FindDiffTableLevelList(ID uint) result.RtnDataList {
+	log.Info("[Controller] calling DiffTableController.FindDiffTableLevelList")
+	rows, _, err := ctl.diffTableService.FindDiffTableLevelList(ID)
+	if err != nil {
+		log.Errorf("[DiffTableController] returning err: %v", eris.ToString(err, true))
 		return result.NewErrorDataList(err)
 	}
 	return result.NewRtnDataList(rows)
@@ -145,9 +156,10 @@ func (ctl *DiffTableController) QueryPredefineTableSchemes() result.RtnDataList 
 	return result.NewRtnDataList(schemes)
 }
 
-func (ctl *DiffTableController) SupplyMissingBMSFromTable(ID uint) result.RtnMessage {
+func (ctl *DiffTableController) SupplyMissingBMSFromTable(ID uint, levels []string) result.RtnMessage {
 	log.Info("[Controller] Calling DiffTableController.SupplyMissingBMSFromTable")
-	if err := ctl.diffTableService.SupplyMissingBMSFromTable(ID); err != nil {
+	if err := ctl.diffTableService.SupplyMissingBMSFromTable(ID, levels); err != nil {
+		log.Errorf("[DiffTableController] returning err: %v", err)
 		return result.NewErrorMessage(err)
 	}
 	return result.SUCCESS

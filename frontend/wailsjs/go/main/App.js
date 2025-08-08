@@ -126,6 +126,10 @@ export function FindDiffTableHeaderTreeWithRival(arg1) {
   return window['go']['main']['App']['FindDiffTableHeaderTreeWithRival'](arg1);
 }
 
+export function FindDiffTableLevelList(arg1) {
+  return window['go']['main']['App']['FindDiffTableLevelList'](arg1);
+}
+
 export function FindDownloadTaskList() {
   return window['go']['main']['App']['FindDownloadTaskList']();
 }
@@ -394,8 +398,8 @@ export function SubmitSingleMD5DownloadTask(arg1, arg2) {
   return window['go']['main']['App']['SubmitSingleMD5DownloadTask'](arg1, arg2);
 }
 
-export function SupplyMissingBMSFromTable(arg1) {
-  return window['go']['main']['App']['SupplyMissingBMSFromTable'](arg1);
+export function SupplyMissingBMSFromTable(arg1, arg2) {
+  return window['go']['main']['App']['SupplyMissingBMSFromTable'](arg1, arg2);
 }
 
 export function SyncRivalTag(arg1) {

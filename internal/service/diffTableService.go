@@ -247,6 +247,10 @@ func (s *DiffTableService) FindDiffTableHeaderList(filter *vo.DiffTableHeaderVo)
 	return ret, len(ret), nil
 }
 
+func (s *DiffTableService) FindDiffTableLevelList(ID uint) ([]string, int, error) {
+	return findDiffTableLevelList(s.db, ID)
+}
+
 // Query difficult table data as tree
 //
 // Example result:
@@ -473,7 +477,10 @@ func (s *DiffTableService) UpdateHeaderLevelOrders(updateParam *vo.DiffTableHead
 	})
 }
 
-func (s *DiffTableService) SupplyMissingBMSFromTable(ID uint) error {
+// Supply missing bms based on specify difficult table
+// If levels is not empty, the supply range would be scoped in levels that requested
+func (s *DiffTableService) SupplyMissingBMSFromTable(ID uint, levels []string) error {
+	log.Debugf("Requesting supplying missing bms from table[%d], specified levels are %v", ID, levels)
 	conf, err := config.ReadConfig()
 	if err != nil {
 		return err
@@ -482,7 +489,7 @@ func (s *DiffTableService) SupplyMissingBMSFromTable(ID uint) error {
 	if !downloadSource.AllowBatchDownload() {
 		return fmt.Errorf("%s doesn't allow batch download, please choose other download source instead", downloadSource.GetMeta().Name)
 	}
-	data, _, err := findDiffTableDataList(s.db, &vo.DiffTableDataVo{HeaderID: ID})
+	data, _, err := findDiffTableDataList(s.db, &vo.DiffTableDataVo{HeaderID: ID, Levels: levels})
 	if err != nil {
 		return err
 	}
@@ -617,6 +624,12 @@ func findDiffTableHeaderList(tx *gorm.DB, filter *vo.DiffTableHeaderVo) ([]*enti
 		return nil, 0, err
 	}
 	return headers, len(headers), nil
+}
+
+func findDiffTableLevelList(tx *gorm.DB, ID uint) (out []string, n int, err error) {
+	err = tx.Debug().Model(&entity.DiffTableData{}).Where("header_id = ?", ID).Distinct("level").Find(&out).Error
+	n = len(out)
+	return
 }
 
 func updateHeaderOrder(tx *gorm.DB, headerIDs []uint) error {

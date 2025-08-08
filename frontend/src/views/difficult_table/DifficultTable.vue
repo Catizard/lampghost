@@ -20,6 +20,7 @@
   <SortTableModal v-model:show="sortTableSettings.show" :query-func="sortTableSettings.queryFunc"
     @select="sortTableSettings.handleUpdateSort" :title="sortTableSettings.title"
     :labelField="sortTableSettings.labelField" :keyField="sortTableSettings.keyField" />
+  <DifficultTableSupply ref="supplyFormRef" />
 </template>
 
 <script lang="ts" setup>
@@ -39,11 +40,13 @@ import DifficultTableAddForm from "./DifficultTableAddForm.vue";
 import DifficultTableEditForm from "./DifficultTableEditForm.vue";
 import { TagColor } from "naive-ui/es/tag/src/common-props";
 import SortTableModal from "@/components/SortTableModal.vue";
+import DifficultTableSupply from "./DifficultTableSupply.vue";
 
 const i18n = useI18n();
 const { t } = i18n;
 const showAddModal = ref(false);
 const editFormRef = ref<InstanceType<typeof DifficultTableEditForm>>(null);
+const supplyFormRef = ref<InstanceType<typeof DifficultTableSupply>>(null);
 
 const dialog = useDialog();
 const loading = ref(false);
@@ -134,22 +137,7 @@ function handleSelectOtherAction(row: dto.DiffTableHeaderDto, key: string) {
     reloadTableHeader(row.ID);
   }
   if ("Supply" === key) {
-    dialog.warning({
-      title: t('message.supplyMissingBMS'),
-      positiveText: t('message.yes'),
-      negativeText: t('message.no'),
-      onPositiveClick: () => {
-        loading.value = true;
-        SupplyMissingBMSFromTable(row.ID)
-          .then(result => {
-            if (result.Code != 200) {
-              return Promise.reject(result.Msg);
-            }
-          })
-          .catch(err => window.$notifyError(err))
-          .finally(() => loading.value = false);
-      }
-    })
+    supplyFormRef.value.open(row.ID);
   }
   if ("Delete" === key) {
     dialog.warning({

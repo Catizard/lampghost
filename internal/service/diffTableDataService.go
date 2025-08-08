@@ -44,18 +44,7 @@ func selectDiffTableDataCount(tx *gorm.DB, filter *vo.DiffTableDataVo) (int64, e
 // Basic query function for diff_table_data table
 func findDiffTableDataList(tx *gorm.DB, filter *vo.DiffTableDataVo) ([]*dto.DiffTableDataDto, int, error) {
 	var contents []*entity.DiffTableData
-	partial := tx.Model(&entity.DiffTableData{})
-	if filter != nil {
-		partial = tx.Where(filter.Entity()).Scopes(
-			scopeInIDs(filter.IDs),
-			scopeInHeaderIDs(filter.HeaderIDs),
-			pagination(filter.Pagination),
-		)
-
-		if filter.SortOrder != nil && *filter.SortOrder != "" {
-			partial.Order(fmt.Sprintf("%s %s", *filter.SortBy, filter.GetOrder()))
-		}
-	}
+	partial := tx.Model(&entity.DiffTableData{}).Scopes(scopeDiffTableDataFilter(filter))
 
 	if err := partial.Debug().Find(&contents).Error; err != nil {
 		return nil, 0, eris.Wrap(err, "failed to query")
@@ -133,15 +122,7 @@ func findDiffTableDataListWithRival(tx *gorm.DB, filter *vo.DiffTableDataVo) ([]
 		return nil, 0, fmt.Errorf("findDiffTableDataListWithRival: filter.rivalID should not be zero")
 	}
 	var contents []*dto.DiffTableDataDto
-	partial := tx.Table("difftable_data").Where(filter.Entity()).Scopes(
-		scopeInIDs(filter.IDs),
-		scopeInHeaderIDs(filter.HeaderIDs),
-		pagination(filter.Pagination),
-	)
-
-	if filter.SortOrder != nil && *filter.SortOrder != "" {
-		partial.Order(fmt.Sprintf("%s %s", *filter.SortBy, filter.GetOrder()))
-	}
+	partial := tx.Table("difftable_data").Scopes(scopeDiffTableDataFilter(filter))
 
 	partial = partial.Joins("left join (select id, sha256, md5 from rival_song_data group by md5) rsd on difftable_data.md5 = rsd.md5")
 	partial = partial.Joins(`left join (
@@ -201,4 +182,27 @@ func findDiffTableDataListWithRival(tx *gorm.DB, filter *vo.DiffTableDataVo) ([]
 	}
 
 	return contents, len(contents), nil
+}
+
+// Common query scope for vo.DiffTableDataVo
+func scopeDiffTableDataFilter(filter *vo.DiffTableDataVo) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if filter == nil {
+			return db
+		}
+		moved := db.Where(filter.Entity())
+		// Extra filters here
+		moved = moved.Scopes(
+			scopeInIDs(filter.IDs),
+			scopeInHeaderIDs(filter.HeaderIDs),
+			pagination(filter.Pagination),
+		)
+		if filter.SortOrder != nil && *filter.SortOrder != "" {
+			moved = moved.Order(fmt.Sprintf("%s %s", *filter.SortBy, filter.GetOrder()))
+		}
+		if len(filter.Levels) > 0 {
+			moved = moved.Where("level in (?)", filter.Levels)
+		}
+		return moved
+	}
 }

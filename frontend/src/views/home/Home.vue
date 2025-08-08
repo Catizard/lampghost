@@ -102,19 +102,7 @@ function handleCopyTimeline() {
 }
 
 onMounted(async () => {
-  let user: dto.RivalInfoDto | null = null;
-  try {
-    const result = await QueryMainUser();
-    if (result.Code != 200) {
-      throw t("message.noMainUserError")
-    }
-    user = result.Data;
-  } catch (err) {
-    window.$notifyError(err);
-    router.push("/initialize");
-    return;
-  }
-  userStore.setter(user);
+  let user = userStore.$state.user;
   currentRivalID.value = route?.query?.rivalID ?? user.ID;
   if (currentRivalID.value != 1) {
     try {

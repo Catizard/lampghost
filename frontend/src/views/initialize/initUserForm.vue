@@ -74,10 +74,11 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
 import { ref, watch, reactive, Ref } from "vue";
-import { ChooseBeatorajaDirectory, InitializeMainUser, OpenDirectoryDialog, OpenFileDialog } from "@wailsjs/go/main/App";
+import { ChooseBeatorajaDirectory, InitializeMainUser, OpenDirectoryDialog, OpenFileDialog, QueryMainUser } from "@wailsjs/go/main/App";
 import { SelectOption } from 'naive-ui';
 import { dto } from '@wailsjs/go/models';
 import DirectoryTable from './directoryTable.vue';
+import { useUserStore } from '@/stores/user';
 
 const { t } = useI18n();
 const globalI18n = useI18n({ useScope: 'global' });
@@ -139,6 +140,7 @@ function chooseBMSDirectory() {
 }
 
 const loading = ref(false);
+const userStore = useUserStore();
 const formRef = ref(null);
 const formData = reactive({
   locale: null,
@@ -218,6 +220,11 @@ function handleSubmit(e) {
         if (result.Code != 200) {
           throw result.Msg;
         }
+        const mainUserResult = await QueryMainUser();
+        if (mainUserResult.Code != 200) {
+          throw result.Msg;
+        }
+        userStore.setter(mainUserResult.Data);
         props.moveOn();
       } catch (err) {
         window.$notifyError(err);

@@ -14,7 +14,7 @@ English | [简体中文](./README.zh-CN.md)
 - `Time Machine`: Compare lamp status between you and your friends, and could even "turn back" your friend's save file time(Suppose your friend is already ^^, using `LampGhost` allows you comparing the lamp status the moment that your friend achived ★5). And even "back port" the data into beatoraja
 - `Favorite Folder`: Customize favorite folder and import it as a difficult table in `beatoraja`(tip: You can reload table by pressing F2 in game). More specifically, import `http://127.0.0.1:7391/table/lampghost.json` in `beatoraja` while keep `LampGhost` opening
 - `Custom Difficult Table`: Customize your own difficult table and export, share, or deploy to static website
-- `Download Missing BMS`: LampGhost implements the integration with some BMS download servers, you can download the missing BMS through LampGhost
+- `Download Missing BMS`: LampGhost implements the integration with some BMS download servers, you can download the missing BMS through LampGhost or supply missing bms based on difficult tables
 
 Because `LampGhost` is an **offline** tool, therefore:
 
@@ -46,7 +46,11 @@ For `Windows` user it's located at `%USERPROFILE%\.lampghost_wails`, for `Linux/
 
 ### Unfortunate LR2 users
 
-This project doesn't support load LR2 save file currently, although its precessor, the tui version of `LampGhost` does.
+LR2's database doesn't record much useful data so `LampGhost` can only provide partial support for LR2 users:
+
+- LR2 users can view their lamps, but all features that are related to time are not useable for LR2 users. This is because LR2's score database file doesn't record when the record set. Also it's impossible to view recent activities since LR2 only records each song's best score but no play logs.
+- Because LR2 doesn't provide a file like `songdata.db`, `LampGhost` provides the ability of scanning bms directories and building an equivalent of `songdata.db`. However, this is a very time-consuming task to do(it needs to scan every bms file on your disk). Currently, `LampGhost` only supports completely rebuild the file.
+- You cannot add a LR2 user as a rival currently.
 
 ## Bugs reports and Advices
 

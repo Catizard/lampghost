@@ -5,6 +5,8 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/vo"
 	"gorm.io/gorm"
+
+	. "github.com/samber/lo"
 )
 
 type RivalScoreDataLogService struct {
@@ -25,6 +27,69 @@ func (s *RivalScoreDataLogService) QueryUserKeyCountInYear(param *vo.RivalScoreD
 		return nil, 0, err
 	}
 	return out, n, nil
+}
+
+func (s *RivalScoreDataLogService) QueryRivalScoreDataLogPageList(filter *vo.RivalScoreDataLogVo) (out []*dto.RivalScoreDataLogDto, n int, err error) {
+	err = s.db.Transaction(func(tx *gorm.DB) error {
+		out, n, err = findRivalScoreDataLogList(tx, filter)
+		if err != nil {
+			return err
+		}
+		tableTags, _, err := queryDiffTableTag(tx, &vo.DiffTableDataVo{
+			Md5s: FilterMap(out, func(log *dto.RivalScoreDataLogDto, _ int) (string, bool) {
+				return log.Md5, log.Md5 != ""
+			}),
+		})
+		if err != nil {
+			return err
+		}
+		ForEach(out, func(log *dto.RivalScoreDataLogDto, _ int) {
+			log.TableTags = make([]*dto.DiffTableTagDto, 0)
+			ForEach(tableTags, func(tag *dto.DiffTableTagDto, _ int) {
+				if tag.Md5 == log.Md5 {
+					log.TableTags = append(log.TableTags, tag)
+				}
+			})
+		})
+		return nil
+	})
+	return
+}
+
+func findRivalScoreDataLogList(tx *gorm.DB, filter *vo.RivalScoreDataLogVo) (out []*dto.RivalScoreDataLogDto, n int, err error) {
+	fields := `
+  rival_score_data_log.*,
+  sd.title as title,
+  sd.sub_title as sub_title,
+  sd.artist as artist,
+  sd.md5 as md5,
+  sd.ID as rival_song_data_id
+  `
+	partial := tx.Model(&entity.RivalScoreDataLog{}).Order("rival_score_data_log.record_time desc").Select(fields)
+	partial = partial.Debug().Joins("left join (select * from rival_song_data group by sha256) as sd on rival_score_data_log.sha256 = sd.sha256").Scopes(
+		scopeRivalScoreDataLogFilter(filter),
+	)
+	if filter != nil && filter.Pagination != nil {
+		partial = partial.Scopes(pagination(filter.Pagination))
+		if filter.SongNameLike != nil && *filter.SongNameLike != "" {
+			partial = partial.Where("sd.title like ('%' || ? || '%')", filter.SongNameLike)
+		}
+	}
+
+	if err = partial.Find(&out).Error; err != nil {
+		return
+	}
+
+	// pagination
+	if filter != nil && filter.Pagination != nil {
+		var count int64
+		count, err = selectRivalScoreDataLogCount(tx, filter)
+		if err != nil {
+			return
+		}
+		filter.Pagination.PageCount = calcPageCount(count, filter.Pagination.PageSize)
+	}
+	return
 }
 
 func findLastRivalScoreDataLog(tx *gorm.DB, filter *vo.RivalScoreDataLogVo) (*entity.RivalScoreDataLog, error) {
@@ -63,6 +128,17 @@ func queryUserKeyCountInYear(tx *gorm.DB, filter *vo.RivalScoreDataLogVo) ([]*dt
 	return out, len(out), nil
 }
 
+func selectRivalScoreDataLogCount(tx *gorm.DB, filter *vo.RivalScoreDataLogVo) (count int64, err error) {
+	partial := tx.Model(&entity.RivalScoreDataLog{}).Joins("left join (select * from rival_song_data group by sha256) as sd on rival_score_data_log.sha256 = sd.sha256").Scopes(
+		scopeRivalScoreDataLogFilter(filter),
+	)
+	if filter != nil && filter.SongNameLike != nil && *filter.SongNameLike != "" {
+		partial = partial.Where("sd.title like ('%' || ? || '%')", filter.SongNameLike)
+	}
+	err = partial.Count(&count).Error
+	return
+}
+
 // Specialized scope for vo.RivalScoreDataLogVo
 func scopeRivalScoreDataLogFilter(filter *vo.RivalScoreDataLogVo) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
@@ -73,8 +149,11 @@ func scopeRivalScoreDataLogFilter(filter *vo.RivalScoreDataLogVo) func(db *gorm.
 		if filter.SpecifyYear != nil {
 			moved = moved.Where(`STRFTIME("%Y", rival_score_data_log.record_time) = ?`, filter.SpecifyYear)
 		}
-		if filter.RivalId != 0 {
-			moved = moved.Where("rival_id = ?", filter.RivalId)
+		if filter.OnlyCourseLogs {
+			moved = moved.Where("length(rival_score_data_log.sha256) > 64")
+		}
+		if filter.NoCourseLog {
+			moved = moved.Where("length(rival_score_data_log.sha256) = 64")
 		}
 		return moved
 	}

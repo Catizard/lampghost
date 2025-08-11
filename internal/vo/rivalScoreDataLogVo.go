@@ -36,12 +36,19 @@ type RivalScoreDataLogVo struct {
 	Random     int32
 	State      int32
 
+	// Pagination
+	Pagination *entity.Page
+
 	// year(RecordTime) == SpecifyYear
-	SpecifyYear *string
+	SpecifyYear    *string
+	SongNameLike   *string
+	OnlyCourseLogs bool
+	NoCourseLog    bool
 }
 
 func (scoreDataLog *RivalScoreDataLogVo) Entity() *entity.RivalScoreDataLog {
 	return &entity.RivalScoreDataLog{
+		RivalId:    scoreDataLog.RivalId,
 		Sha256:     scoreDataLog.Sha256,
 		Mode:       scoreDataLog.Mode,
 		Clear:      scoreDataLog.Clear,

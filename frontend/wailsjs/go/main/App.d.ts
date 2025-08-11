@@ -131,6 +131,8 @@ export function GENERATOR_RIVAL_INFO():Promise<entity.RivalInfo>;
 
 export function GENERATOR_RIVAL_INFO_DTO():Promise<dto.RivalInfoDto>;
 
+export function GENERATOR_RIVAL_SCORE_DATA_LOG_DTO():Promise<dto.RivalScoreDataLogDto>;
+
 export function GENERATOR_SONG_DIRECTORY():Promise<entity.SongDirectory>;
 
 export function GENERATOR_TABLE_DATA():Promise<dto.DiffTableDataDto>;
@@ -174,6 +176,8 @@ export function QueryPreviewURLByMd5(arg1:string):Promise<result.RtnData>;
 export function QueryRivalInfoPageList(arg1:vo.RivalInfoVo):Promise<result.RtnPage>;
 
 export function QueryRivalPlayedYears(arg1:number):Promise<result.RtnDataList>;
+
+export function QueryRivalScoreDataLogPageList(arg1:vo.RivalScoreDataLogVo):Promise<result.RtnPage>;
 
 export function QueryRivalScoreLogPageList(arg1:vo.RivalScoreLogVo):Promise<result.RtnPage>;
 

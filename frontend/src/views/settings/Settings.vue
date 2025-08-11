@@ -44,7 +44,12 @@
           </n-p>
           <n-p>
             <n-form-item :label="t('form.labelPreviewSite')" path="previewSite">
-              <n-select v-model:value="model.PreviewSite" :options="previewSiteOptions" style="width: 150px" />
+              <n-select v-model:value="model.PreviewSite" :options="previewSiteOptions" style="width: 150px;" />
+            </n-form-item>
+          </n-p>
+          <n-p>
+            <n-form-item :label="t('form.labelUseScoredatalog')">
+              <n-select v-model:value="model.UseScoredatalog" :options="yesnoOptions" style="width: 150px;" />
             </n-form-item>
           </n-p>
         </n-h2>
@@ -155,6 +160,7 @@ const model = ref<config.ApplicationConfig>({
   EnableAutoReload: null,
   EnableDownloadFeature: null, // Unused
   PreviewSite: null,
+  UseScoredatalog: null,
 });
 const loading = ref(false);
 const yesnoOptions: Array<SelectOption> = [

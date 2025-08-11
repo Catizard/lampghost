@@ -9,6 +9,7 @@ export namespace config {
 	    MaximumDownloadCount: number;
 	    EnableAutoReload: number;
 	    PreviewSite: string;
+	    UseScoredatalog: number;
 	    EnableDownloadFeature: boolean;
 	
 	    static createFrom(source: any = {}) {
@@ -25,6 +26,7 @@ export namespace config {
 	        this.MaximumDownloadCount = source["MaximumDownloadCount"];
 	        this.EnableAutoReload = source["EnableAutoReload"];
 	        this.PreviewSite = source["PreviewSite"];
+	        this.UseScoredatalog = source["UseScoredatalog"];
 	        this.EnableDownloadFeature = source["EnableDownloadFeature"];
 	    }
 	}
@@ -554,6 +556,114 @@ export namespace dto {
 		    return a;
 		}
 	}
+	export class RivalScoreDataLogDto {
+	    ID: number;
+	    // Go type: time
+	    CreatedAt: any;
+	    // Go type: time
+	    UpdatedAt: any;
+	    // Go type: gorm
+	    DeletedAt: any;
+	    RivalId: number;
+	    Sha256: string;
+	    Mode: string;
+	    Clear: number;
+	    // Go type: time
+	    RecordTime: any;
+	    Epg: number;
+	    Lpg: number;
+	    Egr: number;
+	    Lgr: number;
+	    Egd: number;
+	    Lgd: number;
+	    Ebd: number;
+	    Lbd: number;
+	    Epr: number;
+	    Lpr: number;
+	    Ems: number;
+	    Lms: number;
+	    Notes: number;
+	    Combo: number;
+	    Minbp: number;
+	    PlayCount: number;
+	    ClearCount: number;
+	    Option: number;
+	    Seed: number;
+	    Random: number;
+	    State: number;
+	    Title: string;
+	    SubTitle: string;
+	    Artist: string;
+	    Md5: string;
+	    TableTags: DiffTableTagDto[];
+	    Page: number;
+	    PageSize: number;
+	    PageCount: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new RivalScoreDataLogDto(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.ID = source["ID"];
+	        this.CreatedAt = this.convertValues(source["CreatedAt"], null);
+	        this.UpdatedAt = this.convertValues(source["UpdatedAt"], null);
+	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
+	        this.RivalId = source["RivalId"];
+	        this.Sha256 = source["Sha256"];
+	        this.Mode = source["Mode"];
+	        this.Clear = source["Clear"];
+	        this.RecordTime = this.convertValues(source["RecordTime"], null);
+	        this.Epg = source["Epg"];
+	        this.Lpg = source["Lpg"];
+	        this.Egr = source["Egr"];
+	        this.Lgr = source["Lgr"];
+	        this.Egd = source["Egd"];
+	        this.Lgd = source["Lgd"];
+	        this.Ebd = source["Ebd"];
+	        this.Lbd = source["Lbd"];
+	        this.Epr = source["Epr"];
+	        this.Lpr = source["Lpr"];
+	        this.Ems = source["Ems"];
+	        this.Lms = source["Lms"];
+	        this.Notes = source["Notes"];
+	        this.Combo = source["Combo"];
+	        this.Minbp = source["Minbp"];
+	        this.PlayCount = source["PlayCount"];
+	        this.ClearCount = source["ClearCount"];
+	        this.Option = source["Option"];
+	        this.Seed = source["Seed"];
+	        this.Random = source["Random"];
+	        this.State = source["State"];
+	        this.Title = source["Title"];
+	        this.SubTitle = source["SubTitle"];
+	        this.Artist = source["Artist"];
+	        this.Md5 = source["Md5"];
+	        this.TableTags = this.convertValues(source["TableTags"], DiffTableTagDto);
+	        this.Page = source["Page"];
+	        this.PageSize = source["PageSize"];
+	        this.PageCount = source["PageCount"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	export class RivalScoreLogDto {
 	    ID: number;
 	    // Go type: time
@@ -578,6 +688,8 @@ export namespace dto {
 	    Md5: string;
 	    RivalSongDataID: number;
 	    Title: string;
+	    SubTitle: string;
+	    Artist: string;
 	    TableTags: DiffTableTagDto[];
 	    Page: number;
 	    PageSize: number;
@@ -608,6 +720,8 @@ export namespace dto {
 	        this.Md5 = source["Md5"];
 	        this.RivalSongDataID = source["RivalSongDataID"];
 	        this.Title = source["Title"];
+	        this.SubTitle = source["SubTitle"];
+	        this.Artist = source["Artist"];
 	        this.TableTags = this.convertValues(source["TableTags"], DiffTableTagDto);
 	        this.Page = source["Page"];
 	        this.PageSize = source["PageSize"];
@@ -1998,7 +2112,11 @@ export namespace vo {
 	    Seed: number;
 	    Random: number;
 	    State: number;
+	    Pagination?: entity.Page;
 	    SpecifyYear?: string;
+	    SongNameLike?: string;
+	    OnlyCourseLogs: boolean;
+	    NoCourseLog: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new RivalScoreDataLogVo(source);
@@ -2036,7 +2154,11 @@ export namespace vo {
 	        this.Seed = source["Seed"];
 	        this.Random = source["Random"];
 	        this.State = source["State"];
+	        this.Pagination = this.convertValues(source["Pagination"], entity.Page);
 	        this.SpecifyYear = source["SpecifyYear"];
+	        this.SongNameLike = source["SongNameLike"];
+	        this.OnlyCourseLogs = source["OnlyCourseLogs"];
+	        this.NoCourseLog = source["NoCourseLog"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

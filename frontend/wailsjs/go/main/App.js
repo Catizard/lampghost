@@ -250,6 +250,10 @@ export function GENERATOR_RIVAL_INFO_DTO() {
   return window['go']['main']['App']['GENERATOR_RIVAL_INFO_DTO']();
 }
 
+export function GENERATOR_RIVAL_SCORE_DATA_LOG_DTO() {
+  return window['go']['main']['App']['GENERATOR_RIVAL_SCORE_DATA_LOG_DTO']();
+}
+
 export function GENERATOR_SONG_DIRECTORY() {
   return window['go']['main']['App']['GENERATOR_SONG_DIRECTORY']();
 }
@@ -336,6 +340,10 @@ export function QueryRivalInfoPageList(arg1) {
 
 export function QueryRivalPlayedYears(arg1) {
   return window['go']['main']['App']['QueryRivalPlayedYears'](arg1);
+}
+
+export function QueryRivalScoreDataLogPageList(arg1) {
+  return window['go']['main']['App']['QueryRivalScoreDataLogPageList'](arg1);
 }
 
 export function QueryRivalScoreLogPageList(arg1) {

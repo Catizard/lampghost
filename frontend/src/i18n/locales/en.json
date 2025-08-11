@@ -116,6 +116,7 @@
     "labelLR2": "LR2",
     "labelUserDBPath": "User Database File Path",
     "labelScanBMSFiles": "Scan BMS Files",
+    "labelUseScoredatalog": "Use scoredatalog.db as datasource(experimental)",
     "placeholderName": "Please input name",
     "placeholderUserName": "Please input your name",
     "placeholderRivalName": "Please input rival name",
@@ -191,7 +192,14 @@
     "taskName": "Task Name(Click to Copy)",
     "progress": "Progress",
     "status": "Status",
-    "symbol": "Symbolen.json"
+    "symbol": "Symbol",
+    "perfectGreat": "Perfect",
+    "great": "Great",
+    "good": "Good",
+    "bad": "Bad",
+    "poor": "Poor",
+    "miss": "Miss",
+    "accuracy": "Accuracy"
   },
   "title": {
     "tableManagement": "Table Management",

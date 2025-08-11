@@ -25,6 +25,8 @@ type RivalScoreLogDto struct {
 	Md5             string
 	RivalSongDataID uint
 	Title           string
+	SubTitle        string
+	Artist          string
 	TableTags       []*DiffTableTagDto `gorm:"-"`
 	// Pagination
 	Page      int

@@ -105,6 +105,8 @@ func findRivalScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.Riva
 	fields := `
 		rival_score_log.*,
 		sd.title as title,
+    sd.sub_title as sub_title,
+    sd.artist as artist,
 		sd.md5 as md5,
 		sd.ID as rival_song_data_id
 	`

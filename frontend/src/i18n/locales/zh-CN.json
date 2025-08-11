@@ -116,6 +116,7 @@
     "labelLR2": "LR2",
     "labelUserDBPath": "用户数据库文件路径",
     "labelScanBMSFiles": "扫描BMS文件",
+    "labelUseScoredatalog": "使用scoredatalog.db作为数据源(实验特性)",
     "placeholderName": "请输入名称",
     "placeholderUserName": "请输入用户名称",
     "placeholderRivalName": "请输入玩家名称",
@@ -191,7 +192,13 @@
     "taskName": "任务名称(点击复制)",
     "progress": "下载进度",
     "status": "状态",
-    "symbol": "标志"
+    "symbol": "标志",
+    "perfectGreat": "Perfect",
+    "great": "Great",
+    "good": "Good",
+    "bad": "Bad",
+    "poor": "Poor",
+    "miss": "Miss"
   },
   "title": {
     "tableManagement": "难度表管理",

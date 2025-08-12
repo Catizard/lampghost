@@ -40,7 +40,7 @@ func (ctl *RivalInfoController) ChooseBeatorajaDirectory() result.RtnData {
 	log.Info("[Controller] calling RivalInfoController.ChooseBeatorajaDirectory")
 	meta, err := ctl.rivalInfoService.ChooseBeatorajaDirectory()
 	if err != nil {
-		log.Errorf("[RivalInfoController] returning err: %v", err)
+		log.Errorf("[RivalInfoController] returning err: %v", eris.ToString(err, true))
 		return result.NewErrorData(err)
 	}
 	return result.NewRtnData(meta)
@@ -52,7 +52,7 @@ func (ctl *RivalInfoController) AddRivalInfo(rivalInfo *vo.RivalInfoVo) result.R
 	log.Info("[Controller] calling RivalInfoController.AddRivalInfo")
 	err := ctl.rivalInfoService.AddRivalInfo(rivalInfo)
 	if err != nil {
-		log.Errorf("[RivalController] returning err: %v", err)
+		log.Errorf("[RivalController] returning err: %v", eris.ToString(err, true))
 		return result.NewErrorMessage(err)
 	}
 	return result.SUCCESS
@@ -62,6 +62,7 @@ func (ctl *RivalInfoController) QueryMainUser() result.RtnData {
 	log.Info("[Controller] calling RivalInfoController.QueryMainUser")
 	rivalInfo, err := ctl.rivalInfoService.QueryMainUser()
 	if err != nil {
+		log.Errorf("[RivalController] returning err: %v", eris.ToString(err, true))
 		return result.NewErrorData(err)
 	}
 	return result.NewRtnData(rivalInfo)
@@ -71,6 +72,7 @@ func (ctl *RivalInfoController) QueryUserInfoByID(rivalID uint) result.RtnData {
 	log.Info("[Controller] calling RivalInfoController.QueryUserInfo")
 	data, err := ctl.rivalInfoService.FindRivalInfoByID(rivalID)
 	if err != nil {
+		log.Errorf("[RivalController] returning err: %v", eris.ToString(err, true))
 		return result.NewErrorData(err)
 	}
 	return result.NewRtnData(data)
@@ -80,6 +82,7 @@ func (ctl *RivalInfoController) QueryUserPlayCountInYear(ID uint, yearNum string
 	log.Info("[Controller] calling RivalInfoController.QueryUserPlayCountInYear")
 	pc, err := ctl.rivalInfoService.QueryUserPlayCountInYear(ID, yearNum)
 	if err != nil {
+		log.Errorf("[RivalController] returning err: %v", eris.ToString(err, true))
 		return result.NewErrorDataList(err)
 	}
 	return result.NewRtnDataList(pc)
@@ -89,6 +92,7 @@ func (ctl *RivalInfoController) QueryUserInfoWithLevelLayeredDiffTableLampStatus
 	log.Info("[Controller] calling RivalInfoController.QueryDiffTableLampStatus")
 	data, err := ctl.rivalInfoService.QueryUserInfoWithLevelLayeredDiffTableLampStatus(rivalID, headerID)
 	if err != nil {
+		log.Errorf("[RivalController] returning err: %v", eris.ToString(err, true))
 		return result.NewErrorData(err)
 	}
 	return result.NewRtnData(data)
@@ -97,6 +101,7 @@ func (ctl *RivalInfoController) QueryUserInfoWithLevelLayeredDiffTableLampStatus
 func (ctl *RivalInfoController) ReloadRivalData(rivalID uint, fullyReload bool) result.RtnMessage {
 	log.Info("[Controller] calling RivalInfoController.ReloadRivalData")
 	if err := ctl.rivalInfoService.ReloadRivalData(rivalID, fullyReload); err != nil {
+		log.Errorf("[RivalController] returning err: %v", eris.ToString(err, true))
 		return result.NewErrorMessage(err)
 	}
 	return result.SUCCESS
@@ -106,7 +111,7 @@ func (ctl *RivalInfoController) FindRivalInfoList() result.RtnDataList {
 	log.Info("[Controller] calling RivalInfoController.FindRivalInfoList")
 	rows, _, err := ctl.rivalInfoService.FindRivalInfoList(nil)
 	if err != nil {
-		log.Errorf("[RivalInfoController] returning error: %v", err)
+		log.Errorf("[RivalController] returning err: %v", eris.ToString(err, true))
 		return result.NewErrorDataList(err)
 	}
 	return result.NewRtnDataList(rows)
@@ -116,7 +121,7 @@ func (ctl *RivalInfoController) QueryRivalInfoPageList(filter *vo.RivalInfoVo) r
 	log.Info("[Controller] calling RivalInfoController.QueryRivalInfoPageList")
 	rows, _, err := ctl.rivalInfoService.FindRivalInfoList(filter)
 	if err != nil {
-		log.Errorf("[RivalInfoController] returning error: %v", err)
+		log.Errorf("[RivalController] returning err: %v", eris.ToString(err, true))
 		return result.NewErrorPage(err)
 	}
 	return result.NewRtnPage(*filter.Pagination, rows)
@@ -126,7 +131,7 @@ func (ctl *RivalInfoController) QueryRivalPlayedYears(rivalID uint) result.RtnDa
 	log.Info("[Controller] calling RivalInfoController.QueryRivalPlayedYears")
 	rows, _, err := ctl.rivalInfoService.QueryRivalPlayedYears(rivalID)
 	if err != nil {
-		log.Errorf("[RivalInfoController] returning error: %v", err)
+		log.Errorf("[RivalController] returning err: %v", eris.ToString(err, true))
 		return result.NewErrorDataList(err)
 	}
 	return result.NewRtnDataList(rows)
@@ -136,7 +141,7 @@ func (ctl *RivalInfoController) DelRivalInfo(ID uint) result.RtnMessage {
 	log.Info("[Controller] calling RivalInfoController.DelRivalInfo")
 	err := ctl.rivalInfoService.DelRivalInfo(ID)
 	if err != nil {
-		log.Errorf("[RivalInfoController] returning err: %v", err)
+		log.Errorf("[RivalController] returning err: %v", eris.ToString(err, true))
 		return result.NewErrorMessage(err)
 	}
 	return result.SUCCESS
@@ -146,7 +151,7 @@ func (ctl *RivalInfoController) UpdateRivalInfo(updateParam *vo.RivalInfoVo) res
 	log.Info("[Controller] calling RivalInfoController.UpdateRivalInfo")
 	err := ctl.rivalInfoService.UpdateRivalInfo(updateParam)
 	if err != nil {
-		log.Errorf("[RivalInfoController] returning error: %v", err)
+		log.Errorf("[RivalController] returning err: %v", eris.ToString(err, true))
 		return result.NewErrorMessage(err)
 	}
 	return result.SUCCESS
@@ -155,7 +160,7 @@ func (ctl *RivalInfoController) UpdateRivalInfo(updateParam *vo.RivalInfoVo) res
 func (ctl *RivalInfoController) UpdateRivalReverseImportInfo(updateParam *vo.RivalInfoVo) result.RtnMessage {
 	log.Info("[Controller] calling RivalInfoController.UpdateRivalReverseImportInfo")
 	if err := ctl.rivalInfoService.UpdateRivalReverseImportInfo(updateParam); err != nil {
-		log.Errorf("[RivalInfoController] returning error: %v", err)
+		log.Errorf("[RivalController] returning err: %v", eris.ToString(err, true))
 		return result.NewErrorMessage(err)
 	}
 	return result.SUCCESS

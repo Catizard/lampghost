@@ -56,6 +56,20 @@ func (s *RivalScoreDataLogService) QueryRivalScoreDataLogPageList(filter *vo.Riv
 	return
 }
 
+// Similar to syncScoreDataLog but not delete any old content, only append new logs
+func appendScoreDataLog(tx *gorm.DB, rivalScoreDatalog []*entity.RivalScoreDataLog) error {
+	return tx.Model(&entity.RivalScoreDataLog{}).CreateInBatches(rivalScoreDatalog, DEFAULT_BATCH_SIZE).Error
+}
+
+// Fully delete all content from rival_score_data_log and rebuild them by rawScoreDataLog
+func syncScoreDataLog(tx *gorm.DB, rivalScoreDataLog []*entity.RivalScoreDataLog, rivalID uint) error {
+	if err := tx.Unscoped().Where("rival_id = ?", rivalID).Delete(&entity.RivalScoreDataLog{}).Error; err != nil {
+		return err
+	}
+
+	return tx.CreateInBatches(&rivalScoreDataLog, DEFAULT_BATCH_SIZE).Error
+}
+
 func findRivalScoreDataLogList(tx *gorm.DB, filter *vo.RivalScoreDataLogVo) (out []*dto.RivalScoreDataLogDto, n int, err error) {
 	fields := `
   rival_score_data_log.*,

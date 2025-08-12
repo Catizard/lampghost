@@ -114,7 +114,7 @@ func (s *RivalInfoService) InitializeMainUser(rivalInfo *vo.InitializeRivalInfoV
 	if err := s.db.Transaction(func(tx *gorm.DB) error {
 		return addRivalInfo(tx, insertRivalInfo)
 	}); err != nil {
-		return err
+		return eris.Wrap(err, "transaction")
 	}
 
 	if insertRivalInfo.Type != entity.RIVAL_TYPE_LR2 {
@@ -140,7 +140,7 @@ func (s *RivalInfoService) ChooseBeatorajaDirectory() (*dto.BeatorajaDirectoryMe
 		Title: "Choose Beatoraja Directory",
 	})
 	if err != nil {
-		return nil, err
+		return nil, eris.Wrap(err, "choose directory")
 	}
 	if dir == "" {
 		return nil, eris.New("choose directory: directory cannot be empty")
@@ -196,21 +196,29 @@ func (s *RivalInfoService) AddRivalInfo(rivalInfo *vo.RivalInfoVo) error {
 		return eris.Errorf("add rival: seperate songdata.db is not supported currently")
 	}
 	if rivalInfo.Name == "" {
-		return fmt.Errorf("rival name cannot be empty")
+		return eris.Errorf("rival name cannot be empty")
 	}
 	// No, you can never add a main user by using this inteface
 	rivalInfo.MainUser = false
-	return s.db.Transaction(func(tx *gorm.DB) error {
+	return eris.Wrap(s.db.Transaction(func(tx *gorm.DB) error {
 		return addRivalInfo(tx, rivalInfo.Entity())
-	})
+	}), "transaction")
 }
 
 func (s *RivalInfoService) FindRivalInfoList(filter *vo.RivalInfoVo) ([]*dto.RivalInfoDto, int, error) {
-	return findRivalInfoList(s.db, filter)
+	if data, n, err := findRivalInfoList(s.db, filter); err != nil {
+		return nil, 0, eris.Wrap(err, "findRivalInfoList")
+	} else {
+		return data, n, nil
+	}
 }
 
 func (s *RivalInfoService) FindRivalInfoByID(rivalID uint) (*entity.RivalInfo, error) {
-	return findRivalInfoByID(s.db, rivalID)
+	if data, err := findRivalInfoByID(s.db, rivalID); err != nil {
+		return nil, eris.Wrap(err, "findRivalInfoByID")
+	} else {
+		return data, nil
+	}
 }
 
 // Reload one rival's data, using different strategy based on fullyReload's value
@@ -223,34 +231,43 @@ func (s *RivalInfoService) ReloadRivalData(rivalID uint, fullyReload bool) error
 	} else {
 		if fullyReload {
 			log.Debug("[RivalInfoService] dispatched into fully reload")
-			return s.SyncRivalData(rivalInfo)
+			if err := s.FullySyncRivalData(rivalInfo); err != nil {
+				return eris.Wrap(err, "fully sync rival data")
+			}
 		}
 		log.Debug("[RivalInfoService] dispatched into incremental reload")
-		return s.IncrementalSyncRivalData(rivalInfo)
+		if err := s.IncrementalSyncRivalData(rivalInfo); err != nil {
+			return eris.Wrap(err, "incrementally sync rival data")
+		}
 	}
+	return nil
 }
 
 // Fully reload one rival's save files
-func (s *RivalInfoService) SyncRivalData(rivalInfo *entity.RivalInfo) error {
+func (s *RivalInfoService) FullySyncRivalData(rivalInfo *entity.RivalInfo) error {
 	if rivalInfo == nil {
-		return fmt.Errorf("assert: SyncRivalData: rivalInfo == nil")
+		return eris.Errorf("assert: SyncRivalData: rivalInfo == nil")
 	}
 	if rivalInfo.ID == 0 {
-		return fmt.Errorf("assert: SyncRivalData: rivalInfo.ID corrupted")
+		return eris.Errorf("assert: SyncRivalData: rivalInfo.ID corrupted")
 	}
 	log.Debug("[Service] calling RivalInfoService.SyncRivalData")
 	if rivalInfo.ScoreLogPath == nil || *rivalInfo.ScoreLogPath == "" {
-		return fmt.Errorf("cannot sync rival %s's score log: score log file path is empty", rivalInfo.Name)
+		return eris.Errorf("cannot sync rival %s's score log: score log file path is empty", rivalInfo.Name)
 	}
-	return s.db.Transaction(func(tx *gorm.DB) error {
-		if err := syncRivalData(tx, rivalInfo); err != nil {
-			return err
+	return eris.Wrap(s.db.Transaction(func(tx *gorm.DB) error {
+		if err := syncRivalData(tx, rivalInfo, &vo.RivalFileReloadInfoVo{
+			SongData:     true,
+			ScoreLog:     true,
+			ScoreDataLog: true,
+		}); err != nil {
+			return eris.Wrap(err, "syncRivalData")
 		}
 		if err := updateRivalPlayCount(tx, rivalInfo.ID); err != nil {
-			return err
+			return eris.Wrap(err, "updateRivalPlayCount")
 		}
 		return nil
-	})
+	}), "transaction")
 }
 
 // Extension to SyncRivalData, which only reloads part of the scorelog.db and
@@ -267,20 +284,20 @@ func (s *RivalInfoService) SyncRivalData(rivalInfo *entity.RivalInfo) error {
 // much changes often
 func (s *RivalInfoService) IncrementalSyncRivalData(rivalInfo *entity.RivalInfo) error {
 	if rivalInfo == nil {
-		return fmt.Errorf("incrementalSyncRivalData: rivalInfo cannot be nil")
+		return eris.Errorf("incrementalSyncRivalData: rivalInfo cannot be nil")
 	}
 	if rivalInfo.ID == 0 {
-		return fmt.Errorf("incrementalSyncRivalData: rivalInfo.ID should > 0")
+		return eris.Errorf("incrementalSyncRivalData: rivalInfo.ID should > 0")
 	}
 	if rivalInfo.ScoreLogPath == nil || *rivalInfo.ScoreLogPath == "" {
-		return fmt.Errorf("incrementalSyncRivalData: rivalInfo.ScoreLogPath cannot be empty")
+		return eris.Errorf("incrementalSyncRivalData: rivalInfo.ScoreLogPath cannot be empty")
 	}
 	return s.db.Transaction(func(tx *gorm.DB) error {
 		if err := incrementalSyncRivalData(tx, rivalInfo); err != nil {
-			return err
+			return eris.Wrap(err, "incrementalSyncRivalData")
 		}
 		if err := updateRivalPlayCount(tx, rivalInfo.ID); err != nil {
-			return err
+			return eris.Wrap(err, "updateRivalPlayCount")
 		}
 		return nil
 	})
@@ -289,35 +306,35 @@ func (s *RivalInfoService) IncrementalSyncRivalData(rivalInfo *entity.RivalInfo)
 func (s *RivalInfoService) DelRivalInfo(ID uint) error {
 	mainUser, err := queryMainUser(s.db)
 	if err != nil {
-		return err
+		return eris.Wrap(err, "queryMainUser")
 	}
 	if ID == mainUser.ID {
-		return fmt.Errorf("DelRivalInfo: cannot delete main user")
+		return eris.Errorf("DelRivalInfo: cannot delete main user")
 	}
 	if err := s.db.Transaction(func(tx *gorm.DB) error {
 		var candidate entity.RivalInfo
 		if err := tx.First(&candidate, ID).Error; err != nil {
-			return err
+			return eris.Wrap(err, "query deleting rival")
 		}
 		// RivalInfo
 		if err := tx.Delete(&entity.RivalInfo{}, candidate.ID).Error; err != nil {
-			return err
+			return eris.Wrap(err, "delete rival")
 		}
 		// RivalScoreLog
 		if err := tx.Unscoped().Where("rival_id = ?", candidate.ID).Delete(&entity.RivalScoreLog{}).Error; err != nil {
-			return err
+			return eris.Wrap(err, "delete rival_score_log")
 		}
 		// RivalSongData
 		if err := tx.Unscoped().Where("rival_id = ?", candidate.ID).Delete(&entity.RivalSongData{}).Error; err != nil {
-			return err
+			return eris.Wrap(err, "delete rival_score_data_log")
 		}
 		// RivalTag
 		if err := tx.Unscoped().Where("rival_id = ?", candidate.ID).Delete(entity.RivalTag{}).Error; err != nil {
-			return err
+			return eris.Wrap(err, "delete rival_tag")
 		}
 		return nil
 	}); err != nil {
-		return err
+		return eris.Wrap(err, "transaction")
 	}
 	return nil
 }
@@ -328,7 +345,7 @@ func (s *RivalInfoService) QueryUserPlayCountInYear(ID uint, yearNum string) ([]
 		SpecifyYear: &yearNum,
 	})
 	if err != nil {
-		return nil, err
+		return nil, eris.Wrap(err, "findRivalScoreLogList")
 	}
 	ret := make([]int, 12)
 	for i := range ret {
@@ -344,17 +361,17 @@ func (s *RivalInfoService) QueryUserInfoWithLevelLayeredDiffTableLampStatus(riva
 	log.Debugf("[RivalInfoService] QueryUserInfoWithLevelLayeredDiffTableLampStatus: rivalID=%d, headerId=%d", rivalID, headerID)
 	rivalInfo, err := s.FindRivalInfoByID(rivalID)
 	if err != nil {
-		return nil, err
+		return nil, eris.Wrap(err, "FindRivalInfoByID")
 	}
 	header, err := queryLevelLayeredDiffTableInfoById(s.db, headerID)
 	if err != nil {
-		return nil, err
+		return nil, eris.Wrap(err, "queryLevelLayeredDiffTableInfoById")
 	}
 	sha256MaxLamp, err := findRivalMaximumClearScoreLogSha256Map(s.db, &vo.RivalScoreLogVo{
 		RivalId: rivalID,
 	})
 	if err != nil {
-		return nil, err
+		return nil, eris.Wrap(err, "findRivalMaximumClearScoreLogSha256Map")
 	}
 
 	ret := dto.NewRivalInfoDtoWithDiffTable(rivalInfo, header)
@@ -373,13 +390,17 @@ func (s *RivalInfoService) QueryUserInfoWithLevelLayeredDiffTableLampStatus(riva
 func (s *RivalInfoService) QueryRivalPlayedYears(rivalID uint) ([]int, int, error) {
 	var years []int
 	if err := s.db.Model(&entity.RivalScoreLog{}).Where("rival_id = ?", rivalID).Select("distinct STRFTIME('%Y', record_time)").Find(&years).Error; err != nil {
-		return nil, 0, err
+		return nil, 0, eris.Wrap(err, "query rival_score_log")
 	}
 	return years, len(years), nil
 }
 
 func (s *RivalInfoService) QueryMainUser() (*entity.RivalInfo, error) {
-	return queryMainUser(s.db)
+	if data, err := queryMainUser(s.db); err != nil {
+		return nil, eris.Wrap(err, "queryMainUser")
+	} else {
+		return data, nil
+	}
 }
 
 // Warning: You should never be able to edit `MainUser` by using update interface
@@ -393,10 +414,10 @@ func (s *RivalInfoService) UpdateRivalInfo(rivalInfo *vo.RivalInfoVo) error {
 	// Unset crucial fields
 	rivalInfo.PlayCount = 0
 	rivalInfo.MainUser = false
-	return s.db.Transaction(func(tx *gorm.DB) error {
+	if err := s.db.Transaction(func(tx *gorm.DB) error {
 		var prev entity.RivalInfo
 		if err := tx.Debug().First(&prev, rivalInfo.ID).Error; err != nil {
-			return err
+			return eris.Wrap(err, "query rival_info")
 		}
 
 		if prev.MainUser && (rivalInfo.SongDataPath == nil || *rivalInfo.SongDataPath == "") {
@@ -408,23 +429,31 @@ func (s *RivalInfoService) UpdateRivalInfo(rivalInfo *vo.RivalInfoVo) error {
 		}
 		rivalInfo.Type = prev.Type
 
-		shouldFullyReload := false
-		changedScorelogPath := false
+		reloadInfo := &vo.RivalFileReloadInfoVo{
+			SongData:     false,
+			ScoreLog:     false,
+			ScoreDataLog: false,
+		}
 		if rivalInfo.ScoreLogPath != nil && *rivalInfo.ScoreLogPath != *prev.ScoreLogPath {
-			shouldFullyReload = true
-			changedScorelogPath = true
+			reloadInfo.ScoreLog = true
 		}
 		if rivalInfo.SongDataPath != nil && *rivalInfo.SongDataPath != *prev.SongDataPath {
-			shouldFullyReload = true
+			reloadInfo.SongData = true
 		}
 		if rivalInfo.ScoreDataLogPath != nil && (prev.ScoreDataLogPath == nil || *prev.ScoreDataLogPath != *rivalInfo.ScoreDataLogPath) {
-			shouldFullyReload = true
+			reloadInfo.ScoreDataLog = true
 		}
-		if prev.MainUser && changedScorelogPath {
+		if prev.MainUser && reloadInfo.ScoreLog {
 			s.monitorService.SetScoreLogFilePath(*rivalInfo.ScoreLogPath)
 		}
-		return updateRivalInfo(tx, shouldFullyReload, rivalInfo.Entity())
-	})
+		if err := updateRivalInfo(tx, reloadInfo, rivalInfo.Entity()); err != nil {
+			return eris.Wrap(err, "updateRivalInfo")
+		}
+		return nil
+	}); err != nil {
+		return eris.Wrap(err, "transaction")
+	}
+	return nil
 }
 
 // Special variant of 'UpdateRivalInfo' function, for updating 'Reverse Import' feature fields
@@ -454,21 +483,18 @@ func (s *RivalInfoService) UpdateRivalReverseImportInfo(rivalInfo *vo.RivalInfoV
 	return nil
 }
 
-// Add one rival
-//
-// Don't call incremental sync in this method
 func addRivalInfo(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
 	if err := tx.Create(rivalInfo).Error; err != nil {
-		return err
+		return eris.Wrap(err, "insert rival_info")
 	}
-	// TODO: Sync rival's data based on rival's type
-	if err := syncRivalData(tx, rivalInfo); err != nil {
-		return err
+	if err := syncRivalData(tx, rivalInfo, &vo.RivalFileReloadInfoVo{
+		SongData:     true,
+		ScoreLog:     true,
+		ScoreDataLog: true,
+	}); err != nil {
+		return eris.Wrap(err, "syncRivalData")
 	}
-	if err := updateRivalPlayCount(tx, rivalInfo.ID); err != nil {
-		return err
-	}
-	return nil
+	return eris.Wrap(updateRivalPlayCount(tx, rivalInfo.ID), "updateRivalPlayCount")
 }
 
 func findRivalInfoList(tx *gorm.DB, filter *vo.RivalInfoVo) ([]*dto.RivalInfoDto, int, error) {
@@ -481,38 +507,25 @@ func findRivalInfoList(tx *gorm.DB, filter *vo.RivalInfoVo) ([]*dto.RivalInfoDto
 	moved = moved.Joins(`left join rival_tag on rival_info.lock_tag_id = rival_tag.id`)
 
 	if err := moved.Debug().Find(&out).Error; err != nil {
-		return nil, 0, err
+		return nil, 0, eris.Wrap(err, "query rival_info")
 	}
 
 	return out, len(out), nil
 }
 
 func findRivalInfoByID(tx *gorm.DB, ID uint) (out *entity.RivalInfo, err error) {
-	err = tx.First(&out, ID).Error
+	if err := tx.First(&out, ID).Error; err != nil {
+		return nil, eris.Wrap(err, "query rival_info")
+	}
 	return
 }
 
 func selectRivalInfoCount(tx *gorm.DB, filter *vo.RivalInfoVo) (int64, error) {
 	var count int64
 	if err := tx.Model(&entity.RivalInfo{}).Scopes(scopeRivalInfoFilter(filter)).Count(&count).Error; err != nil {
-		return 0, err
+		return 0, eris.Wrap(err, "query rival_info")
 	}
 	return count, nil
-}
-
-// Common query scope for vo.RivalInfoVo
-func scopeRivalInfoFilter(filter *vo.RivalInfoVo) func(db *gorm.DB) *gorm.DB {
-	return func(db *gorm.DB) *gorm.DB {
-		if filter == nil {
-			return db
-		}
-		moved := db.Where(filter.Entity())
-		// Add extra filter here
-		if filter.IgnoreMainUser {
-			moved = moved.Where("rival_info.ID != 1")
-		}
-		return moved
-	}
 }
 
 // Fully reload one rival's saves files
@@ -520,30 +533,23 @@ func scopeRivalInfoFilter(filter *vo.RivalInfoVo) func(db *gorm.DB) *gorm.DB {
 // WARN: This function wouldn't update rival's play count, it's not this
 // function's purpose
 //
-// For now, theses files would be reloaded
+// For now, theses files would be reloaded if required to
 //  1. scorelog.db
-//  2. songdata.db (if provides)
-//  3. scoredatalog.db (if provides)
-//
-// And these tables' data would be re-generated
-//  1. rival_score_log
-//  2. rival_song_data (if songdata.db provides)
-//  3. rival_score_data_log (if scoredatalog.db provides)
-//  4. rival_tag
+//  2. songdata.db
+//  3. scoredatalog.db
 //
 // NOTE: The way we re-generate rival's tags is based on whether songdata.db
 // file exists or not, see below implementation for details.
-//
-// Specially, songdata.db or scoredatalog.db file path is not provide, this
-// method wouldn't return any error but skip.
-// This hack is because we haven't implmeneted the correct seperate
-// songdata.db for different rivals and scoredatalog.db is optional.
-// TODO: This hack also breaks some related data build
-func syncRivalData(tx *gorm.DB, rivalInfo *entity.RivalInfo) (err error) {
-	// (1) load and sync songdata.db if it's provided
-	var rawSongData []*entity.SongData
+func syncRivalData(tx *gorm.DB, rivalInfo *entity.RivalInfo, reloadInfo *vo.RivalFileReloadInfoVo) (err error) {
+	// Quick quit if nothing specified
+	if !reloadInfo.SongData && !reloadInfo.ScoreLog && !reloadInfo.ScoreDataLog {
+		log.Debugf("no file needs to be reload, skipping...")
+		return nil
+	}
+	// (1) songdata.db
 	var songHashCache *entity.SongHashCache
-	if rivalInfo.SongDataPath != nil && *rivalInfo.SongDataPath != "" {
+	if reloadInfo.SongData && rivalInfo.SongDataPath != nil && *rivalInfo.SongDataPath != "" {
+		var rawSongData []*entity.SongData
 		rawSongData, err = loadSongData(*rivalInfo.SongDataPath)
 		if err != nil {
 			return eris.Wrap(err, "load song data")
@@ -560,35 +566,22 @@ func syncRivalData(tx *gorm.DB, rivalInfo *entity.RivalInfo) (err error) {
 			return eris.Wrap(err, "query default song hash cache")
 		}
 	}
-	// (2) load and sync score logs
-	if rivalInfo.ScoreLogPath == nil {
-		return fmt.Errorf("assert: rival's scorelog path cannot be empty")
-	}
-	scoreLogService := NewScoreLogService(rivalInfo.Type)
-	rivalScoreLog, _, err := scoreLogService.LoadScoreLog(rivalInfo.ID, songHashCache, *rivalInfo.ScoreLogPath, nil)
-	if err != nil {
-		return eris.Wrap(err, "load score log")
-	}
-	if err := syncScoreLog(tx, rivalScoreLog, rivalInfo.ID); err != nil {
-		return eris.Wrap(err, "sync score log")
-	}
-	// (3) generate rival tags
-	if err := syncRivalTag(tx, rivalInfo.ID); err != nil {
-		return err
-	}
-	// (4) load and sync scoredatalog.db if it's provided
-	if rivalInfo.ScoreDataLogPath != nil && *rivalInfo.ScoreDataLogPath != "" {
-		scoreDataLogService := NewScoreDataLogService(rivalInfo.Type)
-		rivalScoreDataLog, _, err := scoreDataLogService.LoadScoreDataLog(rivalInfo.ID, songHashCache, *rivalInfo.ScoreDataLogPath, nil)
-		if err != nil {
-			return eris.Wrap(err, "load score data log")
-		}
-		if err := syncScoreDataLog(tx, rivalScoreDataLog, rivalInfo.ID); err != nil {
-			return err
+	// (2) scorelog.db
+	if reloadInfo.ScoreLog && rivalInfo.ScoreLogPath != nil && *rivalInfo.ScoreLogPath != "" {
+		scoreLogService := NewScoreLogService(tx, rivalInfo.Type, false, songHashCache)
+		if err := scoreLogService.SyncScoreLog(rivalInfo.ID, *rivalInfo.ScoreLogPath); err != nil {
+			return eris.Wrap(err, "sync score log")
 		}
 	}
-
-	return nil
+	// (3) scoredatalog.db
+	if reloadInfo.ScoreDataLog && rivalInfo.ScoreDataLogPath != nil && *rivalInfo.ScoreDataLogPath != "" {
+		scoreDataLogService := NewScoreDataLogService(tx, rivalInfo.Type, false, songHashCache)
+		if err := scoreDataLogService.SyncScoreDataLog(rivalInfo.ID, *rivalInfo.ScoreDataLogPath); err != nil {
+			return eris.Wrap(err, "sync score data log")
+		}
+	}
+	// (4) generate rival tags
+	return eris.Wrap(syncRivalTag(tx, rivalInfo.ID), "syncRivalTag")
 }
 
 // Incrementally reload one rival's save files
@@ -612,109 +605,47 @@ func syncRivalData(tx *gorm.DB, rivalInfo *entity.RivalInfo) (err error) {
 //  1. rival_score_log is empty
 //  2. rival_score_data_log is empty (This wouldn't be a problem since songdata.db could only be imported by main user currently)
 func incrementalSyncRivalData(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
-	lastRivalScoreLog, err := findLastRivalScoreLog(tx, &vo.RivalScoreLogVo{RivalId: rivalInfo.ID})
-	if err != nil {
-		return err
-	}
-	lastRivalScoreDataLog, err := findLastRivalScoreDataLog(tx, &vo.RivalScoreDataLogVo{RivalId: rivalInfo.ID})
-	if err != nil {
-		return err
-	}
-	// Fallback to fully reload
-	if lastRivalScoreLog.ID == 0 || lastRivalScoreDataLog.ID == 0 {
-		return syncRivalData(tx, rivalInfo)
-	}
-	scoreLogMaximumRecordTimestamp := lastRivalScoreLog.RecordTime.Unix()
-	scoreLogService := NewScoreLogService(rivalInfo.Type)
 	songHashCache, err := queryDefaultSongHashCache(tx)
 	if err != nil {
-		return err
-	}
-	rawScoreLog, _, err := scoreLogService.LoadScoreLog(rivalInfo.ID, songHashCache, *rivalInfo.ScoreLogPath, &scoreLogMaximumRecordTimestamp)
-	if err != nil {
-		return err
-	}
-	rivalType, err := queryUserType(tx, rivalInfo.ID)
-	if err != nil {
-		return err
-	}
-	switch rivalType {
-	case entity.RIVAL_TYPE_BEATORAJA:
-		if err := appendScoreLog(tx, rawScoreLog); err != nil {
-			return err
-		}
-	case entity.RIVAL_TYPE_LR2:
-		if err = syncScoreLog(tx, rawScoreLog, rivalInfo.ID); err != nil {
-			return err
-		}
-	default:
-		return eris.Errorf("unexpected rival type: %s", rivalType)
+		return eris.Wrap(err, "queryDefaultSongHashCache")
 	}
 
-	scoreDataLogService := NewScoreDataLogService(rivalInfo.Type)
-	scoreDataLogMaximumRecordTimestamp := lastRivalScoreDataLog.RecordTime.Unix()
-	rivalScoreDataLog, _, err := scoreDataLogService.LoadScoreDataLog(rivalInfo.ID, songHashCache, *rivalInfo.ScoreDataLogPath, &scoreDataLogMaximumRecordTimestamp)
-	if err != nil {
-		return eris.Wrap(err, "load score data log")
+	scoreLogService := NewScoreLogService(tx, rivalInfo.Type, true, songHashCache)
+	if err := scoreLogService.SyncScoreLog(rivalInfo.ID, *rivalInfo.ScoreLogPath); err != nil {
+		return eris.Wrap(err, "sync score log")
 	}
-	switch rivalType {
-	case entity.RIVAL_TYPE_BEATORAJA:
-		if err := appendScoreDataLog(tx, rivalScoreDataLog); err != nil {
-			return err
+
+	if rivalInfo.ScoreDataLogPath != nil && *rivalInfo.ScoreDataLogPath != "" {
+		scoreDataLogService := NewScoreDataLogService(tx, rivalInfo.Type, true, songHashCache)
+		if err := scoreDataLogService.SyncScoreDataLog(rivalInfo.ID, *rivalInfo.ScoreDataLogPath); err != nil {
+			return eris.Wrap(err, "sync score data log")
 		}
-	case entity.RIVAL_TYPE_LR2:
-		if err = syncScoreDataLog(tx, rivalScoreDataLog, rivalInfo.ID); err != nil {
-			return err
-		}
-	default:
-		return eris.Errorf("unexpected rival type: %s", rivalType)
 	}
-	return syncRivalTag(tx, rivalInfo.ID)
+
+	return eris.Wrap(syncRivalTag(tx, rivalInfo.ID), "syncRivalTag")
 }
 
 // Read all contents from `songdata.db` file into memory
 func loadSongData(songDataPath string) ([]*entity.SongData, error) {
 	if songDataPath == "" {
-		return nil, fmt.Errorf("assert: songdata path cannot be empty")
+		return nil, eris.Errorf("assert: songdata path cannot be empty")
 	}
 	log.Debugf("[RivalInfoService] Trying to read song data from %s", songDataPath)
 	if err := database.VerifyLocalDatabaseFilePath(songDataPath); err != nil {
-		return nil, err
+		return nil, eris.Wrap(err, "verify local database file")
 	}
 	dsn := songDataPath + READONLY_PARAMETER
 	songDataDB, err := gorm.Open(sqlite.Open(dsn))
 	if err != nil {
-		return nil, err
+		return nil, eris.Wrap(err, "open songdata.db")
 	}
 	songDataService := NewSongDataService(songDataDB)
 	rawSongData, n, err := songDataService.FindSongDataList()
 	if err != nil {
-		return nil, err
+		return nil, eris.Wrap(err, "FindSongDataList")
 	}
 	log.Infof("[RivalInfoService] Read %d song data from %s", n, songDataPath)
 	return rawSongData, nil
-}
-
-// Fully delete all content from rival_score_log and reinsert them
-func syncScoreLog(tx *gorm.DB, rivalScoreLog []*entity.RivalScoreLog, rivalID uint) error {
-	if err := tx.Unscoped().Where("rival_id = ?", rivalID).Delete(&entity.RivalScoreLog{}).Error; err != nil {
-		return err
-	}
-
-	if err := tx.CreateInBatches(&rivalScoreLog, DEFAULT_BATCH_SIZE).Error; err != nil {
-		return err
-	}
-	return nil
-}
-
-// Similar to syncScoreLog but not delete any old content, only append new logs
-func appendScoreLog(tx *gorm.DB, rivalScoreLog []*entity.RivalScoreLog) error {
-	return tx.Model(&entity.RivalScoreLog{}).CreateInBatches(rivalScoreLog, DEFAULT_BATCH_SIZE).Error
-}
-
-// Similar to syncScoreDataLog but not delete any old content, only append new logs
-func appendScoreDataLog(tx *gorm.DB, rivalScoreDatalog []*entity.RivalScoreDataLog) error {
-	return tx.Model(&entity.RivalScoreDataLog{}).CreateInBatches(rivalScoreDatalog, DEFAULT_BATCH_SIZE).Error
 }
 
 // Fully delete all content from rival_score_log and rebuild them by rawScoreLog
@@ -726,81 +657,69 @@ func syncSongData(tx *gorm.DB, rawSongData []*entity.SongData, rivalID uint) err
 	})
 
 	if err := tx.Unscoped().Where("rival_id = ?", rivalID).Delete(&entity.RivalSongData{}).Error; err != nil {
-		return err
+		return eris.Wrap(err, "delete rival_song_data")
 	}
 
-	return tx.CreateInBatches(&rivalSongData, DEFAULT_BATCH_SIZE).Error
+	return eris.Wrap(tx.CreateInBatches(&rivalSongData, DEFAULT_BATCH_SIZE).Error, "insert rival_song_data")
 }
 
-// Fully delete all content from rival_score_data_log and rebuild them by rawScoreDataLog
-func syncScoreDataLog(tx *gorm.DB, rivalScoreDataLog []*entity.RivalScoreDataLog, rivalID uint) error {
-	if err := tx.Unscoped().Where("rival_id = ?", rivalID).Delete(&entity.RivalScoreDataLog{}).Error; err != nil {
-		return err
-	}
-
-	return tx.CreateInBatches(&rivalScoreDataLog, DEFAULT_BATCH_SIZE).Error
-}
-
-func queryMainUser(tx *gorm.DB) (*entity.RivalInfo, error) {
-	var out entity.RivalInfo
-	if err := tx.Where(&entity.RivalInfo{MainUser: true}).First(&out).Error; err != nil {
-		return nil, err
-	}
-	return &out, nil
-}
-
-func queryUserType(tx *gorm.DB, rivalID uint) (t string, err error) {
-	r, err := findRivalInfoByID(tx, rivalID)
-	if err != nil {
-		return "", err
-	}
-	return r.Type, nil
+func queryMainUser(tx *gorm.DB) (out *entity.RivalInfo, err error) {
+	err = eris.Wrap(tx.Where(&entity.RivalInfo{MainUser: true}).First(&out).Error, "query rival_info")
+	return
 }
 
 // Update one rival info
 //
-// Fully reload save files if one of theses file paths not nil and has been changed:
-//
-//  1. ScoreLogPath
-//  2. SongDataPath
-//  3. ScoreDataLogPath
-//
 // Special Requirements:
 //  1. when updating main user, songdata.db file path cannot be empty
-func updateRivalInfo(tx *gorm.DB, shouldFullyReload bool, rivalInfo *entity.RivalInfo) error {
-	if shouldFullyReload {
-		log.Debugf("[RivalInfoService] trying to fully update rival info")
-		if err := syncRivalData(tx, rivalInfo); err != nil {
-			return err
-		}
+func updateRivalInfo(tx *gorm.DB, reloadInfo *vo.RivalFileReloadInfoVo, rivalInfo *entity.RivalInfo) error {
+	if err := syncRivalData(tx, rivalInfo, reloadInfo); err != nil {
+		return eris.Wrap(err, "syncRivalData")
+	}
 
-		// Since we have fully reloaded save files, we need also update play count here
+	// Since we have reload scorelog.db, we need also update play count here
+	if reloadInfo.ScoreLog {
 		pc, err := selectRivalScoreLogCount(tx, &vo.RivalScoreLogVo{RivalId: rivalInfo.ID})
 		if err != nil {
-			return err
+			return eris.Wrap(err, "selectRivalScoreLogCount")
 		}
 		rivalInfo.PlayCount = int(pc)
 	}
 
-	return tx.Updates(rivalInfo).Error
+	return eris.Wrap(tx.Updates(rivalInfo).Error, "update rival_info")
 }
 
 func updateRivalReverseImportInfo(tx *gorm.DB, rivalInfo entity.RivalInfo) error {
 	updates := make(map[string]any)
 	updates["ReverseImport"] = rivalInfo.ReverseImport
 	updates["LockTagID"] = rivalInfo.LockTagID
-	return eris.Wrap(tx.Model(&rivalInfo).Updates(updates).Error, "cannot update rival_info")
+	return eris.Wrap(tx.Model(&rivalInfo).Updates(updates).Error, "update rival_info")
 }
 
 // Simple helper function for updating one rival's play count field
 func updateRivalPlayCount(tx *gorm.DB, rivalID uint) error {
 	if rivalID == 0 {
-		return fmt.Errorf("updateRivalPlayCount: rivalID cannot be 0")
+		return eris.Errorf("updateRivalPlayCount: rivalID cannot be 0")
 	}
 
 	pc, err := selectRivalScoreLogCount(tx, &vo.RivalScoreLogVo{RivalId: rivalID})
 	if err != nil {
 		return err
 	}
-	return tx.Model(&entity.RivalInfo{Model: gorm.Model{ID: rivalID}}).Update("play_count", pc).Error
+	return eris.Wrap(tx.Model(&entity.RivalInfo{Model: gorm.Model{ID: rivalID}}).Update("play_count", pc).Error, "update rival_info")
+}
+
+// Common query scope for vo.RivalInfoVo
+func scopeRivalInfoFilter(filter *vo.RivalInfoVo) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if filter == nil {
+			return db
+		}
+		moved := db.Where(filter.Entity())
+		// Add extra filter here
+		if filter.IgnoreMainUser {
+			moved = moved.Where("rival_info.ID != 1")
+		}
+		return moved
+	}
 }

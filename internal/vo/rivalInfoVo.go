@@ -100,3 +100,11 @@ func (rivalInfo *InitializeRivalInfoVo) Into() *entity.RivalInfo {
 		return nil
 	}
 }
+
+// Indicates if we need to reload specific file
+type RivalFileReloadInfoVo struct {
+	SongData     bool
+	ScoreLog     bool
+	ScoreDataLog bool
+	// score        bool
+}

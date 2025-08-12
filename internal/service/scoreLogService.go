@@ -5,6 +5,7 @@ import (
 
 	"github.com/Catizard/lampghost_wails/internal/database"
 	"github.com/Catizard/lampghost_wails/internal/entity"
+	"github.com/Catizard/lampghost_wails/internal/vo"
 	"github.com/charmbracelet/log"
 	"github.com/glebarez/sqlite"
 	"github.com/rotisserie/eris"
@@ -12,17 +13,67 @@ import (
 )
 
 type ScoreLogService struct {
-	source string // constants: "beatoraja" | "LR2"
+	tx                  *gorm.DB              // lampghost database connection
+	source              string                // constants: "beatoraja" | "LR2"
+	incrementallyReload bool                  // when flagged, only append "new logs" if possible
+	songHashCache       *entity.SongHashCache // converting md5 -> sha256 for LR2
 }
 
-func NewScoreLogService(source string) *ScoreLogService {
+func NewScoreLogService(tx *gorm.DB, source string, incrementallyReload bool, songHashCache *entity.SongHashCache) *ScoreLogService {
 	return &ScoreLogService{
-		source: source,
+		tx:                  tx,
+		source:              source,
+		incrementallyReload: incrementallyReload,
+		songHashCache:       songHashCache,
 	}
 }
 
-// Load one scorelog.db/user.db as RivalScoreLog into memory
-func (s *ScoreLogService) LoadScoreLog(rivalID uint, songHashCache *entity.SongHashCache, scoreLogPath string, maximumTimestamp *int64) ([]*entity.RivalScoreLog, int, error) {
+// SyncScoreLog Sync one scorelog.db/user.db into database
+func (s *ScoreLogService) SyncScoreLog(rivalID uint, scoreLogPath string) error {
+	var maximumTimestamp *int64 = nil
+	if s.incrementallyReload {
+		log.Debug("[ScoreLogService] call side requires an incrementally reload")
+		// NOTE: Degenerate to fully reload if no log is present or rival type is LR2
+		switch s.source {
+		case entity.RIVAL_TYPE_BEATORAJA:
+			lastRivalScoreLog, err := findLastRivalScoreLog(s.tx, &vo.RivalScoreLogVo{RivalId: rivalID})
+			if err != nil {
+				return eris.Wrap(err, "find last rival score log")
+			}
+			if lastRivalScoreLog.ID == 0 {
+				s.incrementallyReload = false
+				log.Debug("[ScoreLogService] degenerate to fully reload because no log is found")
+			} else {
+				timestamp := lastRivalScoreLog.RecordTime.Unix()
+				maximumTimestamp = &timestamp
+				log.Debugf("[ScoreLogService] last record time is %v", lastRivalScoreLog.RecordTime)
+			}
+		case entity.RIVAL_TYPE_LR2:
+			s.incrementallyReload = false
+		default:
+			return eris.Errorf("unexpected rival type: %s", s.source)
+		}
+	} else {
+		log.Debug("[ScoreLogService] call side requires a fully reload")
+	}
+	rawScoreLog, _, err := s.LoadScoreLog(rivalID, scoreLogPath, maximumTimestamp)
+	if err != nil {
+		return eris.Wrap(err, "load scorelog.db")
+	}
+	if s.incrementallyReload {
+		if err := appendScoreLog(s.tx, rawScoreLog); err != nil {
+			return eris.Wrap(err, "append rival score log")
+		}
+	} else {
+		if err := syncScoreLog(s.tx, rawScoreLog, rivalID); err != nil {
+			return eris.Wrap(err, "rebuild rival score log")
+		}
+	}
+	return nil
+}
+
+// LoadScoreLog Load one scorelog.db/user.db as RivalScoreLog into memory
+func (s *ScoreLogService) LoadScoreLog(rivalID uint, scoreLogPath string, maximumTimestamp *int64) ([]*entity.RivalScoreLog, int, error) {
 	switch s.source {
 	case entity.RIVAL_TYPE_BEATORAJA:
 		rawLogs, err := loadBeatorajaScoreLog(scoreLogPath, maximumTimestamp)
@@ -63,14 +114,14 @@ func (s *ScoreLogService) LoadScoreLog(rivalID uint, songHashCache *entity.SongH
 		for i, rawLog := range rawLogs {
 			rivalLog := entity.FromRawLR2LogToRivalScoreLog(rawLog)
 			rivalLog.RivalId = rivalID
-			if sha256, ok := songHashCache.GetSHA256(rawLog.MD5); ok {
+			if sha256, ok := s.songHashCache.GetSHA256(rawLog.MD5); ok {
 				rivalLog.Sha256 = sha256
 			}
 			rivalScoreLog[i] = &rivalLog
 		}
 		return rivalScoreLog, len(rivalScoreLog), nil
 	default:
-		panic("unexpected source: " + s.source)
+		return nil, 0, eris.Errorf("unexpected source: %s", s.source)
 	}
 }
 

@@ -230,26 +230,30 @@ func TestInitializeLR2User(t *testing.T) {
 	}
 	rivalInfoService := newRivalInfoService(db)
 	t.Run("SmokeTest", func(t *testing.T) {
-		if err := rivalInfoService.InitializeMainUser(&vo.InitializeRivalInfoVo{
+		rivalInfo := &vo.InitializeRivalInfoVo{
 			Name:             "test",
 			ImportStrategy:   "LR2",
 			ScoreLogPath:     &EmptyUserPath,
 			ScoreDataLogPath: &EmptyUserPath,
 			BMSDirectories:   make([]string, 0),
-		}); err != nil {
+		}
+		rivalInfo.BMSDirectories = append(rivalInfo.BMSDirectories, "./testdata")
+		if err := rivalInfoService.InitializeMainUser(rivalInfo); err != nil {
 			t.Fatalf("initialize main user: %s", eris.ToString(err, true))
 		}
 	})
 }
 
 func TestAddUser(t *testing.T) {
+	db, err := database.NewMemoryDatabase()
+	if err != nil {
+		t.Fatalf("db: %s", err)
+	}
+	rivalInfoService := newRivalInfoService(db)
+	if err := rivalInfoService.InitializeMainUser(newEmptyInitializeUser(false, false, false)); err != nil {
+		t.Fatalf("initialize main user: %s", eris.ToString(err, true))
+	}
 	t.Run("FastFailOnWrongFields", func(t *testing.T) {
-		db, err := database.NewMemoryDatabase()
-		if err != nil {
-			t.Fatalf("db: %s", err)
-		}
-		rivalInfoService := newRivalInfoService(db)
-
 		tests := []struct {
 			name  string
 			input *vo.RivalInfoVo
@@ -282,11 +286,6 @@ func TestAddUser(t *testing.T) {
 	})
 
 	t.Run("AddEmptyUser", func(t *testing.T) {
-		db, err := database.NewMemoryDatabase()
-		if err != nil {
-			t.Fatalf("db: %s", err)
-		}
-		rivalInfoService := newRivalInfoService(db)
 		tests := []struct {
 			name  string
 			input *vo.RivalInfoVo
@@ -378,11 +377,11 @@ func TestUpdateUser(t *testing.T) {
 			t.Fatalf("db: %s", err)
 		}
 		rivalInfoService := newRivalInfoService(db)
-		emptyUser := newEmptyUser(false, true, false)
-		if err := rivalInfoService.AddRivalInfo(emptyUser); err != nil {
+		emptyUser := newEmptyInitializeUser(false, false, false)
+		if err := rivalInfoService.InitializeMainUser(emptyUser); err != nil {
 			t.Fatalf("initialize main user: %s", err)
 		}
-		updateParam := newNamedEmptyUser("NEWNAME", true, true, true)
+		updateParam := newNamedEmptyUser("NEWNAME", true, false, true)
 		updateParam.ID = 1
 		// These fields should never be updated directly
 		updateParam.PlayCount = 1
@@ -399,9 +398,6 @@ func TestUpdateUser(t *testing.T) {
 		}
 		if currState.PlayCount != 0 {
 			t.Error("directly writes PlayCount detected")
-		}
-		if currState.MainUser != false {
-			t.Errorf("directly writes MainUser detected")
 		}
 	})
 }

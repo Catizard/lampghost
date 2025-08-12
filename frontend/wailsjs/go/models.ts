@@ -258,6 +258,7 @@ export namespace dto {
 	    Url: string;
 	    UrlDiff: string;
 	    Sha256: string;
+	    SubTitle: string;
 	    Lamp: number;
 	    PlayCount: number;
 	    GhostLamp: number;
@@ -283,6 +284,7 @@ export namespace dto {
 	        this.Url = source["Url"];
 	        this.UrlDiff = source["UrlDiff"];
 	        this.Sha256 = source["Sha256"];
+	        this.SubTitle = source["SubTitle"];
 	        this.Lamp = source["Lamp"];
 	        this.PlayCount = source["PlayCount"];
 	        this.GhostLamp = source["GhostLamp"];

@@ -18,6 +18,7 @@ type DiffTableDataDto struct {
 	UrlDiff  string
 	Sha256   string
 
+	SubTitle  string
 	Lamp      int
 	PlayCount int
 

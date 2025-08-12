@@ -35,6 +35,7 @@ import SelectFolder from '../folder/SelectFolder.vue';
 import SelectDifficult from '../custom_table/SelectDifficult.vue';
 import { useUserStore } from '@/stores/user';
 import SongDirectoryEditForm from './SongDirectoryEditForm.vue';
+import SongTitleParagraph from '@/components/SongTitleParagraph.vue';
 
 const { t } = useI18n();
 
@@ -45,9 +46,12 @@ const editFormRef = ref<InstanceType<typeof SongDirectoryEditForm>>(null);
 
 const searchNameLike: Ref<string | null> = ref(null);
 const columns: DataTableColumns<dto.RivalSongDataDto> = [
-  { title: t('column.title'), key: "Title", resizable: true },
-  { title: t('column.subTitle'), key: "SubTitle", resizable: true, width: "125px", ellipsis: { tooltip: true } },
-  { title: t('column.artist'), key: "Artist", resizable: true, width: "125px", ellipsis: { tooltip: true } },
+  {
+    title: t('column.title'), key: "Title", resizable: true,
+    render(row: dto.RivalSongDataDto) {
+      return h(SongTitleParagraph, { data: row });
+    }
+  },
   { title: t('column.genre'), key: "Genre", resizable: true, width: "125px", ellipsis: { tooltip: true } },
   {
     title: t('column.actions'), key: "actions", resizable: true, width: "90px",

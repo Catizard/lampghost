@@ -19,6 +19,7 @@ import { useI18n } from 'vue-i18n';
 import SelectDifficult from '../custom_table/SelectDifficult.vue';
 import SelectFolder from '../folder/SelectFolder.vue';
 import ChartPreview from '@/components/ChartPreview.vue';
+import SongTitleParagraph from '@/components/SongTitleParagraph.vue';
 
 type PlayLog = dto.RivalScoreLogDto | dto.RivalScoreDataLogDto;
 type SongInfo = {
@@ -47,28 +48,8 @@ function createColumns(useScorelog: boolean): DataTableColumns<PlayLog> {
   const ret: DataTableColumns<PlayLog> = [
     {
       title: t('column.title'), key: "Title", resizable: true, align: 'left',
-      render(row: PlayLog): VNodeChild {
-        // TODO: Extract this as a standalone component and back-port it
-        // to page like difficult table & song table
-        const vnodes: VNode[] = [];
-        vnodes.push(h(NText, { type: "Strong" }, { default: () => row.Title }));
-        if (row.SubTitle != "") {
-          vnodes.push(h(NText, {
-            depth: "2",
-            style: {
-              fontSize: 11
-            }
-          }, { default: () => row.SubTitle }));
-        }
-        if (row.Artist != "") {
-          vnodes.push(h(NText, {
-            depth: "3",
-            style: {
-              fontSize: 9
-            }
-          }, { default: () => row.Artist }));
-        }
-        return h(NFlex, { vertical: true }, { default: () => vnodes });
+      render(row: PlayLog) {
+        return h(SongTitleParagraph, { data: row });
       }
     },
     {

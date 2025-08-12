@@ -20,6 +20,7 @@ import { BrowserOpenURL } from '@wailsjs/runtime/runtime';
 import SelectDifficult from '../custom_table/SelectDifficult.vue';
 import dayjs from 'dayjs';
 import { useUserStore } from '@/stores/user';
+import SongTitleParagraph from '@/components/SongTitleParagraph.vue';
 
 const i18n = useI18n();
 const { t } = i18n;
@@ -47,11 +48,10 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
       if (row.DataLost) {
         vnodes.push(h(NIcon, { component: WarningOutline, color: "red" }));
       }
-      vnodes.push(h(NEllipsis, { tooltip: true, style: { "max-width": "calc(100% - 26px)" } }, { default: () => row.Title }));
+      vnodes.push(h(SongTitleParagraph, { data: row }));
       return vnodes;
     }
   },
-  { title: t('column.artist'), key: "Artist", ellipsis: { tooltip: true }, sorter: true, width: "100px" },
   { title: t('column.playCount'), key: "PlayCount", width: "75px" },
   {
     title: t('column.clear'), key: "Lamp", width: "100px", resizable: true, sorter: true,

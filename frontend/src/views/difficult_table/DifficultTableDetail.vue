@@ -20,6 +20,7 @@ import SelectDifficult from '../custom_table/SelectDifficult.vue';
 import dayjs from 'dayjs';
 import { useUserStore } from '@/stores/user';
 import SongTitleParagraph from '@/components/SongTitleParagraph.vue';
+import SongScoreParagraph from '@/components/SongScoreParagraph.vue';
 
 const i18n = useI18n();
 const { t } = i18n;
@@ -47,22 +48,9 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
     }
   },
   {
-    title: t('column.accuracy'), key: "Accuracy", width: "110px", resizable: true, align: "center",
+    title: t('column.score'), key: "Score", width: "110px", resizable: true, align: "center",
     render(row: dto.DiffTableDataDto) {
-      if (row.Notes == 0) {
-        return "/";
-      }
-      const exscore = (row.Epg + row.Lpg) * 2 + row.Egr + row.Lgr;
-      const accuracy = exscore * 50 / row.Notes;
-      return h(NFlex, {
-        vertical: true,
-        align: "center"
-      }, {
-        default: () => [
-          h(NText, { strong: true }, { default: () => calculateRank(accuracy) }),
-          h(NText, { depth: 3, style: { fontSize: 9 } }, { default: () => `${accuracy.toFixed(2)}%` })
-        ]
-      });
+      return h(SongScoreParagraph, { data: row });
     }
   },
   {
@@ -244,25 +232,6 @@ function handleSubmitSingleMD5DownloadTask(row: dto.DiffTableDataDto) {
     })
     .catch(err => window.$notifyError(err))
     .finally(() => loading.value = false);
-}
-
-function calculateRank(accuracy: number): string {
-  if (accuracy >= 88.88) {
-    return "AAA";
-  } else if (accuracy >= 77.77) {
-    return "AA";
-  } else if (accuracy >= 66.66) {
-    return "A";
-  } else if (accuracy >= 55.55) {
-    return "B";
-  } else if (accuracy >= 44.44) {
-    return "C";
-  } else if (accuracy >= 33.33) {
-    return "D";
-  } else if (accuracy >= 22.22) {
-    return "E";
-  }
-  return "F";
 }
 
 loadData();

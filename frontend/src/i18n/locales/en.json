@@ -202,7 +202,8 @@
     "bad": "Bad",
     "poor": "Poor",
     "miss": "Miss",
-    "accuracy": "Accuracy"
+    "accuracy": "Accuracy",
+    "score": "Score"
   },
   "title": {
     "tableManagement": "Table Management",

@@ -201,7 +201,9 @@
     "good": "Good",
     "bad": "Bad",
     "poor": "Poor",
-    "miss": "Miss"
+    "miss": "Miss",
+    "accuracy": "准确率",
+    "score": "得分"
   },
   "title": {
     "tableManagement": "难度表管理",

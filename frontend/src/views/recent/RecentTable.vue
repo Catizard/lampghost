@@ -13,13 +13,14 @@ import { useUserStore } from '@/stores/user';
 import { BindSongToFolder, QueryRivalScoreDataLogPageList, QueryRivalScoreLogPageList, ReadConfig } from '@wailsjs/go/main/App';
 import { config, dto } from '@wailsjs/go/models';
 import dayjs from 'dayjs';
-import { DataTableColumns, NDropdown, NButton, NText, NFlex } from 'naive-ui';
-import { h, Ref, ref, reactive, onMounted, VNode, VNodeChild } from 'vue';
+import { DataTableColumns, NDropdown, NButton } from 'naive-ui';
+import { h, Ref, ref, reactive, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import SelectDifficult from '../custom_table/SelectDifficult.vue';
 import SelectFolder from '../folder/SelectFolder.vue';
 import ChartPreview from '@/components/ChartPreview.vue';
 import SongTitleParagraph from '@/components/SongTitleParagraph.vue';
+import SongScoreParagraph from '@/components/SongScoreParagraph.vue';
 
 type PlayLog = dto.RivalScoreLogDto | dto.RivalScoreDataLogDto;
 type SongInfo = {
@@ -77,10 +78,7 @@ function createColumns(useScorelog: boolean): DataTableColumns<PlayLog> {
       {
         title: t('column.accuracy'), key: "Accuracy", minWidth: "100px", resizable: true,
         render(row: dto.RivalScoreDataLogDto) {
-          if (row.Notes == 0) {
-            return "/";
-          }
-          return `${(((row.Epg + row.Lpg) * 2 + row.Egr + row.Lgr) / (row.Notes * 2) * 100).toFixed(2)}%`;
+          return h(SongScoreParagraph, { data: row });
         }
       },
       {

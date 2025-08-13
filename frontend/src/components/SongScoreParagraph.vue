@@ -1,7 +1,7 @@
 <template>
   <template v-if="noplay">/</template>
   <template v-else>
-    <n-flex vertical>
+    <n-flex vertical align="center">
       <n-text strong>{{ rank }}</n-text>
       <n-text depth="2" style="font-size: 11;">{{ accuracy.toFixed(2) }}%</n-text>
       <n-text depth="3" style="font-size: 9;">[{{ exscore }}]</n-text>

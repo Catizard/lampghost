@@ -13,6 +13,7 @@ type RivalInfoDto struct {
 	ScoreLogPath     *string
 	SongDataPath     *string
 	ScoreDataLogPath *string
+	ScoreDataPath    *string
 	PlayCount        int
 	MainUser         bool
 	LockTagID        uint
@@ -36,6 +37,7 @@ func NewRivalInfoDto(rival *entity.RivalInfo) *RivalInfoDto {
 		ScoreLogPath:     rival.ScoreLogPath,
 		SongDataPath:     rival.SongDataPath,
 		ScoreDataLogPath: rival.ScoreDataLogPath,
+		ScoreDataPath:    rival.ScoreDataPath,
 		PlayCount:        rival.PlayCount,
 		MainUser:         rival.MainUser,
 		LockTagID:        rival.LockTagID,
@@ -51,6 +53,7 @@ func (rival *RivalInfoDto) Entity() *entity.RivalInfo {
 		ScoreLogPath:     rival.ScoreLogPath,
 		SongDataPath:     rival.SongDataPath,
 		ScoreDataLogPath: rival.ScoreDataLogPath,
+		ScoreDataPath:    rival.ScoreDataPath,
 		MainUser:         rival.MainUser,
 		LockTagID:        rival.LockTagID,
 		ReverseImport:    rival.ReverseImport,

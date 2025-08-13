@@ -20,6 +20,9 @@
       <n-form-item :label="t('form.labelSongdataPath')" path="SongDataPath">
         <n-input disabled v-model:value="formData.SongDataPath" :placeholder="t('form.placeholderSongdataPath')" />
       </n-form-item>
+      <n-form-item :label="t('form.labelScoredataPath')" path="ScoreDataPath">
+        <n-input disabled v-model:value="formData.ScoreDataPath" :placeholder="t('form.placeholderScoredataPath')" />
+      </n-form-item>
     </n-form>
   </n-modal>
 </template>
@@ -44,6 +47,7 @@ const formData = ref({
   Name: null,
   ScoreLogPath: null,
   SongDataPath: null,
+  ScoreDataPath: null,
   ScoreDataLogPath: null,
 });
 const rules = {
@@ -91,10 +95,11 @@ function handleNegativeClick() {
   formData.value.ScoreLogPath = null;
   formData.value.SongDataPath = null;
   formData.value.ScoreDataLogPath = null;
+  formData.value.ScoreDataPath = null;
 }
 
 // target == "scorelogPath" | "songdataPath"
-function chooseFile(title, target: "scorelogPath" | "songdataPath" | "scoredatalogPath") {
+function chooseFile(title, target: "scorelogPath" | "songdataPath" | "scoredatalogPath" | "scoredataPath") {
   OpenFileDialog(title)
     .then(result => {
       if (result.Code != 200) {
@@ -105,6 +110,7 @@ function chooseFile(title, target: "scorelogPath" | "songdataPath" | "scoredatal
           case "scorelogPath": formData.value.ScoreLogPath = result.Data; break;
           case "songdataPath": formData.value.SongDataPath = result.Data; break;
           case "scoredatalogPath": formData.value.ScoreDataLogPath = result.Data; break;
+          case "scoredataPath": formData.value.ScoreDataPath = result.Data; break;
         }
       }
     }).catch(err => window.$notifyError(err));

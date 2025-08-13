@@ -90,8 +90,8 @@ type ScoreDataLog struct {
 	Notes      int32
 	Combo      int32
 	Minbp      int32
-	PlayCount  int32 `gorm:"playcount"`
-	ClearCount int32 `gorm:"clearcount"`
+	PlayCount  int32 `gorm:"column:playcount"`
+	ClearCount int32 `gorm:"column:clearcount"`
 	Option     int32
 	Seed       int64
 	Random     int32
@@ -101,6 +101,40 @@ type ScoreDataLog struct {
 
 func (ScoreDataLog) TableName() string {
 	return "scoredatalog"
+}
+
+type ScoreData struct {
+	Sha256     string
+	Mode       string
+	Clear      int32
+	Epg        int32
+	Lpg        int32
+	Egr        int32
+	Lgr        int32
+	Egd        int32
+	Lgd        int32
+	Ebd        int32
+	Lbd        int32
+	Epr        int32
+	Lpr        int32
+	Ems        int32
+	Lms        int32
+	Notes      int32
+	Combo      int32
+	Minbp      int32
+	PlayCount  int32 `gorm:"column:playcount"`
+	ClearCount int32 `gorm:"column:clearcount"`
+	Trophy     string
+	Ghost      string
+	Option     int32
+	Seed       int64
+	Random     int32
+	TimeStamp  int64 `gorm:"column:date"`
+	State      int32
+}
+
+func (ScoreData) TableName() string {
+	return "score"
 }
 
 type BeatorajaSongMode int

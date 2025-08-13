@@ -111,6 +111,9 @@ func (s *RivalInfoService) InitializeMainUser(rivalInfo *vo.InitializeRivalInfoV
 	if insertRivalInfo.ScoreDataLogPath == nil || *insertRivalInfo.ScoreDataLogPath == "" {
 		return eris.New("scoredatalog.db path cannot be empty")
 	}
+	if insertRivalInfo.ScoreDataPath == nil || *insertRivalInfo.ScoreDataPath == "" {
+		return eris.New("score.db path cannot be empty")
+	}
 	if err := s.db.Transaction(func(tx *gorm.DB) error {
 		return addRivalInfo(tx, insertRivalInfo)
 	}); err != nil {
@@ -260,6 +263,7 @@ func (s *RivalInfoService) FullySyncRivalData(rivalInfo *entity.RivalInfo) error
 			SongData:     true,
 			ScoreLog:     true,
 			ScoreDataLog: true,
+			ScoreData:    true,
 		}); err != nil {
 			return eris.Wrap(err, "syncRivalData")
 		}
@@ -433,6 +437,7 @@ func (s *RivalInfoService) UpdateRivalInfo(rivalInfo *vo.RivalInfoVo) error {
 			SongData:     false,
 			ScoreLog:     false,
 			ScoreDataLog: false,
+			ScoreData:    false,
 		}
 		if rivalInfo.ScoreLogPath != nil && *rivalInfo.ScoreLogPath != *prev.ScoreLogPath {
 			reloadInfo.ScoreLog = true
@@ -442,6 +447,9 @@ func (s *RivalInfoService) UpdateRivalInfo(rivalInfo *vo.RivalInfoVo) error {
 		}
 		if rivalInfo.ScoreDataLogPath != nil && (prev.ScoreDataLogPath == nil || *prev.ScoreDataLogPath != *rivalInfo.ScoreDataLogPath) {
 			reloadInfo.ScoreDataLog = true
+		}
+		if rivalInfo.ScoreDataPath != nil && (prev.ScoreDataPath == nil || *prev.ScoreDataPath != *rivalInfo.ScoreDataPath) {
+			reloadInfo.ScoreData = true
 		}
 		if prev.MainUser && reloadInfo.ScoreLog {
 			s.monitorService.SetScoreLogFilePath(*rivalInfo.ScoreLogPath)
@@ -491,6 +499,7 @@ func addRivalInfo(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
 		SongData:     true,
 		ScoreLog:     true,
 		ScoreDataLog: true,
+		ScoreData:    true,
 	}); err != nil {
 		return eris.Wrap(err, "syncRivalData")
 	}
@@ -542,7 +551,7 @@ func selectRivalInfoCount(tx *gorm.DB, filter *vo.RivalInfoVo) (int64, error) {
 // file exists or not, see below implementation for details.
 func syncRivalData(tx *gorm.DB, rivalInfo *entity.RivalInfo, reloadInfo *vo.RivalFileReloadInfoVo) (err error) {
 	// Quick quit if nothing specified
-	if !reloadInfo.SongData && !reloadInfo.ScoreLog && !reloadInfo.ScoreDataLog {
+	if !reloadInfo.SongData && !reloadInfo.ScoreLog && !reloadInfo.ScoreDataLog && !reloadInfo.ScoreData {
 		log.Debugf("no file needs to be reload, skipping...")
 		return nil
 	}
@@ -580,6 +589,13 @@ func syncRivalData(tx *gorm.DB, rivalInfo *entity.RivalInfo, reloadInfo *vo.Riva
 			return eris.Wrap(err, "sync score data log")
 		}
 	}
+	// (4) score.db
+	if reloadInfo.ScoreData && rivalInfo.ScoreDataPath != nil && *rivalInfo.ScoreDataPath != "" {
+		scoreDataService := NewScoreDataService(tx, rivalInfo.Type, false, songHashCache)
+		if err := scoreDataService.SyncScore(rivalInfo.ID, *rivalInfo.ScoreDataPath); err != nil {
+			return eris.Wrap(err, "sync score data")
+		}
+	}
 	// (4) generate rival tags
 	return eris.Wrap(syncRivalTag(tx, rivalInfo.ID), "syncRivalTag")
 }
@@ -592,11 +608,13 @@ func syncRivalData(tx *gorm.DB, rivalInfo *entity.RivalInfo, reloadInfo *vo.Riva
 // For now, theses files would be reloaded
 //  1. scorelog.db
 //  2. scoredatalog.db (if provides)
+//  3. score.db (if provides)
 //
 // And these tables' data would be updated
 //  1. rival_score_log (incrementally added for beatoraja)
 //  2. rival_score_data_log (incrementally added for beatoraja)
-//  3. rival_tag (keep the old data as much as possible)
+//  3. rival_score_data (incrementally updated for beatoraja)
+//  4. rival_tag (keep the old data as much as possible)
 //
 // NOTE: For LR2 user, rival_score_log and rival_score_data_log would be regenerated because
 // LR2's database doesn't provide record's time
@@ -619,6 +637,13 @@ func incrementalSyncRivalData(tx *gorm.DB, rivalInfo *entity.RivalInfo) error {
 		scoreDataLogService := NewScoreDataLogService(tx, rivalInfo.Type, true, songHashCache)
 		if err := scoreDataLogService.SyncScoreDataLog(rivalInfo.ID, *rivalInfo.ScoreDataLogPath); err != nil {
 			return eris.Wrap(err, "sync score data log")
+		}
+	}
+
+	if rivalInfo.ScoreDataPath != nil && *rivalInfo.ScoreDataPath != "" {
+		scoreDataService := NewScoreDataService(tx, rivalInfo.Type, true, songHashCache)
+		if err := scoreDataService.SyncScore(rivalInfo.ID, *rivalInfo.ScoreDataPath); err != nil {
+			return eris.Wrap(err, "sync score data")
 		}
 	}
 

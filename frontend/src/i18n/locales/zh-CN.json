@@ -91,6 +91,7 @@
     "labelRivalName": "玩家名称",
     "labelSongdataPath": "songdata.db文件路径",
     "labelScorelogPath": "scorelog.db文件路径",
+    "labelScoredataPath": "score.db文件路径",
     "labelScoredatalogPath": "scoredatalog.db文件路径",
     "labelReverseImport": "反向导入",
     "labelLockTag": "锁定版本",
@@ -122,6 +123,7 @@
     "placeholderRivalName": "请输入玩家名称",
     "placeholderSongdataPath": "请输入/beatoraja path/songdata.db文件路径",
     "placeholderScorelogPath": "请输入/beatoraja path/*Player Name*/scorelog.db文件路径",
+    "placeholderScoredataPath": "请输入/beatoraja path/*Player Name*/score.db文件路径",
     "placeholderScoredatalogPath": "请输入/beatoraja path/*Player Name*/scoredatalog.db文件路径",
     "placeholderTagName": "请输入标签名称",
     "placeholderRecordTime": "请输入记录时间",
@@ -142,6 +144,7 @@
     "missingUserName": "用户名不可为空",
     "missingSongdataPath": "songdata.db文件路径不可为空",
     "missingScorelogPath": "scorelog.db文件路径不可为空",
+    "missingScoredataPath": "score.db文件路径不可为空",
     "missingScoredatalogPath": "scoredatalog.db文件路径不可为空",
     "missingTagRecordTime": "标签时间不可为空",
     "missingAddress": "地址不能为空"

@@ -102,7 +102,7 @@ func (s *ScoreDataLogService) LoadScoreDataLog(rivalID uint, scoreDataLogPath st
 		}
 		return rivalScoreDataLog, len(rivalScoreDataLog), nil
 	default:
-		panic("unexpected source: " + s.source)
+		return nil, 0, eris.Errorf("unexpected source: %s", s.source)
 	}
 }
 

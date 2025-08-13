@@ -17,6 +17,7 @@ type RivalInfo struct {
 	ScoreLogPath     *string
 	SongDataPath     *string
 	ScoreDataLogPath *string
+	ScoreDataPath    *string
 	PlayCount        int
 	MainUser         bool
 	LockTagID        uint `gorm:"default:0"` // 0 means no version lock

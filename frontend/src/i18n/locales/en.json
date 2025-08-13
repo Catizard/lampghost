@@ -92,6 +92,7 @@
     "labelSongdataPath": "songdata.db file path",
     "labelScorelogPath": "scorelog.db file path",
     "labelScoredatalogPath": "scoredatalog.db file path",
+    "labelScoredataPath": "score.db file path",
     "labelReverseImport": "Reverse Import",
     "labelLockTag": "Lock Version",
     "labelTagName": "Tag Name",
@@ -123,6 +124,7 @@
     "placeholderSongdataPath": "Please input /beatoraja path/songdata.db file path",
     "placeholderScorelogPath": "Please input /beatoraja path/*Player Name*/scorelog.db file path",
     "placeholderScoredatalogPath": "Please input /beatoraja path/*Player Name*/scoredatalog.db file path",
+    "placeholderScoredataPath": "Please input /beatoraja path/*Player Name*/score.db file path",
     "placeholderTagName": "Please input tag name",
     "placeholderTagRecordTime": "Please input tag time",
     "placeholderSearchSongOrSabunName": "Search Song/Sabun Name",
@@ -143,6 +145,7 @@
     "missingSongdataPath": "songdata.db file path cannot be empty",
     "missingScorelogPath": "scorelog.db file path cannot be empty",
     "missingScoredatalogPath": "scoredatalog.db file path cannot be empty",
+    "missingScoredataPath": "score.db file path cannot be empty",
     "missingTagRecordTime": "Tag time cannot be empty",
     "missingAddress": "Address cannot be empty"
   },

@@ -61,7 +61,7 @@ func appendScoreDataLog(tx *gorm.DB, rivalScoreDatalog []*entity.RivalScoreDataL
 	return tx.Model(&entity.RivalScoreDataLog{}).CreateInBatches(rivalScoreDatalog, DEFAULT_BATCH_SIZE).Error
 }
 
-// Fully delete all content from rival_score_data_log and rebuild them by rawScoreDataLog
+// Fully delete all content from rival_score_data_log and reinsert them
 func syncScoreDataLog(tx *gorm.DB, rivalScoreDataLog []*entity.RivalScoreDataLog, rivalID uint) error {
 	if err := tx.Unscoped().Where("rival_id = ?", rivalID).Delete(&entity.RivalScoreDataLog{}).Error; err != nil {
 		return err

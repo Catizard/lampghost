@@ -44,6 +44,13 @@
           <n-divider vertical />
           <n-input v-model:value="formData.scoredatalogPath" :placeholder="t('form.placeholderScoredatalogPath')" />
         </n-form-item>
+        <n-form-item :label="t('form.labelScoredataPath')" path="scoredataPath">
+          <n-button type="info" @click="chooseFile('Choose score.db', 'scoredataPath')">
+            {{ t('button.chooseFile') }}
+          </n-button>
+          <n-divider vertical />
+          <n-input v-model:value="formData.scoredataPath" :placeholder="t('form.placeholderScoredataPath')" />
+        </n-form-item>
       </template>
       <template v-if="importStrategy == 'LR2'">
         <n-flex justify="space-between">
@@ -90,7 +97,7 @@ const props = defineProps<{
 const importStrategy: Ref<"directory" | "separate" | "LR2"> = ref("directory");
 
 // target == "scorelogPath" | "songdataPath" | "scoredatalogPath"
-function chooseFile(title: string, target: "scorelogPath" | "songdataPath" | "scoredatalogPath") {
+function chooseFile(title: string, target: "scorelogPath" | "songdataPath" | "scoredatalogPath" | "scoredataPath") {
   OpenFileDialog(title)
     .then(result => {
       if (result.Code != 200) {
@@ -103,6 +110,8 @@ function chooseFile(title: string, target: "scorelogPath" | "songdataPath" | "sc
           formData.songdataPath = result.Data;
         } else if (target == "scoredatalogPath") {
           formData.scoredatalogPath = result.Data;
+        } else if (target == "scoredataPath") {
+          formData.scoredataPath = result.Data;
         }
       }
     }).catch(err => window.$notifyError(err));
@@ -147,6 +156,7 @@ const formData = reactive({
   songdataPath: "",
   scorelogPath: "",
   scoredatalogPath: "",
+  scoredataPath: "",
   name: "",
   beatorajaDirectoryPath: "",
   playerDirectory: "",
@@ -190,6 +200,11 @@ const rules = {
     message: t('rule.missingScoredatalogPath'),
     trigger: ["input", "blur"],
   },
+  scoredataPath: {
+    required: true,
+    message: t('rule.missingScoredataPath'),
+    trigger: ["input", "blur"],
+  }
 };
 
 function handleSubmit(e) {
@@ -205,6 +220,7 @@ function handleSubmit(e) {
         ScoreLogPath: formData.scorelogPath,
         SongDataPath: formData.songdataPath,
         ScoreDataLogPath: formData.scoredatalogPath,
+        ScoreDataPath: formData.scoredataPath,
         BeatorajaDirectoryPath: formData.beatorajaDirectoryPath,
         PlayerDirectory: formData.playerDirectory,
         ImportStrategy: importStrategy.value,
@@ -212,6 +228,7 @@ function handleSubmit(e) {
       };
       if (importStrategy.value == "LR2") {
         rivalInfo.ScoreDataLogPath = rivalInfo.ScoreLogPath;
+        rivalInfo.ScoreDataPath = rivalInfo.ScoreLogPath;
         formData.BMSDirectories.forEach(p => rivalInfo.BMSDirectories.push(p));
       }
       console.log('param: ', rivalInfo);

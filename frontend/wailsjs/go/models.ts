@@ -265,6 +265,21 @@ export namespace dto {
 	    GhostPlayCount: number;
 	    DataLost: boolean;
 	    LastPlayedTimestamp: number;
+	    Epg: number;
+	    Lpg: number;
+	    Egr: number;
+	    Lgr: number;
+	    Egd: number;
+	    Lgd: number;
+	    Ebd: number;
+	    Lbd: number;
+	    Epr: number;
+	    Lpr: number;
+	    Ems: number;
+	    Lms: number;
+	    Notes: number;
+	    BestRecordOption: string;
+	    BestRecordTimestamp: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new DiffTableDataDto(source);
@@ -291,6 +306,21 @@ export namespace dto {
 	        this.GhostPlayCount = source["GhostPlayCount"];
 	        this.DataLost = source["DataLost"];
 	        this.LastPlayedTimestamp = source["LastPlayedTimestamp"];
+	        this.Epg = source["Epg"];
+	        this.Lpg = source["Lpg"];
+	        this.Egr = source["Egr"];
+	        this.Lgr = source["Lgr"];
+	        this.Egd = source["Egd"];
+	        this.Lgd = source["Lgd"];
+	        this.Ebd = source["Ebd"];
+	        this.Lbd = source["Lbd"];
+	        this.Epr = source["Epr"];
+	        this.Lpr = source["Lpr"];
+	        this.Ems = source["Ems"];
+	        this.Lms = source["Lms"];
+	        this.Notes = source["Notes"];
+	        this.BestRecordOption = source["BestRecordOption"];
+	        this.BestRecordTimestamp = source["BestRecordTimestamp"];
 	    }
 	}
 	export class DiffTableHeaderDto {
@@ -510,6 +540,7 @@ export namespace dto {
 	    ScoreLogPath?: string;
 	    SongDataPath?: string;
 	    ScoreDataLogPath?: string;
+	    ScoreDataPath?: string;
 	    PlayCount: number;
 	    MainUser: boolean;
 	    LockTagID: number;
@@ -532,6 +563,7 @@ export namespace dto {
 	        this.ScoreLogPath = source["ScoreLogPath"];
 	        this.SongDataPath = source["SongDataPath"];
 	        this.ScoreDataLogPath = source["ScoreDataLogPath"];
+	        this.ScoreDataPath = source["ScoreDataPath"];
 	        this.PlayCount = source["PlayCount"];
 	        this.MainUser = source["MainUser"];
 	        this.LockTagID = source["LockTagID"];
@@ -1299,6 +1331,7 @@ export namespace entity {
 	    ScoreLogPath?: string;
 	    SongDataPath?: string;
 	    ScoreDataLogPath?: string;
+	    ScoreDataPath?: string;
 	    PlayCount: number;
 	    MainUser: boolean;
 	    LockTagID: number;
@@ -1319,6 +1352,7 @@ export namespace entity {
 	        this.ScoreLogPath = source["ScoreLogPath"];
 	        this.SongDataPath = source["SongDataPath"];
 	        this.ScoreDataLogPath = source["ScoreDataLogPath"];
+	        this.ScoreDataPath = source["ScoreDataPath"];
 	        this.PlayCount = source["PlayCount"];
 	        this.MainUser = source["MainUser"];
 	        this.LockTagID = source["LockTagID"];
@@ -1997,6 +2031,7 @@ export namespace vo {
 	    ScoreLogPath?: string;
 	    SongDataPath?: string;
 	    ScoreDataLogPath?: string;
+	    ScoreDataPath?: string;
 	    BMSDirectories: string[];
 	
 	    static createFrom(source: any = {}) {
@@ -2013,6 +2048,7 @@ export namespace vo {
 	        this.ScoreLogPath = source["ScoreLogPath"];
 	        this.SongDataPath = source["SongDataPath"];
 	        this.ScoreDataLogPath = source["ScoreDataLogPath"];
+	        this.ScoreDataPath = source["ScoreDataPath"];
 	        this.BMSDirectories = source["BMSDirectories"];
 	    }
 	}
@@ -2029,6 +2065,7 @@ export namespace vo {
 	    ScoreLogPath?: string;
 	    SongDataPath?: string;
 	    ScoreDataLogPath?: string;
+	    ScoreDataPath?: string;
 	    PlayCount: number;
 	    MainUser: boolean;
 	    LockTagID: number;
@@ -2052,6 +2089,7 @@ export namespace vo {
 	        this.ScoreLogPath = source["ScoreLogPath"];
 	        this.SongDataPath = source["SongDataPath"];
 	        this.ScoreDataLogPath = source["ScoreDataLogPath"];
+	        this.ScoreDataPath = source["ScoreDataPath"];
 	        this.PlayCount = source["PlayCount"];
 	        this.MainUser = source["MainUser"];
 	        this.LockTagID = source["LockTagID"];

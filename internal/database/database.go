@@ -74,6 +74,10 @@ func migrates(db *gorm.DB) error {
 		return err
 	}
 
+	if err := db.Table("rival_score_data").AutoMigrate(&entity.RivalScoreData{}); err != nil {
+		return err
+	}
+
 	// I cannot find a better solution
 	var defaultCustomTable entity.CustomDiffTable
 	defaultCustomTable.ID = 1

@@ -16,6 +16,7 @@ type RivalInfoVo struct {
 	ScoreLogPath     *string
 	SongDataPath     *string
 	ScoreDataLogPath *string
+	ScoreDataPath    *string
 	PlayCount        int
 	MainUser         bool
 	// Below fields cannot be updated by `UpdateRivalInfo`
@@ -40,6 +41,7 @@ func (rivalInfo *RivalInfoVo) Entity() *entity.RivalInfo {
 		ScoreLogPath:     rivalInfo.ScoreLogPath,
 		SongDataPath:     rivalInfo.SongDataPath,
 		ScoreDataLogPath: rivalInfo.ScoreDataLogPath,
+		ScoreDataPath:    rivalInfo.ScoreDataPath,
 		PlayCount:        rivalInfo.PlayCount,
 		MainUser:         rivalInfo.MainUser,
 		LockTagID:        rivalInfo.LockTagID,
@@ -58,6 +60,7 @@ type InitializeRivalInfoVo struct {
 	ScoreLogPath           *string
 	SongDataPath           *string
 	ScoreDataLogPath       *string
+	ScoreDataPath          *string
 	BMSDirectories         []string `json:"BMSDirectories"` // replacement of SongDataPath
 }
 
@@ -70,6 +73,7 @@ func (rivalInfo *InitializeRivalInfoVo) Into() *entity.RivalInfo {
 			SongDataPath:     rivalInfo.SongDataPath,
 			ScoreLogPath:     rivalInfo.ScoreLogPath,
 			ScoreDataLogPath: rivalInfo.ScoreDataLogPath,
+			ScoreDataPath:    rivalInfo.ScoreDataPath,
 		}
 	case "directory":
 		// NOTE: we don't need to do much verification here
@@ -79,12 +83,14 @@ func (rivalInfo *InitializeRivalInfoVo) Into() *entity.RivalInfo {
 		saveFilePath := path.Join(rivalInfo.BeatorajaDirectoryPath, "player", rivalInfo.PlayerDirectory)
 		scorelogPath := path.Join(saveFilePath, "scorelog.db")
 		scoredatalogPath := path.Join(saveFilePath, "scoredatalog.db")
+		scoredataPath := path.Join(saveFilePath, "score.db")
 		return &entity.RivalInfo{
 			Name:             rivalInfo.Name,
 			Type:             entity.RIVAL_TYPE_BEATORAJA,
 			SongDataPath:     &songdataPath,
 			ScoreLogPath:     &scorelogPath,
 			ScoreDataLogPath: &scoredatalogPath,
+			ScoreDataPath:    &scoredataPath,
 		}
 	case "LR2":
 		selfGeneratedSongDataPath := config.GetSelfGeneratedSongDataPath()
@@ -94,6 +100,7 @@ func (rivalInfo *InitializeRivalInfoVo) Into() *entity.RivalInfo {
 			ScoreLogPath:     rivalInfo.ScoreLogPath,
 			ScoreDataLogPath: rivalInfo.ScoreDataLogPath,
 			SongDataPath:     &selfGeneratedSongDataPath,
+			ScoreDataPath:    rivalInfo.ScoreLogPath,
 		}
 	default:
 		log.Errorf("unexpected import strategy: %s", rivalInfo.ImportStrategy)
@@ -106,5 +113,5 @@ type RivalFileReloadInfoVo struct {
 	SongData     bool
 	ScoreLog     bool
 	ScoreDataLog bool
-	// score        bool
+	ScoreData    bool
 }

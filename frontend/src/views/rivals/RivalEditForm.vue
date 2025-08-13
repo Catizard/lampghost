@@ -30,6 +30,14 @@
         <n-input :disabled="!formData.MainUser" v-model:value="formData.ScoreDataLogPath"
           :placeholder="t('form.placeholderScoredatalogPath')" />
       </n-form-item>
+      <n-form-item :label="t('form.labelScoredataPath')" path="ScoreDataPath">
+        <n-button :disabled="!formData.MainUser" type="info" @click="chooseFile('Choose score.db', 'scoredataPath')">
+          {{ t('button.chooseFile') }}
+        </n-button>
+        <n-divider vertical />
+        <n-input :disabled="!formData.MainUser" v-model:value="formData.ScoreDataPath"
+          :placeholder="t('form.placeholderScoredataPath')" />
+      </n-form-item>
     </n-form>
   </n-modal>
 </template>
@@ -71,6 +79,7 @@ function open(rivalID: number) {
       formData.value.ScoreLogPath = data.ScoreLogPath;
       formData.value.SongDataPath = data.SongDataPath;
       formData.value.ScoreDataLogPath = data.ScoreDataLogPath;
+      formData.value.ScoreDataPath = data.ScoreDataPath;
       formData.value.MainUser = data.MainUser;
     }).catch(err => {
       window.$notifyError(err);
@@ -89,6 +98,7 @@ const formData = ref({
   ScoreLogPath: null,
   SongDataPath: null,
   ScoreDataLogPath: null,
+  ScoreDataPath: null,
   MainUser: false,
 });
 const rules = reactive({
@@ -114,6 +124,12 @@ const rules = reactive({
     ignored: true,
     required: true,
     message: t('rule.missingSongdataPath'),
+    trigger: ["input", "blur"],
+  },
+  ScoreDataPath: {
+    ignored: true,
+    required: true,
+    message: t('rule.missingScoredataPath'),
     trigger: ["input", "blur"],
   }
 });
@@ -146,10 +162,11 @@ function handleNegativeClick() {
   formData.value.ScoreLogPath = null;
   formData.value.SongDataPath = null;
   formData.value.ScoreDataLogPath = null;
+  formData.value.ScoreDataPath = null;
   formData.value.MainUser = false;
 }
 
-function chooseFile(title: string, target: "scorelogPath" | "songdataPath" | "scoredatalogPath") {
+function chooseFile(title: string, target: "scorelogPath" | "songdataPath" | "scoredatalogPath" | "scoredataPath") {
   OpenFileDialog(title)
     .then(result => {
       if (result.Code != 200) {
@@ -162,6 +179,8 @@ function chooseFile(title: string, target: "scorelogPath" | "songdataPath" | "sc
           formData.value.SongDataPath = result.Data;
         } else if (target == "scoredatalogPath") {
           formData.value.ScoreDataLogPath = result.Data;
+        } else if (target == "scoredataPath") {
+          formData.value.ScoreDataPath = result.Data;
         }
       }
     }).catch(err => window.$notifyError(err));

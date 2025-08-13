@@ -203,7 +203,8 @@
     "poor": "Poor",
     "miss": "Miss",
     "accuracy": "准确率",
-    "score": "得分"
+    "score": "得分",
+    "bp": "BP"
   },
   "title": {
     "tableManagement": "难度表管理",

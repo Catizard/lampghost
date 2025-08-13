@@ -67,7 +67,7 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
     }
   },
   {
-    title: t('column.lastPlayed'), key: "LastPlayedTimestamp", width: "100px", resizable: true, sorter: true,
+    title: t('column.lastPlayed'), key: "LastPlayedTimestamp", width: "120px", resizable: true, sorter: true,
     render(row: dto.DiffTableDataDto) {
       if (row.LastPlayedTimestamp == 0) {
         return "NO PLAY";

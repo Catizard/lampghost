@@ -13,7 +13,7 @@ import { useUserStore } from '@/stores/user';
 import { BindSongToFolder, QueryRivalScoreDataLogPageList, QueryRivalScoreLogPageList, ReadConfig } from '@wailsjs/go/main/App';
 import { config, dto } from '@wailsjs/go/models';
 import dayjs from 'dayjs';
-import { DataTableColumns, NDropdown, NButton } from 'naive-ui';
+import { DataTableColumns, NDropdown, NButton, NTooltip } from 'naive-ui';
 import { h, Ref, ref, reactive, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import SelectDifficult from '../custom_table/SelectDifficult.vue';
@@ -65,86 +65,65 @@ function createColumns(useScorelog: boolean): DataTableColumns<PlayLog> {
         return h(ClearTag, { clear: row.Clear }, {});
       }
     },
-    {
-      title: t('column.recordTime'), key: "RecordTime", minWidth: "100px", resizable: true,
-      render(row: PlayLog) {
-        return dayjs(row.RecordTime).format('YYYY-MM-DD HH:mm:ss');
-      }
-    },
   ];
 
   if (!useScorelog) {
     ret.push(...[
       {
-        title: t('column.accuracy'), key: "Accuracy", minWidth: "100px", resizable: true,
+        title: t('column.score'), key: "Score", width: "110px", resizable: true,
         render(row: dto.RivalScoreDataLogDto) {
           return h(SongScoreParagraph, { data: row });
         }
       },
-      {
-        title: t('column.perfectGreat'), key: "PerfectGreat", minWidth: "100px", resizable: true,
-        render(row: dto.RivalScoreDataLogDto) {
-          return row.Epg + row.Lpg;
-        }
-      },
-      {
-        title: t('column.great'), key: "Great", minWidth: "100px", resizable: true,
-        render(row: dto.RivalScoreDataLogDto) {
-          return row.Egr + row.Lgr;
-        }
-      },
-      {
-        title: t('column.good'), key: "Good", minWidth: "100px", resizable: true,
-        render(row: dto.RivalScoreDataLogDto) {
-          return row.Egd + row.Lgd;
-        }
-      },
-      {
-        title: t('column.bad'), key: "Bad", minWidth: "100px", resizable: true,
-        render(row: dto.RivalScoreDataLogDto) {
-          return row.Ebd + row.Lbd;
-        }
-      },
-      {
-        title: t('column.miss'), key: "Miss", minWidth: "100px", resizable: true,
-        render(row: dto.RivalScoreDataLogDto) {
-          return row.Ems + row.Lms;
-        }
-      },
+      // NOTE: It's impossible to calculate bp here since beatoraja doesn't provide
+      // complete data: we don't know there're how many 'passnotes'
     ] as DataTableColumns<PlayLog>)
-  } else {
-    ret.push({
-      title: t('column.minbp'), key: "MinBP", minWidth: "100px", resizable: true,
+  }
+
+  ret.push(...[
+    {
+      title: t('column.minbp'), key: "MinBP", width: "100px", resizable: true,
       render(row: PlayLog) {
         return row.Minbp;
       }
-    });
-  }
-
-  ret.push({
-    title: t('column.actions'), key: "actions", resizable: true, minWidth: "90px",
-    render(row: PlayLog) {
-      return h(
-        NDropdown,
-        {
-          trigger: "hover",
-          options: [
-            { label: t('button.addToFavoriteFolder'), key: "AddToFolder" },
-            { label: t('button.addToCustomTable'), key: "AddToTable" },
-            { label: t('button.gotoPreview'), key: "GotoPreview" },
-          ],
-          onSelect: (key: string) => {
-            switch (key) {
-              case 'AddToFolder': handleAddToFolder(row.Sha256, row.Title); break;
-              case 'AddToTable': handleAddToTable(row.Sha256, row.Title); break;
-              case "GotoPreview": chartPreviewRef.value.open(row.Md5); break;
-            }
+    },
+    {
+      title: t('column.recordTime'), key: "RecordTime", width: "120px", resizable: true,
+      render(row: PlayLog) {
+        return h(
+          NTooltip,
+          { trigger: "hover" },
+          {
+            trigger: () => dayjs(row.RecordTime).format('YYYY-MM-DD'),
+            default: () => dayjs(row.RecordTime).format('YYYY-MM-DD HH:mm:ss'),
           }
-        },
-        { default: () => h(NButton, null, { default: () => '...' }) }
-      );
-    }
-  });
+        );
+      }
+    },
+    {
+      title: t('column.actions'), key: "actions", resizable: true, width: "90px",
+      render(row: PlayLog) {
+        return h(
+          NDropdown,
+          {
+            trigger: "hover",
+            options: [
+              { label: t('button.addToFavoriteFolder'), key: "AddToFolder" },
+              { label: t('button.addToCustomTable'), key: "AddToTable" },
+              { label: t('button.gotoPreview'), key: "GotoPreview" },
+            ],
+            onSelect: (key: string) => {
+              switch (key) {
+                case 'AddToFolder': handleAddToFolder(row.Sha256, row.Title); break;
+                case 'AddToTable': handleAddToTable(row.Sha256, row.Title); break;
+                case "GotoPreview": chartPreviewRef.value.open(row.Md5); break;
+              }
+            }
+          },
+          { default: () => h(NButton, null, { default: () => '...' }) }
+        );
+      }
+    }]);
 
   return ret;
 }

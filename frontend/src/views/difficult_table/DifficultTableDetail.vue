@@ -7,15 +7,14 @@
 </template>
 
 <script setup lang="ts">
-import { DataTableColumns, DataTableSortState, NButton, NDropdown, NEllipsis, NFlex, NIcon, NText, NTooltip, useModal } from 'naive-ui';
+import { DataTableColumns, DataTableSortState, NButton, NDropdown, NFlex, NText, NTooltip } from 'naive-ui';
 import { dto } from '@wailsjs/go/models';
-import { h, reactive, ref, Ref, render, watch } from 'vue';
+import { h, reactive, ref, Ref, watch } from 'vue';
 import { BindSongToFolder, QueryDiffTableDataWithRival, SubmitSingleMD5DownloadTask } from '@wailsjs/go/main/App';
 import SelectFolder from '@/views/folder/SelectFolder.vue';
 import ClearTag from '@/components/ClearTag.vue';
 import ChartPreview from '@/components/ChartPreview.vue';
 import { useI18n } from 'vue-i18n';
-import { WarningOutline } from '@vicons/ionicons5';
 import { BrowserOpenURL } from '@wailsjs/runtime/runtime';
 import SelectDifficult from '../custom_table/SelectDifficult.vue';
 import dayjs from 'dayjs';
@@ -44,12 +43,7 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
   {
     title: t('column.title'), key: "Title", resizable: true, sorter: true,
     render: (row: dto.DiffTableDataDto) => {
-      let vnodes = [];
-      if (row.DataLost) {
-        vnodes.push(h(NIcon, { component: WarningOutline, color: "red" }));
-      }
-      vnodes.push(h(SongTitleParagraph, { data: row }));
-      return vnodes;
+      return h(SongTitleParagraph, { data: row, lost: row.DataLost });
     }
   },
   {

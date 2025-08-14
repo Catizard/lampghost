@@ -212,8 +212,8 @@ function buildOverviewTable(data: dto.DiffTableHeaderDto, order: "reverse" | "or
     if (v == ScoreRank.NO_PLAY) {
       continue;
     }
-    overviewData.value[0][v] = `${((100 * sum) / songCount).toFixed(2)}%`;
-    overviewData.value[1][v] = `${sum}/${songCount}`;
+    overviewData.value[0][v] = `${((100 * count) / songCount).toFixed(2)}%`;
+    overviewData.value[1][v] = `${count}/${songCount}`;
   }
   // We cannot have NO_PLAY count directly
   overviewData.value[0][ScoreRank.NO_PLAY] = `${((100 * (songCount - sum)) / songCount).toFixed(2)}%`;

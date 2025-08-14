@@ -250,6 +250,14 @@ export function GENERATOR_RIVAL_INFO_DTO() {
   return window['go']['main']['App']['GENERATOR_RIVAL_INFO_DTO']();
 }
 
+export function GENERATOR_RIVAL_SCORE_DATA_DTO() {
+  return window['go']['main']['App']['GENERATOR_RIVAL_SCORE_DATA_DTO']();
+}
+
+export function GENERATOR_RIVAL_SCORE_DATA_ENTITY() {
+  return window['go']['main']['App']['GENERATOR_RIVAL_SCORE_DATA_ENTITY']();
+}
+
 export function GENERATOR_RIVAL_SCORE_DATA_LOG_DTO() {
   return window['go']['main']['App']['GENERATOR_RIVAL_SCORE_DATA_LOG_DTO']();
 }
@@ -362,8 +370,8 @@ export function QueryUserInfoByID(arg1) {
   return window['go']['main']['App']['QueryUserInfoByID'](arg1);
 }
 
-export function QueryUserInfoWithLevelLayeredDiffTableLampStatus(arg1, arg2) {
-  return window['go']['main']['App']['QueryUserInfoWithLevelLayeredDiffTableLampStatus'](arg1, arg2);
+export function QueryUserInfoWithLevelLayeredDiffTable(arg1, arg2) {
+  return window['go']['main']['App']['QueryUserInfoWithLevelLayeredDiffTable'](arg1, arg2);
 }
 
 export function QueryUserKeyCountInYear(arg1) {

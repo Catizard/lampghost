@@ -39,6 +39,27 @@ func (RivalScoreData) TableName() string {
 	return "rival_score_data"
 }
 
+func (scoreData *RivalScoreData) GetEXScore() int32 {
+	return (scoreData.Lpg+scoreData.Epg)*2 + scoreData.Lgr + scoreData.Egr
+}
+
+func (scoreData *RivalScoreData) GetAccuracy() *float32 {
+	if scoreData.Notes == 0 {
+		return nil
+	}
+	ret := float32(scoreData.GetEXScore()*50) / float32(scoreData.Notes)
+	return &ret
+}
+
+func (scoreData *RivalScoreData) GetRank() *ScoreRank {
+	acc := scoreData.GetAccuracy()
+	if acc == nil {
+		return nil
+	}
+	scoreRank := GetScoreRank(*acc)
+	return &scoreRank
+}
+
 func FromRawScoreDataToRivalScoreData(scoreData *ScoreData) RivalScoreData {
 	return RivalScoreData{
 		Sha256:     scoreData.Sha256,

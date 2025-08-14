@@ -81,7 +81,9 @@
     "copy": "Copy",
     "copyToClipboard": "Copy to Clipboard",
     "addDifficultTable": "Add Difficult Table",
-    "editSongDirectories": "Edit BMS Directories"
+    "editSongDirectories": "Edit BMS Directories",
+    "lamp": "Lamp",
+    "score": "Score"
   },
   "form": {
     "labelLanguage": "Language",
@@ -258,7 +260,8 @@
     "preview": "Preview",
     "previewRecentTimeline": "Preview Recent Activity",
     "supplyMissingBMSFromTable": "Supply Missing BMS",
-    "editSongDirectories": "Edit BMS Directories"
+    "editSongDirectories": "Edit BMS Directories",
+    "overview": "Overview"
   },
   "hint": {
     "initUser": "Configure your own save files location",

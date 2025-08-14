@@ -131,6 +131,10 @@ export function GENERATOR_RIVAL_INFO():Promise<entity.RivalInfo>;
 
 export function GENERATOR_RIVAL_INFO_DTO():Promise<dto.RivalInfoDto>;
 
+export function GENERATOR_RIVAL_SCORE_DATA_DTO():Promise<dto.RivalScoreDataDto>;
+
+export function GENERATOR_RIVAL_SCORE_DATA_ENTITY():Promise<entity.RivalScoreData>;
+
 export function GENERATOR_RIVAL_SCORE_DATA_LOG_DTO():Promise<dto.RivalScoreDataLogDto>;
 
 export function GENERATOR_SONG_DIRECTORY():Promise<entity.SongDirectory>;
@@ -187,7 +191,7 @@ export function QuerySongDataPageList(arg1:vo.RivalSongDataVo):Promise<result.Rt
 
 export function QueryUserInfoByID(arg1:number):Promise<result.RtnData>;
 
-export function QueryUserInfoWithLevelLayeredDiffTableLampStatus(arg1:number,arg2:number):Promise<result.RtnData>;
+export function QueryUserInfoWithLevelLayeredDiffTable(arg1:number,arg2:number):Promise<result.RtnData>;
 
 export function QueryUserKeyCountInYear(arg1:vo.RivalScoreDataLogVo):Promise<result.RtnDataList>;
 

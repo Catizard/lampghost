@@ -81,7 +81,9 @@
     "copy": "复制",
     "copyToClipboard": "复制到剪贴板",
     "addDifficultTable": "新增难度表",
-    "editSongDirectories": "编辑BMS目录"
+    "editSongDirectories": "编辑BMS目录",
+    "lamp": "点灯",
+    "score": "得分"
   },
   "form": {
     "labelLanguage": "语言",
@@ -258,7 +260,8 @@
     "preview": "预览",
     "previewRecentTimeline": "最近游玩预览",
     "supplyMissingBMSFromTable": "补充缺失BMS",
-    "editSongDirectories": "编辑BMS目录"
+    "editSongDirectories": "编辑BMS目录",
+    "overview": "总览"
   },
   "hint": {
     "initUser": "配置你的存档文件路径",

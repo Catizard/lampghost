@@ -361,8 +361,14 @@ func (s *RivalInfoService) QueryUserPlayCountInYear(ID uint, yearNum string) ([]
 	return ret, nil
 }
 
-func (s *RivalInfoService) QueryUserInfoWithLevelLayeredDiffTableLampStatus(rivalID uint, headerID uint) (*dto.RivalInfoDto, error) {
-	log.Debugf("[RivalInfoService] QueryUserInfoWithLevelLayeredDiffTableLampStatus: rivalID=%d, headerId=%d", rivalID, headerID)
+func (s *RivalInfoService) QueryUserInfoWithLevelLayeredDiffTable(rivalID uint, headerID uint) (*dto.RivalInfoDto, error) {
+	log.Debugf("[RivalInfoService] QueryUserInfoWithLevelLayeredDiffTable: rivalID=%d, headerId=%d", rivalID, headerID)
+	if rivalID == 0 {
+		return nil, eris.New("QueryUserInfoWithLevelLayeredDiffTable: rivalID cannot be 0")
+	}
+	if headerID == 0 {
+		return nil, eris.New("QueryUserInfoWithLevelLayeredDiffTable: headerID cannot be 0")
+	}
 	rivalInfo, err := s.FindRivalInfoByID(rivalID)
 	if err != nil {
 		return nil, eris.Wrap(err, "FindRivalInfoByID")
@@ -377,6 +383,14 @@ func (s *RivalInfoService) QueryUserInfoWithLevelLayeredDiffTableLampStatus(riva
 	if err != nil {
 		return nil, eris.Wrap(err, "findRivalMaximumClearScoreLogSha256Map")
 	}
+	rivalScoreData, _, err := findRivalMaximumClearScoreDataList(s.db, rivalID)
+	if err != nil {
+		return nil, eris.Wrap(err, "findRivalScoreDataList")
+	}
+	sha256RivalScoreData := make(map[string]*entity.RivalScoreData)
+	for _, scoreData := range rivalScoreData {
+		sha256RivalScoreData[scoreData.Sha256] = scoreData
+	}
 
 	ret := dto.NewRivalInfoDtoWithDiffTable(rivalInfo, header)
 	for _, dataList := range ret.DiffTableHeader.LevelLayeredContents {
@@ -385,6 +399,17 @@ func (s *RivalInfoService) QueryUserInfoWithLevelLayeredDiffTableLampStatus(riva
 			if _, ok := sha256MaxLamp[data.Sha256]; ok {
 				dataList[i].Lamp = int(sha256MaxLamp[data.Sha256][0].Clear)
 				ret.DiffTableHeader.LampCount[dataList[i].Lamp]++
+			}
+			if scoreData, ok := sha256RivalScoreData[data.Sha256]; ok {
+				scoreRank := scoreData.GetRank()
+				if scoreRank != nil {
+					dataList[i].ScoreRank = scoreRank.Value
+					ret.DiffTableHeader.RankCount[scoreRank.Value]++
+				} else {
+					// We use 0 to represent no play like ClearType
+					dataList[i].ScoreRank = 0
+					ret.DiffTableHeader.RankCount[0]++
+				}
 			}
 		}
 	}

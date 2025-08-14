@@ -23,12 +23,7 @@
     </n-gi>
   </n-grid>
   <n-divider />
-  <n-h1 prefix="bar" style="text-align: start">
-    <n-text type="primary">
-      {{ t("title.lampStatus") }}
-    </n-text>
-  </n-h1>
-  <LampCountChart :rival-id="currentUser?.ID" />
+  <TableOverview :rivalId="currentUser?.ID" />
   <n-divider />
   <n-h1 prefix="bar" style="text-align: start;">
     <n-text type="primary">
@@ -52,17 +47,16 @@
 
 <script setup lang="ts">
 import { onMounted, reactive, ref } from "vue";
-import { ReloadRivalData, QueryMainUser, QueryUserInfoByID } from "@wailsjs/go/main/App";
+import { ReloadRivalData, QueryUserInfoByID } from "@wailsjs/go/main/App";
 import dayjs from "dayjs";
 import { useI18n } from "vue-i18n";
 import PlayCountChart from "./PlayCountChart.vue";
-import LampCountChart from "./LampCountChart.vue";
-import { dto } from '@wailsjs/go/models';
 import { useRoute, useRouter } from "vue-router";
 import RecentTimeline from "./recentTimeline/RecentTimeline.vue";
 import KeyCountChart from "./KeyCountChart.vue";
 import TimelinePreview from "./recentTimeline/Preview.vue";
 import { useUserStore } from "@/stores/user";
+import TableOverview from "./tableOverview/TableOverview.vue";
 
 const { t } = useI18n();
 const router = useRouter();

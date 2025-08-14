@@ -1,30 +1,21 @@
 <template>
-  <n-flex justify="start">
-    <SelectDifficultTable v-model:value="currentTableId" style="width: 150px;" />
-    <n-radio-group v-model:value="currentLampOrder">
-      <n-radio-button :key="'reverse'" :value="'reverse'" :label="t('button.reverse')" />
-      <n-radio-button :key="'ordered'" :value="'ordered'" :label="t('button.ordered')" />
-    </n-radio-group>
-  </n-flex>
-  <n-data-table :columns="overviewColumns" :data="overviewData" :row-class-name="'test'" />
+  <n-data-table :columns="overviewColumns" :data="overviewData" />
   <vue-apex-charts :height="chartHeight()" type="bar" :options="lampCountChartOptions" :series="lampCountChartSeries" />
 </template>
 
 <script setup lang="ts">
 import { ClearType } from "@/constants/cleartype";
-import { QueryUserInfoWithLevelLayeredDiffTableLampStatus } from "@wailsjs/go/main/App";
 import { dto } from "@wailsjs/go/models";
 import { DataTableColumns } from "naive-ui";
-import { reactive, ref, Ref, watch } from "vue";
-import { useI18n } from "vue-i18n";
+import { onMounted, reactive, ref, Ref, watch } from "vue";
 import VueApexCharts from "vue3-apexcharts";
-import SelectDifficultTable from "@/components/difficult_table/SelectDifficultTable.vue";
 
 const props = defineProps<{
+  data: dto.DiffTableHeaderDto | null
   rivalId?: number;
+  tableId?: number;
+  dataOrder: "reverse" | "ordered"
 }>();
-
-const { t } = useI18n();
 
 // TODO: I need a better solution, eh
 const LAMPS = [1, 4, 5, 6, 7, 8, 9, 10, 0];
@@ -74,10 +65,6 @@ const REVERSE_LAMP_COLOR = [
   "#FFFFFF",
 ];
 
-const currentLampOrder: Ref<"reverse" | "ordered"> = ref("reverse");
-const currentTableId: Ref<number | null> = ref(null);
-const currentHeader: Ref<dto.DiffTableHeaderDto | null> = ref(null);
-
 // NOTE: ApexCharts Vue doesn't give any responses if we changed lampCountChartOptions.colors
 // The only way to correctly reassign the colors is by rebuilding whole lampCountChartOptions
 // I believe this is a ApexCharts Vue bug or design failure
@@ -113,24 +100,11 @@ function buildLampCountChartOptions(order: "reverse" | "ordered") {
   };
 }
 let lampCountChartSeries = [];
-function loadLampData() {
-  QueryUserInfoWithLevelLayeredDiffTableLampStatus(
-    props.rivalId,
-    currentTableId.value,
-  )
-    .then((result) => {
-      if (result.Code != 200) {
-        return Promise.reject(result.Msg);
-      }
-      currentHeader.value = result.Data.DiffTableHeader;
-    })
-    .catch(err => window.$notifyError(err));
-}
 
-function buildSeries() {
-  const lampNames = currentLampOrder.value == "reverse" ? REVERSE_STR_LAMPS : STR_LAMPS;
-  const lampValues = currentLampOrder.value == "reverse" ? REVERSE_LAMPS : LAMPS;
-  lampCountChartOptions = buildLampCountChartOptions(currentLampOrder.value);
+function buildSeries(data: dto.DiffTableHeaderDto, order: "reverse" | "ordered") {
+  const lampNames = order == "reverse" ? REVERSE_STR_LAMPS : STR_LAMPS;
+  const lampValues = order == "reverse" ? REVERSE_LAMPS : LAMPS;
+  lampCountChartOptions = buildLampCountChartOptions(order);
   lampCountChartSeries = lampNames.map((lampName) => {
     return {
       name: lampName,
@@ -138,7 +112,7 @@ function buildSeries() {
     };
   });
   lampCountChartOptions.xaxis.categories = [];
-  const header = currentHeader.value;
+  const header = data;
   for (let i = 0; i < header.SortedLevels.length; ++i) {
     const level = header.SortedLevels[i];
     const levelName = header.Symbol + level;
@@ -215,9 +189,9 @@ const overviewColumns: DataTableColumns<dto.DiffTableHeaderDto> = [
 // overviewData[1]: a string for each clear type, which structure is "count/total"
 const overviewData: Ref<Array<any>> = ref([]);
 
-function buildOverviewTable() {
-  const lampCount = currentHeader.value.LampCount;
-  const songCount = currentHeader.value.SongCount ?? 0;
+function buildOverviewTable(data: dto.DiffTableHeaderDto, order: "reverse" | "ordered") {
+  const lampCount = data.LampCount;
+  const songCount = data.SongCount ?? 0;
   let sum = 0;
   overviewData.value = [{}, {}];
   // TODO: currently, Assist/Light Assist would be calculated as fail
@@ -253,19 +227,19 @@ function buildOverviewTable() {
   overviewData.value[1][ClearType.NO_PLAY] = `${songCount - sum}/${songCount}`;
 }
 
-watch([currentTableId, () => props.rivalId], ([newTableId, newRivalId]) => {
-  console.log('LampCountChart: ', newTableId, newRivalId);
-  if (newTableId == null || newTableId == undefined) {
+function rebuild(data: dto.DiffTableHeaderDto, order: "reverse" | "ordered") {
+  if (props.data == null) {
     return;
   }
-  if (newRivalId == null || newRivalId == undefined) {
-    return;
+  try {
+    buildSeries(data, order);
+    buildOverviewTable(data, order);
+  } catch (err) {
+    window.$notifyError(err);
   }
-  loadLampData();
-});
+}
 
-watch([currentHeader, currentLampOrder], (_) => {
-  buildSeries();
-  buildOverviewTable();
-});
+watch([() => props.data, () => props.dataOrder], ([newData, newOrder]) => {
+  rebuild(newData, newOrder);
+}, { immediate: true });
 </script>

@@ -88,9 +88,9 @@ func (ctl *RivalInfoController) QueryUserPlayCountInYear(ID uint, yearNum string
 	return result.NewRtnDataList(pc)
 }
 
-func (ctl *RivalInfoController) QueryUserInfoWithLevelLayeredDiffTableLampStatus(rivalID uint, headerID uint) result.RtnData {
-	log.Info("[Controller] calling RivalInfoController.QueryDiffTableLampStatus")
-	data, err := ctl.rivalInfoService.QueryUserInfoWithLevelLayeredDiffTableLampStatus(rivalID, headerID)
+func (ctl *RivalInfoController) QueryUserInfoWithLevelLayeredDiffTable(rivalID uint, headerID uint) result.RtnData {
+	log.Info("[Controller] calling RivalInfoController.QueryDiffTable")
+	data, err := ctl.rivalInfoService.QueryUserInfoWithLevelLayeredDiffTable(rivalID, headerID)
 	if err != nil {
 		log.Errorf("[RivalController] returning err: %v", eris.ToString(err, true))
 		return result.NewErrorData(err)

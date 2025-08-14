@@ -28,6 +28,7 @@ type App struct {
 	*controller.RivalScoreLogController
 	*controller.RivalScoreDataLogController
 	*controller.RivalSongDataController
+	*controller.RivalScoreDataController
 	*controller.DiffTableController
 	*controller.CourseInfoController
 	*controller.FolderController
@@ -65,11 +66,13 @@ func NewApp() *App {
 	rivalScoreLogService := service.NewRivalScoreLogService(db)
 	rivalSongDataService := service.NewRivalSongDataService(db)
 	rivalScoreDataLogService := service.NewRivalScoreDataLogService(db)
+	rivalScoreDataService := service.NewRivalScoreDataService(db)
 	rivalInfoController := controller.NewRivalInfoController(rivalInfoService)
 	rivalTagController := controller.NewRivalTagController(rivalTagService)
 	rivalScoreLogController := controller.NewRivalScoreLogController(rivalScoreLogService)
 	rivalScoreDataLogController := controller.NewRivalScoreDataLogController(rivalScoreDataLogService)
 	rivalSongDataController := controller.NewRivalSongDataController(rivalSongDataService)
+	rivalScoreDataController := controller.NewRivalScoreDataController(rivalScoreDataService)
 
 	// Set up the initial scorelog path
 	if mainUser, err := rivalInfoService.QueryMainUser(); err == nil && mainUser != nil && mainUser.Type != entity.RIVAL_TYPE_LR2 {
@@ -114,6 +117,7 @@ func NewApp() *App {
 		rivalScoreLogController,
 		rivalScoreDataLogController,
 		rivalSongDataController,
+		rivalScoreDataController,
 		diffTableController,
 		courseInfoController,
 		folderController,

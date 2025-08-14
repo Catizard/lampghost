@@ -31,6 +31,8 @@ type DiffTableHeaderDto struct {
 	Children []DiffTableHeaderDto
 	// clear => count
 	LampCount map[int]int
+	// rank => count
+	RankCount map[int]int
 	SongCount int
 }
 
@@ -47,6 +49,7 @@ func NewDiffTableHeaderDto(header *entity.DiffTableHeader, contents []*DiffTable
 		Contents:           contents,
 		Children:           make([]DiffTableHeaderDto, 0),
 		LampCount:          make(map[int]int),
+		RankCount:          make(map[int]int),
 		TagColor:           header.TagColor,
 		TagTextColor:       header.TagTextColor,
 		NoTagBuild:         header.NoTagBuild,

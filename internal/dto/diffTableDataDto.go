@@ -39,6 +39,7 @@ type DiffTableDataDto struct {
 	Ems                 int32
 	Lms                 int32
 	Notes               int32
+	ScoreRank           int
 	BestRecordOption    string
 	BestRecordTimestamp int64
 }

@@ -278,6 +278,7 @@ export namespace dto {
 	    Ems: number;
 	    Lms: number;
 	    Notes: number;
+	    ScoreRank: number;
 	    BestRecordOption: string;
 	    BestRecordTimestamp: number;
 	
@@ -319,6 +320,7 @@ export namespace dto {
 	        this.Ems = source["Ems"];
 	        this.Lms = source["Lms"];
 	        this.Notes = source["Notes"];
+	        this.ScoreRank = source["ScoreRank"];
 	        this.BestRecordOption = source["BestRecordOption"];
 	        this.BestRecordTimestamp = source["BestRecordTimestamp"];
 	    }
@@ -341,6 +343,7 @@ export namespace dto {
 	    Level: string;
 	    Children: DiffTableHeaderDto[];
 	    LampCount: Record<number, number>;
+	    RankCount: Record<number, number>;
 	    SongCount: number;
 	
 	    static createFrom(source: any = {}) {
@@ -366,6 +369,7 @@ export namespace dto {
 	        this.Level = source["Level"];
 	        this.Children = this.convertValues(source["Children"], DiffTableHeaderDto);
 	        this.LampCount = source["LampCount"];
+	        this.RankCount = source["RankCount"];
 	        this.SongCount = source["SongCount"];
 	    }
 	
@@ -570,6 +574,102 @@ export namespace dto {
 	        this.ReverseImport = source["ReverseImport"];
 	        this.DiffTableHeader = this.convertValues(source["DiffTableHeader"], DiffTableHeaderDto);
 	        this.TagName = source["TagName"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class RivalScoreDataDto {
+	    ID: number;
+	    // Go type: time
+	    CreatedAt: any;
+	    // Go type: time
+	    UpdatedAt: any;
+	    // Go type: gorm
+	    DeletedAt: any;
+	    RivalID: number;
+	    Sha256: string;
+	    Md5: string;
+	    Mode: string;
+	    Clear: number;
+	    // Go type: time
+	    RecordTime: any;
+	    Epg: number;
+	    Lpg: number;
+	    Egr: number;
+	    Lgr: number;
+	    Egd: number;
+	    Lgd: number;
+	    Ebd: number;
+	    Lbd: number;
+	    Epr: number;
+	    Lpr: number;
+	    Ems: number;
+	    Lms: number;
+	    Notes: number;
+	    Combo: number;
+	    Minbp: number;
+	    PlayCount: number;
+	    ClearCount: number;
+	    Trophy: string;
+	    Option: number;
+	    Seed: number;
+	    Random: number;
+	    State: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new RivalScoreDataDto(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.ID = source["ID"];
+	        this.CreatedAt = this.convertValues(source["CreatedAt"], null);
+	        this.UpdatedAt = this.convertValues(source["UpdatedAt"], null);
+	        this.DeletedAt = this.convertValues(source["DeletedAt"], null);
+	        this.RivalID = source["RivalID"];
+	        this.Sha256 = source["Sha256"];
+	        this.Md5 = source["Md5"];
+	        this.Mode = source["Mode"];
+	        this.Clear = source["Clear"];
+	        this.RecordTime = this.convertValues(source["RecordTime"], null);
+	        this.Epg = source["Epg"];
+	        this.Lpg = source["Lpg"];
+	        this.Egr = source["Egr"];
+	        this.Lgr = source["Lgr"];
+	        this.Egd = source["Egd"];
+	        this.Lgd = source["Lgd"];
+	        this.Ebd = source["Ebd"];
+	        this.Lbd = source["Lbd"];
+	        this.Epr = source["Epr"];
+	        this.Lpr = source["Lpr"];
+	        this.Ems = source["Ems"];
+	        this.Lms = source["Lms"];
+	        this.Notes = source["Notes"];
+	        this.Combo = source["Combo"];
+	        this.Minbp = source["Minbp"];
+	        this.PlayCount = source["PlayCount"];
+	        this.ClearCount = source["ClearCount"];
+	        this.Trophy = source["Trophy"];
+	        this.Option = source["Option"];
+	        this.Seed = source["Seed"];
+	        this.Random = source["Random"];
+	        this.State = source["State"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1357,6 +1457,91 @@ export namespace entity {
 	        this.MainUser = source["MainUser"];
 	        this.LockTagID = source["LockTagID"];
 	        this.ReverseImport = source["ReverseImport"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class RivalScoreData {
+	    RivalID: number;
+	    Sha256: string;
+	    Md5: string;
+	    Mode: string;
+	    Clear: number;
+	    // Go type: time
+	    RecordTime: any;
+	    Epg: number;
+	    Lpg: number;
+	    Egr: number;
+	    Lgr: number;
+	    Egd: number;
+	    Lgd: number;
+	    Ebd: number;
+	    Lbd: number;
+	    Epr: number;
+	    Lpr: number;
+	    Ems: number;
+	    Lms: number;
+	    Notes: number;
+	    Combo: number;
+	    Minbp: number;
+	    PlayCount: number;
+	    ClearCount: number;
+	    Trophy: string;
+	    Option: number;
+	    Seed: number;
+	    Random: number;
+	    State: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new RivalScoreData(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.RivalID = source["RivalID"];
+	        this.Sha256 = source["Sha256"];
+	        this.Md5 = source["Md5"];
+	        this.Mode = source["Mode"];
+	        this.Clear = source["Clear"];
+	        this.RecordTime = this.convertValues(source["RecordTime"], null);
+	        this.Epg = source["Epg"];
+	        this.Lpg = source["Lpg"];
+	        this.Egr = source["Egr"];
+	        this.Lgr = source["Lgr"];
+	        this.Egd = source["Egd"];
+	        this.Lgd = source["Lgd"];
+	        this.Ebd = source["Ebd"];
+	        this.Lbd = source["Lbd"];
+	        this.Epr = source["Epr"];
+	        this.Lpr = source["Lpr"];
+	        this.Ems = source["Ems"];
+	        this.Lms = source["Lms"];
+	        this.Notes = source["Notes"];
+	        this.Combo = source["Combo"];
+	        this.Minbp = source["Minbp"];
+	        this.PlayCount = source["PlayCount"];
+	        this.ClearCount = source["ClearCount"];
+	        this.Trophy = source["Trophy"];
+	        this.Option = source["Option"];
+	        this.Seed = source["Seed"];
+	        this.Random = source["Random"];
+	        this.State = source["State"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

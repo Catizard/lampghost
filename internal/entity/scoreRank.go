@@ -1,6 +1,7 @@
 package entity
 
 var ScoreRanks []ScoreRank = []ScoreRank{
+	{"MAX", 100.00, 9},
 	{"AAA", 88.88, 8},
 	{"AA", 77.77, 7},
 	{"A", 66.66, 6},

@@ -8,6 +8,7 @@ export enum ScoreRank {
   A,
   AA,
   AAA,
+  MAX
 }
 
 export class ScoreRankDef {
@@ -19,6 +20,7 @@ export class ScoreRankDef {
 
 export type ScoreRankColorStyle = Record<number, ScoreRankDef>;
 
+// Not used
 export const DefaultScoreRankColorStyle: Record<number, ScoreRankDef> = {
   0: {
     value: 0,
@@ -74,4 +76,10 @@ export const DefaultScoreRankColorStyle: Record<number, ScoreRankDef> = {
     color: "#FFD251",
     textColor: "#ffffff",
   },
+  9: {
+    value: 9,
+    text: "MAX",
+    color: "#FFD251",
+    textColor: "#FFFFFF"
+  }
 }

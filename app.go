@@ -61,7 +61,7 @@ func NewApp() *App {
 	// rival module
 	songDirectoryService := service.NewSongDirectoryService(db)
 	songDirectoryController := controller.NewSongDirectoryController(songDirectoryService)
-	rivalInfoService := service.NewRivalInfoService(db, monitorService, notifySyncChan)
+	rivalInfoService := service.NewRivalInfoService(db, monitorService, conf.UseScoredataForMainUser != 0, configService.Subscribe(), notifySyncChan)
 	rivalTagService := service.NewRivalTagService(db)
 	rivalScoreLogService := service.NewRivalScoreLogService(db)
 	rivalSongDataService := service.NewRivalSongDataService(db)
@@ -84,7 +84,7 @@ func NewApp() *App {
 	downloadTaskController := controller.NewDownloadTaskController(downloadTaskService)
 
 	// difficult table module
-	diffTableService := service.NewDiffTableService(db, downloadTaskService)
+	diffTableService := service.NewDiffTableService(db, downloadTaskService, conf.UseScoredataForMainUser != 0, configService.Subscribe())
 	diffTableController := controller.NewDiffTableController(diffTableService)
 	courseInfoService := service.NewCourseInfoSerivce(db, conf, configService.Subscribe())
 	courseInfoController := controller.NewCourseInfoController(courseInfoService)

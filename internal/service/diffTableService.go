@@ -6,6 +6,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Catizard/bmstable"
@@ -21,14 +22,37 @@ import (
 )
 
 type DiffTableService struct {
-	db                  *gorm.DB
-	downloadTaskService *DownloadTaskService
+	db                      *gorm.DB
+	downloadTaskService     *DownloadTaskService
+	useScoredataForMainUser bool
+	subscribeConfigChange   <-chan any
+	mutex                   sync.Mutex
 }
 
-func NewDiffTableService(db *gorm.DB, downloadTaskService *DownloadTaskService) *DiffTableService {
-	return &DiffTableService{
-		db:                  db,
-		downloadTaskService: downloadTaskService,
+func NewDiffTableService(db *gorm.DB, downloadTaskService *DownloadTaskService, useScoredataForMainUser bool, configNotify <-chan any) *DiffTableService {
+	service := &DiffTableService{
+		db:                      db,
+		downloadTaskService:     downloadTaskService,
+		useScoredataForMainUser: useScoredataForMainUser,
+		subscribeConfigChange:   configNotify,
+	}
+	go service.listenUpdateConfig()
+	return service
+}
+
+func (s *DiffTableService) listenUpdateConfig() {
+	for {
+		<-s.subscribeConfigChange
+		go func() {
+			s.mutex.Lock()
+			log.Debugf("[DiffTableService] updating config")
+			if config, err := config.ReadConfig(); err != nil {
+				log.Errorf("cannot read config: %s", err)
+			} else {
+				s.useScoredataForMainUser = config.UseScoredataForMainUser != 0
+			}
+			s.mutex.Unlock()
+		}()
 	}
 }
 
@@ -444,15 +468,19 @@ func (s *DiffTableService) QueryDiffTableDataWithRival(filter *vo.DiffTableHeade
 		}
 		endGhostRecordTime = tag.RecordTime
 	}
+	s.mutex.Lock()
+	useScoredataForMainUser := s.useScoredataForMainUser
+	s.mutex.Unlock()
 	return findDiffTableDataListWithRival(s.db, &vo.DiffTableDataVo{
-		HeaderID:           filter.ID,
-		Level:              filter.Level,
-		Pagination:         filter.Pagination,
-		SortBy:             filter.SortBy,
-		SortOrder:          filter.SortOrder,
-		RivalID:            filter.RivalID,
-		GhostRivalID:       filter.GhostRivalID,
-		EndGhostRecordTime: endGhostRecordTime,
+		HeaderID:                filter.ID,
+		Level:                   filter.Level,
+		Pagination:              filter.Pagination,
+		SortBy:                  filter.SortBy,
+		SortOrder:               filter.SortOrder,
+		RivalID:                 filter.RivalID,
+		GhostRivalID:            filter.GhostRivalID,
+		UseScoredataForMainUser: useScoredataForMainUser,
+		EndGhostRecordTime:      endGhostRecordTime,
 	})
 }
 

@@ -48,8 +48,31 @@
             </n-form-item>
           </n-p>
           <n-p>
-            <n-form-item :label="t('form.labelUseScoredatalog')">
+            <n-form-item>
+              <template #label>
+                <n-tooltip trigger="hover" style="max-width: 400px; text-align: left; white-space: pre-line;">
+                  <template #trigger>
+                    <n-icon size="15" :component="ExperimentalIcon" color="green" />
+                  </template>
+                  {{ t('hint.useScoredatalog') }}
+                </n-tooltip>
+                <span style="white-space: pre-line;">{{ t('form.labelUseScoredatalog') }}</span>
+              </template>
               <n-select v-model:value="model.UseScoredatalog" :options="yesnoOptions" style="width: 150px;" />
+            </n-form-item>
+          </n-p>
+          <n-p>
+            <n-form-item>
+              <template #label>
+                <n-tooltip trigger="hover" style="max-width: 400px; text-align: left; white-space: pre-line;">
+                  <template #trigger>
+                    <n-icon size="15" :component="ExperimentalIcon" color="green" />
+                  </template>
+                  {{ t('hint.useScoredataForMainUser') }}
+                </n-tooltip>
+                <span style="white-space: pre-line;">{{ t('form.labelUseScoredataForMainUser') }}</span>
+              </template>
+              <n-select v-model:value="model.UseScoredataForMainUser" :options="yesnoOptions" style="width: 150px;" />
             </n-form-item>
           </n-p>
         </n-h2>
@@ -130,6 +153,7 @@ import {
   ChatboxEllipsesOutline as HintIcon,
   LogoGithub as GithubIcon,
   DocumentTextOutline as DocumentIcon,
+  FlaskOutline as ExperimentalIcon,
 } from '@vicons/ionicons5';
 import { Qq as QQIcon } from "@vicons/fa";
 import { QueryLatestVersion, ReadConfig, WriteConfig, OpenDirectoryDialog } from '@wailsjs/go/main/App';
@@ -161,6 +185,7 @@ const model = ref<config.ApplicationConfig>({
   EnableDownloadFeature: null, // Unused
   PreviewSite: null,
   UseScoredatalog: null,
+  UseScoredataForMainUser: null,
 });
 const loading = ref(false);
 const yesnoOptions: Array<SelectOption> = [

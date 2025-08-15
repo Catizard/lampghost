@@ -10,6 +10,7 @@ export namespace config {
 	    EnableAutoReload: number;
 	    PreviewSite: string;
 	    UseScoredatalog: number;
+	    UseScoredataForMainUser: number;
 	    EnableDownloadFeature: boolean;
 	
 	    static createFrom(source: any = {}) {
@@ -27,6 +28,7 @@ export namespace config {
 	        this.EnableAutoReload = source["EnableAutoReload"];
 	        this.PreviewSite = source["PreviewSite"];
 	        this.UseScoredatalog = source["UseScoredatalog"];
+	        this.UseScoredataForMainUser = source["UseScoredataForMainUser"];
 	        this.EnableDownloadFeature = source["EnableDownloadFeature"];
 	    }
 	}

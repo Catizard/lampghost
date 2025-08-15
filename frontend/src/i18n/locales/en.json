@@ -119,7 +119,8 @@
     "labelLR2": "LR2",
     "labelUserDBPath": "User Database File Path",
     "labelScanBMSFiles": "Scan BMS Files",
-    "labelUseScoredatalog": "Use scoredatalog.db as datasource(experimental)",
+    "labelUseScoredatalog": "Use scoredatalog.db as recent menu's datasource",
+    "labelUseScoredataForMainUser": "Use score.db as main user's lamp status datasource",
     "placeholderName": "Please input name",
     "placeholderUserName": "Please input your name",
     "placeholderRivalName": "Please input rival name",
@@ -268,7 +269,9 @@
     "initTable": "Add some most used tables",
     "skipInitTable": "Lampghost might work abnormally with no tables. Do you really want to skip this step?",
     "initTableError": "Some tables are failed to add, you could try adding them manually: {tables}",
-    "ignoreVariantCourse": "When opend, ignore all the courses which constraint contains 'no_good', 'no_speed', 'no_great', only reserve the normal course\nWarning: rival's tag won't be re-generated again by changing this option, you still need to reload manually"
+    "ignoreVariantCourse": "When opend, ignore all the courses which constraint contains 'no_good', 'no_speed', 'no_great', only reserve the normal course\nWarning: rival's tag won't be re-generated again by changing this option, you still need to reload manually",
+    "useScoredatalog": "When opend, use 'scoredatalog.db' instead of 'scorelog.db' as datasource for recent menu",
+    "useScoredataForMainUser": "When opend, use 'score.db' instead of 'scorelog.db' to build main user's lamp status"
   },
   "menuName": {
     "home": "Home",

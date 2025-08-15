@@ -27,8 +27,10 @@ type DiffTableDataVo struct {
 	// NOTE: NEVER access this field directly, use GetOrder() instead
 	SortOrder *string
 	// Extra filter fields
-	IDs       []uint
-	HeaderIDs []uint
+	// See config.go for details
+	UseScoredataForMainUser bool
+	IDs                     []uint
+	HeaderIDs               []uint
 
 	RivalID      uint
 	GhostRivalID uint

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"sync"
 	"time"
 
 	"github.com/Catizard/lampghost_wails/internal/config"
@@ -23,20 +24,41 @@ import (
 const READONLY_PARAMETER = "?open_mode=1"
 
 type RivalInfoService struct {
-	db             *gorm.DB
-	monitorService *MonitorService
-	ctx            context.Context
-	syncChan       <-chan any
+	db                      *gorm.DB
+	monitorService          *MonitorService
+	ctx                     context.Context
+	mutex                   sync.Mutex
+	useScoredataForMainUser bool
+	syncChan                <-chan any
+	subscribeConfigChange   <-chan any
 }
 
-func NewRivalInfoService(db *gorm.DB, monitorService *MonitorService, syncChan <-chan any) *RivalInfoService {
+func NewRivalInfoService(db *gorm.DB, monitorService *MonitorService, useScoredataForMainUser bool, configNotify <-chan any, syncChan <-chan any) *RivalInfoService {
 	ret := &RivalInfoService{
-		db:             db,
-		monitorService: monitorService,
-		syncChan:       syncChan,
+		db:                      db,
+		monitorService:          monitorService,
+		syncChan:                syncChan,
+		useScoredataForMainUser: useScoredataForMainUser,
+		subscribeConfigChange:   configNotify,
 	}
 	go ret.listen()
 	return ret
+}
+
+func (s *RivalInfoService) listenUpdateConfig() {
+	for {
+		<-s.subscribeConfigChange
+		go func() {
+			s.mutex.Lock()
+			log.Debugf("[RivalInfoService] updating config")
+			if config, err := config.ReadConfig(); err != nil {
+				log.Errorf("cannot read config: %s", err)
+			} else {
+				s.useScoredataForMainUser = config.UseScoredataForMainUser != 0
+			}
+			s.mutex.Unlock()
+		}()
+	}
 }
 
 func (s *RivalInfoService) listen() {
@@ -392,23 +414,39 @@ func (s *RivalInfoService) QueryUserInfoWithLevelLayeredDiffTable(rivalID uint, 
 		sha256RivalScoreData[scoreData.Sha256] = scoreData
 	}
 
+	s.mutex.Lock()
+	useScoredataForMainUser := s.useScoredataForMainUser
+	s.mutex.Unlock()
+	log.Debugf("useScoredataForMainUser: %v", useScoredataForMainUser)
+
 	ret := dto.NewRivalInfoDtoWithDiffTable(rivalInfo, header)
 	for _, dataList := range ret.DiffTableHeader.LevelLayeredContents {
 		for i, data := range dataList {
 			ret.DiffTableHeader.SongCount++
-			if _, ok := sha256MaxLamp[data.Sha256]; ok {
-				dataList[i].Lamp = int(sha256MaxLamp[data.Sha256][0].Clear)
-				ret.DiffTableHeader.LampCount[dataList[i].Lamp]++
+			if !useScoredataForMainUser {
+				if _, ok := sha256MaxLamp[data.Sha256]; ok {
+					dataList[i].Lamp = int(sha256MaxLamp[data.Sha256][0].Clear)
+					ret.DiffTableHeader.LampCount[dataList[i].Lamp]++
+				}
 			}
+
 			if scoreData, ok := sha256RivalScoreData[data.Sha256]; ok {
 				scoreRank := scoreData.GetRank()
 				if scoreRank != nil {
 					dataList[i].ScoreRank = scoreRank.Value
 					ret.DiffTableHeader.RankCount[scoreRank.Value]++
+					if useScoredataForMainUser {
+						dataList[i].Lamp = int(scoreData.Clear)
+						ret.DiffTableHeader.LampCount[dataList[i].Lamp]++
+					}
 				} else {
 					// We use 0 to represent no play like ClearType
 					dataList[i].ScoreRank = 0
 					ret.DiffTableHeader.RankCount[0]++
+					if useScoredataForMainUser {
+						dataList[i].Lamp = 0
+						ret.DiffTableHeader.LampCount[0]++
+					}
 				}
 			}
 		}

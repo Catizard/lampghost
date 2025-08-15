@@ -49,6 +49,7 @@ func init() {
 	viper.SetDefault("MaximumDownloadCount", 5)
 	viper.SetDefault("EnableAutoReload", 1)
 	viper.SetDefault("UseScoredatalog", 0)
+	viper.SetDefault("UseScoredataForMainUser", 0)
 	viper.SafeWriteConfig()
 	// Setup logger
 	if logFile, err := os.OpenFile(WorkingDirectory+"lampghost.log", os.O_CREATE|os.O_WRONLY, 0644); err != nil {
@@ -72,8 +73,11 @@ type ApplicationConfig struct {
 	// Auto reload save files when having write operation on scorelog.db
 	EnableAutoReload int
 	// Preview source: sayaka | konmai
-	PreviewSite     string
+	PreviewSite string
+	// When flagged, changing recent page's datasource from 'scorelog.db' to 'scoredatalog'
 	UseScoredatalog int
+	// When flagged, using 'score.db' to build main user's lamp status instead of 'scorelog.db'
+	UseScoredataForMainUser int
 	// Extra fields, need to be setted explicitly
 	EnableDownloadFeature bool
 }
@@ -85,15 +89,16 @@ func ReadConfig() (*ApplicationConfig, error) {
 		return nil, err
 	}
 	conf := &ApplicationConfig{
-		InternalServerPort:   viper.GetInt32("InternalServerPort"),
-		IgnoreVariantCourse:  viper.GetInt32("IgnoreVariantCourse"),
-		Locale:               viper.GetString("Locale"),
-		DownloadSite:         viper.GetString("DownloadSite"),
-		DownloadDirectory:    viper.GetString("DownloadDirectory"),
-		MaximumDownloadCount: viper.GetInt("MaximumDownloadCount"),
-		EnableAutoReload:     viper.GetInt("EnableAutoReload"),
-		PreviewSite:          viper.GetString("PreviewSite"),
-		UseScoredatalog:      viper.GetInt("UseScoredatalog"),
+		InternalServerPort:      viper.GetInt32("InternalServerPort"),
+		IgnoreVariantCourse:     viper.GetInt32("IgnoreVariantCourse"),
+		Locale:                  viper.GetString("Locale"),
+		DownloadSite:            viper.GetString("DownloadSite"),
+		DownloadDirectory:       viper.GetString("DownloadDirectory"),
+		MaximumDownloadCount:    viper.GetInt("MaximumDownloadCount"),
+		EnableAutoReload:        viper.GetInt("EnableAutoReload"),
+		PreviewSite:             viper.GetString("PreviewSite"),
+		UseScoredatalog:         viper.GetInt("UseScoredatalog"),
+		UseScoredataForMainUser: viper.GetInt("UseScoredataForMainUser"),
 	}
 	conf.EnableDownloadFeature = conf.EnableDownload() == nil
 	return conf, nil
@@ -112,6 +117,7 @@ func (c *ApplicationConfig) WriteConfig() error {
 	viper.Set("EnableAutoReload", c.EnableAutoReload)
 	viper.Set("PreviewSite", c.PreviewSite)
 	viper.Set("UseScoredatalog", c.UseScoredatalog)
+	viper.Set("UseScoredataForMainUser", c.UseScoredataForMainUser)
 	if err := viper.WriteConfig(); err != nil {
 		return err
 	}

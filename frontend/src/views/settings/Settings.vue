@@ -105,6 +105,12 @@
           </n-form-item>
         </n-h2>
         <n-h2>
+          <n-text>{{ t('title.dangerZone') }}</n-text>
+          <n-flex>
+            <n-button type="error" @click="handleFullyReloadClick">{{ t('button.fullyReload') }}</n-button>
+          </n-flex>
+        </n-h2>
+        <n-h2>
           <n-text>{{ t('title.contactUs') }}</n-text>
           <n-p>
             <n-flex>
@@ -147,7 +153,7 @@
 </template>
 
 <script setup lang="ts">
-import { FormInst, SelectOption } from 'naive-ui';
+import { FormInst, SelectOption, useDialog } from 'naive-ui';
 import { ref } from 'vue';
 import {
   ChatboxEllipsesOutline as HintIcon,
@@ -156,13 +162,16 @@ import {
   FlaskOutline as ExperimentalIcon,
 } from '@vicons/ionicons5';
 import { Qq as QQIcon } from "@vicons/fa";
-import { QueryLatestVersion, ReadConfig, WriteConfig, OpenDirectoryDialog } from '@wailsjs/go/main/App';
+import { QueryLatestVersion, ReadConfig, WriteConfig, OpenDirectoryDialog, ReloadRivalData } from '@wailsjs/go/main/App';
 import { config } from '../../../wailsjs/go/models';
 import { useI18n } from 'vue-i18n';
 import { BrowserOpenURL } from '@wailsjs/runtime/runtime';
+import { useUserStore } from '@/stores/user';
 
 const i18n = useI18n();
 const { t } = i18n;
+const userStore = useUserStore();
+const dialog = useDialog();
 const localeOptions: Array<SelectOption> = [
   {
     label: "English",
@@ -267,6 +276,27 @@ function checkVersion() {
       }
       window.$notifyInfo(result.Msg);
     }).catch(err => window.$notifyError(err));
+}
+
+function handleFullyReloadClick() {
+  dialog.error({
+    title: t('title.fullyReloadMainUser'),
+    positiveText: t('button.submit'),
+    negativeText: t('button.cancel'),
+    content: t('hint.fullyReloadMainUser'),
+    onPositiveClick: () => {
+      loading.value = true;
+      ReloadRivalData(userStore.id, true)
+        .then(result => {
+          if (result.Code != 200) {
+            return Promise.reject(result.Msg)
+          }
+          window.$notifySuccess(t('message.reloadSuccess'));
+        })
+        .catch(err => window.$notifyError(err))
+        .finally(() => loading.value = false);
+    }
+  })
 }
 
 function gotoGithubRepo() {

@@ -262,7 +262,9 @@
     "previewRecentTimeline": "最近游玩预览",
     "supplyMissingBMSFromTable": "补充缺失BMS",
     "editSongDirectories": "编辑BMS目录",
-    "overview": "总览"
+    "overview": "总览",
+    "dangerZone": "危险区",
+    "fullyReloadMainUser": "全量同步主用户数据"
   },
   "hint": {
     "initUser": "配置你的存档文件路径",
@@ -271,7 +273,8 @@
     "initTableError": "部分难度表新增失败,你可以稍后手动添加他们: {tables}",
     "ignoreVariantCourse": "开启时移除所有带有no_good/no_great/no_speed的段位\n注意: 修改该配置不会自动更新用户的标签,你必须手动刷新用户的标签信息",
     "useScoredatalog": "开启时使用scoredatalog.db而不是scorelog.db作为最近游玩的数据源",
-    "useScoredataForMainUser": "开启时使用score.db而不是scorelog.db作为主用户的点灯情况的数据源"
+    "useScoredataForMainUser": "开启时使用score.db而不是scorelog.db作为主用户的点灯情况的数据源",
+    "fullyReloadMainUser": "完全删除已有数据并重新读取。使用这个按钮会导致某些数据丢失（例如击键数）。如果你只是想同步某些数据，请使用主页的更新按钮或歌曲页面的同步按钮。只有当某些错误数据已经无法挽回时才应该使用这个按钮！"
   },
   "menuName": {
     "home": "个人主页",

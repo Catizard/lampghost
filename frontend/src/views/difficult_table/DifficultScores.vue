@@ -100,8 +100,7 @@ function rowClassName(row: dto.DiffTableHeaderDto): string {
     if (sum == row.SongCount && v != ClearType.Failed) {
       // I don't have a better idea for managing this
       const def: ClearTypeDef = DefaultClearTypeColorStyle[k];
-      console.log('row: ', row.Level, 'picking', def.text);
-      return def.text;
+      return "row-" + def.text;
     }
   }
   return ""
@@ -143,31 +142,31 @@ watch(currentDiffTableID, (newID: string | number) => {
 <style lang="css" scoped>
 /* background color when clearing whole difficult level */
 /* NOTE: This color style is actually different with ClearTag, so no code reuse here */
-:deep(.EASY > td) {
+:deep(.row-EASY > td) {
   background-color: rgba(200, 247, 212, 0.7) !important;
 }
 
-:deep(.NORMAL > td) {
+:deep(.row-NORMAL > td) {
   background-color: rgba(202, 235, 253, 0.7) !important;
 }
 
-:deep(.HARD > td) {
+:deep(.row-HARD > td) {
   background-color: rgba(255, 210, 213, 0.7) !important;
 }
 
-:deep(.EX-HARD > td) {
+:deep(.row-EX-HARD > td) {
   background-color: rgba(255, 230, 212, 0.7) !important;
 }
 
-:deep(.FULL_COMBO> td) {
+:deep(.row-FULL_COMBO > td) {
   background-color: rgba(255, 241, 202, 0.7) !important;
 }
 
-:deep(.PERFECT > td) {
+:deep(.row-PERFECT > td) {
   background-color: rgba(255, 241, 202, 0.7) !important;
 }
 
-:deep(.MAX > td) {
+:deep(.row-MAX > td) {
   background-color: rgba(255, 241, 202, 0.7) !important;
 }
 </style>

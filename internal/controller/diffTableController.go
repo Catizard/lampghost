@@ -123,7 +123,7 @@ func (ctl *DiffTableController) QueryDiffTableDataWithRival(filter *vo.DiffTable
 	log.Info("[Controller] calling DiffTableController.QueryDiffTableDataWithRival")
 	rows, _, err := ctl.diffTableService.QueryDiffTableDataWithRival(filter)
 	if err != nil {
-		log.Errorf("[DiffTableController] returning err: %v", err)
+		log.Errorf("[DiffTableController] returning err: %v", eris.ToJSON(err, true))
 		return result.NewErrorPage(err)
 	}
 	return result.NewRtnPage(*filter.Pagination, rows)

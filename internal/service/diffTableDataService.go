@@ -161,7 +161,7 @@ func findDiffTableDataListWithRival(tx *gorm.DB, filter *vo.DiffTableDataVo) ([]
 		partial = partial.Joins(`left join (
 			select rsl.clear as Lamp, rsl.PlayCount, rsl.minbp as MinBP, rsl.sha256
       from (
-        select rsl.clear, rsl.minbp, ROW_NUMBER() OVER w as rn, COUNT(1) OVER w as PlayCount, rsl.rival_id, rsl.sha256
+        select rsl.clear, rsl.minbp, ROW_NUMBER() OVER w as rn, COUNT(1) OVER w as PlayCount, rsl.rival_id, rsl.sha256, rsl.record_time
         from rival_score_log rsl
 				where rsl.rival_id = ?
         WINDOW w AS (PARTITION BY rsl.sha256 ORDER BY rsl.clear desc, rsl.minbp asc)

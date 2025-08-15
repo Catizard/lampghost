@@ -281,7 +281,7 @@ export namespace dto {
 	    Lms: number;
 	    Notes: number;
 	    ScoreRank: number;
-	    BestRecordOption: string;
+	    BestRecordOption: number;
 	    BestRecordTimestamp: number;
 	
 	    static createFrom(source: any = {}) {

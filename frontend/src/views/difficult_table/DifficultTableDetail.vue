@@ -1,6 +1,7 @@
 <template>
   <n-data-table remote :columns="columns" :data="data" :pagination="pagination" :bordered="false" min-height="500px"
-    :loading="loading" :row-key="(row: dto.DiffTableDataDto) => row.ID" @update-sorter="handleUpdateSorter" />
+    :loading="loading" :row-key="(row: dto.DiffTableDataDto) => row.ID" @update-sorter="handleUpdateSorter"
+    :rowClassName="rowClassName" />
   <select-folder v-model:show="showFolderSelection" :sha256="candidateSongInfo?.Sha256" @submit="handleSubmit" />
   <select-difficult v-model:show="showTableSelection" :sha256="candidateSongInfo?.Sha256" @submit="handleSubmit" />
   <ChartPreview ref="chartPreviewRef" />
@@ -21,6 +22,8 @@ import dayjs from 'dayjs';
 import { useUserStore } from '@/stores/user';
 import SongTitleParagraph from '@/components/SongTitleParagraph.vue';
 import SongScoreParagraph from '@/components/SongScoreParagraph.vue';
+import SongClearParagraph from '@/components/SongClearParagraph.vue';
+import { ClearType, ClearTypeDef, DefaultClearTypeColorStyle } from '@/constants/cleartype';
 
 const i18n = useI18n();
 const { t } = i18n;
@@ -54,16 +57,22 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
     }
   },
   {
-    title: t('column.clear'), key: "Lamp", width: "100px", resizable: true, sorter: true,
+    title: t('column.clear'), key: "Lamp", width: "125px", resizable: true, sorter: true, className: "clearColumn",
     render(row: dto.DiffTableDataDto) {
-      return h(ClearTag, { clear: row.Lamp },)
+      return h(SongClearParagraph, {
+        clearType: row.Lamp,
+        scoreOption: row.BestRecordOption
+      });
     }
   },
   {
     // TODO: Change sorter from false to true when user choosed ghost rival
-    title: t('column.ghost'), key: "GhostLamp", width: "100px", resizable: true, sorter: true,
+    title: t('column.ghost'), key: "GhostLamp", width: "125px", resizable: true, sorter: true, className: "ghostClearColumn",
     render(row: dto.DiffTableDataDto) {
-      return h(ClearTag, { clear: row.GhostLamp, },)
+      return h(SongClearParagraph, {
+        clearType: row.GhostLamp,
+        scoreOption: null
+      });
     }
   },
   {
@@ -234,5 +243,25 @@ function handleSubmitSingleMD5DownloadTask(row: dto.DiffTableDataDto) {
     .finally(() => loading.value = false);
 }
 
+function rowClassName(row: dto.DiffTableDataDto): string {
+  let clearText = "";
+  let ghostClearText = "";
+  for (const [k, v] of Object.entries(ClearType).reverse()) {
+    if (row.Lamp == parseInt(k)) {
+      const def: ClearTypeDef = DefaultClearTypeColorStyle[k];
+      clearText = def.text;
+    }
+    if (row.GhostLamp == parseInt(k)) {
+      const def: ClearTypeDef = DefaultClearTypeColorStyle[k];
+      ghostClearText = "ghost-" + def.text;
+    }
+  }
+  return clearText + " " + ghostClearText;
+}
+
 loadData();
 </script>
+
+<style lang="css" scoped>
+@import "@/assets/css/clearBackground.css"
+</style>

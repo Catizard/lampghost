@@ -1,0 +1,88 @@
+:deep(.NO-PLAY > .clearColumn) {
+  background-color: #8C8C8C !important;
+}
+
+:deep(.EASY > .clearColumn) {
+  background-color: #5ff38433 !important;
+}
+
+:deep(.FAILED > .clearColumn) {
+  background-color: #CC5C7633 !important;
+}
+
+:deep(.A-EASY > .clearColumn) {
+  background-color: #FF9FF933 !important;
+}
+
+:deep(.LA-EASY > .clearColumn) {
+  background-color: #FF9FF933 !important;
+}
+
+:deep(.NORMAL > .clearColumn) {
+  background-color: #62bff133 !important;
+}
+
+:deep(.HARD > .clearColumn) {
+  background-color: #FF6B7433 !important;
+}
+
+:deep(.EX-HARD > .clearColumn) {
+  background-color: #FFAD7033 !important;
+}
+
+:deep(.FULL-COMBO > .clearColumn) {
+  background-color: #FFD25133 !important;
+}
+
+:deep(.PERFECT-HARD > .clearColumn) {
+  background-color: #FFD25133 !important;
+}
+
+:deep(.MAX > .clearColumn) {
+  background-color: #FFD25133 !important;
+}
+
+/* TODO: This is pretty hacky and tedious. Is there any better solution?*/
+:deep(.ghost-NO-PLAY > .ghostClearColumn) {
+  background-color: #8C8C8C !important;
+}
+
+:deep(.ghost-EASY > .ghostClearColumn) {
+  background-color: #5ff38433 !important;
+}
+
+:deep(.ghost-FAILED > .ghostClearColumn) {
+  background-color: #CC5C7633 !important;
+}
+
+:deep(.ghost-A-EASY > .ghostClearColumn) {
+  background-color: #FF9FF933 !important;
+}
+
+:deep(.ghost-LA-EASY > .ghostClearColumn) {
+  background-color: #FF9FF933 !important;
+}
+
+:deep(.ghost-NORMAL > .ghostClearColumn) {
+  background-color: #62bff133 !important;
+}
+
+:deep(.ghost-HARD > .ghostClearColumn) {
+  background-color: #FF6B7433 !important;
+}
+
+:deep(.ghost-EX-HARD > .ghostClearColumn) {
+  background-color: #FFAD7033 !important;
+}
+
+:deep(.ghost-FULL-COMBO > .ghostClearColumn) {
+  background-color: #FFD25133 !important;
+}
+
+:deep(.ghost-PERFECT-HARD > .ghostClearColumn) {
+  background-color: #FFD25133 !important;
+}
+
+:deep(.ghost-MAX > .ghostClearColumn) {
+  background-color: #FFD25133 !important;
+}

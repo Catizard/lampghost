@@ -1,19 +1,18 @@
 <template>
   <n-data-table remote :columns="columns" :data="data" :pagination="pagination" :bordered="false" :loading="loading"
-    :row-key="row => row.ID" />
+    :row-key="row => row.ID" :rowClassName="rowClassName" />
   <select-folder v-model:show="showFolderSelection" :sha256="candidateSongInfo?.Sha256" @submit="handleSubmit" />
   <select-difficult v-model:show="showDifficultSelection" :sha256="candidateSongInfo?.Sha256" @submit="handleSubmit" />
   <ChartPreview ref="chartPreviewRef" />
 </template>
 
 <script setup lang="ts">
-import ClearTag from '@/components/ClearTag.vue';
 import TableTags from '@/components/TableTags.vue';
 import { useUserStore } from '@/stores/user';
 import { BindSongToFolder, QueryRivalScoreDataLogPageList, QueryRivalScoreLogPageList, ReadConfig } from '@wailsjs/go/main/App';
 import { config, dto } from '@wailsjs/go/models';
 import dayjs from 'dayjs';
-import { DataTableColumns, NDropdown, NButton, NTooltip } from 'naive-ui';
+import { DataTableColumns, NDropdown, NButton, NTooltip, NText, NFlex } from 'naive-ui';
 import { h, Ref, ref, reactive, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import SelectDifficult from '../custom_table/SelectDifficult.vue';
@@ -21,6 +20,8 @@ import SelectFolder from '../folder/SelectFolder.vue';
 import ChartPreview from '@/components/ChartPreview.vue';
 import SongTitleParagraph from '@/components/SongTitleParagraph.vue';
 import SongScoreParagraph from '@/components/SongScoreParagraph.vue';
+import { ClearType, ClearTypeDef, DefaultClearTypeColorStyle, queryClearTypeColorStyle } from '@/constants/cleartype';
+import SongClearParagraph from '@/components/SongClearParagraph.vue';
 
 type PlayLog = dto.RivalScoreLogDto | dto.RivalScoreDataLogDto;
 type SongInfo = {
@@ -56,13 +57,17 @@ function createColumns(useScorelog: boolean): DataTableColumns<PlayLog> {
     {
       title: t('column.tag'), key: "Tag", minWidth: "100px", resizable: true,
       render(row: PlayLog) {
-        return h(TableTags, { tableTags: row.TableTags })
+        return h(TableTags, { tableTags: row.TableTags });
       }
     },
     {
-      title: t('column.clear'), key: "Clear", minWidth: "100px", resizable: true,
+      title: t('column.clear'), key: "Clear", width: "150px", resizable: true, className: "clearColumn",
       render(row: PlayLog) {
-        return h(ClearTag, { clear: row.Clear }, {});
+        const p = { clearType: row.Clear, scoreOption: null };
+        if (!useScorelog) {
+          p.scoreOption = (row as dto.RivalScoreDataLogDto).Option;
+        }
+        return h(SongClearParagraph, p);
       }
     },
   ];
@@ -70,7 +75,7 @@ function createColumns(useScorelog: boolean): DataTableColumns<PlayLog> {
   if (!useScorelog) {
     ret.push(...[
       {
-        title: t('column.score'), key: "Score", width: "110px", resizable: true,
+        title: t('column.score'), key: "Score", width: "80px", resizable: true,
         render(row: dto.RivalScoreDataLogDto) {
           return h(SongScoreParagraph, { data: row });
         }
@@ -218,7 +223,21 @@ const pagination = reactive({
   }
 });
 
+function rowClassName(row: PlayLog): string {
+  for (const [k, v] of Object.entries(ClearType).reverse()) {
+    if (row.Clear == parseInt(k)) {
+      const def: ClearTypeDef = DefaultClearTypeColorStyle[k];
+      return def.text;
+    }
+  }
+  return "";
+}
+
 onMounted(() => {
   loadData();
 });
 </script>
+
+<style lang="css" scoped>
+@import "@/assets/css/clearBackground.css"
+</style>

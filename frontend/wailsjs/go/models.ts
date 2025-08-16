@@ -283,6 +283,7 @@ export namespace dto {
 	    ScoreRank: number;
 	    BestRecordOption: number;
 	    BestRecordTimestamp: number;
+	    GhostBestRecordTimestamp: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new DiffTableDataDto(source);
@@ -325,6 +326,7 @@ export namespace dto {
 	        this.ScoreRank = source["ScoreRank"];
 	        this.BestRecordOption = source["BestRecordOption"];
 	        this.BestRecordTimestamp = source["BestRecordTimestamp"];
+	        this.GhostBestRecordTimestamp = source["GhostBestRecordTimestamp"];
 	    }
 	}
 	export class DiffTableHeaderDto {
@@ -341,7 +343,7 @@ export namespace dto {
 	    NoTagBuild?: number;
 	    Contents: DiffTableDataDto[];
 	    SortedLevels: string[];
-	    LevelLayeredContents: Record<string, Array<DiffTableDataDto>>;
+	    LevelLayeredContents: Record<string, DiffTableDataDto[]>;
 	    Level: string;
 	    Children: DiffTableHeaderDto[];
 	    LampCount: Record<number, number>;
@@ -367,7 +369,7 @@ export namespace dto {
 	        this.NoTagBuild = source["NoTagBuild"];
 	        this.Contents = this.convertValues(source["Contents"], DiffTableDataDto);
 	        this.SortedLevels = source["SortedLevels"];
-	        this.LevelLayeredContents = this.convertValues(source["LevelLayeredContents"], Array<DiffTableDataDto>, true);
+	        this.LevelLayeredContents = this.convertValues(source["LevelLayeredContents"], DiffTableDataDto[], true);
 	        this.Level = source["Level"];
 	        this.Children = this.convertValues(source["Children"], DiffTableHeaderDto);
 	        this.LampCount = source["LampCount"];

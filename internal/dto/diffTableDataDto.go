@@ -22,26 +22,27 @@ type DiffTableDataDto struct {
 	Lamp      int
 	PlayCount int
 
-	GhostLamp           int
-	GhostPlayCount      int
-	DataLost            bool
-	LastPlayedTimestamp int64
-	Epg                 int32
-	Lpg                 int32
-	Egr                 int32
-	Lgr                 int32
-	Egd                 int32
-	Lgd                 int32
-	Ebd                 int32
-	Lbd                 int32
-	Epr                 int32
-	Lpr                 int32
-	Ems                 int32
-	Lms                 int32
-	Notes               int32
-	ScoreRank           int
-	BestRecordOption    int
-	BestRecordTimestamp int64
+	GhostLamp                int
+	GhostPlayCount           int
+	DataLost                 bool
+	LastPlayedTimestamp      int64
+	Epg                      int32
+	Lpg                      int32
+	Egr                      int32
+	Lgr                      int32
+	Egd                      int32
+	Lgd                      int32
+	Ebd                      int32
+	Lbd                      int32
+	Epr                      int32
+	Lpr                      int32
+	Ems                      int32
+	Lms                      int32
+	Notes                    int32
+	ScoreRank                int
+	BestRecordOption         int
+	BestRecordTimestamp      int64
+	GhostBestRecordTimestamp int64
 }
 
 func NewDiffTableDataDto(data *entity.DiffTableData) *DiffTableDataDto {

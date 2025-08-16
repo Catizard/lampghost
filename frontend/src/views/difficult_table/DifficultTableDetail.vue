@@ -61,7 +61,8 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
     render(row: dto.DiffTableDataDto) {
       return h(SongClearParagraph, {
         clearType: row.Lamp,
-        scoreOption: row.BestRecordOption
+        scoreOption: row.BestRecordOption,
+        bestRecordTimestamp: row.BestRecordTimestamp,
       });
     }
   },
@@ -71,7 +72,8 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
     render(row: dto.DiffTableDataDto) {
       return h(SongClearParagraph, {
         clearType: row.GhostLamp,
-        scoreOption: null
+        scoreOption: null,
+        bestRecordTimestamp: row.GhostBestRecordTimestamp
       });
     }
   },
@@ -79,7 +81,7 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
     title: t('column.lastPlayed'), key: "LastPlayedTimestamp", width: "120px", resizable: true, sorter: true,
     render(row: dto.DiffTableDataDto) {
       if (row.LastPlayedTimestamp == 0) {
-        return "NO PLAY";
+        return "/";
       }
       // return dayjs(row.LastPlayedTimestamp * 1000).format("YYYY-MM-DD HH:mm:ss");
       return h(

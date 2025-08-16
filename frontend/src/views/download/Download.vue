@@ -58,7 +58,7 @@ const downloadProgress = computed(() => {
   return t('message.downloadProgress', {
     success: c,
     count: c + p,
-    progress: (c + p) == 0 ? 100 : c / (c + p) * 100
+    progress: ((c + p) == 0 ? 100 : c / (c + p) * 100).toFixed(2)
   });;
 });
 

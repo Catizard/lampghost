@@ -34,8 +34,8 @@ func main() {
 	// Create application with options
 	err := wails.Run(&options.App{
 		Title:  fmt.Sprintf("lampghost_wails %s", config.VERSION),
-		Width:  1920,
-		Height: 1080,
+		Width:  1600,
+		Height: 900,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},

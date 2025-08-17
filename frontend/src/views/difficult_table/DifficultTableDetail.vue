@@ -45,7 +45,7 @@ const sorter: Ref<Sorter> = ref({
 });
 const columns: DataTableColumns<dto.DiffTableDataDto> = [
   {
-    title: t('column.title'), key: "Title", resizable: true, sorter: true, className: "compact",
+    title: t('column.title'), key: "Title", resizable: true, sorter: true, titleAlign: "center",
     render: (row: dto.DiffTableDataDto) => {
       return h(SongTitleParagraph, { data: row, lost: row.DataLost });
     }
@@ -57,7 +57,8 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
     }
   },
   {
-    title: t('column.clear'), key: "Lamp", width: "140px", resizable: true, sorter: true, className: "clearColumn",
+    title: t('column.clear'), key: "Lamp", width: "140px", resizable: true, sorter: true, align: "center",
+    className: "clearColumn",
     render(row: dto.DiffTableDataDto) {
       return h(SongClearParagraph, {
         clearType: row.Lamp,
@@ -68,7 +69,8 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
   },
   {
     // TODO: Change sorter from false to true when user choosed ghost rival
-    title: t('column.ghost'), key: "GhostLamp", width: "140px", resizable: true, sorter: true, className: "ghostClearColumn",
+    title: t('column.ghost'), key: "GhostLamp", width: "140px", resizable: true, sorter: true, align: "center",
+    className: "ghostClearColumn",
     render(row: dto.DiffTableDataDto) {
       return h(SongClearParagraph, {
         clearType: row.GhostLamp,
@@ -78,7 +80,7 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
     }
   },
   {
-    title: t('column.lastPlayed'), key: "LastPlayedTimestamp", width: "120px", resizable: true, sorter: true,
+    title: t('column.lastPlayed'), key: "LastPlayedTimestamp", width: "135px", resizable: true, sorter: true, align: "center",
     render(row: dto.DiffTableDataDto) {
       if (row.LastPlayedTimestamp == 0) {
         return "/";
@@ -94,12 +96,9 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
       );
     }
   },
-  { title: t('column.playCount'), key: "PlayCount", width: "75px" },
+  { title: t('column.playCount'), key: "PlayCount", width: "100px", align: "center" },
   {
-    title: t('column.actions'),
-    key: "actions",
-    resizable: true,
-    width: "90px",
+    title: t('column.actions'), key: "actions", resizable: true, width: "90px", align: "center",
     render(row: dto.DiffTableDataDto) {
       return h(
         NDropdown,

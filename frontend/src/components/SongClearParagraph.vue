@@ -1,6 +1,6 @@
 <template>
   <n-flex vertical align="center">
-    <n-text strong>{{ clearType.clearText }}</n-text>
+    <strong>{{ clearType.clearText }}</strong>
     <!-- <small v-if="scoreOptionValue != null && clearTypeValue != ClearType.NO_PLAY">{{ scoreOption.text }}</small> -->
     <small v-if="bestRecordTimestamp != null && clearTypeValue != ClearType.NO_PLAY">{{
       dayjs(bestRecordTimestamp * 1000).format('YYYY-MM-DD') }}

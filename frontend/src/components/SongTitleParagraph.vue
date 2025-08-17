@@ -2,7 +2,7 @@
   <n-flex vertical :size="2">
     <n-flex>
       <n-icon v-if="lost" :component="WarningOutline" color="red" />
-      <n-text strong>{{ data.Title }}</n-text>
+      <strong>{{ data.Title }}</strong>
     </n-flex>
     <n-text v-if="data.SubTitle != ''" depth="2" style="font-size: 11;">{{ data.SubTitle }}</n-text>
     <n-text v-if="data.Artist != ''" depth="3" style="font-size: 9;">{{ data.Artist }}</n-text>

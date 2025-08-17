@@ -268,7 +268,7 @@ loadData();
 @import "@/assets/css/clearBackground.css";
 
 :deep(td.n-data-table-td) {
-  padding-top: 0px !important;
-  padding-bottom: 0px !important;
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
 }
 </style>

@@ -51,7 +51,7 @@ func (d *wriggleDownloadSource) GetDownloadURLFromMD5(md5 string) (downloadInfo 
 		return
 	}
 	if result.Error != "" {
-		err = eris.Errorf(result.Error)
+		err = eris.New(result.Error)
 		return
 	}
 	return DownloadInfo{

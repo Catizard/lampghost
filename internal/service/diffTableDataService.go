@@ -168,7 +168,19 @@ func findDiffTableDataListWithRival(tx *gorm.DB, filter *vo.DiffTableDataVo) ([]
       ) as rsl
       where rsl.rn = 1 and rsl.record_time <= ?
 		) as ghost_rsl on ghost_rsl.sha256 = rsd.sha256`, filter.GhostRivalID, endRecordTime)
+
 	}
+
+	// TODO: This is shit
+	partial = partial.Joins(`left join (
+		select * from (
+    	select *, ROW_NUMBER() OVER w as rn
+    	from rival_score_data rscore
+    	where rival_id = ?
+    	WINDOW w AS (PARTITION BY rscore.sha256 ORDER BY clear desc, minbp asc)
+    ) as rscore 
+		where rscore.rn = 1
+	) as rscore on rsl.sha256 = rscore.sha256`, filter.RivalID)
 
 	fields := `
 		difftable_data.*,
@@ -177,11 +189,9 @@ func findDiffTableDataListWithRival(tx *gorm.DB, filter *vo.DiffTableDataVo) ([]
 		(rsd.id is null) as data_lost,
     rsd.sub_title as sub_title,
 		strftime("%s", rsdl.record_time) as LastPlayedTimestamp,
-    strftime("%s", rsl.best_record_time) as BestRecordTimestamp
+    strftime("%s", rsl.best_record_time) as BestRecordTimestamp,
+ 		rscore.epg, rscore.lpg, rscore.egr, rscore.lgr, rscore.egd, rscore.lgd, rscore.ebd, rscore.lbd, rscore.ems, rscore.lms, rscore.option as best_record_option, rscore.notes as notes
 	`
-	if filter.UseScoredataForMainUser {
-		fields = fields + ", rscore.epg, rscore.lpg, rscore.egr, rscore.lgr, rscore.egd, rscore.lgd, rscore.ebd, rscore.lbd, rscore.ems, rscore.lms, rscore.option as best_record_option, rscore.notes as notes"
-	}
 	if filter.GhostRivalID > 0 {
 		fields = fields + `, ghost_rsl.Lamp as GhostLamp, ghost_rsl.PlayCount as GhostPlayCount, strftime("%s", ghost_rsl.best_record_time) as GhostBestRecordTimestamp`
 	}

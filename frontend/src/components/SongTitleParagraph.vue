@@ -1,5 +1,5 @@
 <template>
-  <n-flex vertical>
+  <n-flex vertical :size="2">
     <n-flex>
       <n-icon v-if="lost" :component="WarningOutline" color="red" />
       <n-text strong>{{ data.Title }}</n-text>

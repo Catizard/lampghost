@@ -45,7 +45,7 @@ const sorter: Ref<Sorter> = ref({
 });
 const columns: DataTableColumns<dto.DiffTableDataDto> = [
   {
-    title: t('column.title'), key: "Title", resizable: true, sorter: true,
+    title: t('column.title'), key: "Title", resizable: true, sorter: true, className: "compact",
     render: (row: dto.DiffTableDataDto) => {
       return h(SongTitleParagraph, { data: row, lost: row.DataLost });
     }
@@ -57,7 +57,7 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
     }
   },
   {
-    title: t('column.clear'), key: "Lamp", width: "125px", resizable: true, sorter: true, className: "clearColumn",
+    title: t('column.clear'), key: "Lamp", width: "140px", resizable: true, sorter: true, className: "clearColumn",
     render(row: dto.DiffTableDataDto) {
       return h(SongClearParagraph, {
         clearType: row.Lamp,
@@ -68,7 +68,7 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
   },
   {
     // TODO: Change sorter from false to true when user choosed ghost rival
-    title: t('column.ghost'), key: "GhostLamp", width: "125px", resizable: true, sorter: true, className: "ghostClearColumn",
+    title: t('column.ghost'), key: "GhostLamp", width: "140px", resizable: true, sorter: true, className: "ghostClearColumn",
     render(row: dto.DiffTableDataDto) {
       return h(SongClearParagraph, {
         clearType: row.GhostLamp,
@@ -265,5 +265,10 @@ loadData();
 </script>
 
 <style lang="css" scoped>
-@import "@/assets/css/clearBackground.css"
+@import "@/assets/css/clearBackground.css";
+
+:deep(td.n-data-table-td) {
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+}
 </style>

@@ -17,7 +17,7 @@
 <script setup lang="ts">
 import { DataTableColumns } from 'naive-ui';
 import { dto } from '@wailsjs/go/models';
-import { ref, h, reactive, Ref, watch } from 'vue';
+import { ref, h, reactive, Ref, watch, inject } from 'vue';
 import { FindCourseInfoListWithRival } from '@wailsjs/go/main/App';
 import { useI18n } from 'vue-i18n';
 import CourseTableDetail from './CourseTableDetail.vue';
@@ -26,10 +26,11 @@ import SelectRivalTag from '@/components/rivals/SelectRivalTag.vue';
 import SelectRival from '@/components/rivals/SelectRival.vue';
 import { useUserStore } from '@/stores/user';
 import SongClearParagraph from '@/components/SongClearParagraph.vue';
-import { ClearType, queryClearTypeColorStyle } from '@/constants/cleartype';
+import { queryClearTypeColorStyle } from '@/constants/cleartype';
 
 const i18n = useI18n();
 const { t } = i18n;
+const resetScrollBar = inject("resetScrollBar", () => { });
 
 const loading = ref(false);
 const userStore = useUserStore();
@@ -42,12 +43,13 @@ const pagination = reactive({
   pageSizes: [10, 20, 50],
   onChange: (page: number) => {
     pagination.page = page;
+    resetScrollBar();
   },
   onUpdatePageSize: (pageSize: number) => {
     pagination.pageSize = pageSize;
     pagination.page = 1;
   }
-});;
+});
 let data = ref<Array<dto.CourseInfoDto>>([]);
 
 function createColumns(): DataTableColumns<dto.CourseInfoDto> {

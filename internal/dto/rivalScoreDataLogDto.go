@@ -36,11 +36,12 @@ type RivalScoreDataLogDto struct {
 	Random     int32
 	State      int32
 
-	Title     string
-	SubTitle  string
-	Artist    string
-	Md5       string
-	TableTags []*DiffTableTagDto `gorm:"-"`
+	Title           string
+	SubTitle        string
+	Artist          string
+	Md5             string
+	TableTags       []*DiffTableTagDto `gorm:"-"`
+	RecordTimestamp int64
 	// Pagination
 	Page      int
 	PageSize  int

@@ -121,6 +121,7 @@ func appendScoreLog(tx *gorm.DB, rivalScoreLog []*entity.RivalScoreLog) error {
 func findRivalScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.RivalScoreLogDto, int, error) {
 	fields := `
 		rival_score_log.*,
+    strftime("%s", rival_score_log.record_time) as RecordTimestamp,
 		sd.title as title,
     sd.sub_title as sub_title,
     sd.artist as artist,

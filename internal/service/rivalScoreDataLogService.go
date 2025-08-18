@@ -73,6 +73,7 @@ func syncScoreDataLog(tx *gorm.DB, rivalScoreDataLog []*entity.RivalScoreDataLog
 func findRivalScoreDataLogList(tx *gorm.DB, filter *vo.RivalScoreDataLogVo) (out []*dto.RivalScoreDataLogDto, n int, err error) {
 	fields := `
   rival_score_data_log.*,
+  strftime("%s", rival_score_data_log.record_time) as RecordTimestamp,
   sd.title as title,
   sd.sub_title as sub_title,
   sd.artist as artist,
@@ -90,7 +91,7 @@ func findRivalScoreDataLogList(tx *gorm.DB, filter *vo.RivalScoreDataLogVo) (out
 		}
 	}
 
-	if err = partial.Find(&out).Error; err != nil {
+	if err = partial.Debug().Find(&out).Error; err != nil {
 		return
 	}
 
@@ -149,7 +150,7 @@ func selectRivalScoreDataLogCount(tx *gorm.DB, filter *vo.RivalScoreDataLogVo) (
 	if filter != nil && filter.SongNameLike != nil && *filter.SongNameLike != "" {
 		partial = partial.Where("sd.title like ('%' || ? || '%')", filter.SongNameLike)
 	}
-	err = partial.Count(&count).Error
+	err = partial.Debug().Count(&count).Error
 	return
 }
 

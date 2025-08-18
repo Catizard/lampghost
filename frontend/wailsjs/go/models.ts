@@ -725,6 +725,7 @@ export namespace dto {
 	    Artist: string;
 	    Md5: string;
 	    TableTags: DiffTableTagDto[];
+	    RecordTimestamp: number;
 	    Page: number;
 	    PageSize: number;
 	    PageCount: number;
@@ -770,6 +771,7 @@ export namespace dto {
 	        this.Artist = source["Artist"];
 	        this.Md5 = source["Md5"];
 	        this.TableTags = this.convertValues(source["TableTags"], DiffTableTagDto);
+	        this.RecordTimestamp = source["RecordTimestamp"];
 	        this.Page = source["Page"];
 	        this.PageSize = source["PageSize"];
 	        this.PageCount = source["PageCount"];
@@ -820,6 +822,7 @@ export namespace dto {
 	    SubTitle: string;
 	    Artist: string;
 	    TableTags: DiffTableTagDto[];
+	    RecordTimestamp: number;
 	    Page: number;
 	    PageSize: number;
 	    PageCount: number;
@@ -852,6 +855,7 @@ export namespace dto {
 	        this.SubTitle = source["SubTitle"];
 	        this.Artist = source["Artist"];
 	        this.TableTags = this.convertValues(source["TableTags"], DiffTableTagDto);
+	        this.RecordTimestamp = source["RecordTimestamp"];
 	        this.Page = source["Page"];
 	        this.PageSize = source["PageSize"];
 	        this.PageCount = source["PageCount"];

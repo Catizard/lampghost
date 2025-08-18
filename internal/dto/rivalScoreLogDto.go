@@ -28,6 +28,7 @@ type RivalScoreLogDto struct {
 	SubTitle        string
 	Artist          string
 	TableTags       []*DiffTableTagDto `gorm:"-"`
+	RecordTimestamp int64
 	// Pagination
 	Page      int
 	PageSize  int

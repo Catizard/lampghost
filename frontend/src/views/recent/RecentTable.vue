@@ -97,7 +97,7 @@ function createColumns(useScorelog: boolean): DataTableColumns<PlayLog> {
       title: t('column.recordTime'), key: "RecordTime", width: "120px", resizable: true, align: "center",
       render(row: PlayLog) {
         return h(RecordTimeParagraph, {
-          recordTimestamp: row.RecordTime
+          recordTimestamp: row.RecordTimestamp * 1000,
         })
       }
     },
@@ -159,26 +159,25 @@ function handleSubmit(folderIds: number[]) {
     }).catch(err => window.$notifyError(err));
 }
 
-async function queryConfig() {
-  console.log("query config");
-  try {
-    const result = await ReadConfig();
+function queryConfig(): Promise<"datalog" | "scorelog"> {
+  return ReadConfig().then(result => {
     if (result.Code != 200) {
-      throw result.Msg;
+      return Promise.reject(result.Msg);
     }
-    const config: config.ApplicationConfig = result.Data;
-    logType.value = config.UseScoredatalog ? "datalog" : "scorelog";
-  } catch (err) {
-    throw err;
-  }
+    const config: config.ApplicationConfig = result.Data
+    return Promise.resolve(config.UseScoredatalog ? "datalog" : "scorelog");
+  });
 }
 
 async function loadData() {
   loading.value = true;
   try {
+    console.log('no logType, querying');
     if (logType.value == null) {
-      queryConfig();
+      const newLogTypeValue = await queryConfig();
+      logType.value = newLogTypeValue;
     }
+    console.log('logType: ', logType.value);
     let arg: any = {
       RivalID: userStore.id,
       Pagination: pagination,

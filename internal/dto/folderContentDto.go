@@ -14,8 +14,9 @@ type FolderContentDto struct {
 	Title      string
 	Comment    string
 
-	Lamp      int
-	TableTags []*DiffTableTagDto `gorm:"-"`
+	Lamp                int
+	BestRecordTimestamp int64
+	TableTags           []*DiffTableTagDto `gorm:"-"`
 	// Pagination
 	Page      int
 	PageSize  int

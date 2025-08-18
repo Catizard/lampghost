@@ -1,17 +1,18 @@
 <!-- Display one custom course's song list -->
 <template>
   <n-data-table :loading="loading" :columns="columns" :data="data" :bordered="false"
-    :row-key="(row: dto.RivalSongDataDto) => row.ID" />
+    :row-key="(row: dto.RivalSongDataDto) => row.ID" :rowClassName="rowClassName" />
 </template>
 
 <script lang="ts" setup>
-import ClearTag from '@/components/ClearTag.vue';
 import { useUserStore } from '@/stores/user';
 import { DeleteCustomCourseData, QueryCustomCourseSongListWithRival } from '@wailsjs/go/main/App';
 import { dto } from '@wailsjs/go/models';
 import { DataTableColumns, NButton, useDialog } from 'naive-ui';
 import { h, onMounted, Ref, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import SongClearParagraph from '@/components/SongClearParagraph.vue';
+import { queryClearTypeColorStyle } from '@/constants/cleartype';
 
 const loading = ref(false);
 const userStore = useUserStore();
@@ -30,7 +31,11 @@ const columns: DataTableColumns<dto.RivalSongDataDto> = [
     title: t('column.clear'), key: "Clear",
     width: "125px",
     render(row: dto.RivalSongDataDto) {
-      return h(ClearTag, { clear: row.Lamp })
+      return h(SongClearParagraph, {
+        clearType: row.Lamp,
+        scoreOption: null,
+        bestRecordTimestamp: row.BestRecordTimestamp,
+      });
     }
   },
   { title: t('column.minbp'), key: "MinBP", width: "75px", },
@@ -65,6 +70,10 @@ const columns: DataTableColumns<dto.RivalSongDataDto> = [
   }
 ];
 
+function rowClassName(row: dto.RivalSongDataDto): string {
+  return queryClearTypeColorStyle(row.Lamp).text;
+}
+
 function loadData() {
   loading.value = true;
   QueryCustomCourseSongListWithRival({
@@ -89,4 +98,6 @@ watch(props, () => {
 });
 </script>
 
-<style lang="css" scoped></style>
+<style lang="css" scoped>
+@import "@/assets/css/clearBackground.css";
+</style>

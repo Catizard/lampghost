@@ -1,16 +1,17 @@
 <template>
   <n-data-table remote :loading="loading" :columns="columns" :data="data" :pagination="pagination" :bordered="false"
-    :row-key="(row: dto.FolderDto) => row.ID" v-model:checked-row-keys="checkedRowKeys" />
+    :row-key="(row: dto.FolderDto) => row.ID" v-model:checked-row-keys="checkedRowKeys" :rowClassName="rowClassName" />
 </template>
 
 <script lang="ts" setup>
 import { dto } from '@wailsjs/go/models';
-import { create, DataTableColumns, NButton } from 'naive-ui';
+import { DataTableColumns, NButton } from 'naive-ui';
 import { h, reactive, Ref, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import ClearTag from '@/components/ClearTag.vue';
 import { DelFolderContent, QueryFolderContentWithRival } from '@wailsjs/go/main/App';
 import TableTags from '@/components/TableTags.vue';
+import SongClearParagraph from '@/components/SongClearParagraph.vue';
+import { queryClearTypeColorStyle } from '@/constants/cleartype';
 
 const loading = ref(false);
 const { t } = useI18n();
@@ -66,10 +67,13 @@ function createColumns(): DataTableColumns<dto.FolderContentDto> {
       }
     },
     {
-      title: t('column.clear'), key: "Clear",
-      width: "125px",
+      title: t('column.clear'), key: "Clear", width: "125px", align: "center", className: "clearColumn",
       render: (row: dto.FolderContentDto) => {
-        return h(ClearTag, { clear: row.Lamp },)
+        return h(SongClearParagraph, {
+          clearType: row.Lamp,
+          scoreOption: null,
+          bestRecordTimestamp: row.BestRecordTimestamp,
+        });
       }
     },
   );
@@ -113,6 +117,10 @@ function loadData() {
     .finally(() => loading.value = false)
 }
 
+function rowClassName(row: dto.FolderContentDto): string {
+  return queryClearTypeColorStyle(row.Lamp).text;
+}
+
 function deleteFolderContent(id: number) {
   DelFolderContent(id)
     .then((result) => {
@@ -129,3 +137,7 @@ watch([() => folderId, () => rivalId], () => {
 });
 loadData();
 </script>
+
+<style lang="css" scoped>
+@import "@/assets/css/clearBackground.css";
+</style>

@@ -149,7 +149,6 @@ watch(currentDiffTableID, (newID: string | number) => {
 
 <style lang="css" scoped>
 /* background color when clearing whole difficult level */
-/* NOTE: This color style is actually different with ClearTag, so no code reuse here */
 :deep(.row-EASY > td) {
   background-color: rgba(200, 247, 212, 0.7) !important;
 }

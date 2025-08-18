@@ -45,7 +45,7 @@ func findFolderContentListWithRival(tx *gorm.DB, filter *vo.FolderContentVo) ([]
 		pagination(filter.Pagination),
 	)
 	partial = partial.Joins(`left join (
-		select max(clear) as Lamp, count(1) as PlayCount, rsl.sha256
+		select max(clear) as Lamp, count(1) as PlayCount, rsl.sha256, rsl.record_time
 		from rival_score_log rsl
 		where rsl.rival_id = ?
 		group by rsl.sha256
@@ -53,7 +53,8 @@ func findFolderContentListWithRival(tx *gorm.DB, filter *vo.FolderContentVo) ([]
 
 	fields := `
 		folder_content.*,
-		rsl.Lamp as Lamp, rsl.PlayCount as PlayCount
+		rsl.Lamp as Lamp, rsl.PlayCount as PlayCount,
+    strftime("%s", rsl.record_time) as BestRecordTimestamp
 	`
 
 	if err := partial.Select(fields).Find(&contents).Error; err != nil {

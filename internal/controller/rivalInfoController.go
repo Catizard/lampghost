@@ -46,8 +46,6 @@ func (ctl *RivalInfoController) ChooseBeatorajaDirectory() result.RtnData {
 	return result.NewRtnData(meta)
 }
 
-// TODO: Seperate songdata.db file feature doesn't implement yet, this function would
-// not save the songdata.db file path parameter
 func (ctl *RivalInfoController) AddRivalInfo(rivalInfo *vo.RivalInfoVo) result.RtnMessage {
 	log.Info("[Controller] calling RivalInfoController.AddRivalInfo")
 	err := ctl.rivalInfoService.AddRivalInfo(rivalInfo)

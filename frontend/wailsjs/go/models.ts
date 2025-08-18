@@ -411,6 +411,7 @@ export namespace dto {
 	    Title: string;
 	    Comment: string;
 	    Lamp: number;
+	    BestRecordTimestamp: number;
 	    TableTags: DiffTableTagDto[];
 	    Page: number;
 	    PageSize: number;
@@ -430,6 +431,7 @@ export namespace dto {
 	        this.Title = source["Title"];
 	        this.Comment = source["Comment"];
 	        this.Lamp = source["Lamp"];
+	        this.BestRecordTimestamp = source["BestRecordTimestamp"];
 	        this.TableTags = this.convertValues(source["TableTags"], DiffTableTagDto);
 	        this.Page = source["Page"];
 	        this.PageSize = source["PageSize"];

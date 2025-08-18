@@ -50,10 +50,16 @@ func findFolderContentListWithRival(tx *gorm.DB, filter *vo.FolderContentVo) ([]
 		where rsl.rival_id = ?
 		group by rsl.sha256
 	) as rsl on rsl.sha256 = folder_content.sha256`, filter.RivalID)
+	partial = partial.Joins(`left join (
+    select sha256, sub_title, artist
+    from rival_song_data rsd
+    group by rsd.sha256
+  ) rsd on rsd.sha256 = folder_content.sha256`)
 
 	fields := `
 		folder_content.*,
 		rsl.Lamp as Lamp, rsl.PlayCount as PlayCount,
+    rsd.sub_title, rsd.artist,
     strftime("%s", rsl.record_time) as BestRecordTimestamp
 	`
 

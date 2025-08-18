@@ -410,6 +410,8 @@ export namespace dto {
 	    Md5: string;
 	    Title: string;
 	    Comment: string;
+	    SubTitle: string;
+	    Artist: string;
 	    Lamp: number;
 	    BestRecordTimestamp: number;
 	    TableTags: DiffTableTagDto[];
@@ -430,6 +432,8 @@ export namespace dto {
 	        this.Md5 = source["Md5"];
 	        this.Title = source["Title"];
 	        this.Comment = source["Comment"];
+	        this.SubTitle = source["SubTitle"];
+	        this.Artist = source["Artist"];
 	        this.Lamp = source["Lamp"];
 	        this.BestRecordTimestamp = source["BestRecordTimestamp"];
 	        this.TableTags = this.convertValues(source["TableTags"], DiffTableTagDto);

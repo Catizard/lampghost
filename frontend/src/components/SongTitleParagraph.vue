@@ -14,7 +14,7 @@ import { WarningOutline } from '@vicons/ionicons5';
 import { dto } from '@wailsjs/go/models';
 
 const { data, lost } = defineProps<{
-  data: dto.RivalScoreLogDto | dto.RivalScoreDataLogDto | dto.DiffTableDataDto | dto.RivalSongDataDto
+  data: dto.RivalScoreLogDto | dto.RivalScoreDataLogDto | dto.DiffTableDataDto | dto.RivalSongDataDto | dto.FolderContentDto
   lost?: boolean
 }>();
 </script>

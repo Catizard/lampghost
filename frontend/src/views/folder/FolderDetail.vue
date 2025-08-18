@@ -12,6 +12,7 @@ import { DelFolderContent, QueryFolderContentWithRival } from '@wailsjs/go/main/
 import TableTags from '@/components/TableTags.vue';
 import SongClearParagraph from '@/components/SongClearParagraph.vue';
 import { queryClearTypeColorStyle } from '@/constants/cleartype';
+import SongTitleParagraph from '@/components/SongTitleParagraph.vue';
 
 const loading = ref(false);
 const { t } = useI18n();
@@ -51,7 +52,12 @@ function createColumns(): DataTableColumns<dto.FolderContentDto> {
     });
   }
   columns.push(
-    { title: t('column.name'), key: "Title" },
+    {
+      title: t('column.name'), key: "Title",
+      render(row: dto.FolderContentDto) {
+        return h(SongTitleParagraph, { data: row });
+      }
+    },
     {
       title: (): string => {
         if (type == "folder") {

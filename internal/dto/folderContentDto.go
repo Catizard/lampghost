@@ -14,6 +14,8 @@ type FolderContentDto struct {
 	Title      string
 	Comment    string
 
+	SubTitle            string
+	Artist              string
 	Lamp                int
 	BestRecordTimestamp int64
 	TableTags           []*DiffTableTagDto `gorm:"-"`

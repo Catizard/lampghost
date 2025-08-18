@@ -2,12 +2,14 @@
   <n-flex vertical align="center" :size="6">
     <strong style="font-size: 1.1em;">{{ clearType.clearText }}</strong>
     <!-- <small v-if="scoreOptionValue != null && clearTypeValue != ClearType.NO_PLAY">{{ scoreOption.text }}</small> -->
-    <small v-if="bestRecordTimestamp != null && clearTypeValue != ClearType.NO_PLAY">{{
-      dayjs(bestRecordTimestamp * 1000).format('YYYY-MM-DD') }}
-    </small>
-    <small v-else>
-      -
-    </small>
+    <template v-if="disableTimestamp == null || disableTimestamp == true">
+      <small v-if="bestRecordTimestamp != null && clearTypeValue != ClearType.NO_PLAY">{{
+        dayjs(bestRecordTimestamp * 1000).format('YYYY-MM-DD') }}
+      </small>
+      <small v-else>
+        -
+      </small>
+    </template>
   </n-flex>
 </template>
 
@@ -21,6 +23,7 @@ const { clearType: clearTypeValue, scoreOption: scoreOptionValue } = defineProps
   clearType: number,
   scoreOption?: number,
   bestRecordTimestamp?: number
+  disableTimestamp?: boolean
 }>();
 
 const clearType = computed<ClearTypeDef>(() => {

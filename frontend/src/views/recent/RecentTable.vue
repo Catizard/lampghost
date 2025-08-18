@@ -22,6 +22,7 @@ import SongTitleParagraph from '@/components/SongTitleParagraph.vue';
 import SongScoreParagraph from '@/components/SongScoreParagraph.vue';
 import { ClearType, ClearTypeDef, DefaultClearTypeColorStyle, queryClearTypeColorStyle } from '@/constants/cleartype';
 import SongClearParagraph from '@/components/SongClearParagraph.vue';
+import RecordTimeParagraph from '@/components/RecordTimeParagraph.vue';
 
 type PlayLog = dto.RivalScoreLogDto | dto.RivalScoreDataLogDto;
 type SongInfo = {
@@ -61,7 +62,7 @@ function createColumns(useScorelog: boolean): DataTableColumns<PlayLog> {
       }
     },
     {
-      title: t('column.clear'), key: "Clear", width: "150px", resizable: true, className: "clearColumn",
+      title: t('column.clear'), key: "Clear", width: "140px", resizable: true, className: "clearColumn",
       render(row: PlayLog) {
         const p = { clearType: row.Clear, scoreOption: null };
         if (!useScorelog) {
@@ -87,22 +88,17 @@ function createColumns(useScorelog: boolean): DataTableColumns<PlayLog> {
 
   ret.push(...[
     {
-      title: t('column.minbp'), key: "MinBP", width: "100px", resizable: true,
+      title: t('column.minbp'), key: "MinBP", width: "100px", resizable: true, align: "center",
       render(row: PlayLog) {
         return row.Minbp;
       }
     },
     {
-      title: t('column.recordTime'), key: "RecordTime", width: "120px", resizable: true,
+      title: t('column.recordTime'), key: "RecordTime", width: "120px", resizable: true, align: "center",
       render(row: PlayLog) {
-        return h(
-          NTooltip,
-          { trigger: "hover" },
-          {
-            trigger: () => dayjs(row.RecordTime).format('YYYY-MM-DD'),
-            default: () => dayjs(row.RecordTime).format('YYYY-MM-DD HH:mm:ss'),
-          }
-        );
+        return h(RecordTimeParagraph, {
+          recordTimestamp: row.RecordTime
+        })
       }
     },
     {
@@ -128,7 +124,7 @@ function createColumns(useScorelog: boolean): DataTableColumns<PlayLog> {
           { default: () => h(NButton, null, { default: () => '...' }) }
         );
       }
-    }]);
+    }] as DataTableColumns<PlayLog>);
 
   return ret;
 }

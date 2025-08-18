@@ -1,5 +1,5 @@
 <template>
-  <template v-if="recordTimestamp == null">/</template>
+  <template v-if="recordTimestamp == null">-</template>
   <template v-else>
     <n-flex vertical :size="4">
       <n-text style="font-size: 1em;">{{ dayjs(recordTimestamp).format("YYYY-MM-DD") }}</n-text>

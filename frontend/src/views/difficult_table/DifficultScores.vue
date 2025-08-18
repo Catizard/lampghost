@@ -4,7 +4,7 @@
       <n-text type="primary">{{ t('title.tableStatistics') }}</n-text>
     </n-h1>
   </n-flex>
-  <n-flex justify="start">
+  <n-flex justify="start" style="margin-bottom: 8px;">
     <SelectDifficultTable v-model:value="currentDiffTableID" style="width: 200px;" />
     <SelectRival v-model:value="currentRivalID" width="200px" :placeholder="t('form.placeholderRival')" clearable />
     <SelectRivalTag v-model:value="currentRivalTagID" :rivalId="currentRivalID" width="200px"
@@ -35,7 +35,7 @@ const currentDiffTableID: Ref<number | null> = ref(null);
 
 const columns: DataTableColumns<dto.DiffTableHeaderDto> = [
   {
-    type: "expand",
+    type: "expand", align: "center",
     renderExpand: (row: dto.DiffTableHeaderDto) => {
       return h(
         DifficultTableDetail,
@@ -48,48 +48,52 @@ const columns: DataTableColumns<dto.DiffTableHeaderDto> = [
       )
     }
   },
-  { title: "Level", key: "Name" },
+  { title: "Level", key: "Name", align: "center" },
   {
-    title: "Failed", key: "FailCount",
-    render: (row: dto.DiffTableHeaderDto) => {
-      return (row.LampCount[ClearType.Failed] ?? 0)
+    title: "Failed", key: "FailCount", align: "center",
+    render(row: dto.DiffTableHeaderDto): number | string {
+      return positiveOrEmpty(
+        (row.LampCount[ClearType.Failed] ?? 0)
         + (row.LampCount[ClearType.AssistEasy] ?? 0)
-        + (row.LampCount[ClearType.LightAssistEasy] ?? 0);
+        + (row.LampCount[ClearType.LightAssistEasy] ?? 0)
+      );
     }
   },
   {
-    title: "Easy Clear", key: "ECCount",
-    render: (row: dto.DiffTableHeaderDto) => {
-      return row.LampCount[ClearType.Easy] ?? 0
+    title: "Easy Clear", key: "ECCount", align: "center",
+    render(row: dto.DiffTableHeaderDto): number | string {
+      return positiveOrEmpty(row.LampCount[ClearType.Easy] ?? 0);
     }
   },
   {
-    title: "Normal Clear", key: "NCCount",
-    render: (row: dto.DiffTableHeaderDto) => {
-      return row.LampCount[ClearType.Normal] ?? 0;
+    title: "Normal Clear", key: "NCCount", align: "center",
+    render(row: dto.DiffTableHeaderDto): number | string {
+      return positiveOrEmpty(row.LampCount[ClearType.Normal] ?? 0);
     }
   },
   {
-    title: "Hard Clear", key: "HCCount",
-    render: (row: dto.DiffTableHeaderDto) => {
-      return row.LampCount[ClearType.Hard] ?? 0;
+    title: "Hard Clear", key: "HCCount", align: "center",
+    render(row: dto.DiffTableHeaderDto): number | string {
+      return positiveOrEmpty(row.LampCount[ClearType.Hard] ?? 0);
     }
   },
   {
-    title: "EX Hard Clear", key: "EXHCCount",
-    render: (row: dto.DiffTableHeaderDto) => {
-      return row.LampCount[ClearType.ExHard] ?? 0;
+    title: "EX Hard Clear", key: "EXHCCount", align: "center",
+    render(row: dto.DiffTableHeaderDto): number | string {
+      return positiveOrEmpty(row.LampCount[ClearType.ExHard] ?? 0);
     }
   },
   {
-    title: "Full Combo+", key: "FCPlusCount",
-    render: (row: dto.DiffTableHeaderDto) => {
-      return (row.LampCount[ClearType.FullCombo] ?? 0)
+    title: "Full Combo+", key: "FCPlusCount", align: "center",
+    render(row: dto.DiffTableHeaderDto): number | string {
+      return positiveOrEmpty(
+        (row.LampCount[ClearType.FullCombo] ?? 0)
         + (row.LampCount[ClearType.Perfect] ?? 0)
-        + (row.LampCount[ClearType.Max] ?? 0);
+        + (row.LampCount[ClearType.Max] ?? 0)
+      );
     }
   },
-  { title: "Chart Count", key: "SongCount" },
+  { title: "Chart Count", key: "SongCount", align: "center" },
 ];
 
 // NOTE: we don't build failed lamp marker, that means nothing for user
@@ -100,10 +104,10 @@ function rowClassName(row: dto.DiffTableHeaderDto): string {
     if (sum == row.SongCount && v != ClearType.Failed) {
       // I don't have a better idea for managing this
       const def: ClearTypeDef = DefaultClearTypeColorStyle[k];
-      return "row-" + def.text;
+      return `row-${def.text}`;
     }
   }
-  return ""
+  return "";
 }
 const data: Ref<Array<dto.DiffTableHeaderDto>> = ref([]);
 const pagination = false as const;
@@ -128,6 +132,10 @@ function loadLevelTableData(difftableID: string | number) {
     })
     .catch(err => window.$notifyError(err))
     .finally(() => levelTableLoading.value = false);
+}
+
+function positiveOrEmpty(v: number): number | string {
+  return v == 0 ? "" : v;
 }
 
 const currentRivalID: Ref<number | null> = ref(null);
@@ -168,5 +176,14 @@ watch(currentDiffTableID, (newID: string | number) => {
 
 :deep(.row-MAX > td) {
   background-color: rgba(255, 241, 202, 0.7) !important;
+}
+
+/*
+* header row
+* NOTE: This also overrides DifficultTableDetail.vue's header
+*/
+:deep(th.n-data-table-th) {
+  font-weight: bold;
+  font-size: 1.1em;
 }
 </style>

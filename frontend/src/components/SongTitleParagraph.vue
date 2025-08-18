@@ -1,11 +1,11 @@
 <template>
-  <n-flex vertical :size="2">
+  <n-flex vertical :size="4">
     <n-flex>
       <n-icon v-if="lost" :component="WarningOutline" color="red" />
-      <strong>{{ data.Title }}</strong>
+      <strong style="font-size: 1.1em;">{{ data.Title }}</strong>
     </n-flex>
-    <n-text v-if="data.SubTitle != ''" depth="2" style="font-size: 11;">{{ data.SubTitle }}</n-text>
-    <n-text v-if="data.Artist != ''" depth="3" style="font-size: 9;">{{ data.Artist }}</n-text>
+    <n-text v-if="data.SubTitle != ''" depth="2" style="font-size: 0.9em;">{{ data.SubTitle }}</n-text>
+    <n-text v-if="data.Artist != ''" depth="3" style="font-size: 0.9em;">{{ data.Artist }}</n-text>
   </n-flex>
 </template>
 

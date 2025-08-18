@@ -343,7 +343,7 @@ export namespace dto {
 	    NoTagBuild?: number;
 	    Contents: DiffTableDataDto[];
 	    SortedLevels: string[];
-	    LevelLayeredContents: Record<string, DiffTableDataDto[]>;
+	    LevelLayeredContents: Record<string, Array<DiffTableDataDto>>;
 	    Level: string;
 	    Children: DiffTableHeaderDto[];
 	    LampCount: Record<number, number>;
@@ -369,7 +369,7 @@ export namespace dto {
 	        this.NoTagBuild = source["NoTagBuild"];
 	        this.Contents = this.convertValues(source["Contents"], DiffTableDataDto);
 	        this.SortedLevels = source["SortedLevels"];
-	        this.LevelLayeredContents = this.convertValues(source["LevelLayeredContents"], DiffTableDataDto[], true);
+	        this.LevelLayeredContents = this.convertValues(source["LevelLayeredContents"], Array<DiffTableDataDto>, true);
 	        this.Level = source["Level"];
 	        this.Children = this.convertValues(source["Children"], DiffTableHeaderDto);
 	        this.LampCount = source["LampCount"];

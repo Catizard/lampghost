@@ -1,6 +1,6 @@
 <template>
-  <n-flex vertical align="center">
-    <strong>{{ clearType.clearText }}</strong>
+  <n-flex vertical align="center" :size="6">
+    <strong style="font-size: 1.1em;">{{ clearType.clearText }}</strong>
     <!-- <small v-if="scoreOptionValue != null && clearTypeValue != ClearType.NO_PLAY">{{ scoreOption.text }}</small> -->
     <small v-if="bestRecordTimestamp != null && clearTypeValue != ClearType.NO_PLAY">{{
       dayjs(bestRecordTimestamp * 1000).format('YYYY-MM-DD') }}
@@ -31,3 +31,9 @@ const scoreOption = computed<ScoreOptionDef>(() => {
   return queryScoreOptionColorStyle(scoreOptionValue);
 });
 </script>
+
+<style lang="css" scoped>
+small {
+  font-size: 0.85em;
+}
+</style>

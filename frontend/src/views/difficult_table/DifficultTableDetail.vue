@@ -13,7 +13,6 @@ import { dto } from '@wailsjs/go/models';
 import { h, reactive, ref, Ref, watch } from 'vue';
 import { BindSongToFolder, QueryDiffTableDataWithRival, SubmitSingleMD5DownloadTask } from '@wailsjs/go/main/App';
 import SelectFolder from '@/views/folder/SelectFolder.vue';
-import ClearTag from '@/components/ClearTag.vue';
 import ChartPreview from '@/components/ChartPreview.vue';
 import { useI18n } from 'vue-i18n';
 import { BrowserOpenURL } from '@wailsjs/runtime/runtime';
@@ -23,7 +22,8 @@ import { useUserStore } from '@/stores/user';
 import SongTitleParagraph from '@/components/SongTitleParagraph.vue';
 import SongScoreParagraph from '@/components/SongScoreParagraph.vue';
 import SongClearParagraph from '@/components/SongClearParagraph.vue';
-import { ClearType, ClearTypeDef, DefaultClearTypeColorStyle } from '@/constants/cleartype';
+import RecordTimeParagraph from '@/components/RecordTimeParagraph.vue';
+import { ClearType, ClearTypeDef, DefaultClearTypeColorStyle, queryClearTypeColorStyle } from '@/constants/cleartype';
 
 const i18n = useI18n();
 const { t } = i18n;
@@ -51,7 +51,7 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
     }
   },
   {
-    title: t('column.score'), key: "Score", width: "110px", resizable: true, align: "center",
+    title: t('column.score'), key: "Score", width: "100px", resizable: true, align: "center",
     render(row: dto.DiffTableDataDto) {
       return h(SongScoreParagraph, { data: row });
     }
@@ -82,21 +82,21 @@ const columns: DataTableColumns<dto.DiffTableDataDto> = [
   {
     title: t('column.lastPlayed'), key: "LastPlayedTimestamp", width: "135px", resizable: true, sorter: true, align: "center",
     render(row: dto.DiffTableDataDto) {
-      if (row.LastPlayedTimestamp == 0) {
-        return "/";
-      }
-      // return dayjs(row.LastPlayedTimestamp * 1000).format("YYYY-MM-DD HH:mm:ss");
-      return h(
-        NTooltip,
-        { trigger: "hover" },
-        {
-          trigger: () => dayjs(row.LastPlayedTimestamp * 1000).format("YYYY-MM-DD"),
-          default: () => dayjs(row.LastPlayedTimestamp * 1000).format("YYYY-MM-DD HH:mm:ss")
-        }
-      );
+      return h(RecordTimeParagraph, {
+        recordTimestamp: row.LastPlayedTimestamp == 0 ? null : row.LastPlayedTimestamp * 1000
+      });
     }
   },
-  { title: t('column.playCount'), key: "PlayCount", width: "100px", align: "center" },
+  {
+    title: t('column.playCount'), key: "PlayCount", width: "110px", align: "center",
+    render(row: dto.DiffTableDataDto) {
+      return h(NText, {
+        style: {
+          fontSize: "1.25em"
+        }
+      }, { default: () => row.PlayCount });
+    }
+  },
   {
     title: t('column.actions'), key: "actions", resizable: true, width: "90px", align: "center",
     render(row: dto.DiffTableDataDto) {
@@ -245,19 +245,9 @@ function handleSubmitSingleMD5DownloadTask(row: dto.DiffTableDataDto) {
 }
 
 function rowClassName(row: dto.DiffTableDataDto): string {
-  let clearText = "";
-  let ghostClearText = "";
-  for (const [k, v] of Object.entries(ClearType).reverse()) {
-    if (row.Lamp == parseInt(k)) {
-      const def: ClearTypeDef = DefaultClearTypeColorStyle[k];
-      clearText = def.text;
-    }
-    if (row.GhostLamp == parseInt(k)) {
-      const def: ClearTypeDef = DefaultClearTypeColorStyle[k];
-      ghostClearText = "ghost-" + def.text;
-    }
-  }
-  return clearText + " " + ghostClearText;
+  let clearText = queryClearTypeColorStyle(row.Lamp).text;
+  let ghostClearText = queryClearTypeColorStyle(row.GhostLamp).text;
+  return `${clearText} ghost-${ghostClearText}`
 }
 
 loadData();

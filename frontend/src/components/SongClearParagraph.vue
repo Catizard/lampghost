@@ -2,7 +2,7 @@
   <n-flex vertical align="center" :size="6">
     <strong style="font-size: 1.1em;">{{ clearType.clearText }}</strong>
     <!-- <small v-if="scoreOptionValue != null && clearTypeValue != ClearType.NO_PLAY">{{ scoreOption.text }}</small> -->
-    <template v-if="disableTimestamp == null || disableTimestamp == true">
+    <template v-if="!disableTimestamp">
       <small v-if="bestRecordTimestamp != null && clearTypeValue != ClearType.NO_PLAY">{{
         dayjs(bestRecordTimestamp * 1000).format('YYYY-MM-DD') }}
       </small>
@@ -19,7 +19,7 @@ import { queryScoreOptionColorStyle, ScoreOptionDef } from '@/constants/scoreOpt
 import dayjs from 'dayjs';
 import { computed } from 'vue';
 
-const { clearType: clearTypeValue, scoreOption: scoreOptionValue } = defineProps<{
+const { clearType: clearTypeValue, scoreOption: scoreOptionValue, bestRecordTimestamp, disableTimestamp = false } = defineProps<{
   clearType: number,
   scoreOption?: number,
   bestRecordTimestamp?: number

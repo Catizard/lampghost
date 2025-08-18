@@ -64,7 +64,7 @@ function createColumns(useScorelog: boolean): DataTableColumns<PlayLog> {
     {
       title: t('column.clear'), key: "Clear", width: "140px", resizable: true, className: "clearColumn",
       render(row: PlayLog) {
-        const p = { clearType: row.Clear, scoreOption: null };
+        const p = { clearType: row.Clear, scoreOption: null, disableTimestamp: true };
         if (!useScorelog) {
           p.scoreOption = (row as dto.RivalScoreDataLogDto).Option;
         }

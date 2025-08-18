@@ -10,6 +10,7 @@ import (
 	"github.com/Catizard/lampghost_wails/internal/config/download"
 	"github.com/Catizard/lampghost_wails/internal/result"
 	"github.com/Catizard/lampghost_wails/internal/service"
+	"github.com/charmbracelet/log"
 	"github.com/rotisserie/eris"
 )
 
@@ -54,6 +55,7 @@ func (ctl *ConfigController) ReadConfig() result.RtnData {
 }
 
 func (ctl *ConfigController) WriteConfig(conf *config.ApplicationConfig) result.RtnMessage {
+	log.Debugf("[Controller] calling ConfigController.WriteConfig")
 	if err := ctl.service.WriteConfig(conf); err != nil {
 		return result.NewErrorMessage(err)
 	}

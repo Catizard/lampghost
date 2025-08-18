@@ -129,6 +129,7 @@ func (s *DownloadTaskService) debugProgress() {
 func (s *DownloadTaskService) listenUpdateConfig() {
 	for {
 		<-s.subscribeConfigChange
+		log.Debugf("[DownloadTaskService] received config change notification")
 		go func() {
 			s.lock()
 			log.Debugf("[DownloadTaskService] updating config")

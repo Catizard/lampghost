@@ -46,6 +46,7 @@ func NewCourseInfoSerivce(db *gorm.DB, conf *config.ApplicationConfig, configNot
 func (s *CourseInfoService) listenUpdateConfig() {
 	for {
 		<-s.configNotify
+		log.Debugf("[CourseInfoService] received config change notification")
 		go func() {
 			log.Debugf("[CourseInfoService] updating config")
 			if conf, err := config.ReadConfig(); err != nil {

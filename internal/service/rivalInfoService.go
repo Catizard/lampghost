@@ -42,12 +42,14 @@ func NewRivalInfoService(db *gorm.DB, monitorService *MonitorService, useScoreda
 		subscribeConfigChange:   configNotify,
 	}
 	go ret.listen()
+	go ret.listenUpdateConfig()
 	return ret
 }
 
 func (s *RivalInfoService) listenUpdateConfig() {
 	for {
 		<-s.subscribeConfigChange
+		log.Debugf("[RivalInfoService] received config change notification")
 		go func() {
 			s.mutex.Lock()
 			log.Debugf("[RivalInfoService] updating config")

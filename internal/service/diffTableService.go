@@ -43,6 +43,7 @@ func NewDiffTableService(db *gorm.DB, downloadTaskService *DownloadTaskService, 
 func (s *DiffTableService) listenUpdateConfig() {
 	for {
 		<-s.subscribeConfigChange
+		log.Debugf("[DiffTableService] received config change notification")
 		go func() {
 			s.mutex.Lock()
 			log.Debugf("[DiffTableService] updating config")

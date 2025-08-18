@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/Catizard/lampghost_wails/internal/config"
+	"github.com/charmbracelet/log"
 	"gorm.io/gorm"
 )
 
@@ -35,7 +36,8 @@ func (s *ConfigService) Subscribe() <-chan any {
 func (s *ConfigService) publish() {
 	for {
 		notify := <-s.dirty
-		for _, ch := range s.subscribes {
+		for i, ch := range s.subscribes {
+			log.Debugf("[ConfigService] sending notification to %d/%v", i, ch)
 			ch <- notify
 		}
 	}

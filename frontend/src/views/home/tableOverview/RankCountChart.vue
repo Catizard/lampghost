@@ -47,29 +47,29 @@ const STR_REVERSE_RANKS = [
   "F",
 ];
 
-const REVERSE_RANK_COLOR = [
-  "#FFFFFF",
-  "#CC5C76",
-  "#CC5C76",
-  "#49E670",
-  "#4FBCF7",
-  "#FF6B74",
-  "#FFAD70",
-  "#FFD251",
-  "#FFFF21",
-  "#FFE270",
-];
 const RANK_COLOR = [
   "#FFFFFF",
+  "#8C8C8C",
+  "#B2A2FF",
+  "#FF9FF9",
+  "#49E670",
+  "#4FBCF7",
+  "#FF6B74",
+  "#FFAD70",
   "#FFD251",
+  "#FFD251",
+];
+const REVERSE_RANK_COLOR = [
+  "#FFFFFF",
   "#FFD251",
   "#FFD251",
   "#FFAD70",
   "#FF6B74",
   "#4FBCF7",
   "#49E670",
-  "#CC5C76",
-  "#CC5C76",
+  "#FF9FF9",
+  "#B2A2FF",
+  "#8C8C8C",
 ];
 
 // NOTE: ApexCharts Vue doesn't give any responses if we changed rankCountChartOptions.colors

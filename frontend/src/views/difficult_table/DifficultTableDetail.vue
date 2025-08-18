@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import { DataTableColumns, DataTableSortState, NButton, NDropdown, NFlex, NText, NTooltip } from 'naive-ui';
+import { DataTableColumns, DataTableSortState, NButton, NDropdown, NText } from 'naive-ui';
 import { dto } from '@wailsjs/go/models';
 import { h, reactive, ref, Ref, watch } from 'vue';
 import { BindSongToFolder, QueryDiffTableDataWithRival, SubmitSingleMD5DownloadTask } from '@wailsjs/go/main/App';
@@ -17,13 +17,12 @@ import ChartPreview from '@/components/ChartPreview.vue';
 import { useI18n } from 'vue-i18n';
 import { BrowserOpenURL } from '@wailsjs/runtime/runtime';
 import SelectDifficult from '../custom_table/SelectDifficult.vue';
-import dayjs from 'dayjs';
 import { useUserStore } from '@/stores/user';
 import SongTitleParagraph from '@/components/SongTitleParagraph.vue';
 import SongScoreParagraph from '@/components/SongScoreParagraph.vue';
 import SongClearParagraph from '@/components/SongClearParagraph.vue';
 import RecordTimeParagraph from '@/components/RecordTimeParagraph.vue';
-import { ClearType, ClearTypeDef, DefaultClearTypeColorStyle, queryClearTypeColorStyle } from '@/constants/cleartype';
+import { queryClearTypeColorStyle } from '@/constants/cleartype';
 
 const i18n = useI18n();
 const { t } = i18n;

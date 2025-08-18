@@ -1,15 +1,17 @@
 <!-- Display one course's song list -->
 <template>
   <n-data-table :loading="loading" :columns="columns" :data="data" :boarded="false"
-    :row-key="(row: dto.RivalSongDataDto) => row.ID" />
+    :row-key="(row: dto.RivalSongDataDto) => row.ID" :rowClassName="rowClassName" />
 </template>
 
 <script setup lang="ts">
-import ClearTag from '@/components/ClearTag.vue';
+import SongClearParagraph from '@/components/SongClearParagraph.vue';
+import SongTitleParagraph from '@/components/SongTitleParagraph.vue';
+import { queryClearTypeColorStyle } from '@/constants/cleartype';
 import { useUserStore } from '@/stores/user';
 import { QueryCourseSongListWithRival } from '@wailsjs/go/main/App';
 import { dto } from '@wailsjs/go/models';
-import { DataTableColumns, NButton, useDialog } from 'naive-ui';
+import { DataTableColumns } from 'naive-ui';
 import { h, onMounted, Ref, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -25,23 +27,41 @@ const props = defineProps<{
 
 let data: Ref<dto.RivalSongDataDto[]> = ref([]);
 const columns: DataTableColumns<dto.RivalSongDataDto> = [
-  { title: t('column.name'), key: "Title" },
   {
-    title: t('column.clear'), key: "Clear",
-    width: "125px",
+    title: t('column.name'), key: "Title",
     render(row: dto.RivalSongDataDto) {
-      return h(ClearTag, { clear: row.Lamp })
+      return h(SongTitleParagraph, { data: row });
+    }
+  },
+  {
+    title: t('column.clear'), key: "Clear", width: "140px", className: "clearColumn",
+    render(row: dto.RivalSongDataDto) {
+      return h(SongClearParagraph, {
+        clearType: row.Lamp,
+        scoreOption: null,
+        bestRecordTimestamp: row.BestRecordTimestamp != 0 ? row.BestRecordTimestamp : null
+      });
     }
   },
   { title: t('column.minbp'), key: "MinBP", width: "75px", },
   {
-    title: t('column.ghost'), key: "GhostLamp", width: "125px",
+    title: t('column.ghost'), key: "GhostLamp", width: "140px", className: "ghostClearColumn",
     render(row: dto.RivalSongDataDto) {
-      return h(ClearTag, { clear: row.GhostLamp, },)
+      return h(SongClearParagraph, {
+        clearType: row.GhostLamp,
+        scoreOption: null,
+        bestRecordTimestamp: null,
+      });
     }
   },
   { title: t('column.minbp'), key: "GhostMinBP", width: "75px", },
 ];
+
+function rowClassName(row: dto.RivalSongDataDto): string {
+  let clearText = queryClearTypeColorStyle(row.Lamp).text;
+  let ghostClearText = queryClearTypeColorStyle(row.GhostLamp).text;
+  return `${clearText} ghost-${ghostClearText}`;
+}
 
 function loadData() {
   loading.value = true;
@@ -69,3 +89,7 @@ watch(props, () => {
   loadData();
 });
 </script>
+
+<style lang="css" scoped>
+@import "@/assets/css/clearBackground.css";
+</style>

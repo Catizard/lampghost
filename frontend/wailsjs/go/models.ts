@@ -62,8 +62,9 @@ export namespace dto {
 	    NoSepJoinedSha256s: string;
 	    Constraints: string;
 	    Clear: number;
-	    // Go type: time
-	    FirstClearTimestamp: any;
+	    FirstClearTimestamp: number;
+	    GhostClear: number;
+	    GhostFirstClearTimestamp: number;
 	    Constraint: string[];
 	
 	    static createFrom(source: any = {}) {
@@ -82,27 +83,11 @@ export namespace dto {
 	        this.NoSepJoinedSha256s = source["NoSepJoinedSha256s"];
 	        this.Constraints = source["Constraints"];
 	        this.Clear = source["Clear"];
-	        this.FirstClearTimestamp = this.convertValues(source["FirstClearTimestamp"], null);
+	        this.FirstClearTimestamp = source["FirstClearTimestamp"];
+	        this.GhostClear = source["GhostClear"];
+	        this.GhostFirstClearTimestamp = source["GhostFirstClearTimestamp"];
 	        this.Constraint = source["Constraint"];
 	    }
-	
-		convertValues(a: any, classs: any, asMap: boolean = false): any {
-		    if (!a) {
-		        return a;
-		    }
-		    if (a.slice && a.map) {
-		        return (a as any[]).map(elem => this.convertValues(elem, classs));
-		    } else if ("object" === typeof a) {
-		        if (asMap) {
-		            for (const key of Object.keys(a)) {
-		                a[key] = new classs(a[key]);
-		            }
-		            return a;
-		        }
-		        return new classs(a);
-		    }
-		    return a;
-		}
 	}
 	export class CustomCourseDataDto {
 	    ID: number;
@@ -920,6 +905,7 @@ export namespace dto {
 	    PageSize: number;
 	    PageCount: number;
 	    Lamp: number;
+	    BestRecordTimestamp: number;
 	    PlayCount: number;
 	    MinBP: number;
 	    GhostLamp: number;
@@ -964,6 +950,7 @@ export namespace dto {
 	        this.PageSize = source["PageSize"];
 	        this.PageCount = source["PageCount"];
 	        this.Lamp = source["Lamp"];
+	        this.BestRecordTimestamp = source["BestRecordTimestamp"];
 	        this.PlayCount = source["PlayCount"];
 	        this.MinBP = source["MinBP"];
 	        this.GhostLamp = source["GhostLamp"];

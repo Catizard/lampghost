@@ -102,9 +102,9 @@ func findRivalSongDataListWithRival(tx *gorm.DB, filter *vo.RivalSongDataVo) (ou
 
 	partial := tx.Table("rival_song_data").Scopes(scopeRivalSongDataFilter(filter))
 	partial = partial.Joins(`left join (
-    select rsl.clear as Lamp, rsl.PlayCount, rsl.minbp as MinBP, rsl.sha256
+    select rsl.clear as Lamp, rsl.PlayCount, rsl.minbp as MinBP, rsl.sha256, rsl.record_time as best_record_time
     from (
-      select rsl.clear, rsl.minbp, ROW_NUMBER() OVER w as rn, COUNT(1) OVER w as PlayCount, rsl.rival_id, rsl.sha256
+      select rsl.clear, rsl.minbp, ROW_NUMBER() OVER w as rn, COUNT(1) OVER w as PlayCount, rsl.rival_id, rsl.sha256, rsl.record_time
       from rival_score_log rsl
 			where rsl.rival_id = ?
       WINDOW w AS (PARTITION BY rsl.sha256 ORDER BY rsl.clear desc, rsl.minbp asc)
@@ -126,7 +126,7 @@ func findRivalSongDataListWithRival(tx *gorm.DB, filter *vo.RivalSongDataVo) (ou
 		partial = partial.Joins(`left join (
 			select rsl.clear as Lamp, rsl.PlayCount, rsl.minbp as MinBP, rsl.sha256
       from (
-        select rsl.clear, rsl.minbp, ROW_NUMBER() OVER w as rn, COUNT(1) OVER w as PlayCount, rsl.rival_id, rsl.sha256
+        select rsl.clear, rsl.minbp, ROW_NUMBER() OVER w as rn, COUNT(1) OVER w as PlayCount, rsl.rival_id, rsl.sha256, rsl.record_time
         from rival_score_log rsl
 				where rsl.rival_id = ?
         WINDOW w AS (PARTITION BY rsl.sha256 ORDER BY rsl.clear desc, rsl.minbp asc)
@@ -137,7 +137,8 @@ func findRivalSongDataListWithRival(tx *gorm.DB, filter *vo.RivalSongDataVo) (ou
 
 	fields := `
 		rival_song_data.*,
-		rsl.Lamp, rsl.PlayCount, rsl.MinBP
+		rsl.Lamp, rsl.PlayCount, rsl.MinBP,
+    strftime("%s", rsl.best_record_time) as BestRecordTimestamp
 	`
 	if filter.GhostRivalID > 0 {
 		fields = fields + ", ghost_rsl.Lamp as GhostLamp, ghost_rsl.PlayCount as GhostPlayCount, ghost_rsl.MinBP as GhostMinBP"

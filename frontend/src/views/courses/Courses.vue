@@ -10,7 +10,7 @@
   </n-flex>
   <n-spin :show="loading">
     <n-data-table :columns="columns" :data="data" :pagination="pagination" :bordered="false"
-      :row-key="(row: dto.CourseInfoDto) => row.ID" />
+      :row-key="(row: dto.CourseInfoDto) => row.ID" :rowClassName="rowClassName" />
   </n-spin>
 </template>
 
@@ -19,14 +19,14 @@ import { DataTableColumns } from 'naive-ui';
 import { dto } from '@wailsjs/go/models';
 import { ref, h, reactive, Ref, watch } from 'vue';
 import { FindCourseInfoListWithRival } from '@wailsjs/go/main/App';
-import ClearTag from "@/components/ClearTag.vue"
-import dayjs from 'dayjs'
 import { useI18n } from 'vue-i18n';
 import CourseTableDetail from './CourseTableDetail.vue';
 import SelectDifficultTable from '@/components/difficult_table/SelectDifficultTable.vue';
 import SelectRivalTag from '@/components/rivals/SelectRivalTag.vue';
 import SelectRival from '@/components/rivals/SelectRival.vue';
 import { useUserStore } from '@/stores/user';
+import SongClearParagraph from '@/components/SongClearParagraph.vue';
+import { ClearType, queryClearTypeColorStyle } from '@/constants/cleartype';
 
 const i18n = useI18n();
 const { t } = i18n;
@@ -68,29 +68,22 @@ function createColumns(): DataTableColumns<dto.CourseInfoDto> {
     { title: t('column.name'), key: "Name", },
     { title: t('column.constraints'), key: "Constraints" },
     {
-      title: t('column.clear'),
-      key: "Clear",
-      render(row) {
-        return h(
-          ClearTag,
-          {
-            clear: row.Clear
-          },
-        )
-      }
-    },
-    {
-      title: t('column.firstClearTime'),
-      key: "FirstClearTime",
+      title: t('column.clear'), key: "Clear", align: "center", className: "clearColumn",
       render(row: dto.CourseInfoDto) {
-        if (row.Clear > 1) {
-          return dayjs(row.FirstClearTimestamp).format('YYYY-MM-DD HH:mm:ss');
-        } else {
-          return "/";
-        }
+        return h(SongClearParagraph, {
+          clearType: row.Clear,
+          scoreOption: null,
+          bestRecordTimestamp: row.FirstClearTimestamp != 0 ? row.FirstClearTimestamp : null
+        });
       }
     },
   ]
+}
+
+function rowClassName(row: dto.CourseInfoDto): string {
+  let clearText = queryClearTypeColorStyle(row.Clear).text;
+  let ghostClearText = queryClearTypeColorStyle(row.GhostClear).text;
+  return `${clearText} ghost-${ghostClearText}`
 }
 
 const currentDiffTableID: Ref<number | null> = ref(null);
@@ -116,3 +109,7 @@ watch(currentDiffTableID, () => {
   loadData();
 });
 </script>
+
+<style lang="css" scoped>
+@import "@/assets/css/clearBackground.css";
+</style>

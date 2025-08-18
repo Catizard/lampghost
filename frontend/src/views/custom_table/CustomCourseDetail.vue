@@ -88,3 +88,5 @@ watch(props, () => {
   loadData();
 });
 </script>
+
+<style lang="css" scoped></style>

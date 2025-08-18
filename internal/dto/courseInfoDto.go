@@ -2,7 +2,6 @@ package dto
 
 import (
 	"strings"
-	"time"
 
 	"github.com/Catizard/lampghost_wails/internal/entity"
 )
@@ -18,9 +17,11 @@ type CourseInfoDto struct {
 	NoSepJoinedSha256s string
 	Constraints        string
 
-	Clear               int32
-	FirstClearTimestamp time.Time
-	Constraint          []string
+	Clear                    int32
+	FirstClearTimestamp      int64
+	GhostClear               int32
+	GhostFirstClearTimestamp int64
+	Constraint               []string
 }
 
 func NewCourseInfoDto(courseInfo *entity.CourseInfo, cache *entity.SongHashCache) *CourseInfoDto {

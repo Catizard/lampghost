@@ -188,10 +188,9 @@ func mergeRivalScoreLogToCourses(courses []*dto.CourseInfoDto, logs []*dto.Rival
 			}
 			course.Clear = max(course.Clear, scoreLog.Clear)
 			if scoreLog.Clear > entity.Failed {
-				if course.FirstClearTimestamp.IsZero() {
-					course.FirstClearTimestamp = scoreLog.RecordTime
-				} else if course.FirstClearTimestamp.After(scoreLog.RecordTime) {
-					course.FirstClearTimestamp = scoreLog.RecordTime
+				next := scoreLog.RecordTime.Unix()
+				if course.FirstClearTimestamp == 0 || course.FirstClearTimestamp > next {
+					course.FirstClearTimestamp = next
 				}
 			}
 		}

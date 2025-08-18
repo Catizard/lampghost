@@ -34,7 +34,7 @@ func NewRivalTagDto(rivalTag *entity.RivalTag) *RivalTagDto {
 		Enabled:         rivalTag.Enabled,
 		RecordTime:      rivalTag.RecordTime,
 		Symbol:          rivalTag.Symbol,
-		RecordTimestamp: rivalTag.RecordTime.UnixMilli(),
+		RecordTimestamp: rivalTag.RecordTime.Local().UnixMilli(),
 	}
 }
 

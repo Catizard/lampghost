@@ -28,7 +28,9 @@
     "supplyMissingBMS": "Do you really want to supply all missing BMS?",
     "setClipboardSuccess": "Copied to clipboard successfully",
     "setClipboardError": "Failed to copy to clipboard, error: {msg}",
-    "downloadProgress": "Current downloading: {success}/{count}, progress: {progress}%"
+    "downloadProgress": "Current downloading: {success}/{count}, progress: {progress}%",
+    "releaseVersionDiverage": "Release version: {releaseVersion}, current version: {currentVersion}",
+    "clipboardForImagesAreNotSetup": "Cannot setup clipboard for image related feature correctly, are you running on an incomplete environment?"
   },
   "button": {
     "add": "Add",

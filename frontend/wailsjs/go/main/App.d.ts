@@ -121,6 +121,8 @@ export function GENERATOR_FOLDER_DTO():Promise<dto.FolderDto>;
 
 export function GENERATOR_KEY_COUNT_DTO():Promise<dto.KeyCountDto>;
 
+export function GENERATOR_META_INFO_ENTITY():Promise<entity.MetaInfo>;
+
 export function GENERATOR_NOTIFICATION_DTO():Promise<dto.NotificationDto>;
 
 export function GENERATOR_PREDEFINE_TABLE_HEADER():Promise<entity.PredefineTableHeader>;
@@ -170,6 +172,8 @@ export function QueryFolderContentWithRival(arg1:vo.FolderContentVo):Promise<res
 export function QueryLatestVersion():Promise<result.RtnMessage>;
 
 export function QueryMainUser():Promise<result.RtnData>;
+
+export function QueryMetaInfo():Promise<result.RtnData>;
 
 export function QueryPredefineTableSchemes():Promise<result.RtnDataList>;
 

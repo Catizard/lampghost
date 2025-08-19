@@ -28,7 +28,9 @@
     "supplyMissingBMS": "确定要添加所有缺少的BMS吗?",
     "setClipboardSuccess": "成功复制到剪贴板",
     "setClipboardError": "复制失败，错误原因: {msg}",
-    "downloadProgress": "当前进行的任务 {success}/{count}, 进度: {progress}%"
+    "downloadProgress": "当前进行的任务 {success}/{count}, 进度: {progress}%",
+    "releaseVersionDiverage": "已发布版本: {releaseVersion}, 当前版本: {currentVersion}",
+    "clipboardForImagesAreNotSetup": "无法为图片相关的功能初始化剪贴板，现在运行在一个不完整的环境上吗？"
   },
   "button": {
     "add": "新增",

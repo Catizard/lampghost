@@ -21,7 +21,10 @@ func main() {
 	log.SetLevel(log.DebugLevel)
 	// Setup clipboard
 	if err := clipboard.Init(); err != nil {
+		config.ClipboardSetupFlag = false
 		log.Errorf("Cannot initialize clipboard due to %s, clipboard related feature may not work!", err)
+	} else {
+		config.ClipboardSetupFlag = true
 	}
 
 	// Create an instance of the app structure

@@ -18,8 +18,9 @@ const (
 )
 
 var (
-	WorkingDirectory string
-	lock             sync.Mutex
+	WorkingDirectory   string
+	lock               sync.Mutex
+	ClipboardSetupFlag bool
 )
 
 func init() {

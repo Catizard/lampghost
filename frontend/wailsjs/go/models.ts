@@ -1349,6 +1349,22 @@ export namespace entity {
 		    return a;
 		}
 	}
+	export class MetaInfo {
+	    CurrentVersion: string;
+	    ReleaseVersion: string;
+	    ClipboardSetup: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new MetaInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.CurrentVersion = source["CurrentVersion"];
+	        this.ReleaseVersion = source["ReleaseVersion"];
+	        this.ClipboardSetup = source["ClipboardSetup"];
+	    }
+	}
 	export class Page {
 	    page: number;
 	    pageSize: number;

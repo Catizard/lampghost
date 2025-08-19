@@ -1,13 +1,11 @@
 package controller
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 
 	"github.com/Catizard/lampghost_wails/internal/config"
 	"github.com/Catizard/lampghost_wails/internal/config/download"
+	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/result"
 	"github.com/Catizard/lampghost_wails/internal/service"
 	"github.com/charmbracelet/log"
@@ -25,25 +23,15 @@ func NewConfigController(configService *service.ConfigService) *ConfigController
 }
 
 func (ctl *ConfigController) QueryLatestVersion() result.RtnMessage {
-	resp, err := http.Get("https://api.github.com/repos/Catizard/lampghost/releases/latest")
-	if err != nil {
+	log.Debugf("[Controller] calling ConfigController.QueryLatestVersion")
+	if version, err := ctl.service.QueryLatestVersion(); err != nil {
+		log.Debugf("[ConfigController] returning err: %s", eris.ToString(err, true))
 		return result.NewErrorMessage(err)
+	} else if version != config.VERSION {
+		return result.NewRtnMessage(result.SUCCESS.Code, fmt.Sprintf("Release: %s; Using %s", version, config.VERSION))
+	} else {
+		return result.NewRtnMessage(result.SUCCESS.Code, "Using the latest version")
 	}
-	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return result.NewErrorMessage(err)
-	}
-	ret := struct {
-		TagName string `json:"tag_name"`
-	}{}
-	if err := json.Unmarshal(body, &ret); err != nil {
-		return result.NewErrorMessage(err)
-	}
-	if ret.TagName != config.VERSION {
-		return result.NewRtnMessage(result.SUCCESS.Code, fmt.Sprintf("Release: %s; Using %s", ret.TagName, config.VERSION))
-	}
-	return result.NewRtnMessage(result.SUCCESS.Code, "Using the latest version")
 }
 
 func (ctl *ConfigController) ReadConfig() result.RtnData {
@@ -87,4 +75,14 @@ func (ctl *ConfigController) QueryPreviewURLByMd5(md5 string) result.RtnData {
 	}
 }
 
+func (ctl *ConfigController) QueryMetaInfo() result.RtnData {
+	log.Debugf("[Controller] calling ConfigController.QueryMetaInfo")
+	data, err := ctl.service.QueryMetaInfo()
+	if err != nil {
+		return result.NewErrorData(err)
+	}
+	return result.NewRtnData(data)
+}
+
 func (ctl *ConfigController) GENERATOR_DOWNLOAD_SOURCE() *download.DownloadSource { return nil }
+func (ctl *ConfigController) GENERATOR_META_INFO_ENTITY() *entity.MetaInfo        { return nil }

@@ -230,6 +230,10 @@ export function GENERATOR_KEY_COUNT_DTO() {
   return window['go']['main']['App']['GENERATOR_KEY_COUNT_DTO']();
 }
 
+export function GENERATOR_META_INFO_ENTITY() {
+  return window['go']['main']['App']['GENERATOR_META_INFO_ENTITY']();
+}
+
 export function GENERATOR_NOTIFICATION_DTO() {
   return window['go']['main']['App']['GENERATOR_NOTIFICATION_DTO']();
 }
@@ -328,6 +332,10 @@ export function QueryLatestVersion() {
 
 export function QueryMainUser() {
   return window['go']['main']['App']['QueryMainUser']();
+}
+
+export function QueryMetaInfo() {
+  return window['go']['main']['App']['QueryMetaInfo']();
 }
 
 export function QueryPredefineTableSchemes() {

@@ -1,8 +1,14 @@
 package service
 
 import (
+	"encoding/json"
+	"io"
+	"net/http"
+
 	"github.com/Catizard/lampghost_wails/internal/config"
+	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/charmbracelet/log"
+	"github.com/rotisserie/eris"
 	"gorm.io/gorm"
 )
 
@@ -49,4 +55,35 @@ func (s *ConfigService) WriteConfig(conf *config.ApplicationConfig) error {
 	}
 	s.dirty <- 1
 	return nil
+}
+
+func (s *ConfigService) QueryLatestVersion() (string, error) {
+	resp, err := http.Get("https://api.github.com/repos/Catizard/lampghost/releases/latest")
+	if err != nil {
+		return "", eris.Wrap(err, "http get github")
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", eris.Wrap(err, "read body")
+	}
+	ret := struct {
+		TagName string `json:"tag_name"`
+	}{}
+	if err := json.Unmarshal(body, &ret); err != nil {
+		return "", eris.Wrap(err, "unmarshal")
+	}
+	return ret.TagName, nil
+}
+
+func (s *ConfigService) QueryMetaInfo() (*entity.MetaInfo, error) {
+	if version, err := s.QueryLatestVersion(); err != nil {
+		return nil, eris.Wrap(err, "query latest version")
+	} else {
+		return &entity.MetaInfo{
+			CurrentVersion: config.VERSION,
+			ReleaseVersion: version,
+			ClipboardSetup: config.ClipboardSetupFlag,
+		}, nil
+	}
 }

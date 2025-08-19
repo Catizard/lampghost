@@ -773,6 +773,7 @@ func updateRivalInfo(tx *gorm.DB, reloadInfo *vo.RivalFileReloadInfoVo, rivalInf
 		if err != nil {
 			return eris.Wrap(err, "selectRivalScoreLogCount")
 		}
+		// TODO: If rivalInfo.PlayCount is exactly zero, the update would be skipped
 		rivalInfo.PlayCount = int(pc)
 	}
 

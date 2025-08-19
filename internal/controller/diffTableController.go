@@ -34,7 +34,7 @@ func (ctl *DiffTableController) AddBatchDiffTableHeader(candidates []*vo.DiffTab
 	log.Info("[Controller] calling DiffTableController.AddBatchDiffTableHeader")
 	rows, _, err := ctl.diffTableService.AddBatchDiffTableHeader(candidates)
 	if err != nil {
-		log.Errorf("[DiffTableController] returning err: %v", err)
+		log.Errorf("[DiffTableController] returning err: %v", eris.ToString(err, true))
 		return result.NewErrorDataList(err)
 	}
 	return result.NewRtnDataList(rows)

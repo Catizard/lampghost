@@ -18,7 +18,7 @@ import { DelFolder, FindFolderList } from "@wailsjs/go/main/App";
 
 const checkedRowKeys = defineModel<number[]>("checkedRowKeys");
 const props = defineProps<{
-  customTableId?: number
+  customTableId: number
   type: "table" | "folder",
   selectSong?: "single" | "multiple", // need to be passed to FolderDetail
   noActions?: boolean // also being passed to FolderDetail
@@ -119,10 +119,14 @@ function deleteFolder(id: number) {
 }
 
 function loadData() {
+  // Do nothing if custom table is empty
+  if (props.customTableId == null || props.customTableId == 0) {
+    return;
+  }
   loading.value = true;
   FindFolderList({
     RivalID: 1,
-    CustomTableID: props.customTableId ?? 1
+    CustomTableID: props.customTableId
   } as any)
     .then((result) => {
       if (result.Code != 200) {

@@ -49,6 +49,7 @@ const formData = ref({
   SongDataPath: null,
   ScoreDataPath: null,
   ScoreDataLogPath: null,
+  Type: "beatoraja" // TODO: We don't support import LR2 user as rival currently
 });
 const rules = {
   Name: {
@@ -83,6 +84,7 @@ function handlePositiveClick(): boolean {
           }
           show.value = false;
           emit('refresh')
+          refreshFormData();
         });
     })
     .catch(err => window.$notifyError(err))
@@ -91,11 +93,7 @@ function handlePositiveClick(): boolean {
 }
 
 function handleNegativeClick() {
-  formData.value.Name = null;
-  formData.value.ScoreLogPath = null;
-  formData.value.SongDataPath = null;
-  formData.value.ScoreDataLogPath = null;
-  formData.value.ScoreDataPath = null;
+  refreshFormData();
 }
 
 // target == "scorelogPath" | "songdataPath"
@@ -114,5 +112,13 @@ function chooseFile(title, target: "scorelogPath" | "songdataPath" | "scoredatal
         }
       }
     }).catch(err => window.$notifyError(err));
+}
+
+function refreshFormData() {
+  formData.value.Name = null;
+  formData.value.ScoreLogPath = null;
+  formData.value.SongDataPath = null;
+  formData.value.ScoreDataLogPath = null;
+  formData.value.ScoreDataPath = null;
 }
 </script>

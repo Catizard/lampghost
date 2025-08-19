@@ -121,6 +121,7 @@
     "labelScanBMSFiles": "扫描BMS文件",
     "labelUseScoredatalog": "使用scoredatalog.db作为最近游玩的数据源",
     "labelUseScoredataForMainUser": "使用score.db作为主用户的点灯情况的数据源",
+    "labelConstraints": "限制",
     "placeholderName": "请输入名称",
     "placeholderUserName": "请输入用户名称",
     "placeholderRivalName": "请输入玩家名称",

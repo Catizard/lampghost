@@ -86,7 +86,7 @@ const columns: DataTableColumns<dto.CustomCourseDto> = [
   { title: t('column.name'), key: "Name" },
   { title: t('column.constraints'), key: "Constraints" },
   {
-    title: t('column.actions'), key: "Actions", width: "75px",
+    title: t('column.actions'), key: "Actions", width: "100px",
     render(row: dto.CustomCourseDto) {
       return h(
         NDropdown,

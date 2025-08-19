@@ -33,7 +33,7 @@ func (s *CustomDiffTableService) AddCustomDiffTable(param *vo.CustomDiffTableVo)
 			return eris.Wrap(err, "query custom_diff_table")
 		}
 		if count != 0 {
-			return eris.New("AddCustomDiffTable: name %s is duplicated")
+			return eris.Errorf("AddCustomDiffTable: name %s is duplicated", param.Name)
 		}
 		return addCustomDiffTable(tx, param.Entity())
 	})

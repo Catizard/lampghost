@@ -121,6 +121,7 @@
     "labelScanBMSFiles": "Scan BMS Files",
     "labelUseScoredatalog": "Use scoredatalog.db as recent menu's datasource",
     "labelUseScoredataForMainUser": "Use score.db as main user's lamp status datasource",
+    "labelConstraints": "Constraints",
     "placeholderName": "Please input name",
     "placeholderUserName": "Please input your name",
     "placeholderRivalName": "Please input rival name",

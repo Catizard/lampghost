@@ -7,18 +7,20 @@ English | [简体中文](./README.zh-CN.md)
 ![showcase1](./doc/showcase1.png)
 ![showcase2](./doc/showcase2.png)
 
-`LampGhost` is an **offline** and **cross-platform** `beatoraja` save file viewer, favorite folder manager and provides lamp diff view . It supports:
+`LampGhost` is an **offline** and **cross-platform** `beatoraja/LR2` save file viewer, favorite folder manager and BMS downloader. It supports:
 
 - `I18n`:`English` and `zh-CN` are supported currently
-- `Multiple User`: You can load your friends' save file and view their scores
-- `Time Machine`: Compare lamp status between you and your friends, and could even "turn back" your friend's save file time(Suppose your friend is already ^^, using `LampGhost` allows you comparing the lamp status the moment that your friend achived ★5). And even "back port" the data into beatoraja
+- `Clients`: We keep `LR2` user in heart, although `LampGhost` is mainly supporting `beatoraja`, we give as much as possible support to `LR2` users
+- `Multiple User`: You can load your friends' save file and view/compare their scores
+- `Time Machine`: "Turn back" your friend's save file time(Suppose your friend is already ^^, using `LampGhost` allows you comparing the lamp status the moment that your friend achived ★5). And even "back port" the data into beatoraja
 - `Favorite Folder`: Customize favorite folder and import it as a difficult table in `beatoraja`(tip: You can reload table by pressing F2 in game). More specifically, import `http://127.0.0.1:7391/table/lampghost.json` in `beatoraja` while keep `LampGhost` opening
 - `Custom Difficult Table`: Customize your own difficult table and export, share, or deploy to static website
-- `Download Missing BMS`: LampGhost implements the integration with some BMS download servers, you can download the missing BMS through LampGhost or supply missing bms based on difficult tables
+- `Download Missing BMS`: `LampGhost` implements the integration with some BMS download servers. You can download the missing BMS manually or supply all missing BMS based on difficult tables
+- `Automatic`: `LampGhost` will monitor your save files and trigger an incremental sync when finishing gameplay
 
 Because `LampGhost` is an **offline** tool, therefore:
 
-- No need of an `ir.jar` file for connecting a centerialized server. Therefore won't be unusable due to server is down
+- No need of an `ir.jar` file for connecting a centralized server. Therefore won't be unusable due to server is down
 - If you want to compare your friends' save file, you need to ask them and handle them manually, which could be a tedious task
 - It's always here, when you want to see your progress, the only thing you need to do is pressing the sync button
 - There might be a risk for some breaking changes that you have to remove `LampGhost`'s database file and have a clean start
@@ -38,13 +40,16 @@ Grab an executable at `Release` page, then double-click it. This should be worki
 
 ## Attentions
 
-First of all, you need to import some difficult tables just like `beatoraja` to make the most features work.
-
-Secondly,this project is still at early demo phase, you might encounter some mystery problem(Don't worry, won't ruin your save file most likely). You could delete the whole `LampGhost` data folder to have a clean restart:
+This project is still at early demo phase, you might encounter some mystery problem(Don't worry, won't ruin your save file most likely). You could delete the whole `LampGhost` data folder to have a clean restart:
 
 For `Windows` user it's located at `%USERPROFILE%\.lampghost_wails`, for `Linux/OSX` user is `$HOME/.lampghost_wails`
 
 ### Unfortunate LR2 users
+
+> [!warning]
+> In short, we are not encouraging LR2 users to use `LampGhost` currently. Although the features are implemented. There's still many things we have to polish, see [#25] for more details.
+> If you happens to be a LR2 user and want to use `LampGhost` as a missing BMS downloader, you can also download a `beatoraja` and let it build `songdata.db` for `LampGhost` to know what BMS you don't have.
+> This might be more stable than you initialize the main user by importing LR2 files and BMS directories
 
 LR2's database doesn't record much useful data so `LampGhost` can only provide partial support for LR2 users:
 

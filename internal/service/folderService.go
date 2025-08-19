@@ -175,7 +175,7 @@ func (s *FolderService) QueryFolderContentWithRival(filter *vo.FolderContentVo) 
 	ForEach(contents, func(content *dto.FolderContentDto, _ int) {
 		content.TableTags = make([]*dto.DiffTableTagDto, 0)
 		ForEach(tableTags, func(tag *dto.DiffTableTagDto, _ int) {
-			if tag.Md5 == content.Md5 {
+			if content.Md5 != "" && tag.Md5 == content.Md5 {
 				content.TableTags = append(content.TableTags, tag)
 			}
 		})

@@ -46,7 +46,7 @@ func (s *RivalScoreDataLogService) QueryRivalScoreDataLogPageList(filter *vo.Riv
 		ForEach(out, func(log *dto.RivalScoreDataLogDto, _ int) {
 			log.TableTags = make([]*dto.DiffTableTagDto, 0)
 			ForEach(tableTags, func(tag *dto.DiffTableTagDto, _ int) {
-				if tag.Md5 == log.Md5 {
+				if log.Md5 != "" && tag.Md5 == log.Md5 {
 					log.TableTags = append(log.TableTags, tag)
 				}
 			})

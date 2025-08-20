@@ -738,7 +738,7 @@ func loadSongData(songDataPath string) ([]*entity.SongData, error) {
 	return rawSongData, nil
 }
 
-// Fully delete all content from rival_score_log and rebuild them by rawScoreLog
+// Fully delete all content from rival_score_data and rebuild them
 func syncSongData(tx *gorm.DB, rawSongData []*entity.SongData, rivalID uint) error {
 	rivalSongData := Map(rawSongData, func(rawData *entity.SongData, _ int) *entity.RivalSongData {
 		ret := entity.FromRawSongDataToRivalSongData(rawData)

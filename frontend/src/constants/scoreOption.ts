@@ -73,5 +73,6 @@ export const DefaultScoreOptionColorStyle: Record<number, ScoreOptionDef> = {
 }
 
 export function queryScoreOptionColorStyle(scoreOption: number): ScoreOptionDef {
+  console.log(scoreOption);
   return DefaultScoreOptionColorStyle[scoreOption];
 }

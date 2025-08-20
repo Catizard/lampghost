@@ -23,6 +23,7 @@ import SongScoreParagraph from '@/components/SongScoreParagraph.vue';
 import { ClearType, ClearTypeDef, DefaultClearTypeColorStyle, queryClearTypeColorStyle } from '@/constants/cleartype';
 import SongClearParagraph from '@/components/SongClearParagraph.vue';
 import RecordTimeParagraph from '@/components/RecordTimeParagraph.vue';
+import MinBPParagraph from '@/components/MinBPParagraph.vue';
 
 type PlayLog = dto.RivalScoreLogDto | dto.RivalScoreDataLogDto;
 type SongInfo = {
@@ -81,18 +82,31 @@ function createColumns(useScorelog: boolean): DataTableColumns<PlayLog> {
           return h(SongScoreParagraph, { data: row });
         }
       },
+      {
+        title: t('column.minbp'), key: "MinBP", width: "100px", resizable: true, align: "center",
+        render(row: dto.RivalScoreDataLogDto) {
+          return h(MinBPParagraph, {
+            noplay: false,
+            optionValue: row.Option,
+            minbp: row.Minbp
+          });
+        }
+      },
       // NOTE: It's impossible to calculate bp here since beatoraja doesn't provide
       // complete data: we don't know there're how many 'passnotes'
+    ] as DataTableColumns<PlayLog>)
+  } else {
+    ret.push(...[
+      {
+        title: t('column.minbp'), key: "MinBP", width: "100px", resizable: true, align: "center",
+        render(row: dto.RivalScoreDataLogDto) {
+          return h(MinBPParagraph, { noplay: false, minbp: row.Minbp, noOption: true });
+        }
+      }
     ] as DataTableColumns<PlayLog>)
   }
 
   ret.push(...[
-    {
-      title: t('column.minbp'), key: "MinBP", width: "100px", resizable: true, align: "center",
-      render(row: PlayLog) {
-        return row.Minbp;
-      }
-    },
     {
       title: t('column.recordTime'), key: "RecordTime", width: "120px", resizable: true, align: "center",
       render(row: PlayLog) {

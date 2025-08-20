@@ -213,6 +213,9 @@ func generateSongHashCacheFromRawData(songData []*entity.SongData) *entity.SongH
 }
 
 // fully reload rival_song_data
+// NOTE: This is mainly a wrapper for loadSongData & syncSongData,
+// and there's still a place use these api directly since the raw
+// data won't be returned by this function
 func reloadRivalSongData(tx *gorm.DB) error {
 	mainUser, err := queryMainUser(tx)
 	if err != nil {

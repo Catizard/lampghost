@@ -201,12 +201,17 @@ func (s *DownloadTaskService) tryKickingWaitTask() {
 		resp, err := contextLockedReq.
 			SetOutputFile(next.IntermediateFilePath).
 			SetDownloadCallbackWithInterval(func(info req.DownloadInfo) {
-				s.updMsgReceiver <- taskUpdMsg{
-					taskID:        next.ID,
-					final:         false,
-					err:           nil,
-					downloadSize:  info.DownloadedSize,
-					contentLength: info.Response.ContentLength,
+				if info.Response != nil && info.Response.Response != nil {
+					contentLength := info.Response.Response.ContentLength
+					s.updMsgReceiver <- taskUpdMsg{
+						taskID:        next.ID,
+						final:         false,
+						err:           nil,
+						downloadSize:  info.DownloadedSize,
+						contentLength: contentLength,
+					}
+				} else {
+					log.Errorf("invalid http download response, what is happening?")
 				}
 			}, 1*time.Second).
 			Get(next.URL)

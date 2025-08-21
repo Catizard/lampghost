@@ -1,10 +1,12 @@
 package download
 
-var DefaultDownloadSource DownloadSource = &KonmaiDownloadSource
-var downloadSources map[string]DownloadSource = map[string]DownloadSource{
-	"wriggle": &WriggleDownloadSource,
-	"konmai":  &KonmaiDownloadSource,
-}
+var (
+	DefaultDownloadSource DownloadSource            = &WriggleDownloadSource
+	downloadSources       map[string]DownloadSource = map[string]DownloadSource{
+		"wriggle": &WriggleDownloadSource,
+		"konmai":  &KonmaiDownloadSource,
+	}
+)
 
 type DownloadSourceMeta struct {
 	Name         string

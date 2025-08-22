@@ -267,7 +267,8 @@
     "editSongDirectories": "编辑BMS目录",
     "overview": "总览",
     "dangerZone": "危险区",
-    "fullyReloadMainUser": "全量同步主用户数据"
+    "fullyReloadMainUser": "全量同步主用户数据",
+    "chooseBeatorajaDirectory": "选择Beatoraja路径"
   },
   "hint": {
     "initUser": "配置你的存档文件路径",

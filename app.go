@@ -36,6 +36,7 @@ type App struct {
 	*controller.CustomDiffTableController
 	*controller.CustomCourseController
 	*service.MonitorService
+	*service.EventService
 	*server.InternalServer
 }
 
@@ -46,6 +47,9 @@ func NewApp() *App {
 	if err != nil {
 		log.Fatalf("initialize database: %s", err)
 	}
+
+	// event module
+	eventService := &service.EventService{}
 
 	// config module
 	configService := service.NewConfigService(db)
@@ -61,7 +65,10 @@ func NewApp() *App {
 	// rival module
 	songDirectoryService := service.NewSongDirectoryService(db)
 	songDirectoryController := controller.NewSongDirectoryController(songDirectoryService)
-	rivalInfoService := service.NewRivalInfoService(db, monitorService, conf.UseScoredataForMainUser != 0, configService.Subscribe(), notifySyncChan)
+	rivalInfoService := service.NewRivalInfoService(db).
+		SubscribeConfigChanges(conf, configService.Subscribe()).
+		SubscribeSaveFileChanges(monitorService, notifySyncChan).
+		UseEvents(eventService)
 	rivalTagService := service.NewRivalTagService(db)
 	rivalScoreLogService := service.NewRivalScoreLogService(db)
 	rivalSongDataService := service.NewRivalSongDataService(db)
@@ -80,13 +87,15 @@ func NewApp() *App {
 	}
 
 	// download task module
-	downloadTaskService := service.NewDownloadTaskService(db, conf, configService.Subscribe())
+	downloadTaskService := service.NewDownloadTaskService(db).
+		SubscribeConfigChange(conf, configService.Subscribe()).
+		UseEvents(eventService)
 	downloadTaskController := controller.NewDownloadTaskController(downloadTaskService)
 
 	// difficult table module
-	diffTableService := service.NewDiffTableService(db, downloadTaskService, conf.UseScoredataForMainUser != 0, configService.Subscribe())
+	diffTableService := service.NewDiffTableService(db, downloadTaskService).SubscribeConfigChanges(conf, configService.Subscribe())
 	diffTableController := controller.NewDiffTableController(diffTableService)
-	courseInfoService := service.NewCourseInfoSerivce(db, conf, configService.Subscribe())
+	courseInfoService := service.NewCourseInfoSerivce(db).SubscribeConfigChanges(conf, configService.Subscribe())
 	courseInfoController := controller.NewCourseInfoController(courseInfoService)
 
 	// custom difficult table module
@@ -125,6 +134,7 @@ func NewApp() *App {
 		customDiffTableController,
 		customCourseController,
 		monitorService,
+		eventService,
 		internalServer,
 	}
 }
@@ -136,8 +146,7 @@ func (a *App) startup(ctx context.Context) {
 		log.Fatalf("cannot start internal server: %s", err)
 	}
 	a.ctx = ctx
-	a.RivalInfoController.InjectContext(ctx)
-	a.DownloadTaskController.InjectContext(ctx)
+	a.EventService.InjectContext(ctx)
 }
 
 // domReady is called after front-end resources have been loaded

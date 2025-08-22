@@ -50,8 +50,8 @@ export function CancelDownloadTask(arg1) {
   return window['go']['main']['App']['CancelDownloadTask'](arg1);
 }
 
-export function ChooseBeatorajaDirectory() {
-  return window['go']['main']['App']['ChooseBeatorajaDirectory']();
+export function ChooseBeatorajaDirectory(arg1) {
+  return window['go']['main']['App']['ChooseBeatorajaDirectory'](arg1);
 }
 
 export function CopyImageToClipboard(arg1) {
@@ -290,12 +290,32 @@ export function InitializeMainUser(arg1) {
   return window['go']['main']['App']['InitializeMainUser'](arg1);
 }
 
+export function InjectContext(arg1) {
+  return window['go']['main']['App']['InjectContext'](arg1);
+}
+
+export function NotifyError(arg1) {
+  return window['go']['main']['App']['NotifyError'](arg1);
+}
+
+export function NotifyInfo(arg1) {
+  return window['go']['main']['App']['NotifyInfo'](arg1);
+}
+
+export function NotifySuccess(arg1) {
+  return window['go']['main']['App']['NotifySuccess'](arg1);
+}
+
 export function OpenDirectoryDialog(arg1) {
   return window['go']['main']['App']['OpenDirectoryDialog'](arg1);
 }
 
 export function OpenFileDialog(arg1) {
   return window['go']['main']['App']['OpenFileDialog'](arg1);
+}
+
+export function PushEvent(arg1, arg2) {
+  return window['go']['main']['App']['PushEvent'](arg1, arg2);
 }
 
 export function QueryCourseSongListWithRival(arg1) {
@@ -392,6 +412,10 @@ export function QueryUserPlayCountInYear(arg1, arg2) {
 
 export function ReadConfig() {
   return window['go']['main']['App']['ReadConfig']();
+}
+
+export function RefreshPage() {
+  return window['go']['main']['App']['RefreshPage']();
 }
 
 export function ReloadDiffTableHeader(arg1) {

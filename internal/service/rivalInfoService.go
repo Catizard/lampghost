@@ -1,7 +1,6 @@
 package service
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"path"
@@ -17,7 +16,6 @@ import (
 	"github.com/glebarez/sqlite"
 	"github.com/rotisserie/eris"
 	. "github.com/samber/lo"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"gorm.io/gorm"
 )
 
@@ -26,29 +24,42 @@ const READONLY_PARAMETER = "?open_mode=1"
 type RivalInfoService struct {
 	db                      *gorm.DB
 	monitorService          *MonitorService
-	ctx                     context.Context
+	eventService            *EventService
 	mutex                   sync.Mutex
 	useScoredataForMainUser bool
-	syncChan                <-chan any
-	subscribeConfigChange   <-chan any
+	saveFileNotify          <-chan any
+	configNotify            <-chan any
 }
 
-func NewRivalInfoService(db *gorm.DB, monitorService *MonitorService, useScoredataForMainUser bool, configNotify <-chan any, syncChan <-chan any) *RivalInfoService {
-	ret := &RivalInfoService{
-		db:                      db,
-		monitorService:          monitorService,
-		syncChan:                syncChan,
-		useScoredataForMainUser: useScoredataForMainUser,
-		subscribeConfigChange:   configNotify,
+func NewRivalInfoService(db *gorm.DB) *RivalInfoService {
+	return &RivalInfoService{
+		db:           db,
+		eventService: &EventService{},
 	}
-	go ret.listen()
-	go ret.listenUpdateConfig()
-	return ret
 }
 
-func (s *RivalInfoService) listenUpdateConfig() {
+func (s *RivalInfoService) SubscribeConfigChanges(conf *config.ApplicationConfig, configNotify <-chan any) *RivalInfoService {
+	s.useScoredataForMainUser = conf.UseScoredataForMainUser != 0
+	s.configNotify = configNotify
+	go s.listenConfigChanges()
+	return s
+}
+
+func (s *RivalInfoService) SubscribeSaveFileChanges(monitorService *MonitorService, changeNotify <-chan any) *RivalInfoService {
+	s.monitorService = monitorService
+	s.saveFileNotify = changeNotify
+	go s.listenSaveFileChanges()
+	return s
+}
+
+func (s *RivalInfoService) UseEvents(eventService *EventService) *RivalInfoService {
+	s.eventService = eventService
+	return s
+}
+
+func (s *RivalInfoService) listenConfigChanges() {
 	for {
-		<-s.subscribeConfigChange
+		<-s.configNotify
 		log.Debugf("[RivalInfoService] received config change notification")
 		go func() {
 			s.mutex.Lock()
@@ -63,36 +74,23 @@ func (s *RivalInfoService) listenUpdateConfig() {
 	}
 }
 
-func (s *RivalInfoService) listen() {
+func (s *RivalInfoService) listenSaveFileChanges() {
 	for {
-		<-s.syncChan
-		runtime.EventsEmit(s.ctx, "global:notify", dto.NotificationDto{
-			Type:    "info",
-			Content: "File change detected, trying to auto-reload save files",
-		})
+		<-s.saveFileNotify
+		s.eventService.NotifyInfo("File change detected, trying to auto-reload save files")
 		// TODO: Magical main user id=1
 		if err := s.ReloadRivalData(1, false); err != nil {
 			log.Errorf("failed to auto-reload: %s", err)
-			runtime.EventsEmit(s.ctx, "global:notify", dto.NotificationDto{
-				Type:    "error",
-				Content: fmt.Sprintf("Failed to auto-reload: %s", err),
-			})
+			s.eventService.NotifyError(fmt.Sprintf("Failed to auto-reload: %s", err))
 		} else {
-			runtime.EventsEmit(s.ctx, "global:refresh")
+			s.eventService.RefreshPage()
 			// HACK: Make the message as visible as possible
 			go func() {
 				time.Sleep(1 * time.Second)
-				runtime.EventsEmit(s.ctx, "global:notify", dto.NotificationDto{
-					Type:    "success",
-					Content: "Successfully auto-reload save files",
-				})
+				s.eventService.NotifySuccess("Successfully auto-reload save files")
 			}()
 		}
 	}
-}
-
-func (s *RivalInfoService) InjectContext(ctx context.Context) {
-	s.ctx = ctx
 }
 
 // TODO: I think it's better to change the signature to InitializeMainUser(conf, rivalInfo)
@@ -162,13 +160,7 @@ func (s *RivalInfoService) InitializeMainUser(rivalInfo *vo.InitializeRivalInfoV
 //
 // Returns directory names which is located under 'player' and
 // beatoraja directory path chosen by user
-func (s *RivalInfoService) ChooseBeatorajaDirectory() (*dto.BeatorajaDirectoryMeta, error) {
-	dir, err := runtime.OpenDirectoryDialog(s.ctx, runtime.OpenDialogOptions{
-		Title: "Choose Beatoraja Directory",
-	})
-	if err != nil {
-		return nil, eris.Wrap(err, "choose directory")
-	}
+func (s *RivalInfoService) ChooseBeatorajaDirectory(dir string) (*dto.BeatorajaDirectoryMeta, error) {
 	if dir == "" {
 		return nil, eris.New("choose directory: directory cannot be empty")
 	}

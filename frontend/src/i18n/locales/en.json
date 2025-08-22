@@ -267,7 +267,8 @@
     "editSongDirectories": "Edit BMS Directories",
     "overview": "Overview",
     "dangerZone": "Danger Zone",
-    "fullyReloadMainUser": "Fully Reload Main User's Data"
+    "fullyReloadMainUser": "Fully Reload Main User's Data",
+    "chooseBeatorajaDirectory": "Choose Beatoraja Directory"
   },
   "hint": {
     "initUser": "Configure your own save files location",

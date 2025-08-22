@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"context"
-
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/result"
@@ -22,10 +20,6 @@ func NewRivalInfoController(rivalInfoService *service.RivalInfoService) *RivalIn
 	}
 }
 
-func (ctl *RivalInfoController) InjectContext(ctx context.Context) {
-	ctl.rivalInfoService.InjectContext(ctx)
-}
-
 func (ctl *RivalInfoController) InitializeMainUser(rivalInfo *vo.InitializeRivalInfoVo) result.RtnMessage {
 	log.Info("[Controller] calling RivalInfoController.InitializeMainUser")
 	err := ctl.rivalInfoService.InitializeMainUser(rivalInfo)
@@ -36,9 +30,9 @@ func (ctl *RivalInfoController) InitializeMainUser(rivalInfo *vo.InitializeRival
 	return result.SUCCESS
 }
 
-func (ctl *RivalInfoController) ChooseBeatorajaDirectory() result.RtnData {
+func (ctl *RivalInfoController) ChooseBeatorajaDirectory(dir string) result.RtnData {
 	log.Info("[Controller] calling RivalInfoController.ChooseBeatorajaDirectory")
-	meta, err := ctl.rivalInfoService.ChooseBeatorajaDirectory()
+	meta, err := ctl.rivalInfoService.ChooseBeatorajaDirectory(dir)
 	if err != nil {
 		log.Errorf("[RivalInfoController] returning err: %v", eris.ToString(err, true))
 		return result.NewErrorData(err)

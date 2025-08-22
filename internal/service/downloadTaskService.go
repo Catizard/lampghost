@@ -15,25 +15,25 @@ import (
 
 	"github.com/Catizard/lampghost_wails/internal/config"
 	"github.com/Catizard/lampghost_wails/internal/config/download"
-	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/charmbracelet/log"
 	"github.com/imroc/req/v3"
 	"github.com/rotisserie/eris"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"gorm.io/gorm"
 )
 
 type DownloadTaskService struct {
-	db                    *gorm.DB
-	ctx                   context.Context
-	mutex                 sync.Mutex
-	tasks                 []*entity.DownloadTask
-	waitTasks             []*entity.DownloadTask
-	runningTasks          map[uint]*entity.DownloadTask
-	updMsgReceiver        chan taskUpdMsg
-	subscribeConfigChange <-chan any
-	config                *config.ApplicationConfig
+	db                   *gorm.DB
+	eventService         *EventService
+	mutex                sync.Mutex
+	tasks                []*entity.DownloadTask
+	waitTasks            []*entity.DownloadTask
+	runningTasks         map[uint]*entity.DownloadTask
+	updMsgReceiver       chan taskUpdMsg
+	configNotify         <-chan any
+	maximumDownloadCount int
+	downloadDirectory    string
+	downloadSite         string
 	// Exeprimental, only for test case
 	taskID uint
 }
@@ -46,26 +46,34 @@ type taskUpdMsg struct {
 	contentLength int64
 }
 
-func NewDownloadTaskService(db *gorm.DB, config *config.ApplicationConfig, configNotify <-chan any) *DownloadTaskService {
+func NewDownloadTaskService(db *gorm.DB) *DownloadTaskService {
 	service := &DownloadTaskService{
-		db:                    db,
-		tasks:                 make([]*entity.DownloadTask, 0),
-		waitTasks:             make([]*entity.DownloadTask, 0),
-		runningTasks:          make(map[uint]*entity.DownloadTask),
-		taskID:                1,
-		updMsgReceiver:        make(chan taskUpdMsg),
-		config:                config,
-		subscribeConfigChange: configNotify,
+		db:             db,
+		tasks:          make([]*entity.DownloadTask, 0),
+		waitTasks:      make([]*entity.DownloadTask, 0),
+		runningTasks:   make(map[uint]*entity.DownloadTask),
+		taskID:         1,
+		updMsgReceiver: make(chan taskUpdMsg),
+		eventService:   &EventService{},
 	}
 	go service.receive()
 	// go service.debugProgress()
 	go service.pushupState()
-	go service.listenUpdateConfig()
 	return service
 }
 
-func (s *DownloadTaskService) InjectContext(ctx context.Context) {
-	s.ctx = ctx
+func (s *DownloadTaskService) SubscribeConfigChange(conf *config.ApplicationConfig, configNotify <-chan any) *DownloadTaskService {
+	s.configNotify = configNotify
+	s.maximumDownloadCount = conf.MaximumDownloadCount
+	s.downloadDirectory = conf.DownloadDirectory
+	s.downloadSite = conf.DownloadSite
+	go s.listenConfigChanges()
+	return s
+}
+
+func (s *DownloadTaskService) UseEvents(eventService *EventService) *DownloadTaskService {
+	s.eventService = eventService
+	return s
 }
 
 func (s *DownloadTaskService) lock() {
@@ -103,8 +111,8 @@ func (s *DownloadTaskService) pushupState() {
 		tasks, n, err := s.FindDownloadTaskList()
 		if err != nil {
 			log.Errorf("cannot pushup download task state: %s", err)
-		} else if n > 0 && s.ctx != nil {
-			runtime.EventsEmit(s.ctx, "DownloadTask:pushup", tasks)
+		} else if n > 0 {
+			s.eventService.PushEvent("DownloadTask:pushup", tasks)
 		}
 		time.Sleep(1 * time.Second)
 	}
@@ -126,9 +134,9 @@ func (s *DownloadTaskService) debugProgress() {
 //
 // NOTE: This function should be called only when there is no running task,
 // if not, it's not lampghost's job to handle tasks correctly
-func (s *DownloadTaskService) listenUpdateConfig() {
+func (s *DownloadTaskService) listenConfigChanges() {
 	for {
-		<-s.subscribeConfigChange
+		<-s.configNotify
 		log.Debugf("[DownloadTaskService] received config change notification")
 		go func() {
 			s.lock()
@@ -137,7 +145,9 @@ func (s *DownloadTaskService) listenUpdateConfig() {
 				// TODO: emit a message to frontend here
 				log.Errorf("cannot read config: %s", err)
 			} else {
-				s.config = config
+				s.maximumDownloadCount = config.MaximumDownloadCount
+				s.downloadDirectory = config.DownloadDirectory
+				s.downloadSite = config.DownloadSite
 			}
 			s.unlock()
 		}()
@@ -181,7 +191,7 @@ func (s *DownloadTaskService) submitTaskError(taskID uint, err error) {
 func (s *DownloadTaskService) tryKickingWaitTask() {
 	s.lock()
 	defer s.unlock()
-	if s.config.MaximumDownloadCount == len(s.runningTasks) || len(s.waitTasks) == 0 {
+	if s.maximumDownloadCount == len(s.runningTasks) || len(s.waitTasks) == 0 {
 		return
 	}
 	next := s.waitTasks[0]
@@ -271,7 +281,7 @@ func (s *DownloadTaskService) tryKickingWaitTask() {
 		filename = strings.ReplaceAll(filename, ">", "_")
 		filename = strings.ReplaceAll(filename, "|", "_")
 
-		targetPath := filepath.Join(s.config.DownloadDirectory, filename)
+		targetPath := filepath.Join(s.downloadDirectory, filename)
 
 		if err := os.MkdirAll(filepath.Dir(targetPath), 0o755); err != nil {
 			s.submitTaskError(next.ID, eris.Wrapf(err, "cannot create directory for %s", targetPath))
@@ -294,23 +304,18 @@ func (s *DownloadTaskService) tryKickingWaitTask() {
 			final:  true,
 			err:    nil,
 		}
-		if s.ctx != nil {
-			runtime.EventsEmit(s.ctx, "global:notify", dto.NotificationDto{
-				Type:    "success",
-				Content: fmt.Sprintf("%s download successfully", filename),
-			})
-		}
+		s.eventService.NotifySuccess(fmt.Sprintf("%s download successfully", filename))
 	}()
 }
 
 func (s *DownloadTaskService) SubmitSingleMD5DownloadTask(md5 string, taskName *string) error {
-	if err := s.config.EnableDownload(); err != nil {
-		return eris.Wrap(err, "download config is not complete")
+	if s.downloadDirectory == "" {
+		return eris.New("download directory cannot be empty")
 	}
 	if md5 == "" {
 		return eris.New("assert: md5 cannot be empty")
 	}
-	downloadSource := download.GetDownloadSource(s.config.DownloadSite)
+	downloadSource := download.GetDownloadSource(s.downloadSite)
 	downloadInfo, err := downloadSource.GetDownloadURLFromMD5(md5)
 	if err != nil {
 		return eris.Wrap(err, "build download url")
@@ -337,10 +342,10 @@ func (s *DownloadTaskService) SubmitSingleMD5DownloadTask(md5 string, taskName *
 }
 
 func (s *DownloadTaskService) submitSingleDownloadTask(id uint, downloadInfo download.DownloadInfo, intermediateFileName string, taskName *string) error {
-	if err := s.config.EnableDownload(); err != nil {
-		return err
+	if s.downloadDirectory == "" {
+		return eris.New("download directory cannot be empty")
 	}
-	intermediateFilePath := filepath.Join(s.config.DownloadDirectory, intermediateFileName)
+	intermediateFilePath := filepath.Join(s.downloadDirectory, intermediateFileName)
 	s.lock()
 	defer s.unlock()
 	status := entity.TASK_PREPARE

@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"context"
-
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/result"
 	"github.com/Catizard/lampghost_wails/internal/service"
@@ -18,10 +16,6 @@ func NewDownloadTaskController(downloadTaskService *service.DownloadTaskService)
 	return &DownloadTaskController{
 		downloadTaskService: downloadTaskService,
 	}
-}
-
-func (ctl *DownloadTaskController) InjectContext(ctx context.Context) {
-	ctl.downloadTaskService.InjectContext(ctx)
 }
 
 func (ctl *DownloadTaskController) SubmitSingleMD5DownloadTask(md5 string, taskName *string) result.RtnMessage {

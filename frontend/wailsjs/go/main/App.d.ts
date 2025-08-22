@@ -5,6 +5,7 @@ import {result} from '../models';
 import {entity} from '../models';
 import {dto} from '../models';
 import {download} from '../models';
+import {context} from '../models';
 import {config} from '../models';
 
 export function AddBatchDiffTableHeader(arg1:Array<vo.DiffTableHeaderVo>):Promise<result.RtnDataList>;
@@ -31,7 +32,7 @@ export function BindSongToFolder(arg1:vo.BindToFolderVo):Promise<result.RtnMessa
 
 export function CancelDownloadTask(arg1:number):Promise<result.RtnMessage>;
 
-export function ChooseBeatorajaDirectory():Promise<result.RtnData>;
+export function ChooseBeatorajaDirectory(arg1:string):Promise<result.RtnData>;
 
 export function CopyImageToClipboard(arg1:string):Promise<result.RtnMessage>;
 
@@ -151,9 +152,19 @@ export function GENERATOR_TABLE_TAG_DTO():Promise<dto.DiffTableTagDto>;
 
 export function InitializeMainUser(arg1:vo.InitializeRivalInfoVo):Promise<result.RtnMessage>;
 
+export function InjectContext(arg1:context.Context):Promise<void>;
+
+export function NotifyError(arg1:string):Promise<void>;
+
+export function NotifyInfo(arg1:string):Promise<void>;
+
+export function NotifySuccess(arg1:string):Promise<void>;
+
 export function OpenDirectoryDialog(arg1:string):Promise<result.RtnData>;
 
 export function OpenFileDialog(arg1:string):Promise<result.RtnData>;
+
+export function PushEvent(arg1:string,arg2:Array<any>):Promise<void>;
 
 export function QueryCourseSongListWithRival(arg1:vo.CourseInfoVo):Promise<result.RtnDataList>;
 
@@ -202,6 +213,8 @@ export function QueryUserKeyCountInYear(arg1:vo.RivalScoreDataLogVo):Promise<res
 export function QueryUserPlayCountInYear(arg1:number,arg2:string):Promise<result.RtnDataList>;
 
 export function ReadConfig():Promise<result.RtnData>;
+
+export function RefreshPage():Promise<void>;
 
 export function ReloadDiffTableHeader(arg1:number):Promise<result.RtnMessage>;
 

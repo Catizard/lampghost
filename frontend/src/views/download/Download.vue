@@ -24,6 +24,7 @@ import { useI18n } from 'vue-i18n';
 import TaskStatusTag from './TaskStatusTag.vue';
 import { DownloadTaskStatus } from '@/constants/downloadTaskStatus';
 import { CancelDownloadTask, RestartDownloadTask } from '@wailsjs/go/main/App';
+import { Download } from '@vicons/ionicons5';
 
 const { t } = useI18n();
 
@@ -36,14 +37,22 @@ const status = ref<"progressing" | "completed">("progressing");
 
 onMounted(() => {
   cancel = EventsOn("DownloadTask:pushup", ((tasks: entity.DownloadTask[]) => {
+    console.log(tasks);
     tasks.sort((a: entity.DownloadTask, b: entity.DownloadTask): number => {
+      console.log('a: ', a, 'b: ', b);
       return DownloadTaskStatus.compare(
         DownloadTaskStatus.from(a.Status),
         DownloadTaskStatus.from(b.Status)
       );
     });
-    completed.value = [...tasks.filter((task: entity.DownloadTask) => DownloadTaskStatus.from(task.Status) == DownloadTaskStatus.SUCCESS)];
-    progressing.value = [...tasks.filter((task: entity.DownloadTask) => DownloadTaskStatus.from(task.Status) != DownloadTaskStatus.SUCCESS)];
+    const isSuccess = (task: entity.DownloadTask) => {
+      console.log(task, task.Status);
+      return DownloadTaskStatus.from(task.Status) == DownloadTaskStatus.SUCCESS;
+    };
+    console.log('1');
+    completed.value = [...tasks.filter(task => isSuccess(task))];
+    console.log('2');
+    progressing.value = [...tasks.filter(task => !isSuccess(task))];
   }));
 });
 
@@ -92,6 +101,7 @@ const columns: DataTableColumns<entity.DownloadTask> = [
   {
     title: t('column.status'), key: "status", width: "125px",
     render(row: entity.DownloadTask) {
+      console.log(row.Status);
       return h(
         TaskStatusTag,
         { status: DownloadTaskStatus.from(row.Status), errorMsg: row.ErrorMessage },

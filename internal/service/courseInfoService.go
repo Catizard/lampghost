@@ -29,21 +29,25 @@ var ignoreVariantCourse bool = false
 // NOTE: NEVER USE MD5 AT DATA PROCESSING
 type CourseInfoService struct {
 	db           *gorm.DB
-	configNotify <-chan any
 	mu           sync.Mutex
+	configNotify <-chan any
 }
 
-func NewCourseInfoSerivce(db *gorm.DB, conf *config.ApplicationConfig, configNotify <-chan any) *CourseInfoService {
+func NewCourseInfoSerivce(db *gorm.DB) *CourseInfoService {
 	ret := &CourseInfoService{
-		db:           db,
-		configNotify: configNotify,
+		db: db,
 	}
-	ignoreVariantCourse = conf.IgnoreVariantCourse != 0
-	go ret.listenUpdateConfig()
 	return ret
 }
 
-func (s *CourseInfoService) listenUpdateConfig() {
+func (s *CourseInfoService) SubscribeConfigChanges(conf *config.ApplicationConfig, configNotify <-chan any) *CourseInfoService {
+	ignoreVariantCourse = conf.IgnoreVariantCourse != 0
+	s.configNotify = configNotify
+	go s.listenConfigChanges()
+	return s
+}
+
+func (s *CourseInfoService) listenConfigChanges() {
 	for {
 		<-s.configNotify
 		log.Debugf("[CourseInfoService] received config change notification")

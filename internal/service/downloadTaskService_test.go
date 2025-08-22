@@ -42,7 +42,7 @@ func TestSubmitSingleMD5DownloadTask(t *testing.T) {
 		if err != nil {
 			t.Fatalf("config: %s", err)
 		}
-		downloadTaskService := service.NewDownloadTaskService(db, config, nil)
+		downloadTaskService := service.NewDownloadTaskService(db).SubscribeConfigChange(config, make(<-chan any))
 
 		md5s := []string{
 			"552467f149f79e72e783f863eebef7b3",

@@ -3,7 +3,6 @@ package service_test
 import (
 	"testing"
 
-	"github.com/Catizard/lampghost_wails/internal/config"
 	"github.com/Catizard/lampghost_wails/internal/database"
 	"github.com/Catizard/lampghost_wails/internal/entity"
 	"github.com/Catizard/lampghost_wails/internal/service"
@@ -141,8 +140,7 @@ func skipRealFileTest(noScoreLog, noSongData, noScoreDataLog bool) error {
 
 // Simple wrapper of service.NewRivalInfoService
 func newRivalInfoService(db *gorm.DB) *service.RivalInfoService {
-	monitorService, syncChan := service.NewMonitorService(&config.ApplicationConfig{})
-	return service.NewRivalInfoService(db, monitorService, syncChan)
+	return service.NewRivalInfoService(db)
 }
 
 func TestInitializeBeatorajaUser(t *testing.T) {

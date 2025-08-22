@@ -25,24 +25,28 @@ type DiffTableService struct {
 	db                      *gorm.DB
 	downloadTaskService     *DownloadTaskService
 	useScoredataForMainUser bool
-	subscribeConfigChange   <-chan any
+	configNotify            <-chan any
 	mutex                   sync.Mutex
 }
 
-func NewDiffTableService(db *gorm.DB, downloadTaskService *DownloadTaskService, useScoredataForMainUser bool, configNotify <-chan any) *DiffTableService {
+func NewDiffTableService(db *gorm.DB, downloadTaskService *DownloadTaskService) *DiffTableService {
 	service := &DiffTableService{
-		db:                      db,
-		downloadTaskService:     downloadTaskService,
-		useScoredataForMainUser: useScoredataForMainUser,
-		subscribeConfigChange:   configNotify,
+		db:                  db,
+		downloadTaskService: downloadTaskService,
 	}
-	go service.listenUpdateConfig()
 	return service
 }
 
-func (s *DiffTableService) listenUpdateConfig() {
+func (s *DiffTableService) SubscribeConfigChanges(conf *config.ApplicationConfig, configNotify <-chan any) *DiffTableService {
+	s.useScoredataForMainUser = conf.UseScoredataForMainUser != 0
+	s.configNotify = configNotify
+	go s.listenConfigChanges()
+	return s
+}
+
+func (s *DiffTableService) listenConfigChanges() {
 	for {
-		<-s.subscribeConfigChange
+		<-s.configNotify
 		log.Debugf("[DiffTableService] received config change notification")
 		go func() {
 			s.mutex.Lock()

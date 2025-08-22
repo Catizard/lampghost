@@ -119,21 +119,28 @@ function chooseFile(title: string, target: "scorelogPath" | "songdataPath" | "sc
 
 const playerDirectories: Ref<SelectOption[]> = ref([]);
 function chooseBeatorajaDirectory() {
-  ChooseBeatorajaDirectory()
-    .then(result => {
-      if (result.Code != 200) {
-        return Promise.reject(result.Msg)
-      }
-      const data: dto.BeatorajaDirectoryMeta = result.Data;
-      playerDirectories.value = data.PlayerDirectories.map(row => {
-        return {
-          label: row,
-          value: row
-        } as SelectOption
-      });
-      formData.beatorajaDirectoryPath = data.BeatorajaDirectoryPath;
-      formData.playerDirectory = playerDirectories.value[0].value as string;
-    }).catch(err => window.$notifyError(err));
+  OpenDirectoryDialog(t('title.chooseBeatorajaDirectory')).then(result => {
+    if (result.Code != 200) {
+      return Promise.reject(result.Msg);
+    }
+    return Promise.resolve(result.Data);
+  }).then(path => {
+    ChooseBeatorajaDirectory(path)
+      .then(result => {
+        if (result.Code != 200) {
+          return Promise.reject(result.Msg)
+        }
+        const data: dto.BeatorajaDirectoryMeta = result.Data;
+        playerDirectories.value = data.PlayerDirectories.map(row => {
+          return {
+            label: row,
+            value: row
+          } as SelectOption
+        });
+        formData.beatorajaDirectoryPath = data.BeatorajaDirectoryPath;
+        formData.playerDirectory = playerDirectories.value[0].value as string;
+      })
+  }).catch(err => window.$notifyError(err));
 }
 
 function chooseBMSDirectory() {

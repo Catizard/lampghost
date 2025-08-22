@@ -257,6 +257,7 @@ func (s *DownloadTaskService) tryKickingWaitTask() {
 		// NOTE: <del>Below check & conversion was stolen from wriggle, sorry wriggle!</del>
 		if filename == "" || filename == "/" || filename == "." {
 			s.submitTaskError(next.ID, eris.New("cannot determine filename"))
+			return
 		}
 
 		filename = filepath.Clean(filename)

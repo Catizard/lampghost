@@ -20,6 +20,9 @@
   <SortTableModal v-model:show="sortTableSettings.show" :query-func="sortTableSettings.queryFunc"
     @select="sortTableSettings.handleUpdateSort" :title="sortTableSettings.title"
     :labelField="sortTableSettings.labelField" :keyField="sortTableSettings.keyField" />
+  <SortTableModal v-model:show="sortLevelSettings.show" :query-func="sortLevelSettings.queryFunc"
+    @select="sortLevelSettings.handleUpdateSort" :title="sortLevelSettings.title"
+    :labelField="sortLevelSettings.labelField" :keyField="sortLevelSettings.keyField" />
   <DifficultTableSupply ref="supplyFormRef" />
 </template>
 
@@ -30,8 +33,9 @@ import { h, reactive, Ref, ref } from "vue";
 import {
   DelDiffTableHeader,
   FindDiffTableHeaderTree,
+  FindDiffTableLevelList,
   ReloadDiffTableHeader,
-  SupplyMissingBMSFromTable,
+  UpdateHeaderLevelOrders,
   UpdateHeaderOrder
 } from "@wailsjs/go/main/App";
 import { dto } from "@wailsjs/go/models";
@@ -67,9 +71,41 @@ const sortTableSettings = reactive({
     }).catch(err => window.$notifyError(err))
       .finally(() => loading.value = false);
   },
-  title: t('title.refactorDifficultTableLevelOrder'),
+  title: t('title.refactorDifficultTableOrder'),
   labelField: "Name",
   keyField: "ID"
+});
+
+const sortLevelSettings = reactive({
+  tableId: 0,
+  show: false,
+  queryFunc: () => {
+    return FindDiffTableLevelList(sortLevelSettings.tableId).then(result => {
+      result.Rows = result.Rows.map(row => {
+        return {
+          key: row,
+          label: row,
+        }
+      });
+      return result;
+    });
+  },
+  handleUpdateSort: (levels: string[]) => {
+    loading.value = true;
+    UpdateHeaderLevelOrders({
+      ID: sortLevelSettings.tableId,
+      LevelOrders: levels.join(",")
+    } as any).then(result => {
+      if (result.Code != 200) {
+        return Promise.reject(result.Msg);
+      }
+      loadDiffTableData();
+    }).catch(err => window.$notifyError(err))
+      .finally(() => loading.value = false);
+  },
+  title: t('title.refactorDifficultTableLevelOrder'),
+  keyField: "key",
+  labelField: "label"
 });
 
 const columns = [
@@ -137,7 +173,7 @@ function handleSelectOtherAction(row: dto.DiffTableHeaderDto, key: string) {
     reloadTableHeader(row.ID);
   }
   if ("Supply" === key) {
-    supplyFormRef.value.open(row.ID);
+    supplyFormRef.value.open(row.ID, row.Symbol);
   }
   if ("Delete" === key) {
     dialog.warning({
@@ -153,7 +189,8 @@ function handleSelectOtherAction(row: dto.DiffTableHeaderDto, key: string) {
     editFormRef.value.open(row.ID);
   }
   if ("SortLevels" === key) {
-    sortTableSettings.show = true;
+    sortLevelSettings.tableId = row.ID;
+    sortLevelSettings.show = true;
   }
 }
 

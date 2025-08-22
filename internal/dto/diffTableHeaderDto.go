@@ -25,7 +25,6 @@ type DiffTableHeaderDto struct {
 	SortedLevels         []string
 	LevelLayeredContents map[string][]*DiffTableDataDto
 
-	// Only used in tree query interface
 	Level string
 	// NOTE: children field should never be nil
 	Children []DiffTableHeaderDto
@@ -34,6 +33,7 @@ type DiffTableHeaderDto struct {
 	// rank => count
 	RankCount map[int]int
 	SongCount int
+	LostCount int
 }
 
 func NewDiffTableHeaderDto(header *entity.DiffTableHeader, contents []*DiffTableDataDto) *DiffTableHeaderDto {

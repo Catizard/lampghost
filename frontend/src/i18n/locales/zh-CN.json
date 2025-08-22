@@ -210,7 +210,10 @@
     "miss": "Miss",
     "accuracy": "准确率",
     "score": "得分",
-    "bp": "BP"
+    "bp": "BP",
+    "lostCount": "缺失数量",
+    "songCount": "歌曲数量",
+    "level": "难度"
   },
   "title": {
     "tableManagement": "难度表管理",

@@ -277,7 +277,27 @@ func (s *DiffTableService) FindDiffTableHeaderList(filter *vo.DiffTableHeaderVo)
 }
 
 func (s *DiffTableService) FindDiffTableLevelList(ID uint) ([]string, int, error) {
-	return findDiffTableLevelList(s.db, ID)
+	levels, n, err := findDiffTableLevelList(s.db, ID)
+	if err != nil {
+		return nil, 0, eris.Wrap(err, "findDiffTableLevelList")
+	}
+	headerInfo, err := findDiffTableHeaderByID(s.db, ID)
+	if err != nil {
+		return nil, 0, eris.Wrap(err, "findDiffTableHeaderByID")
+	}
+	return sortLevels(levels, strings.Split(headerInfo.LevelOrders, ",")), n, nil
+}
+
+func (s *DiffTableService) FindDownloadableLevelList(ID uint) ([]dto.DiffTableHeaderDto, int, error) {
+	headers, n, err := findDownloadableLevelList(s.db, ID)
+	if err != nil {
+		return nil, 0, eris.Wrap(err, "findDownloadableLevelList")
+	}
+	headerInfo, err := findDiffTableHeaderByID(s.db, ID)
+	if err != nil {
+		return nil, 0, eris.Wrap(err, "findDiffTableHeaderByID")
+	}
+	return sortHeadersByLevel(headers, strings.Split(headerInfo.LevelOrders, ",")), n, nil
 }
 
 // Query difficult table data as tree
@@ -505,6 +525,7 @@ func (s *DiffTableService) UpdateHeaderLevelOrders(updateParam *vo.DiffTableHead
 	if updateParam.LevelOrders == "" {
 		return fmt.Errorf("assert: UpdateHeaderLevelOrders: updateParam.LevelOrders cannot be empty")
 	}
+	log.Debugf("%d -> %s", updateParam.ID, updateParam.LevelOrders)
 	return s.db.Transaction(func(tx *gorm.DB) error {
 		return updateHeaderLevelOrders(tx, updateParam.ID, updateParam.LevelOrders)
 	})
@@ -636,6 +657,11 @@ func reloadDiffTableHeader(tx *gorm.DB, ID uint, importHeader *bmstable.Difficul
 	return nil
 }
 
+func findDiffTableHeaderByID(tx *gorm.DB, ID uint) (out *entity.DiffTableHeader, err error) {
+	err = eris.Wrap(tx.First(&out, ID).Error, "query difftable_header")
+	return
+}
+
 // Query one difficult table header and its related contents by header's ID
 //
 // Related contents would be attached on `Contents` field
@@ -663,6 +689,54 @@ func findDiffTableLevelList(tx *gorm.DB, ID uint) (out []string, n int, err erro
 	err = tx.Debug().Model(&entity.DiffTableData{}).Where("header_id = ?", ID).Distinct("level").Find(&out).Error
 	n = len(out)
 	return
+}
+
+func findDownloadableLevelList(tx *gorm.DB, ID uint) ([]dto.DiffTableHeaderDto, int, error) {
+	rows, err := tx.Raw(`
+    select "level", data_lost, count(1)
+    from (
+	    select dd.sha256, dd.md5, dd.level, (rsd.id is null) as data_lost
+	    from difftable_data dd 
+	    left join (select md5, sha256, id from rival_song_data rsd group by rsd.sha256) rsd on dd.md5 = rsd.md5 
+	    where dd.header_id = ?
+    ) t
+    group by t."level", t.data_lost`, ID).Rows()
+	if err != nil {
+		return nil, 0, eris.Wrap(err, "query difftable_data")
+	}
+
+	levelToSongCount := make(map[string]int)
+	levelToLostCount := make(map[string]int)
+	for rows.Next() {
+		var level string
+		var dataLost bool
+		var count int
+		if err := rows.Scan(&level, &dataLost, &count); err != nil {
+			return nil, 0, eris.Wrap(err, "scan difftable_data")
+		}
+		if dataLost {
+			levelToLostCount[level] = count
+		}
+		if prev, ok := levelToSongCount[level]; ok {
+			levelToSongCount[level] = prev + count
+		} else {
+			levelToSongCount[level] = count
+		}
+	}
+
+	ret := make([]dto.DiffTableHeaderDto, 0)
+	for level, songCount := range levelToSongCount {
+		lostCount := 0
+		if v, ok := levelToLostCount[level]; ok {
+			lostCount = v
+		}
+		ret = append(ret, dto.DiffTableHeaderDto{
+			Level:     level,
+			SongCount: songCount,
+			LostCount: lostCount,
+		})
+	}
+	return ret, len(ret), nil
 }
 
 func updateHeaderOrder(tx *gorm.DB, headerIDs []uint) error {

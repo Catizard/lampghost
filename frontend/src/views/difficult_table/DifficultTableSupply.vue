@@ -2,42 +2,40 @@
   <n-modal :loading="loading" v-model:show="show" preset="dialog" :title="t('title.supplyMissingBMSFromTable')"
     :positive-text="t('button.submit')" :negative-text="t('button.cancel')" @positive-click="handlePositiveClick"
     @negative-click="handleNegativeClick" :mask-closable="false">
-    <n-data-table :columns="columns" :data="data" :bordered="false" :row-key="(row: Level) => row.name"
+    <n-data-table :columns="columns" :data="data" :bordered="false" :row-key="(row: dto.DiffTableHeaderDto) => row.Name"
       v-model:checked-row-keys="selectedLevels" max-height="75vh" />
   </n-modal>
 </template>
 
 <script setup lang="ts">
-import { FindDiffTableLevelList, SupplyMissingBMSFromTable } from '@wailsjs/go/main/App';
+import { FindDownloadableLevelList, SupplyMissingBMSFromTable } from '@wailsjs/go/main/App';
+import { dto } from '@wailsjs/go/models';
 import { DataTableColumns } from 'naive-ui';
 import { Ref, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-
-type Level = {
-  name: string
-};
 
 const { t } = useI18n();
 const show = ref(false);
 const loading = ref(false);
 const tableId = ref(null);
+const tableSymbol = ref("");
 const selectedLevels: Ref<string[]> = ref([]);
 defineExpose({ open });
 
-function open(difficultTableId: number) {
+// I'm lazy to query symbol in this function
+function open(difficultTableId: number, symbol: string) {
   show.value = true;
   loading.value = true;
   tableId.value = difficultTableId;
-  FindDiffTableLevelList(difficultTableId).then(result => {
+  tableSymbol.value = symbol;
+  FindDownloadableLevelList(difficultTableId).then(result => {
     if (result.Code != 200) {
       return Promise.reject(result.Msg);
     }
-    data.value = [...result.Rows.map(level => {
-      return {
-        name: level
-      }
+    data.value = [...result.Rows];
+    selectedLevels.value = [...result.Rows.map(header => {
+      return header.Name;
     })];
-    selectedLevels.value = [...result.Rows];
   }).catch(err => window.$notifyError(err))
     .finally(() => loading.value = false)
 }
@@ -64,15 +62,15 @@ function handleNegativeClick() {
   show.value = false;
 }
 
-let data: Ref<Level[]> = ref([]);
-const columns: DataTableColumns<Level> = [
+let data: Ref<dto.DiffTableHeaderDto[]> = ref([]);
+const columns: DataTableColumns<dto.DiffTableHeaderDto> = [
   { type: "selection" },
-  { title: t('column.name'), key: "name" },
   {
-    title: t('column.rowIndex'), key: "RowIndex",
-    render(_, rowIndex: number) {
-      return rowIndex + 1;
+    title: t('column.level'), key: "Level", render(row: dto.DiffTableHeaderDto) {
+      return `${tableSymbol.value}${row.Level}`;
     }
-  }
+  },
+  { title: t('column.lostCount'), key: "LostCount" },
+  { title: t('column.songCount'), key: "SongCount" },
 ]
 </script>

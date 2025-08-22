@@ -134,6 +134,10 @@ export function FindDownloadTaskList() {
   return window['go']['main']['App']['FindDownloadTaskList']();
 }
 
+export function FindDownloadableLevelList(arg1) {
+  return window['go']['main']['App']['FindDownloadableLevelList'](arg1);
+}
+
 export function FindFolderContentList(arg1) {
   return window['go']['main']['App']['FindFolderContentList'](arg1);
 }

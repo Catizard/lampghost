@@ -89,6 +89,16 @@ func (ctl *DiffTableController) FindDiffTableLevelList(ID uint) result.RtnDataLi
 	return result.NewRtnDataList(rows)
 }
 
+func (ctl *DiffTableController) FindDownloadableLevelList(ID uint) result.RtnDataList {
+	log.Info("[Controller] calling DiffTableController.FindDownloadableLevelList")
+	rows, _, err := ctl.diffTableService.FindDownloadableLevelList(ID)
+	if err != nil {
+		log.Errorf("[DiffTableController] returning err: %v", eris.ToString(err, true))
+		return result.NewErrorDataList(err)
+	}
+	return result.NewRtnDataList(rows)
+}
+
 func (ctl *DiffTableController) FindDiffTableHeaderTree(filter *vo.DiffTableHeaderVo) result.RtnDataList {
 	log.Info("[Controller] calling DiffTableController.FindDiffTableHeaderTree")
 	rows, _, err := ctl.diffTableService.FindDiffTableHeaderTree(filter)
@@ -141,7 +151,7 @@ func (ctl *DiffTableController) UpdateHeaderOrder(headerIDs []uint) result.RtnMe
 func (ctl *DiffTableController) UpdateHeaderLevelOrders(updateParam *vo.DiffTableHeaderVo) result.RtnMessage {
 	log.Info("[Controller] Calling DiffTableController.UpdateHeaderLevelOrders")
 	if err := ctl.diffTableService.UpdateHeaderLevelOrders(updateParam); err != nil {
-		log.Errorf("[DiffTableController] returning err: %v", err)
+		log.Errorf("[DiffTableController] returning err: %v", eris.ToString(err, true))
 		return result.NewErrorMessage(err)
 	}
 	return result.SUCCESS

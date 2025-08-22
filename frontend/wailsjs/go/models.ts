@@ -334,6 +334,7 @@ export namespace dto {
 	    LampCount: Record<number, number>;
 	    RankCount: Record<number, number>;
 	    SongCount: number;
+	    LostCount: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new DiffTableHeaderDto(source);
@@ -360,6 +361,7 @@ export namespace dto {
 	        this.LampCount = source["LampCount"];
 	        this.RankCount = source["RankCount"];
 	        this.SongCount = source["SongCount"];
+	        this.LostCount = source["LostCount"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

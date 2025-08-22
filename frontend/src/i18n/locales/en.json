@@ -210,7 +210,10 @@
     "miss": "Miss",
     "accuracy": "Accuracy",
     "score": "Score",
-    "bp": "BP"
+    "bp": "BP",
+    "lostCount": "Lost Chart",
+    "songCount": "Chart Count",
+    "level": "Level"
   },
   "title": {
     "tableManagement": "Table Management",

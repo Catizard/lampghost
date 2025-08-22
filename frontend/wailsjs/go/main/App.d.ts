@@ -74,6 +74,8 @@ export function FindDiffTableLevelList(arg1:number):Promise<result.RtnDataList>;
 
 export function FindDownloadTaskList():Promise<result.RtnDataList>;
 
+export function FindDownloadableLevelList(arg1:number):Promise<result.RtnDataList>;
+
 export function FindFolderContentList(arg1:vo.FolderContentVo):Promise<result.RtnDataList>;
 
 export function FindFolderList(arg1:vo.FolderVo):Promise<result.RtnDataList>;

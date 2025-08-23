@@ -2,8 +2,9 @@
   <n-modal :loading="loading" v-model:show="show" preset="dialog" :title="t('title.supplyMissingBMSFromTable')"
     :positive-text="t('button.submit')" :negative-text="t('button.cancel')" @positive-click="handlePositiveClick"
     @negative-click="handleNegativeClick" :mask-closable="false">
-    <n-data-table :columns="columns" :data="data" :bordered="false" :row-key="(row: dto.DiffTableHeaderDto) => row.Name"
-      v-model:checked-row-keys="selectedLevels" max-height="75vh" />
+    <n-data-table :columns="columns" :data="data" :bordered="false"
+      :row-key="(row: dto.DiffTableHeaderDto) => row.Level" v-model:checked-row-keys="selectedLevels"
+      max-height="75vh" />
   </n-modal>
 </template>
 
@@ -34,7 +35,7 @@ function open(difficultTableId: number, symbol: string) {
     }
     data.value = [...result.Rows];
     selectedLevels.value = [...result.Rows.map(header => {
-      return header.Name;
+      return header.Level;
     })];
   }).catch(err => window.$notifyError(err))
     .finally(() => loading.value = false)

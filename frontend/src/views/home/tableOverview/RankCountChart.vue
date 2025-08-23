@@ -20,7 +20,7 @@ const props = defineProps<{
 
 // TODO: I need a better solution, eh
 const RANKS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-const REVERSE_RANKS = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
+const REVERSE_RANKS = [0, 9, 8, 7, 6, 5, 4, 3, 2, 1];
 
 const STR_RANKS = [
   "NO_PLAY",

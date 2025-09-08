@@ -52,7 +52,7 @@ func NewApp() *App {
 	eventService := &service.EventService{}
 
 	// config module
-	configService := service.NewConfigService(db)
+	configService := service.NewConfigService(db).UseEvents(eventService)
 	configController := controller.NewConfigController(configService)
 	conf, err := config.ReadConfig()
 	if err != nil {

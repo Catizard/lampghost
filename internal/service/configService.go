@@ -13,9 +13,10 @@ import (
 )
 
 type ConfigService struct {
-	db         *gorm.DB
-	dirty      chan any
-	subscribes []chan<- any
+	db           *gorm.DB
+	dirty        chan any
+	subscribes   []chan<- any
+	eventService *EventService
 }
 
 func NewConfigService(db *gorm.DB) *ConfigService {
@@ -29,6 +30,11 @@ func NewConfigService(db *gorm.DB) *ConfigService {
 	}
 	go ret.publish()
 	return ret
+}
+
+func (s *ConfigService) UseEvents(eventService *EventService) *ConfigService {
+	s.eventService = eventService
+	return s
 }
 
 // Taking DownloadTaskService, which requires updating the config changes as an example:
@@ -54,6 +60,7 @@ func (s *ConfigService) WriteConfig(conf *config.ApplicationConfig) error {
 		return err
 	}
 	s.dirty <- 1
+	s.eventService.PushEvent("config:update")
 	return nil
 }
 

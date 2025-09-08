@@ -75,6 +75,20 @@
               <n-select v-model:value="model.UseScoredataForMainUser" :options="yesnoOptions" style="width: 150px;" />
             </n-form-item>
           </n-p>
+          <n-p>
+            <n-form-item>
+              <template #label>
+                <n-tooltip trigger="hover" style="max-width: 400px; text-align: left; white-space: pre-line;">
+                  <template #trigger>
+                    <n-icon size="15" :component="ExperimentalIcon" color="green" />
+                  </template>
+                  {{ t('hint.assistAsFailed') }}
+                </n-tooltip>
+                <span style="white-space: pre-line;">{{ t('form.labelAssistAsFailed') }}</span>
+              </template>
+              <n-select v-model:value="model.AssistAsFailed" :options="yesnoOptions" style="width: 150px;" />
+            </n-form-item>
+          </n-p>
         </n-h2>
         <n-h2>
           <n-text>
@@ -195,6 +209,7 @@ const model = ref<config.ApplicationConfig>({
   PreviewSite: null,
   UseScoredatalog: null,
   UseScoredataForMainUser: null,
+  AssistAsFailed: null
 });
 const loading = ref(false);
 const yesnoOptions: Array<SelectOption> = [

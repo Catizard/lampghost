@@ -124,6 +124,7 @@
     "labelUseScoredatalog": "Use scoredatalog.db as recent menu's datasource",
     "labelUseScoredataForMainUser": "Use score.db as main user's lamp status datasource",
     "labelConstraints": "Constraints",
+    "labelAssistAsFailed": "Consider assist clear as failed",
     "placeholderName": "Please input name",
     "placeholderUserName": "Please input your name",
     "placeholderRivalName": "Please input rival name",
@@ -278,10 +279,11 @@
     "initTable": "Add some most used tables",
     "skipInitTable": "Lampghost might work abnormally with no tables. Do you really want to skip this step?",
     "initTableError": "Some tables are failed to add, you could try adding them manually: {tables}",
-    "ignoreVariantCourse": "When opend, ignore all the courses which constraint contains 'no_good', 'no_speed', 'no_great', only reserve the normal course\nWarning: rival's tag won't be re-generated again by changing this option, you still need to reload manually",
-    "useScoredatalog": "When opend, use 'scoredatalog.db' instead of 'scorelog.db' as datasource for recent menu",
+    "ignoreVariantCourse": "When opened, ignore all the courses which constraint contains 'no_good', 'no_speed', 'no_great', only reserve the normal course\nWarning: rival's tag won't be re-generated again by changing this option, you still need to reload manually",
+    "useScoredatalog": "When opened, use 'scoredatalog.db' instead of 'scorelog.db' as datasource for recent menu",
     "useScoredataForMainUser": "When opend, use 'score.db' instead of 'scorelog.db' to build main user's lamp status",
-    "fullyReloadMainUser": "Removing all existed data and reloading them. This would make some data lost (e.g. key count will be decreased). If you only want to reload part of the data, please use buttons in home page or song menu. Only use this button when really necessary!"
+    "fullyReloadMainUser": "Removing all existed data and reloading them. This would make some data lost (e.g. key count will be decreased). If you only want to reload part of the data, please use buttons in home page or song menu. Only use this button when really necessary!",
+    "assistAsFailed": "When opened, assist clear and light assist clear would be considered as failed"
   },
   "menuName": {
     "home": "Home",

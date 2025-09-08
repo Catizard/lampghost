@@ -16,6 +16,7 @@
 <script setup lang="ts">
 import { ClearType, ClearTypeDef, queryClearTypeColorStyle } from '@/constants/cleartype';
 import { queryScoreOptionColorStyle, ScoreOptionDef } from '@/constants/scoreOption';
+import { useConfigStore } from '@/stores/config';
 import dayjs from 'dayjs';
 import { computed } from 'vue';
 
@@ -26,8 +27,18 @@ const { clearType: clearTypeValue, scoreOption: scoreOptionValue, bestRecordTime
   disableTimestamp?: boolean
 }>();
 
+const configStore = useConfigStore();
+function fixClearTypeValue(clearTypeValue: number): number {
+  if (configStore.config.AssistAsFailed != 0) {
+    if (clearTypeValue == ClearType.LightAssistEasy || clearTypeValue == ClearType.AssistEasy) {
+      return ClearType.Failed;
+    }
+  }
+  return clearTypeValue;
+}
+
 const clearType = computed<ClearTypeDef>(() => {
-  return queryClearTypeColorStyle(clearTypeValue);
+  return queryClearTypeColorStyle(fixClearTypeValue(clearTypeValue));
 });
 
 const scoreOption = computed<ScoreOptionDef>(() => {

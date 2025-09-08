@@ -39,14 +39,14 @@ export const DefaultClearTypeColorStyle: Record<number, ClearTypeDef> = {
   },
   2: {
     value: 2,
-    text: "A-Easy",
+    text: "A-EASY",
     clearText: "A-Easy Clear",
     color: "#FF9FF9",
     textColor: "#ffffff",
   },
   3: {
     value: 3,
-    text: "LA-Easy",
+    text: "LA-EASY",
     clearText: "LA-Easy Clear",
     color: "#FF9FF9",
     textColor: "#ffffff",

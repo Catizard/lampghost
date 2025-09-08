@@ -51,6 +51,7 @@ func init() {
 	viper.SetDefault("EnableAutoReload", 1)
 	viper.SetDefault("UseScoredatalog", 0)
 	viper.SetDefault("UseScoredataForMainUser", 0)
+	viper.SetDefault("AssistAsFailed", 1)
 	viper.SafeWriteConfig()
 	// Setup logger
 	if logFile, err := os.OpenFile(WorkingDirectory+"lampghost.log", os.O_CREATE|os.O_WRONLY, 0644); err != nil {
@@ -79,6 +80,8 @@ type ApplicationConfig struct {
 	UseScoredatalog int
 	// When flagged, using 'score.db' to build main user's lamp status instead of 'scorelog.db'
 	UseScoredataForMainUser int
+	// When flagged, assist-clear & l-assist-clear would be considered as failed
+	AssistAsFailed int
 	// Extra fields, need to be setted explicitly
 	EnableDownloadFeature bool
 }
@@ -100,6 +103,7 @@ func ReadConfig() (*ApplicationConfig, error) {
 		PreviewSite:             viper.GetString("PreviewSite"),
 		UseScoredatalog:         viper.GetInt("UseScoredatalog"),
 		UseScoredataForMainUser: viper.GetInt("UseScoredataForMainUser"),
+		AssistAsFailed:          viper.GetInt("AssistAsFailed"),
 	}
 	conf.EnableDownloadFeature = conf.EnableDownload() == nil
 	return conf, nil
@@ -119,6 +123,7 @@ func (c *ApplicationConfig) WriteConfig() error {
 	viper.Set("PreviewSite", c.PreviewSite)
 	viper.Set("UseScoredatalog", c.UseScoredatalog)
 	viper.Set("UseScoredataForMainUser", c.UseScoredataForMainUser)
+	viper.Set("AssistAsFailed", c.AssistAsFailed)
 	if err := viper.WriteConfig(); err != nil {
 		return err
 	}

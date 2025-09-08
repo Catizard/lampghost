@@ -11,6 +11,7 @@ export namespace config {
 	    PreviewSite: string;
 	    UseScoredatalog: number;
 	    UseScoredataForMainUser: number;
+	    AssistAsFailed: number;
 	    EnableDownloadFeature: boolean;
 	
 	    static createFrom(source: any = {}) {
@@ -29,6 +30,7 @@ export namespace config {
 	        this.PreviewSite = source["PreviewSite"];
 	        this.UseScoredatalog = source["UseScoredatalog"];
 	        this.UseScoredataForMainUser = source["UseScoredataForMainUser"];
+	        this.AssistAsFailed = source["AssistAsFailed"];
 	        this.EnableDownloadFeature = source["EnableDownloadFeature"];
 	    }
 	}

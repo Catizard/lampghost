@@ -9,7 +9,7 @@
 <script setup lang="ts">
 import TableTags from '@/components/TableTags.vue';
 import { useUserStore } from '@/stores/user';
-import { BindSongToFolder, QueryRivalScoreDataLogPageList, QueryRivalScoreLogPageList, ReadConfig } from '@wailsjs/go/main/App';
+import { BindSongToFolder, QueryRivalScoreDataLogPageList, QueryRivalScoreLogPageList } from '@wailsjs/go/main/App';
 import { config, dto } from '@wailsjs/go/models';
 import dayjs from 'dayjs';
 import { DataTableColumns, NDropdown, NButton, NTooltip, NText, NFlex } from 'naive-ui';
@@ -24,6 +24,7 @@ import { ClearType, ClearTypeDef, DefaultClearTypeColorStyle, queryClearTypeColo
 import SongClearParagraph from '@/components/SongClearParagraph.vue';
 import RecordTimeParagraph from '@/components/RecordTimeParagraph.vue';
 import MinBPParagraph from '@/components/MinBPParagraph.vue';
+import { useConfigStore } from '@/stores/config';
 
 type PlayLog = dto.RivalScoreLogDto | dto.RivalScoreDataLogDto;
 type SongInfo = {
@@ -173,23 +174,13 @@ function handleSubmit(folderIds: number[]) {
     }).catch(err => window.$notifyError(err));
 }
 
-function queryConfig(): Promise<"datalog" | "scorelog"> {
-  return ReadConfig().then(result => {
-    if (result.Code != 200) {
-      return Promise.reject(result.Msg);
-    }
-    const config: config.ApplicationConfig = result.Data
-    return Promise.resolve(config.UseScoredatalog ? "datalog" : "scorelog");
-  });
-}
-
+const configStore = useConfigStore();
 async function loadData() {
   loading.value = true;
   try {
     console.log('no logType, querying');
     if (logType.value == null) {
-      const newLogTypeValue = await queryConfig();
-      logType.value = newLogTypeValue;
+      logType.value = configStore.config.UseScoredatalog != 0 ? "datalog" : "scorelog";
     }
     console.log('logType: ', logType.value);
     let arg: any = {

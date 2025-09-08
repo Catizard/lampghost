@@ -34,7 +34,7 @@
   background-color: #FFD25133 !important;
 }
 
-:deep(.PERFECT-HARD > .clearColumn) {
+:deep(.PERFECT > .clearColumn) {
   background-color: #FFD25133 !important;
 }
 
@@ -79,7 +79,7 @@
   background-color: #FFD25133 !important;
 }
 
-:deep(.ghost-PERFECT-HARD > .ghostClearColumn) {
+:deep(.ghost-PERFECT > .ghostClearColumn) {
   background-color: #FFD25133 !important;
 }
 

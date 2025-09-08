@@ -5,78 +5,71 @@
 
 <script setup lang="ts">
 import { ClearType } from "@/constants/cleartype";
-import { dto } from "@wailsjs/go/models";
+import { useConfigStore } from "@/stores/config";
+import { config, dto } from "@wailsjs/go/models";
 import { DataTableColumns } from "naive-ui";
 import { onMounted, reactive, ref, Ref, watch } from "vue";
 import VueApexCharts from "vue3-apexcharts";
+
+type OrderType = "reverse" | "ordered";
 
 const props = defineProps<{
   data: dto.DiffTableHeaderDto | null
   rivalId?: number;
   tableId?: number;
-  dataOrder: "reverse" | "ordered"
+  dataOrder: OrderType;
 }>();
+const configStore = useConfigStore();
 
-// TODO: I need a better solution, eh
-const LAMPS = [1, 4, 5, 6, 7, 8, 9, 10, 0];
-const REVERSE_LAMPS = [10, 9, 8, 7, 6, 5, 4, 1, 0];
-const STR_LAMPS = [
-  "FAILED",
-  "Easy",
-  "Normal",
-  "Hard",
-  "EXH",
-  "FC",
-  "PERFECT",
-  "MAX",
-  "NO_PLAY",
-];
-const REVERSE_STR_LAMPS = [
-  "MAX",
-  "PERFECT",
-  "FC",
-  "EXH",
-  "Hard",
-  "Normal",
-  "Easy",
-  "FAILED",
-  "NO_PLAY",
-];
-const LAMP_COLOR = [
-  "#CC5C76",
-  "#49E670",
-  "#4FBCF7",
-  "#FF6B74",
-  "#FFAD70",
-  "#FFD251",
-  "#FFD251",
-  "#FFD251",
-  "#FFFFFF",
-];
-const REVERSE_LAMP_COLOR = [
-  "#FFD251",
-  "#FFD251",
-  "#FFD251",
-  "#FFAD70",
-  "#FF6B74",
-  "#4FBCF7",
-  "#49E670",
-  "#CC5C76",
-  "#FFFFFF",
-];
+function getLamps(order: OrderType): number[] {
+  let r = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  if (order == "reverse") {
+    r = r.reverse();
+  }
+  console.log(configStore.config.AssistAsFailed)
+  if (configStore.config.AssistAsFailed != 0) {
+    r = r.filter(lamp => lamp != ClearType.AssistEasy && lamp != ClearType.LightAssistEasy)
+  }
+  r.push(0);
+  return r;
+}
+
+function getLampNames(order: OrderType): string[] {
+  let r = ["FAILED", "LA-Easy", "A-Easy", "Easy", "Normal", "Hard", "EXH", "FC", "PERFECT", "MAX"];
+  if (order == "reverse") {
+    r = r.reverse();
+  }
+  if (configStore.config.AssistAsFailed != 0) {
+    r = r.filter(lamp => lamp != "LA-Easy" && lamp != "A-Easy");
+  }
+  r.push("NO_PLAY")
+  return r;
+}
+
+function getLampColors(order: OrderType): string[] {
+  let r = ["#CC5C76", "#FF9FF9", "#FF9FF9", "#49E670", "#4FBCF7", "#FF6B74", "#FFAD70", "#FFD251", "#FFD251", "#FFD251"];
+  if (order == "reverse") {
+    r = r.reverse();
+  }
+  if (configStore.config.AssistAsFailed != 0) {
+    r = r.filter(lamp => lamp != "#FF9FF9");
+  }
+  r.push("#FFFFFF")
+  return r;
+}
 
 // NOTE: ApexCharts Vue doesn't give any responses if we changed lampCountChartOptions.colors
 // The only way to correctly reassign the colors is by rebuilding whole lampCountChartOptions
 // I believe this is a ApexCharts Vue bug or design failure
 let lampCountChartOptions = reactive(buildLampCountChartOptions("reverse"));
-function buildLampCountChartOptions(order: "reverse" | "ordered") {
+function buildLampCountChartOptions(order: OrderType) {
   return {
     chart: {
       type: "bar",
       stacked: true,
       stackType: "100%",
     },
-    colors: order == "reverse" ? REVERSE_LAMP_COLOR : LAMP_COLOR,
+    colors: getLampColors(order),
     plotOptions: {
       bar: {
         horizontal: true,
@@ -101,9 +94,9 @@ function buildLampCountChartOptions(order: "reverse" | "ordered") {
 }
 let lampCountChartSeries = [];
 
-function buildSeries(data: dto.DiffTableHeaderDto, order: "reverse" | "ordered") {
-  const lampNames = order == "reverse" ? REVERSE_STR_LAMPS : STR_LAMPS;
-  const lampValues = order == "reverse" ? REVERSE_LAMPS : LAMPS;
+function buildSeries(data: dto.DiffTableHeaderDto, order: OrderType) {
+  const lampNames = getLampNames(order);
+  const lampValues = getLamps(order);
   lampCountChartOptions = buildLampCountChartOptions(order);
   lampCountChartSeries = lampNames.map((lampName) => {
     return {
@@ -147,43 +140,63 @@ function chartHeight(): string {
   return `${baseHeight + addition}px`;
 }
 
-const overviewColumns: DataTableColumns<dto.DiffTableHeaderDto> = [
-  {
-    title: "No Play",
-    key: ClearType.NO_PLAY,
-    width: "60px",
-  },
-  {
-    title: "Failed",
-    key: ClearType.Failed,
-    width: "60px",
-  },
-  {
-    title: "Easy Clear+",
-    key: ClearType.Easy,
-    width: "60px",
-  },
-  {
-    title: "Normal Clear+",
-    key: ClearType.Normal,
-    width: "60px",
-  },
-  {
-    title: "Hard Clear+",
-    key: ClearType.Hard,
-    width: "60px",
-  },
-  {
-    title: "EX Hard Clear+",
-    key: ClearType.ExHard,
-    width: "60px",
-  },
-  {
-    title: "Full Combo+",
-    key: ClearType.FullCombo,
-    width: "60px",
-  },
-];
+function getOverviewColumns(): DataTableColumns<dto.DiffTableHeaderDto> {
+  let r = [
+    {
+      title: "No Play",
+      key: ClearType.NO_PLAY,
+      width: "60px",
+    },
+    {
+      title: "Failed",
+      key: ClearType.Failed,
+      width: "60px",
+    },
+    {
+      title: "LA-Easy",
+      key: ClearType.LightAssistEasy,
+      width: "60px",
+    },
+    {
+      title: "A-Easy",
+      key: ClearType.AssistEasy,
+      width: "60px",
+    },
+    {
+      title: "Easy Clear+",
+      key: ClearType.Easy,
+      width: "60px",
+    },
+    {
+      title: "Normal Clear+",
+      key: ClearType.Normal,
+      width: "60px",
+    },
+    {
+      title: "Hard Clear+",
+      key: ClearType.Hard,
+      width: "60px",
+    },
+    {
+      title: "EX Hard Clear+",
+      key: ClearType.ExHard,
+      width: "60px",
+    },
+    {
+      title: "Full Combo+",
+      key: ClearType.FullCombo,
+      width: "60px",
+    },
+  ];
+
+  if (configStore.config.AssistAsFailed != 0) {
+    r = r.filter(col => col.key != ClearType.AssistEasy && col.key != ClearType.LightAssistEasy);
+  }
+
+  return r;
+}
+
+const overviewColumns = getOverviewColumns();
 // overviewData is a two-dimensional array
 // overviewData[0]: the percentage for each clear type
 // overviewData[1]: a string for each clear type, which structure is "count/total"
@@ -196,10 +209,11 @@ function buildOverviewTable(data: dto.DiffTableHeaderDto, order: "reverse" | "or
   overviewData.value = [{}, {}];
   // TODO: currently, Assist/Light Assist would be calculated as fail
   // Some of the ClearType has special calculate way, I haven't found a good way to write this code
-  const failCount =
-    (lampCount[ClearType.Failed] ?? 0) +
-    (lampCount[ClearType.AssistEasy] ?? 0) +
-    (lampCount[ClearType.LightAssistEasy] ?? 0);
+  let failCount = (lampCount[ClearType.Failed] ?? 0);
+  if (configStore.config.AssistAsFailed != 0) {
+    failCount += (lampCount[ClearType.AssistEasy] ?? 0) +
+      (lampCount[ClearType.LightAssistEasy] ?? 0);
+  }
   overviewData.value[0][ClearType.Failed] =
     `${((100 * failCount) / songCount).toFixed(2)}%`;
   overviewData.value[1][ClearType.Failed] = `${failCount}/${songCount}`;
@@ -210,12 +224,10 @@ function buildOverviewTable(data: dto.DiffTableHeaderDto, order: "reverse" | "or
     const count = lampCount[v] ?? 0;
     sum += count;
     // We should continue to calculate sum here
-    if (
-      v == ClearType.LightAssistEasy ||
-      v == ClearType.AssistEasy ||
-      v == ClearType.Failed ||
-      v == ClearType.NO_PLAY
-    ) {
+    if (v == ClearType.Failed || v == ClearType.NO_PLAY) {
+      continue;
+    }
+    if (configStore.config.AssistAsFailed != 0 && (v == ClearType.AssistEasy || v == ClearType.LightAssistEasy)) {
       continue;
     }
     overviewData.value[0][v] = `${((100 * sum) / songCount).toFixed(2)}%`;

@@ -539,6 +539,9 @@ func (s *DiffTableService) SupplyMissingBMSFromTable(ID uint, levels []string) e
 	if err != nil {
 		return err
 	}
+	if err := conf.EnableDownload(); err != nil {
+		return eris.Wrap(err, "download config")
+	}
 	downloadSource := download.GetDownloadSource(conf.DownloadSite)
 	if !downloadSource.AllowBatchDownload() {
 		return fmt.Errorf("%s doesn't allow batch download, please choose other download source instead", downloadSource.GetMeta().Name)

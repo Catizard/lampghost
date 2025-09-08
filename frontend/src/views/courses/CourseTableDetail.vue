@@ -34,7 +34,7 @@ const columns: DataTableColumns<dto.RivalSongDataDto> = [
     }
   },
   {
-    title: t('column.clear'), key: "Clear", width: "140px", className: "clearColumn",
+    title: t('column.clear'), key: "Clear", width: "140px", className: "clearColumn", align: "center",
     render(row: dto.RivalSongDataDto) {
       return h(SongClearParagraph, {
         clearType: row.Lamp,
@@ -43,9 +43,9 @@ const columns: DataTableColumns<dto.RivalSongDataDto> = [
       });
     }
   },
-  { title: t('column.minbp'), key: "MinBP", width: "75px", },
+  { title: t('column.minbp'), key: "MinBP", width: "75px", align: "center" },
   {
-    title: t('column.ghost'), key: "GhostLamp", width: "140px", className: "ghostClearColumn",
+    title: t('column.ghost'), key: "GhostLamp", width: "140px", className: "ghostClearColumn", align: "center",
     render(row: dto.RivalSongDataDto) {
       return h(SongClearParagraph, {
         clearType: row.GhostLamp,
@@ -54,7 +54,7 @@ const columns: DataTableColumns<dto.RivalSongDataDto> = [
       });
     }
   },
-  { title: t('column.minbp'), key: "GhostMinBP", width: "75px", },
+  { title: t('column.minbp'), key: "GhostMinBP", width: "75px", align: "center" },
 ];
 
 function rowClassName(row: dto.RivalSongDataDto): string {

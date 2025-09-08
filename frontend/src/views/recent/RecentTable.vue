@@ -57,13 +57,13 @@ function createColumns(useScorelog: boolean): DataTableColumns<PlayLog> {
       }
     },
     {
-      title: t('column.tag'), key: "Tag", minWidth: "100px", resizable: true,
+      title: t('column.tag'), key: "Tag", minWidth: "100px", resizable: true, align: "center",
       render(row: PlayLog) {
         return h(TableTags, { tableTags: row.TableTags });
       }
     },
     {
-      title: t('column.clear'), key: "Clear", width: "140px", resizable: true, className: "clearColumn",
+      title: t('column.clear'), key: "Clear", width: "140px", resizable: true, className: "clearColumn", align: "center",
       render(row: PlayLog) {
         const p = { clearType: row.Clear, scoreOption: null, disableTimestamp: true };
         if (!useScorelog) {

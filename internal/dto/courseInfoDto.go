@@ -149,5 +149,14 @@ func (courseInfo *CourseInfoDto) GetConstraintMode() int {
 			gauge = 5
 		}
 	}
+	// TODO: Add random option in consideration here?
 	return /* (ln ? lnmode : 0) + option * 10*/ +hispeed*100 + judge*1000 + gauge*10000
+}
+
+func (courseInfo *CourseInfoDto) IsMatchingScoreMode(mode int) bool {
+	courseMode := courseInfo.GetConstraintMode()
+	if mode < 10000 {
+		courseMode %= 10000
+	}
+	return mode/100 == courseMode/100
 }

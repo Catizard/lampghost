@@ -226,7 +226,7 @@ func buildRivalTag(tx *gorm.DB, rivalID uint) ([]*entity.RivalTag, int, error) {
 			if err != nil {
 				continue
 			}
-			if scoreLogMode/100 != courseInfo.GetConstraintMode()/100 {
+			if !courseInfo.IsMatchingScoreMode(scoreLogMode) {
 				continue
 			}
 			fct := &entity.RivalTag{

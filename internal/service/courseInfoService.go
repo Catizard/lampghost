@@ -188,7 +188,7 @@ func mergeRivalScoreLogToCourses(courses []*dto.CourseInfoDto, logs []*dto.Rival
 				// do nothing...
 				continue
 			}
-			if scoreLogMode/100 != course.GetConstraintMode()/100 {
+			if !course.IsMatchingScoreMode(scoreLogMode) {
 				continue
 			}
 			course.Clear = max(course.Clear, scoreLog.Clear)

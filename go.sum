@@ -1,7 +1,5 @@
 github.com/Catizard/bmscanner v0.1.0 h1:pZbF56y16anjH+3G3pAVX1PSW6oah25BrEXEcBDtsRM=
 github.com/Catizard/bmscanner v0.1.0/go.mod h1:Ry+KW6oj25W2OZuLf1ra2JbiLJkJtZF5Wp2k2ozBf8Q=
-github.com/Catizard/bmstable v1.0.3 h1:H3V2c8FHi/T0SSqJjqfqHOqgq6WQL8Gidy83BtRQqQA=
-github.com/Catizard/bmstable v1.0.3/go.mod h1:St3a/Tusx7rFkaK1LGUowaIND6JGpd/vM4ZJ27YTFbo=
 github.com/Catizard/bmstable v1.0.4 h1:+CdHu6K5zydbQQ09E86PHT/RniM8z3nwRNLTtxpfAdE=
 github.com/Catizard/bmstable v1.0.4/go.mod h1:St3a/Tusx7rFkaK1LGUowaIND6JGpd/vM4ZJ27YTFbo=
 github.com/andybalholm/brotli v1.1.1 h1:PR2pgnyFznKEugtsUo0xLdDop5SKXd5Qf5ysW+7XdTA=

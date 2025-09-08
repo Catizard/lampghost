@@ -7,6 +7,7 @@ require (
 	github.com/charmbracelet/log v0.4.0
 	github.com/glebarez/sqlite v1.11.0
 	github.com/rotisserie/eris v0.5.4
+	github.com/saintfish/chardet v0.0.0-20230101081208-5e3ef4b5456d
 	github.com/samber/lo v1.50.0
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.10.0
@@ -94,7 +95,7 @@ require (
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
 	golang.org/x/net v0.41.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
-	golang.org/x/text v0.26.0 // indirect
+	golang.org/x/text v0.26.0
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	modernc.org/libc v1.22.5 // indirect

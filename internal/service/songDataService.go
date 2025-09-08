@@ -3,6 +3,11 @@ package service
 import (
 	"github.com/Catizard/bmscanner"
 	"github.com/Catizard/lampghost_wails/internal/entity"
+	"github.com/charmbracelet/log"
+	"github.com/saintfish/chardet"
+	"golang.org/x/text/encoding"
+	"golang.org/x/text/encoding/japanese"
+	"golang.org/x/text/transform"
 	"gorm.io/gorm"
 )
 
@@ -36,9 +41,40 @@ func (s *SongDataService) BuildSongData(directories []string) error {
 	if err != nil {
 		return err
 	}
+	// Try converting encoding if necessary
+	if len(models) == 0 {
+		return nil
+	}
+	any := models[0]
+	detector := chardet.NewTextDetector()
+	r, err := detector.DetectBest([]byte(any.Title))
+	cname := ""
+	if err != nil {
+		log.Infof("failed to detect charset: %s, skipping auto convert steps", err)
+	} else {
+		cname = r.Language
+	}
+	log.Debugf("charset name: %s", cname)
 	songData := make([]*entity.SongData, 0)
+	d := japanese.ShiftJIS.NewDecoder()
 	for _, model := range models {
+		model.Genre = convShiftJISEncoding(d, model.Genre)
+		model.Title = convShiftJISEncoding(d, model.Title)
+		model.SubTitle = convShiftJISEncoding(d, model.SubTitle)
+		model.Artist = convShiftJISEncoding(d, model.Artist)
+		model.SubArtist = convShiftJISEncoding(d, model.SubArtist)
 		songData = append(songData, entity.NewSongDataFromBMSModel(model))
 	}
+	log.Debugf("songdata length=%d", len(songData))
 	return s.db.CreateInBatches(songData, DEFAULT_BATCH_SIZE).Error
+}
+
+// Convert a string from encoding 'ch' to utf-8
+// Keep slient when having error
+func convShiftJISEncoding(d *encoding.Decoder, str string) string {
+	r, _, err := transform.String(d, str)
+	if err != nil {
+		return str
+	}
+	return r
 }

@@ -19,11 +19,10 @@ const props = defineProps<{
 }>();
 
 // TODO: I need a better solution, eh
-const RANKS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-const REVERSE_RANKS = [0, 9, 8, 7, 6, 5, 4, 3, 2, 1];
+const RANKS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+const REVERSE_RANKS = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
 
 const STR_RANKS = [
-  "NO_PLAY",
   "F",
   "E",
   "D",
@@ -33,9 +32,9 @@ const STR_RANKS = [
   "AA",
   "AAA",
   "MAX",
+  "NO_PLAY",
 ];
 const STR_REVERSE_RANKS = [
-  "NO_PLAY",
   "MAX",
   "AAA",
   "AA",
@@ -45,10 +44,10 @@ const STR_REVERSE_RANKS = [
   "D",
   "E",
   "F",
+  "NO_PLAY",
 ];
 
 const RANK_COLOR = [
-  "#FFFFFF",
   "#8C8C8C",
   "#B2A2FF",
   "#FF9FF9",
@@ -58,9 +57,9 @@ const RANK_COLOR = [
   "#FFAD70",
   "#FFD251",
   "#FFD251",
+  "#FFFFFF",
 ];
 const REVERSE_RANK_COLOR = [
-  "#FFFFFF",
   "#FFD251",
   "#FFD251",
   "#FFAD70",
@@ -70,6 +69,7 @@ const REVERSE_RANK_COLOR = [
   "#FF9FF9",
   "#B2A2FF",
   "#8C8C8C",
+  "#FFFFFF",
 ];
 
 // NOTE: ApexCharts Vue doesn't give any responses if we changed rankCountChartOptions.colors

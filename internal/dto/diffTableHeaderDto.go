@@ -96,7 +96,7 @@ type DiffTableHeaderExportDto struct {
 	HeaderUrl  string                       `json:"header_url"`
 	DataUrl    string                       `json:"data_url"`
 	LevelOrder []string                     `json:"level_order"`
-	Courses    [][]DiffTableCourseExportDto `json:"course"`
+	Courses    [][]DiffTableCourseExportDto `json:"course,omitempty"`
 }
 
 type DiffTableCourseExportDto struct {

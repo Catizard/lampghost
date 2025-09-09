@@ -87,14 +87,20 @@ func (s *ScoreDataService) LoadScoreData(rivalID uint, scoreDataPath string, max
 		if err != nil {
 			return nil, 0, err
 		}
-		rivalScoreData := make([]*entity.RivalScoreData, len(rawLogs))
-		for i, rawLog := range rawLogs {
+		rivalScoreData := make([]*entity.RivalScoreData, 0)
+		for _, rawLog := range rawLogs {
 			scoreData := entity.FromRawLR2LogToRivalScoreData(rawLog)
 			if sha256, ok := s.songHashCache.GetSHA256(rawLog.MD5); ok {
 				scoreData.Sha256 = sha256
+			} else {
+				// HACK: rival_score_data requires multiple primary key: (rival_id, sha256, mode)
+				// if a sha256 cannot be found, it'll be filled with empty string as default value
+				// This causes violation of constraints. Currently, we just skip this data since
+				// incrementally update lr2's scores is impossible
+				continue
 			}
 			scoreData.RivalID = rivalID
-			rivalScoreData[i] = &scoreData
+			rivalScoreData = append(rivalScoreData, &scoreData)
 		}
 		return rivalScoreData, len(rivalScoreData), nil
 	default:

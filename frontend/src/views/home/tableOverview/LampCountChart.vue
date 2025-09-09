@@ -26,7 +26,6 @@ function getLamps(order: OrderType): number[] {
   if (order == "reverse") {
     r = r.reverse();
   }
-  console.log(configStore.config.AssistAsFailed)
   if (configStore.config.AssistAsFailed != 0) {
     r = r.filter(lamp => lamp != ClearType.AssistEasy && lamp != ClearType.LightAssistEasy)
   }

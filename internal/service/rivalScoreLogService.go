@@ -104,11 +104,11 @@ func (s *RivalScoreLogService) QueryReverseImportScoreData(filter *vo.RivalScore
 // Fully delete all content from rival_score_log and reinsert them
 func syncScoreLog(tx *gorm.DB, rivalScoreLog []*entity.RivalScoreLog, rivalID uint) error {
 	if err := tx.Unscoped().Where("rival_id = ?", rivalID).Delete(&entity.RivalScoreLog{}).Error; err != nil {
-		return err
+		return eris.Wrap(err, "delete rival_score_log")
 	}
 
 	if err := tx.CreateInBatches(&rivalScoreLog, DEFAULT_BATCH_SIZE).Error; err != nil {
-		return err
+		return eris.Wrap(err, "insert rival_score_log")
 	}
 	return nil
 }

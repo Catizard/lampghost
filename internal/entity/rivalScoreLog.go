@@ -48,7 +48,7 @@ func FromRawLR2LogToRivalScoreLog(lr2Log *LR2Log) RivalScoreLog {
 		Md5:        lr2Log.MD5,
 		Mode:       "0", // TODO: Cannot figure out play mode here
 		Clear:      int32(ConvLR2Clear(lr2Log.Clear)),
-		RecordTime: time.Unix(int64(lr2Log.RowID), 0),
+		RecordTime: time.Now(),
 		OldClear:   0, // NOTE: LR2 doesn't provide old clear
 		Combo:      int32(lr2Log.MaxCombo),
 		Minbp:      int32(lr2Log.Minbp),

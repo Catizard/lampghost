@@ -95,6 +95,36 @@ func (s *ScoreLogService) LoadScoreLog(rivalID uint, scoreLogPath string, maximu
 		if err != nil {
 			return nil, 0, err
 		}
+		// NOTE: In order to make the recent activity component works for LR2 users, we implement
+		// a diff algorithm here: each time we load the lr2's database, we calculate the difference
+		// between current and the state in database based on lamp. If one song's clear lamp has
+		// changed, we insert it as a rival_score_log row into database. This generates the data
+		// that recent activity needs
+		rivalScoreData, _, err := findRivalScoreDataList(s.tx, &vo.RivalScoreDataVo{
+			RivalID: rivalID,
+		})
+		if err != nil {
+			return nil, 0, err
+		}
+		oldLamps := make(map[string]int)
+		for _, oldScoreData := range rivalScoreData {
+			if old, ok := oldLamps[oldScoreData.Md5]; ok {
+				// It's possible because the primary key is (md5, mode)
+				oldLamps[oldScoreData.Md5] = max(old, oldLamps[oldScoreData.Md5])
+			} else {
+				oldLamps[oldScoreData.Md5] = old
+			}
+		}
+		diffLogs := make([]*entity.LR2Log, 0)
+		for _, rawLog := range rawLogs {
+			if oldLamp, ok := oldLamps[rawLog.MD5]; ok {
+				if oldLamp < rawLog.Clear {
+					diffLogs = append(diffLogs, rawLog)
+				}
+			} else {
+				diffLogs = append(diffLogs, rawLog)
+			}
+		}
 		rivalScoreLog := make([]*entity.RivalScoreLog, len(rawLogs))
 		// NOTE: Unlike beatoraja' scorelog, LR2's log is using MD5 as the hash field. There're
 		// two ways to handle this:
@@ -111,7 +141,7 @@ func (s *ScoreLogService) LoadScoreLog(rivalID uint, scoreLogPath string, maximu
 		//
 		// We still have to add a 'md5' field to 'rival_score_log' for repairing the hash lost logs,
 		// and this issue is completely unseeable for users, which might be annoying
-		for i, rawLog := range rawLogs {
+		for i, rawLog := range diffLogs {
 			rivalLog := entity.FromRawLR2LogToRivalScoreLog(rawLog)
 			rivalLog.RivalId = rivalID
 			if sha256, ok := s.songHashCache.GetSHA256(rawLog.MD5); ok {

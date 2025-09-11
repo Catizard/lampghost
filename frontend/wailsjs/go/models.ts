@@ -729,6 +729,7 @@ export namespace dto {
 	    Artist: string;
 	    Md5: string;
 	    TableTags: DiffTableTagDto[];
+	    RandomPattern: string;
 	    RecordTimestamp: number;
 	    Page: number;
 	    PageSize: number;
@@ -775,6 +776,7 @@ export namespace dto {
 	        this.Artist = source["Artist"];
 	        this.Md5 = source["Md5"];
 	        this.TableTags = this.convertValues(source["TableTags"], DiffTableTagDto);
+	        this.RandomPattern = source["RandomPattern"];
 	        this.RecordTimestamp = source["RecordTimestamp"];
 	        this.Page = source["Page"];
 	        this.PageSize = source["PageSize"];

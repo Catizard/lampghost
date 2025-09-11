@@ -1,9 +1,13 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
+	"github.com/Catizard/lampghost_wails/internal/random"
 	"github.com/Catizard/lampghost_wails/internal/vo"
+	"github.com/charmbracelet/log"
 	"gorm.io/gorm"
 
 	. "github.com/samber/lo"
@@ -50,6 +54,25 @@ func (s *RivalScoreDataLogService) QueryRivalScoreDataLogPageList(filter *vo.Riv
 					log.TableTags = append(log.TableTags, tag)
 				}
 			})
+		})
+		ForEach(out, func(rlog *dto.RivalScoreDataLogDto, _ int) {
+			// TODO: This only considers 7+1k
+			keys := make([]int, 7)
+			for i := range keys {
+				keys[i] = i
+			}
+			if rlog.Md5 == "21ba2c31f460db85eea8a786cd7f1b4c" {
+				log.Debugf("this one")
+			}
+			rawRandomPatternArr := random.MakeRandom(rlog.Seed, keys)
+			randomPattern := ""
+			for _, p := range rawRandomPatternArr {
+				randomPattern += fmt.Sprintf("%d", p+1)
+			}
+			rlog.RandomPattern = randomPattern
+			if rlog.Md5 == "21ba2c31f460db85eea8a786cd7f1b4c" {
+				log.Debugf("final: %s", rlog.RandomPattern)
+			}
 		})
 		return nil
 	})

@@ -34,10 +34,13 @@ defineExpose({ open });
 const show = ref(false);
 const url: Ref<string | null> = ref(null);
 
-async function open(md5: string) {
+async function open(md5: string, option: number | null = null) {
   try {
     const result = await QueryPreviewURLByMd5(md5)
     url.value = result.Data;
+    if (option != null) {
+      url.value = `${url.value}&o=${option}`
+    }
     show.value = true;
   } catch (err) {
     window.$notifyError(err)

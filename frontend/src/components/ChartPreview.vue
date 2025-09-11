@@ -5,6 +5,13 @@
         Preview
         <n-button>
           <template #icon>
+            <n-icon height="30px" @click="copy">
+              <CopyIcon />
+            </n-icon>
+          </template>
+        </n-button>
+        <n-button>
+          <template #icon>
             <n-icon height="30px" @click="refresh">
               <RefreshIcon />
             </n-icon>
@@ -17,8 +24,9 @@
 </template>
 
 <script setup lang="ts">
-import { Refresh as RefreshIcon } from '@vicons/ionicons5';
+import { Refresh as RefreshIcon, Copy as CopyIcon } from '@vicons/ionicons5';
 import { QueryPreviewURLByMd5 } from '@wailsjs/go/main/App';
+import { ClipboardSetText } from '@wailsjs/runtime/runtime';
 import { nextTick, ref, Ref } from 'vue';
 
 defineExpose({ open });
@@ -42,5 +50,16 @@ function refresh() {
   nextTick(() => {
     url.value = prev;
   });
+}
+
+async function copy() {
+  try {
+    const result = await ClipboardSetText(url.value);
+    if (!result) {
+      throw "Failed to copy";
+    }
+  } catch (err) {
+    window.$notifyError(err);
+  }
 }
 </script>

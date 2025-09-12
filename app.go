@@ -83,7 +83,7 @@ func NewApp() *App {
 
 	// Set up the initial scorelog path
 	if mainUser, err := rivalInfoService.QueryMainUser(); err == nil && mainUser != nil && mainUser.Type != entity.RIVAL_TYPE_LR2 {
-		monitorService.SetScoreLogFilePath(*mainUser.ScoreLogPath)
+		monitorService.SetScoreLogFilePath(*mainUser.ScoreDataLogPath)
 	}
 
 	// download task module

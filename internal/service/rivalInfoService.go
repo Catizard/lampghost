@@ -143,7 +143,7 @@ func (s *RivalInfoService) InitializeMainUser(rivalInfo *vo.InitializeRivalInfoV
 	}
 
 	if insertRivalInfo.Type != entity.RIVAL_TYPE_LR2 {
-		if err := s.monitorService.SetScoreLogFilePath(*insertRivalInfo.ScoreLogPath); err != nil {
+		if err := s.monitorService.SetScoreLogFilePath(*insertRivalInfo.ScoreDataLogPath); err != nil {
 			log.Errorf("monitor: cannot setup monitor service: %s", err)
 		}
 	}
@@ -508,8 +508,8 @@ func (s *RivalInfoService) UpdateRivalInfo(rivalInfo *vo.RivalInfoVo) error {
 		if rivalInfo.ScoreDataPath != nil && (prev.ScoreDataPath == nil || *prev.ScoreDataPath != *rivalInfo.ScoreDataPath) {
 			reloadInfo.ScoreData = true
 		}
-		if prev.MainUser && reloadInfo.ScoreLog {
-			s.monitorService.SetScoreLogFilePath(*rivalInfo.ScoreLogPath)
+		if prev.MainUser && reloadInfo.ScoreDataLog {
+			s.monitorService.SetScoreLogFilePath(*rivalInfo.ScoreDataLogPath)
 		}
 		if err := updateRivalInfo(tx, reloadInfo, rivalInfo.Entity()); err != nil {
 			return eris.Wrap(err, "updateRivalInfo")

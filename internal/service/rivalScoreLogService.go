@@ -142,13 +142,13 @@ func findRivalScoreLogList(tx *gorm.DB, filter *vo.RivalScoreLogVo) ([]*dto.Riva
 	}
 
 	if err := partial.Find(&out).Error; err != nil {
-		return nil, 0, err
+		return nil, 0, eris.Wrap(err, "query rival_score_log")
 	}
 	// pagination
 	if filter != nil && filter.Pagination != nil {
 		count, err := selectRivalScoreLogCount(tx, filter)
 		if err != nil {
-			return nil, 0, err
+			return nil, 0, eris.Wrap(err, "selectRivalScoreLogCount")
 		}
 		filter.Pagination.PageCount = calcPageCount(count, filter.Pagination.PageSize)
 	}
@@ -221,7 +221,7 @@ func selectRivalScoreLogCount(tx *gorm.DB, filter *vo.RivalScoreLogVo) (int64, e
 	if filter == nil {
 		var count int64
 		if err := tx.Debug().Model(&entity.RivalScoreLog{}).Count(&count).Error; err != nil {
-			return 0, err
+			return 0, eris.Wrap(err, "query rival_score_log")
 		}
 		return count, nil
 	}
@@ -233,7 +233,7 @@ func selectRivalScoreLogCount(tx *gorm.DB, filter *vo.RivalScoreLogVo) (int64, e
 		partial = partial.Where("sd.title like ('%' || ? || '%')", filter.SongNameLike)
 	}
 	if err := partial.Count(&count).Error; err != nil {
-		return 0, err
+		return 0, eris.Wrap(err, "query rival_score_log")
 	}
 	return count, nil
 }

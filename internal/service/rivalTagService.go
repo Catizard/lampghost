@@ -186,7 +186,7 @@ func syncRivalTag(tx *gorm.DB, rivalID uint) error {
 func buildRivalTag(tx *gorm.DB, rivalID uint) ([]*entity.RivalTag, int, error) {
 	courseInfoDtos, _, err := findCourseInfoList(tx, nil)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, eris.Wrap(err, "findCourseInfoList")
 	}
 
 	interestHashSet := make(map[string]any)
@@ -201,7 +201,7 @@ func buildRivalTag(tx *gorm.DB, rivalID uint) ([]*entity.RivalTag, int, error) {
 		MinimumClear:   &minimumClear,
 	})
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, eris.Wrap(err, "findRivalScoreLogList")
 	}
 	interestScoreLogs := Filter(rawScorelogs, func(log *dto.RivalScoreLogDto, _ int) bool {
 		_, ok := interestHashSet[log.Sha256]

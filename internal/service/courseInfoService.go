@@ -142,14 +142,14 @@ func delCourseInfo(tx *gorm.DB, filter *vo.CourseInfoVo) error {
 func findCourseInfoList(tx *gorm.DB, filter *vo.CourseInfoVo) ([]*dto.CourseInfoDto, int, error) {
 	var raw []*entity.CourseInfo
 	if err := tx.Debug().Model(&entity.CourseInfo{}).Scopes(scopeCourseInfoFilter(filter)).Find(&raw).Error; err != nil {
-		return nil, 0, err
+		return nil, 0, eris.Wrap(err, "query course_info")
 	}
 	if len(raw) == 0 {
 		return make([]*dto.CourseInfoDto, 0), 0, nil
 	}
 	cache, err := queryDefaultSongHashCache(tx)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, eris.Wrap(err, "queryDefaultSongHashCache")
 	}
 	out := make([]*dto.CourseInfoDto, 0)
 	for i := range raw {

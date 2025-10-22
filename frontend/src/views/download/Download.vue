@@ -10,7 +10,7 @@
       <n-radio-button key="completed" value="completed" :label="t('button.completed')" />
     </n-radio-group>
     {{ downloadProgress }}
-    <n-button type="warning" size="small" :disabled="!hasErrorTasks" @click="handleQuickRetry" style="margin-left: 8px;">
+    <n-button type="info" size="small" :disabled="!hasErrorTasks" @click="handleQuickRetry" style="margin-left: 8px;">
       {{ t('button.quickRetry') }}
     </n-button>
   </n-flex>

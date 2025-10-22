@@ -30,7 +30,9 @@
     "setClipboardError": "Failed to copy to clipboard, error: {msg}",
     "downloadProgress": "Current downloading: {success}/{count}, progress: {progress}%",
     "releaseVersionDiverage": "Release version: {releaseVersion}, current version: {currentVersion}",
-    "clipboardForImagesAreNotSetup": "Cannot setup clipboard for image related feature correctly, are you running on an incomplete environment?"
+    "clipboardForImagesAreNotSetup": "Cannot setup clipboard for image related feature correctly, are you running on an incomplete environment?",
+    "quickRetryStarted": "Quick retry triggered (error tasks)",
+    "noErrorTasks": "No error download tasks"
   },
   "button": {
     "add": "Add",
@@ -85,7 +87,8 @@
     "addDifficultTable": "Add Difficult Table",
     "editSongDirectories": "Edit BMS Directories",
     "lamp": "Lamp",
-    "score": "Score"
+    "score": "Score",
+    "quickRetry": "Quick Retry"
   },
   "form": {
     "labelLanguage": "Language",

@@ -30,7 +30,9 @@
     "setClipboardError": "复制失败，错误原因: {msg}",
     "downloadProgress": "当前进行的任务 {success}/{count}, 进度: {progress}%",
     "releaseVersionDiverage": "已发布版本: {releaseVersion}, 当前版本: {currentVersion}",
-    "clipboardForImagesAreNotSetup": "无法为图片相关的功能初始化剪贴板，现在运行在一个不完整的环境上吗？"
+    "clipboardForImagesAreNotSetup": "无法为图片相关的功能初始化剪贴板，现在运行在一个不完整的环境上吗？",
+    "quickRetryStarted": "已触发快速重试（错误任务）",
+    "noErrorTasks": "当前没有错误的下载任务"
   },
   "button": {
     "add": "新增",
@@ -85,7 +87,8 @@
     "addDifficultTable": "新增难度表",
     "editSongDirectories": "编辑BMS目录",
     "lamp": "点灯",
-    "score": "得分"
+    "score": "得分",
+    "quickRetry": "快速重试"
   },
   "form": {
     "labelLanguage": "语言",

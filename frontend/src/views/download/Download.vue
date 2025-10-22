@@ -10,6 +10,9 @@
       <n-radio-button key="completed" value="completed" :label="t('button.completed')" />
     </n-radio-group>
     {{ downloadProgress }}
+    <n-button type="warning" size="small" :disabled="!hasErrorTasks" @click="handleQuickRetry" style="margin-left: 8px;">
+      {{ t('button.quickRetry') }}
+    </n-button>
   </n-flex>
   <n-data-table :loading="loading" :columns="columns" :data='status == "progressing" ? progressing : completed'
     :row-key="(row: entity.DownloadTask) => row.ID" :pagination="pagination" />
@@ -195,5 +198,28 @@ function humanFileSize(bytes, si = false, dp = 1) {
 
 
   return bytes.toFixed(dp) + ' ' + units[u];
+}
+
+const hasErrorTasks = computed(() => {
+  return progressing.value.some(task => DownloadTaskStatus.from(task.Status) == DownloadTaskStatus.ERROR);
+});
+
+async function handleQuickRetry() {
+  const errorTasks = progressing.value.filter(task => DownloadTaskStatus.from(task.Status) == DownloadTaskStatus.ERROR);
+  if (errorTasks.length === 0) {
+    window.$notifySuccess(t('message.noErrorTasks'));
+    return;
+  }
+  try {
+    const results = await Promise.all(errorTasks.map(task => RestartDownloadTask(task.ID)));
+    const failed = results.filter(result => result.Code != 200);
+    if (failed.length > 0) {
+      window.$notifyError(failed.map(f => f.Msg).join('; '));
+    } else {
+      window.$notifySuccess(t('message.quickRetryStarted'));
+    }
+  } catch (err) {
+    window.$notifyError(err);
+  }
 }
 </script>

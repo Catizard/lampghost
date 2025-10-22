@@ -6,7 +6,9 @@
   </n-flex>
   <n-flex justify="space-between">
     <n-radio-group v-model:value="status" name="downloadStatusRadioGroup">
-      <n-radio-button key="progressing" value="progressing" :label="t('button.progressing')" />
+      <n-radio-button key="pending" value="pending" :label="t('button.pendingQuery')" />
+      <n-radio-button key="notFound" value="notFound" :label="t('button.notFound')" />
+      <n-radio-button key="downloading" value="downloading" :label="t('button.downloading')" />
       <n-radio-button key="completed" value="completed" :label="t('button.completed')" />
     </n-radio-group>
     {{ downloadProgress }}
@@ -14,7 +16,7 @@
       {{ t('button.quickRetry') }}
     </n-button>
   </n-flex>
-  <n-data-table :loading="loading" :columns="columns" :data='status == "progressing" ? progressing : completed'
+  <n-data-table :loading="loading" :columns="columns" :data="dataByStatus"
     :row-key="(row: entity.DownloadTask) => row.ID" :pagination="pagination" />
 </template>
 
@@ -34,28 +36,24 @@ const { t } = useI18n();
 const loading = ref(false);
 
 let cancel: () => void = null;
-const progressing: Ref<entity.DownloadTask[]> = ref([]);
+const pending: Ref<entity.DownloadTask[]> = ref([]);
+const notFound: Ref<entity.DownloadTask[]> = ref([]);
+const downloading: Ref<entity.DownloadTask[]> = ref([]);
 const completed: Ref<entity.DownloadTask[]> = ref([]);
-const status = ref<"progressing" | "completed">("progressing");
+const status = ref<"pending" | "notFound" | "downloading" | "completed">("pending");
 
 onMounted(() => {
   cancel = EventsOn("DownloadTask:pushup", ((tasks: entity.DownloadTask[]) => {
-    console.log(tasks);
     tasks.sort((a: entity.DownloadTask, b: entity.DownloadTask): number => {
-      console.log('a: ', a, 'b: ', b);
       return DownloadTaskStatus.compare(
         DownloadTaskStatus.from(a.Status),
         DownloadTaskStatus.from(b.Status)
       );
     });
-    const isSuccess = (task: entity.DownloadTask) => {
-      console.log(task, task.Status);
-      return DownloadTaskStatus.from(task.Status) == DownloadTaskStatus.SUCCESS;
-    };
-    console.log('1');
-    completed.value = [...tasks.filter(task => isSuccess(task))];
-    console.log('2');
-    progressing.value = [...tasks.filter(task => !isSuccess(task))];
+    pending.value = tasks.filter(task => DownloadTaskStatus.from(task.Status) == DownloadTaskStatus.PREPARE);
+    notFound.value = tasks.filter(task => DownloadTaskStatus.from(task.Status) == DownloadTaskStatus.ERROR);
+    downloading.value = tasks.filter(task => DownloadTaskStatus.from(task.Status) == DownloadTaskStatus.DOWNLOAD);
+    completed.value = tasks.filter(task => DownloadTaskStatus.from(task.Status) == DownloadTaskStatus.SUCCESS);
   }));
 });
 
@@ -65,13 +63,23 @@ onUnmounted(() => {
   }
 });
 
+const dataByStatus = computed(() => {
+  switch (status.value) {
+    case 'pending': return pending.value;
+    case 'notFound': return notFound.value;
+    case 'downloading': return downloading.value;
+    case 'completed': return completed.value;
+  }
+});
+
 const downloadProgress = computed(() => {
-  const c = completed.value.length, p = progressing.value.length;
+  const c = completed.value.length;
+  const total = completed.value.length + downloading.value.length + pending.value.length + notFound.value.length;
   return t('message.downloadProgress', {
     success: c,
-    count: c + p,
-    progress: ((c + p) == 0 ? 100 : c / (c + p) * 100).toFixed(2)
-  });;
+    count: total,
+    progress: (total == 0 ? 100 : c / total * 100).toFixed(2)
+  });
 });
 
 const columns: DataTableColumns<entity.DownloadTask> = [
@@ -98,13 +106,15 @@ const columns: DataTableColumns<entity.DownloadTask> = [
   {
     title: t('column.progress'), key: "progress", width: "220px",
     render(row: entity.DownloadTask) {
-      return `${humanFileSize(row.DownloadSize, true)}/${humanFileSize(row.ContentLength, true)}(${(row.DownloadSize / row.ContentLength * 100).toFixed(2)}%)`;
+      const len = row.ContentLength;
+      const cur = row.DownloadSize;
+      const percent = len > 0 ? (cur / len * 100).toFixed(2) : '0.00';
+      return `${humanFileSize(cur, true)}/${humanFileSize(len, true)}(${percent}%)`;
     }
   },
   {
     title: t('column.status'), key: "status", width: "125px",
     render(row: entity.DownloadTask) {
-      console.log(row.Status);
       return h(
         TaskStatusTag,
         { status: DownloadTaskStatus.from(row.Status), errorMsg: row.ErrorMessage },
@@ -201,11 +211,11 @@ function humanFileSize(bytes, si = false, dp = 1) {
 }
 
 const hasErrorTasks = computed(() => {
-  return progressing.value.some(task => DownloadTaskStatus.from(task.Status) == DownloadTaskStatus.ERROR);
+  return notFound.value.some(task => DownloadTaskStatus.from(task.Status) == DownloadTaskStatus.ERROR);
 });
 
 async function handleQuickRetry() {
-  const errorTasks = progressing.value.filter(task => DownloadTaskStatus.from(task.Status) == DownloadTaskStatus.ERROR);
+  const errorTasks = notFound.value.filter(task => DownloadTaskStatus.from(task.Status) == DownloadTaskStatus.ERROR);
   if (errorTasks.length === 0) {
     window.$notifySuccess(t('message.noErrorTasks'));
     return;

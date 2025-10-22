@@ -1,10 +1,12 @@
 <template>
-  <n-modal :loading="loading" v-model:show="show" preset="dialog" :title="t('title.supplyMissingBMSFromTable')"
+  <n-modal :loading="modalLoading" v-model:show="show" preset="dialog" :title="t('title.supplyMissingBMSFromTable')"
     :positive-text="t('button.submit')" :negative-text="t('button.cancel')" @positive-click="handlePositiveClick"
     @negative-click="handleNegativeClick" :mask-closable="false">
-    <n-data-table :columns="columns" :data="data" :bordered="false"
-      :row-key="(row: dto.DiffTableHeaderDto) => row.Level" v-model:checked-row-keys="selectedLevels"
-      max-height="75vh" />
+    <n-spin :show="queryLoading">
+      <n-data-table :columns="columns" :data="data" :bordered="false"
+        :row-key="(row: dto.DiffTableHeaderDto) => row.Level" v-model:checked-row-keys="selectedLevels"
+        max-height="75vh" />
+    </n-spin>
   </n-modal>
 </template>
 
@@ -17,7 +19,8 @@ import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 const show = ref(false);
-const loading = ref(false);
+const modalLoading = ref(false);
+const queryLoading = ref(false);
 const tableId = ref(null);
 const tableSymbol = ref("");
 const selectedLevels: Ref<string[]> = ref([]);
@@ -26,7 +29,8 @@ defineExpose({ open });
 // I'm lazy to query symbol in this function
 function open(difficultTableId: number, symbol: string) {
   show.value = true;
-  loading.value = true;
+  queryLoading.value = true;
+  modalLoading.value = false;
   tableId.value = difficultTableId;
   tableSymbol.value = symbol;
   FindDownloadableLevelList(difficultTableId).then(result => {
@@ -38,7 +42,7 @@ function open(difficultTableId: number, symbol: string) {
       return header.Level;
     })];
   }).catch(err => window.$notifyError(err))
-    .finally(() => loading.value = false)
+    .finally(() => queryLoading.value = false)
 }
 
 async function handlePositiveClick() {
@@ -46,7 +50,7 @@ async function handlePositiveClick() {
     window.$notifyError(t('message.noSelectedLevel'));
     return;
   }
-  loading.value = true;
+  modalLoading.value = true;
   try {
     const result = await SupplyMissingBMSFromTable(tableId.value, selectedLevels.value);
     if (result.Code != 200) {
@@ -55,7 +59,7 @@ async function handlePositiveClick() {
   } catch (err) {
     window.$notifyError(err);
   } finally {
-    loading.value = false;
+    modalLoading.value = false;
   }
 }
 

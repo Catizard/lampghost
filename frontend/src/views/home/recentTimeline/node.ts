@@ -1,6 +1,9 @@
 import { ClearType, ClearTypeDef, queryClearTypeColorStyle } from "@/constants/cleartype";
 import { dto } from "@wailsjs/go/models";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+// HACK:See https://github.com/Catizard/lampghost/issues/28
+dayjs.extend(utc);
 
 // NOTE: No semantic meaning, used as the unique field of Node type
 let nodeId = 0;
@@ -14,7 +17,7 @@ export type Node = {
 };
 
 export function parseOneDayLogs(rows: dto.RivalScoreLogDto[]): [dayjs.Dayjs, Array<Node>] {
-  let queryDate = dayjs(rows[0].RecordTime);
+  let queryDate = dayjs(rows[0].RecordTime).utc();
   let nodes = [];
   nodes.push(buildTimelineDateNode(queryDate.format("YYYY-MM-DD")));
   for (let i = 0; i < rows.length; ++i) {

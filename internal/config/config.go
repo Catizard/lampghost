@@ -54,7 +54,7 @@ func init() {
 	viper.SetDefault("AssistAsFailed", 1)
 	viper.SafeWriteConfig()
 	// Setup logger
-	if logFile, err := os.OpenFile(WorkingDirectory+"lampghost.log", os.O_CREATE|os.O_WRONLY, 0644); err != nil {
+	if logFile, err := os.OpenFile(WorkingDirectory+"lampghost.log", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644); err != nil {
 		panic(err)
 	} else {
 		log.SetOutput(io.MultiWriter(logFile, os.Stdout))

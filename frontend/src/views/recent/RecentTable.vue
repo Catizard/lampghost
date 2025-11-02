@@ -25,6 +25,7 @@ import SongClearParagraph from '@/components/SongClearParagraph.vue';
 import RecordTimeParagraph from '@/components/RecordTimeParagraph.vue';
 import MinBPParagraph from '@/components/MinBPParagraph.vue';
 import { useConfigStore } from '@/stores/config';
+import { ScoreOption } from '@/constants/scoreOption';
 
 type PlayLog = dto.RivalScoreLogDto | dto.RivalScoreDataLogDto;
 type SongInfo = {
@@ -132,7 +133,20 @@ function createColumns(useScorelog: boolean): DataTableColumns<PlayLog> {
               switch (key) {
                 case 'AddToFolder': handleAddToFolder(row.Sha256, row.Title); break;
                 case 'AddToTable': handleAddToTable(row.Sha256, row.Title); break;
-                case "GotoPreview": chartPreviewRef.value.open(row.Md5); break;
+                case "GotoPreview": {
+                  let option = null;
+                  if (!useScorelog) {
+                    const dataLog = row as dto.RivalScoreDataLogDto
+                    if (dataLog.Option == ScoreOption.MIRROR) {
+                      option = 1;
+                    } else if (dataLog.Option == ScoreOption.RANDOM) {
+                      option = dataLog.RandomPattern;
+                      console.log("md5: %s, option: %s", row.Md5, option);
+                    }
+                  }
+                  chartPreviewRef.value.open(row.Md5, option);
+                  break;
+                }
               }
             }
           },

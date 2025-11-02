@@ -1,8 +1,11 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/Catizard/lampghost_wails/internal/dto"
 	"github.com/Catizard/lampghost_wails/internal/entity"
+	"github.com/Catizard/lampghost_wails/internal/random"
 	"github.com/Catizard/lampghost_wails/internal/vo"
 	"gorm.io/gorm"
 
@@ -50,6 +53,19 @@ func (s *RivalScoreDataLogService) QueryRivalScoreDataLogPageList(filter *vo.Riv
 					log.TableTags = append(log.TableTags, tag)
 				}
 			})
+		})
+		// TODO: Seemingly impossible to retrieve the key mode from play log?
+		ForEach(out, func(rlog *dto.RivalScoreDataLogDto, _ int) {
+			keys := make([]int, 7)
+			for i := range keys {
+				keys[i] = i
+			}
+			rawRandomPatternArr := random.MakeRandom(rlog.Seed, keys)
+			randomPattern := ""
+			for _, p := range rawRandomPatternArr {
+				randomPattern += fmt.Sprintf("%d", p+1)
+			}
+			rlog.RandomPattern = randomPattern
 		})
 		return nil
 	})

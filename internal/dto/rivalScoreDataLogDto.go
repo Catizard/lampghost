@@ -41,6 +41,7 @@ type RivalScoreDataLogDto struct {
 	Artist          string
 	Md5             string
 	TableTags       []*DiffTableTagDto `gorm:"-"`
+	RandomPattern   string
 	RecordTimestamp int64
 	// Pagination
 	Page      int

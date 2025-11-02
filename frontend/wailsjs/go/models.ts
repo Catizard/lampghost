@@ -9,6 +9,7 @@ export namespace config {
 	    MaximumDownloadCount: number;
 	    EnableAutoReload: number;
 	    PreviewSite: string;
+	    PreviewSide: string;
 	    UseScoredatalog: number;
 	    UseScoredataForMainUser: number;
 	    AssistAsFailed: number;
@@ -28,6 +29,7 @@ export namespace config {
 	        this.MaximumDownloadCount = source["MaximumDownloadCount"];
 	        this.EnableAutoReload = source["EnableAutoReload"];
 	        this.PreviewSite = source["PreviewSite"];
+	        this.PreviewSide = source["PreviewSide"];
 	        this.UseScoredatalog = source["UseScoredatalog"];
 	        this.UseScoredataForMainUser = source["UseScoredataForMainUser"];
 	        this.AssistAsFailed = source["AssistAsFailed"];

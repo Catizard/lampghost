@@ -128,6 +128,7 @@
     "labelUseScoredataForMainUser": "使用score.db作为主用户的点灯情况的数据源",
     "labelConstraints": "限制",
     "labelAssistAsFailed": "将assist灯视作坏灯",
+    "labelPreviewSide": "预览游玩侧",
     "placeholderName": "请输入名称",
     "placeholderUserName": "请输入用户名称",
     "placeholderRivalName": "请输入玩家名称",
@@ -275,7 +276,8 @@
     "overview": "总览",
     "dangerZone": "危险区",
     "fullyReloadMainUser": "全量同步主用户数据",
-    "chooseBeatorajaDirectory": "选择Beatoraja路径"
+    "chooseBeatorajaDirectory": "选择Beatoraja路径",
+    "previewSetting": "预览设置"
   },
   "hint": {
     "initUser": "配置你的存档文件路径",

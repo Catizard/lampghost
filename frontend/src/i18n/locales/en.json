@@ -128,6 +128,7 @@
     "labelUseScoredataForMainUser": "Use score.db as main user's lamp status datasource",
     "labelConstraints": "Constraints",
     "labelAssistAsFailed": "Consider assist clear as failed",
+    "labelPreviewSide": "Preview Player Side",
     "placeholderName": "Please input name",
     "placeholderUserName": "Please input your name",
     "placeholderRivalName": "Please input rival name",
@@ -275,7 +276,8 @@
     "overview": "Overview",
     "dangerZone": "Danger Zone",
     "fullyReloadMainUser": "Fully Reload Main User's Data",
-    "chooseBeatorajaDirectory": "Choose Beatoraja Directory"
+    "chooseBeatorajaDirectory": "Choose Beatoraja Directory",
+    "previewSetting": "Preview Settings"
   },
   "hint": {
     "initUser": "Configure your own save files location",

@@ -42,11 +42,7 @@
               <n-select v-model:value="model.EnableAutoReload" :options="yesnoOptions" style="width: 150px;" />
             </n-form-item>
           </n-p>
-          <n-p>
-            <n-form-item :label="t('form.labelPreviewSite')" path="previewSite">
-              <n-select v-model:value="model.PreviewSite" :options="previewSiteOptions" style="width: 150px;" />
-            </n-form-item>
-          </n-p>
+
           <n-p>
             <n-form-item>
               <template #label>
@@ -87,6 +83,21 @@
                 <span style="white-space: pre-line;">{{ t('form.labelAssistAsFailed') }}</span>
               </template>
               <n-select v-model:value="model.AssistAsFailed" :options="yesnoOptions" style="width: 150px;" />
+            </n-form-item>
+          </n-p>
+        </n-h2>
+        <n-h2>
+          <n-text>
+            {{ t('title.previewSetting') }}
+          </n-text>
+          <n-p>
+            <n-form-item :label="t('form.labelPreviewSite')" path="previewSite">
+              <n-select v-model:value="model.PreviewSite" :options="previewSiteOptions" style="width: 150px;" />
+            </n-form-item>
+          </n-p>
+          <n-p>
+            <n-form-item :label="t('form.labelPreviewSide')" path="previewSide">
+              <n-select v-model:value="model.PreviewSide" :options="previewSideOptions" style="width: 150px;" />
             </n-form-item>
           </n-p>
         </n-h2>
@@ -206,6 +217,7 @@ const model = ref<config.ApplicationConfig>({
   MaximumDownloadCount: null,
   EnableAutoReload: null,
   EnableDownloadFeature: null, // Unused
+  PreviewSide: null,
   PreviewSite: null,
   UseScoredatalog: null,
   UseScoredataForMainUser: null,
@@ -244,6 +256,17 @@ const previewSiteOptions: Array<SelectOption> = [
     value: "konmai"
   }
 ];
+
+const previewSideOptions: Array<SelectOption> = [
+  {
+    label: "P1",
+    value: "P1",
+  },
+  {
+    label: "P2",
+    value: "P2"
+  }
+]
 
 function handleSaveSettings() {
   loading.value = true;

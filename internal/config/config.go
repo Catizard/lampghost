@@ -47,6 +47,7 @@ func init() {
 	viper.SetDefault("Locale", "en")
 	viper.SetDefault("DownloadSite", download.DefaultDownloadSource.GetMeta().Name)
 	viper.SetDefault("PreviewSite", DefaultPreviewSource.GetName())
+	viper.SetDefault("PreviewSide", "P1")
 	viper.SetDefault("MaximumDownloadCount", 5)
 	viper.SetDefault("EnableAutoReload", 1)
 	viper.SetDefault("UseScoredatalog", 0)
@@ -76,6 +77,8 @@ type ApplicationConfig struct {
 	EnableAutoReload int
 	// Preview source: sayaka | konmai
 	PreviewSite string
+	// Preview side preference: P1 | P2
+	PreviewSide string
 	// When flagged, changing recent page's datasource from 'scorelog.db' to 'scoredatalog'
 	UseScoredatalog int
 	// When flagged, using 'score.db' to build main user's lamp status instead of 'scorelog.db'
@@ -101,6 +104,7 @@ func ReadConfig() (*ApplicationConfig, error) {
 		MaximumDownloadCount:    viper.GetInt("MaximumDownloadCount"),
 		EnableAutoReload:        viper.GetInt("EnableAutoReload"),
 		PreviewSite:             viper.GetString("PreviewSite"),
+		PreviewSide:             viper.GetString("PreviewSide"),
 		UseScoredatalog:         viper.GetInt("UseScoredatalog"),
 		UseScoredataForMainUser: viper.GetInt("UseScoredataForMainUser"),
 		AssistAsFailed:          viper.GetInt("AssistAsFailed"),
@@ -121,6 +125,7 @@ func (c *ApplicationConfig) WriteConfig() error {
 	viper.Set("MaximumDownloadCount", c.MaximumDownloadCount)
 	viper.Set("EnableAutoReload", c.EnableAutoReload)
 	viper.Set("PreviewSite", c.PreviewSite)
+	viper.Set("PreviewSide", c.PreviewSide)
 	viper.Set("UseScoredatalog", c.UseScoredatalog)
 	viper.Set("UseScoredataForMainUser", c.UseScoredataForMainUser)
 	viper.Set("AssistAsFailed", c.AssistAsFailed)

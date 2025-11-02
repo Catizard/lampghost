@@ -144,7 +144,7 @@ function createColumns(useScorelog: boolean): DataTableColumns<PlayLog> {
                       console.log("md5: %s, option: %s", row.Md5, option);
                     }
                   }
-                  chartPreviewRef.value.open(row.Md5, option);
+                  chartPreviewRef.value.open(row.Md5, option, configStore.config.PreviewSide as ("P1" | "P2"));
                   break;
                 }
               }

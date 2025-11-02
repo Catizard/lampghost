@@ -1,7 +1,5 @@
 package random
 
-import "github.com/charmbracelet/log"
-
 const (
 	multiplier uint64 = 0x5DEECE66D
 	mask       uint64 = (1 << 48) - 1
@@ -54,7 +52,6 @@ func MakeRandom(seed int64, keys []int) []int {
 	}
 	for lane := range keys {
 		r := random.NextInt(int32(len(l)))
-		log.Debugf("%d -> %d", lane, r)
 		result[keys[lane]] = l[r]
 		l = append(l[:r], l[r+1:]...)
 	}

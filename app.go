@@ -115,6 +115,7 @@ func NewApp() *App {
 		rivalScoreLogService,
 		rivalTagService,
 		rivalSongDataService,
+		rivalScoreDataLogService,
 	)
 
 	return &App{

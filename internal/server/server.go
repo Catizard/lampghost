@@ -23,13 +23,14 @@ import (
 const port = 7391
 
 type InternalServer struct {
-	customDiffTableService *service.CustomDiffTableService
-	customCourseService    *service.CustomCourseService
-	folderService          *service.FolderService
-	rivalInfoService       *service.RivalInfoService
-	rivalScoreLogService   *service.RivalScoreLogService
-	rivalTagService        *service.RivalTagService
-	rivalSongDataService   *service.RivalSongDataService
+	customDiffTableService   *service.CustomDiffTableService
+	customCourseService      *service.CustomCourseService
+	folderService            *service.FolderService
+	rivalInfoService         *service.RivalInfoService
+	rivalScoreLogService     *service.RivalScoreLogService
+	rivalTagService          *service.RivalTagService
+	rivalSongDataService     *service.RivalSongDataService
+	rivalScoreDataLogService *service.RivalScoreDataLogService
 }
 
 func NewInternalServer(
@@ -40,15 +41,17 @@ func NewInternalServer(
 	rivalScoreLogService *service.RivalScoreLogService,
 	rivalTagService *service.RivalTagService,
 	rivalSongDataService *service.RivalSongDataService,
+	rivalScoreDataLogService *service.RivalScoreDataLogService,
 ) *InternalServer {
 	return &InternalServer{
-		customDiffTableService: customDiffTableService,
-		customCourseService:    customCourseService,
-		folderService:          folderService,
-		rivalInfoService:       rivalInfoService,
-		rivalScoreLogService:   rivalScoreLogService,
-		rivalTagService:        rivalTagService,
-		rivalSongDataService:   rivalSongDataService,
+		customDiffTableService:   customDiffTableService,
+		customCourseService:      customCourseService,
+		folderService:            folderService,
+		rivalInfoService:         rivalInfoService,
+		rivalScoreLogService:     rivalScoreLogService,
+		rivalTagService:          rivalTagService,
+		rivalSongDataService:     rivalSongDataService,
+		rivalScoreDataLogService: rivalScoreDataLogService,
 	}
 }
 
@@ -64,6 +67,7 @@ func (s *InternalServer) RunServer() error {
 	http.HandleFunc("/table/", s.tableHandler)
 	http.HandleFunc("/content/", s.tableContentHandler)
 	http.HandleFunc("/ir/", s.irHandler)
+	http.HandleFunc("/info/", s.infoHandler)
 	go http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 	return nil
 }
@@ -301,4 +305,44 @@ func (s *InternalServer) scoresHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Fprintf(w, "%s", data)
+}
+
+func (s *InternalServer) infoHandler(w http.ResponseWriter, r *http.Request) {
+	path := r.URL.Path
+	suffix := strings.TrimPrefix(path, "/info/")
+	switch suffix {
+	case "lastPlay":
+		scoreLog, n, err := s.rivalScoreDataLogService.QueryRivalScoreDataLogPageList(&vo.RivalScoreDataLogVo{
+			RivalId: 1,
+			Pagination: &entity.Page{
+				Page:     1,
+				PageSize: 1,
+			},
+		})
+		if err != nil {
+			http.Error(w, fmt.Sprintf("internal error: %s", err), 500)
+			return
+		}
+		if n != len(scoreLog) {
+			http.Error(w, "what", 500)
+			return
+		}
+		if n == 0 {
+			fmt.Fprint(w, "No Data")
+			return
+		}
+		if n != 1 {
+			http.Error(w, "internal error: data count is not 1", 500)
+			return
+		}
+		payload, err := json.Marshal(scoreLog[0])
+		if err != nil {
+			http.Error(w, fmt.Sprintf("internal error: %s", err), 500)
+			return
+		}
+		fmt.Fprint(w, string(payload))
+	default:
+		http.Error(w, "No such interface", 404)
+		return
+	}
 }

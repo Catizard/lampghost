@@ -111,6 +111,8 @@ func findRivalScoreDataLogList(tx *gorm.DB, filter *vo.RivalScoreDataLogVo) (out
 		return
 	}
 
+	n = len(out)
+
 	// pagination
 	if filter != nil && filter.Pagination != nil {
 		var count int64

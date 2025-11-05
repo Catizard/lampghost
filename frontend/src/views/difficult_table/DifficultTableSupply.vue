@@ -1,5 +1,5 @@
 <template>
-  <n-modal :loading="loading" v-model:show="show" preset="dialog" :title="t('title.supplyMissingBMSFromTable')"
+  <n-modal :loading="loading" v-model:show="show" preset="dialog" :title="`${t('title.supplyMissingBMSFromTable')} - ${tableName.value}`"
     :positive-text="t('button.submit')" :negative-text="t('button.cancel')" @positive-click="handlePositiveClick"
     @negative-click="handleNegativeClick" :mask-closable="false">
     <n-data-table :columns="columns" :data="data" :bordered="false"
@@ -20,15 +20,17 @@ const show = ref(false);
 const loading = ref(false);
 const tableId = ref(null);
 const tableSymbol = ref("");
+const tableName = ref("");
 const selectedLevels: Ref<string[]> = ref([]);
 defineExpose({ open });
 
 // I'm lazy to query symbol in this function
-function open(difficultTableId: number, symbol: string) {
+function open(difficultTableId: number, symbol: string, name: string) {
   show.value = true;
   loading.value = true;
   tableId.value = difficultTableId;
   tableSymbol.value = symbol;
+  tableName.value = name;
   FindDownloadableLevelList(difficultTableId).then(result => {
     if (result.Code != 200) {
       return Promise.reject(result.Msg);

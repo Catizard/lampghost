@@ -1,7 +1,7 @@
 <template>
-  <n-modal :loading="loading" v-model:show="show" preset="dialog" :title="`${t('title.supplyMissingBMSFromTable')} - ${tableName.value}`"
-    :positive-text="t('button.submit')" :negative-text="t('button.cancel')" @positive-click="handlePositiveClick"
-    @negative-click="handleNegativeClick" :mask-closable="false">
+  <n-modal :loading="loading" v-model:show="show" preset="dialog" :title="title" :positive-text="t('button.submit')"
+    :negative-text="t('button.cancel')" @positive-click="handlePositiveClick" @negative-click="handleNegativeClick"
+    :mask-closable="false">
     <n-data-table :columns="columns" :data="data" :bordered="false"
       :row-key="(row: dto.DiffTableHeaderDto) => row.Level" v-model:checked-row-keys="selectedLevels"
       max-height="75vh" />
@@ -12,7 +12,7 @@
 import { FindDownloadableLevelList, SupplyMissingBMSFromTable } from '@wailsjs/go/main/App';
 import { dto } from '@wailsjs/go/models';
 import { DataTableColumns } from 'naive-ui';
-import { Ref, ref } from 'vue';
+import { computed, Ref, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -42,6 +42,10 @@ function open(difficultTableId: number, symbol: string, name: string) {
   }).catch(err => window.$notifyError(err))
     .finally(() => loading.value = false)
 }
+
+const title = computed(() => {
+  return `${t('title.supplyMissingBMSFromTable')} - ${tableName.value}`;
+});
 
 async function handlePositiveClick() {
   if (selectedLevels.value.length == 0) {

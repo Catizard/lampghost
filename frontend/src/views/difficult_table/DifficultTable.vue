@@ -173,7 +173,7 @@ function handleSelectOtherAction(row: dto.DiffTableHeaderDto, key: string) {
     reloadTableHeader(row.ID);
   }
   if ("Supply" === key) {
-    supplyFormRef.value.open(row.ID, row.Symbol);
+    supplyFormRef.value.open(row.ID, row.Symbol, row.Name);
   }
   if ("Delete" === key) {
     dialog.warning({

@@ -29,7 +29,7 @@
   <DifficultTableSupply ref="supplyFormRef" />
 
   <!-- 预置难度表添加：复用初始化页面 -->
-  <n-modal v-model:show="showAddPredefineModal" :mask-closable="false" :title="t('title.initTable')">
+  <n-modal v-model:show="showAddPredefineModal" preset="dialog" :mask-closable="false" :title="t('title.initTable')" style="width: 85vw;">
     <InitTableForm :moveOn="closePredefineModal" />
   </n-modal>
 </template>

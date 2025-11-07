@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import { AddBatchDiffTableHeader, QueryPredefineTableSchemes } from '@wailsjs/go/main/App';
+import { AddBatchDiffTableHeader, QueryPredefineTableSchemes, FindDiffTableHeaderTree } from '@wailsjs/go/main/App';
 import { entity, vo } from '@wailsjs/go/models';
 import { DataTableColumn, DataTableRowKey, NDataTable, NTag, useModal } from 'naive-ui';
 import { TagColor } from 'naive-ui/es/tag/src/common-props';
@@ -164,7 +164,27 @@ function handleSubmit() {
 }
 
 function handleSkip() {
-  createSkipModal();
+  loading.value = true;
+  FindDiffTableHeaderTree(null)
+    .then(result => {
+      if (result.Code != 200) {
+        return Promise.reject(result.Msg);
+      }
+      const hasExistingTables = Array.isArray(result.Rows) && result.Rows.length > 0;
+      if (hasExistingTables) {
+        // 有已有难度表，直接跳过，不提示
+        props.moveOn();
+      } else {
+        // 无任何难度表，提示用户确认跳过
+        createSkipModal();
+      }
+    })
+    .catch(err => {
+      // 查询失败时，为安全起见仍提示确认
+      window.$notifyError(err);
+      createSkipModal();
+    })
+    .finally(() => loading.value = false);
 }
 
 function createSkipModal() {

@@ -3,14 +3,17 @@
     <n-h1 prefix="bar" style="text-align: start">
       <n-text type="primary">{{ t('title.tableManagement') }}</n-text>
     </n-h1>
-    <n-flex justify="end">
-      <n-button :loading="loading" type="info" @click="sortTableSettings.show = true">
-        {{ t('button.sort') }}
-      </n-button>
-      <n-button :loading="loading" type="primary" @click="showAddModal = true">
-        {{ t('button.addDifficultTable') }}
-      </n-button>
-    </n-flex>
+  <n-flex justify="end">
+    <n-button :loading="loading" type="info" @click="sortTableSettings.show = true">
+      {{ t('button.sort') }}
+    </n-button>
+    <n-button :loading="loading" type="primary" @click="showAddModal = true">
+      {{ t('button.addDifficultTable') }}
+    </n-button>
+    <n-button :loading="loading" type="primary" @click="showAddPredefineModal = true">
+      {{ t('button.addPredefineTable') }}
+    </n-button>
+  </n-flex>
   </n-flex>
   <n-data-table :loading="loading" :columns="columns" :data="data" :pagination="pagination" :bordered="false"
     :row-key="(row: dto.DiffTableHeaderDto) => row.ID" />
@@ -24,6 +27,11 @@
     @select="sortLevelSettings.handleUpdateSort" :title="sortLevelSettings.title"
     :labelField="sortLevelSettings.labelField" :keyField="sortLevelSettings.keyField" />
   <DifficultTableSupply ref="supplyFormRef" />
+
+  <!-- 预置难度表添加：复用初始化页面 -->
+  <n-modal v-model:show="showAddPredefineModal" preset="dialog" :mask-closable="false" :title="t('title.initTable')" style="width: 85vw;">
+    <InitTableForm :moveOn="closePredefineModal" />
+  </n-modal>
 </template>
 
 <script lang="ts" setup>
@@ -45,10 +53,12 @@ import DifficultTableEditForm from "./DifficultTableEditForm.vue";
 import { TagColor } from "naive-ui/es/tag/src/common-props";
 import SortTableModal from "@/components/SortTableModal.vue";
 import DifficultTableSupply from "./DifficultTableSupply.vue";
+import InitTableForm from "../initialize/initTableForm.vue";
 
 const i18n = useI18n();
 const { t } = i18n;
 const showAddModal = ref(false);
+const showAddPredefineModal = ref(false);
 const editFormRef = ref<InstanceType<typeof DifficultTableEditForm>>(null);
 const supplyFormRef = ref<InstanceType<typeof DifficultTableSupply>>(null);
 
@@ -233,6 +243,11 @@ function loadDiffTableData() {
     })
     .catch((err) => window.$notifyError(t('message.loadTableDataError', { msg: err })))
     .finally(() => loading.value = false);
+}
+
+function closePredefineModal() {
+  showAddPredefineModal.value = false;
+  loadDiffTableData();
 }
 
 </script>

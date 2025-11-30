@@ -1,0 +1,197 @@
+{
+  "schemeNames": ["Raw", "Zris", "616sb"],
+  "headers": [
+    {
+      "name": "Stardust",
+      "symbol": "ξ",
+      "category": "Starter",
+      "tagColor": "#E5F4D3",
+      "tagTextColor": "#2B410D",
+      "headerUrls": {
+        "Raw": "https://mqppppp.neocities.org/StardustTable.html"
+      }
+    },
+    {
+      "name": "Starlight",
+      "symbol": "sr",
+      "category": "Starter",
+      "tagColor": "#E8EDFF",
+      "tagTextColor": "#121D52",
+      "headerUrls": {
+        "Raw": "https://djkuroakari.github.io/starlighttable.html"
+      }
+    },
+    {
+      "name": "通常難易度表",
+      "symbol": "☆",
+      "category": "Starter",
+      "tagColor": "#EDF7FD",
+      "tagTextColor": "#0F5F8A",
+      "headerUrls": {
+        "Raw": "http://www.ribbit.xyz/bms/tables/normal.html",
+        "Zris": "http://zris.work/bmstable/normal/normal_header.json",
+        "616sb": "https://bms.alvorna.com/tables/ff4cb9d4c6f14f68a895798143a2a7b9/header.json"
+      }
+    },
+    {
+      "name": "NEW GENERATION 通常難易度表",
+      "symbol": "▽",
+      "category": "Starter",
+      "tagColor": "#FFFAEB",
+      "tagTextColor": "#946D18",
+      "headerUrls": {
+        "Raw": "http://rattoto10.jounin.jp/table.html",
+        "Zris": "http://zris.work/bmstable/normal2/header.json",
+        "616sb": "https://bms.alvorna.com/tables/1c7c8c5d80338a5835f8221ca8d1bc47/header.json"
+      }
+    },
+    {
+      "name": "Satellite",
+      "symbol": "sl",
+      "category": "Insane",
+      "tagColor": "#B6EAD2",
+      "tagTextColor": "#0A4D2F",
+      "headerUrls": {
+        "Raw": "https://stellabms.xyz/sl/table.html",
+        "Zris": "http://zris.work/bmstable/satellite/header.json",
+        "616sb": "https://bms.alvorna.com/tables/adceda62af0cac6fdba049c0ced12479/header.json"
+      }
+    },
+    {
+      "name": "発狂BMS難易度表",
+      "symbol": "★",
+      "category": "Insane",
+      "tagColor": "#A3D8F5",
+      "tagTextColor": "#0F5F8A",
+      "headerUrls": {
+        "Raw": "http://www.ribbit.xyz/bms/tables/insane.html",
+        "Zris": "http://zris.work/bmstable/insane/insane_header.json",
+        "616sb": "https://bms.alvorna.com/tables/ea159b8f57a768682957735baf332e04/header.json"
+      }
+    },
+    {
+      "name": "NEW GENERATION 発狂難易度表",
+      "symbol": "▼",
+      "category": "Insane",
+      "tagColor": "#FFECB9",
+      "tagTextColor": "#946D18",
+      "headerUrls": {
+        "Raw": "http://rattoto10.jounin.jp/table_insane.html",
+        "Zris": "http://zris.work/bmstable/insane2/insane_header.json",
+        "616sb": "https://bms.alvorna.com/tables/5f5d17d84528e331316304128063a515/header.json"
+      }
+    },
+    {
+      "name": "第三期Overjoy",
+      "symbol": "★★",
+      "category": "Overjoy",
+      "tagColor": "#DDBDF2",
+      "tagTextColor": "#5C2989",
+      "headerUrls": {
+        "Raw": "http://rattoto10.jounin.jp/table_overjoy.html",
+        "Zris": "http://zris.work/bmstable/overjoy/header.json",
+        "616sb": "https://bms.alvorna.com/tables/6096431ac74339abf61389cd60a5586e/header.json"
+      }
+    },
+    {
+      "name": "Stella",
+      "symbol": "st",
+      "category": "Overjoy",
+      "tagColor": "#FFB5A8",
+      "tagTextColor": "#331510",
+      "headerUrls": {
+        "Raw": "https://stellabms.xyz/st/table.html",
+        "Zris": "http://zris.work/bmstable/stella/header.json",
+        "616sb": "https://bms.alvorna.com/tables/be86d1e944f4003491b970f4797d6c9a/header.json"
+      }
+    },
+    {
+      "name": "δ難易度表",
+      "symbol": "δ",
+      "category": "DP",
+      "tagColor": "#EDF7FD",
+      "tagTextColor": "#0F5F8A",
+      "headerUrls": {
+        "Raw": "https://deltabms.yaruki0.net/table/dpdelta",
+        "Zris": "http://zris.work/bmstable/dp_normal/dpn_header.json"
+      }
+    },
+    {
+      "name": "発狂DP難易度表",
+      "symbol": "★",
+      "category": "DP",
+      "tagColor": "#A3D8F5",
+      "tagTextColor": "#0F5F8A",
+      "headerUrls": {
+        "Raw": "https://deltabms.yaruki0.net/table/dpinsane",
+        "Zris": "http://zris.work/bmstable/dp_insane/dpi_header.json"
+      }
+    },
+    {
+      "name": "DP Overjoy",
+      "symbol": "★★",
+      "category": "DP",
+      "tagColor": "#DDBDF2",
+      "tagTextColor": "#5C2989",
+      "headerUrls": {
+        "Raw": "http://ereter.net/dpoverjoy",
+        "Zris": "http://zris.work/bmstable/dp_overjoy/header.json"
+      }
+    },
+    {
+      "name": "DP Satellite",
+      "symbol": "DPsl",
+      "category": "DP",
+      "tagColor": "#B6EAD2",
+      "tagTextColor": "#0A4D2F",
+      "headerUrls": {
+        "Raw": "https://stellabms.xyz/dp/table.html",
+        "Zris": "http://zris.work/bmstable/dp_satellite/header.json"
+      }
+    },
+    {
+      "name": "DP Stella",
+      "symbol": "DPst",
+      "category": "DP",
+      "tagColor": "#FFB5A8",
+      "tagTextColor": "#331510",
+      "headerUrls": {
+        "Raw": "https://stellabms.xyz/dpst/table.html",
+        "Zris": "http://zris.work/bmstable/dp_stella/header.json"
+      }
+    },
+    {
+      "name": "PMSデータベース(Lv1~45)",
+      "symbol": "PLv",
+      "category": "PMS",
+      "tagColor": "#EDF7FD",
+      "tagTextColor": "#0F5F8A",
+      "headerUrls": {
+        "Raw": "http://pmsdifficulty.xxxxxxxx.jp/PMSdifficulty.html",
+        "Zris": "http://zris.work/bmstable/pms_normal/pmsdatabase_header.json"
+      }
+    },
+    {
+      "name": "発狂PMSデータベース(lv46～)",
+      "symbol": "P●",
+      "category": "PMS",
+      "tagColor": "#A3D8F5",
+      "tagTextColor": "#0F5F8A",
+      "headerUrls": {
+        "Raw": "https://pmsdifficulty.xxxxxxxx.jp/insane_PMSdifficulty.html",
+        "Zris": "http://zris.work/bmstable/pms_insane/insane_pmsdatabase_header.json"
+      }
+    },
+    {
+      "name": "発狂PMS難易度表",
+      "symbol": "●",
+      "category": "PMS",
+      "tagColor": "#FFECB9",
+      "tagTextColor": "#946D18",
+      "headerUrls": {
+        "Raw": "https://pmsdifficulty.xxxxxxxx.jp/_pastoral_home.html",
+        "Zris": "http://zris.work/bmstable/pms_upper/header.json"
+      }
+    }
+  ]
+}

@@ -243,6 +243,10 @@ const downloadSiteOptions: Array<SelectOption> = [
   {
     label: "konmai",
     value: "konmai"
+  },
+  {
+    label: "ginger",
+    value: "ginger"
   }
 ];
 

@@ -1,10 +1,11 @@
 package download
 
 var (
-	DefaultDownloadSource DownloadSource            = &WriggleDownloadSource
+	DefaultDownloadSource DownloadSource            = &GingerDownloadSource
 	downloadSources       map[string]DownloadSource = map[string]DownloadSource{
 		"wriggle": &WriggleDownloadSource,
 		"konmai":  &KonmaiDownloadSource,
+		"ginger":  &GingerDownloadSource,
 	}
 )
 
